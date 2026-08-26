@@ -85,18 +85,6 @@ func _build_ui() -> void:
 		b.pressed.connect(pair[1])
 		hud.add_child(b)
 	if _game != null:
-		var robot := get_node("/root/Robot")
-		var tele := Button.new()
-		var sync_tele := func() -> void:
-			tele.text = "手势:开" if robot.teleop_running() else "手势:关"
-		tele.pressed.connect(func() -> void:
-			if robot.teleop_running():
-				robot.teleop_stop()
-			elif robot.connected:
-				robot.teleop_start())
-		robot.teleop_state_changed.connect(func(_on: bool) -> void: sync_tele.call())
-		sync_tele.call()
-		hud.add_child(tele)
 		_next_btn = Button.new()
 		_next_btn.text = "下一关 ▶"
 		_next_btn.visible = false

@@ -34,11 +34,6 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 ```
 (先停桥接;详见 docs/ROBOT_API.md。)
 
-## 手势遥操映射
-
-手势 → 小机演出的映射表在 `hardware/teleop/teleop.py` 顶部 `GESTURE_CMDS`(dict,直接改);
-游戏侧捏合=左键、握拳=右键的注入逻辑在 `game/gesture_input.gd`。
-
 ## 验证改动
 
 ```bash

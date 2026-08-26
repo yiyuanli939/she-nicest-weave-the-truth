@@ -11,10 +11,6 @@ const THROTTLE_MS: Dictionary = {"confused": 8000, "hint": 15000}   # cue -> 最
 
 ## 机器人上行事件(pong / button / cal_done / cal_timeout / err),已解析为 Dictionary
 signal robot_event(data: Dictionary)
-## 手势遥操手部数据({seen,x,y,pinch,fist,gesture}),20Hz
-signal teleop_hand(data: Dictionary)
-## 遥操进程开/关状态变化
-signal teleop_state_changed(on: bool)
 
 var _ws := WebSocketPeer.new()
 var _state := WebSocketPeer.STATE_CLOSED
@@ -26,21 +22,9 @@ var connected: bool = false
 var _pan := 90
 var _tilt := 90
 
-## 手势虚拟光标层(全场景生效)
-var gesture: GestureInput
-var _teleop_pid := -1
-
 
 func _ready() -> void:
-	gesture = GestureInput.new()
-	add_child(gesture)
-	teleop_hand.connect(gesture.on_hand)
 	_connect()
-
-
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_EXIT_TREE:
-		teleop_stop()
 
 
 func _connect() -> void:
@@ -60,10 +44,7 @@ func _process(delta: float) -> void:
 			var msg := _ws.get_packet().get_string_from_utf8()
 			var parsed: Variant = JSON.parse_string(msg)
 			if parsed is Dictionary:
-				if parsed.has("teleop"):
-					teleop_hand.emit(parsed.teleop)
-				else:
-					robot_event.emit(parsed)
+				robot_event.emit(parsed)
 	elif s == WebSocketPeer.STATE_CLOSED:
 		if connected:
 			print("[Robot] 桥接断开,静默重试")
@@ -141,32 +122,3 @@ func nudge(d_pan: int, d_tilt: int) -> void:
 
 func save_look_here() -> void:
 	send({cmd = "cal_set"})
-
-
-# ---- 手势遥操进程(可开关;见 docs/ROBOT_API.md) ----
-
-func teleop_running() -> bool:
-	return _teleop_pid > 0 and OS.is_process_running(_teleop_pid)
-
-
-func teleop_start(extra_args: PackedStringArray = []) -> bool:
-	if teleop_running():
-		return true
-	# mediapipe 在 mac 上要 py3.12 专用 venv(.venv-teleop);没有则退回通用 .venv
-	var py := ProjectSettings.globalize_path("res://hardware/.venv-teleop/bin/python")
-	if not FileAccess.file_exists(py):
-		py = ProjectSettings.globalize_path("res://hardware/.venv/bin/python")
-	var script := ProjectSettings.globalize_path("res://hardware/teleop/teleop.py")
-	var args := PackedStringArray([script])
-	args.append_array(extra_args)
-	_teleop_pid = OS.create_process(py, args)
-	var ok := teleop_running()
-	teleop_state_changed.emit(ok)
-	return ok
-
-
-func teleop_stop() -> void:
-	if _teleop_pid > 0 and OS.is_process_running(_teleop_pid):
-		OS.kill(_teleop_pid)
-	_teleop_pid = -1
-	teleop_state_changed.emit(false)
