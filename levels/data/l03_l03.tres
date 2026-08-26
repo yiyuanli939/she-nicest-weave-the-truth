@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="LevelDef" format=3]
+
+[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_kjkf3"]
+[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_f8yfv"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="3_jjorm"]
+
+[sub_resource type="Resource" id="Resource_odvgm"]
+script = ExtResource("1_kjkf3")
+speaker = "阿梭"
+text = "[占位] 拆开,再反着织回去。"
+
+[sub_resource type="Resource" id="Resource_8crae"]
+script = ExtResource("2_f8yfv")
+lines = Array[ExtResource("1_kjkf3")]([SubResource("Resource_odvgm")])
+
+[resource]
+script = ExtResource("3_jjorm")
+id = &"l03"
+title = "左右互换"
+assumptions = Array[String](["A & B"])
+goal = "B & A"
+allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
+atoms = Array[StringName]([&"A", &"B"])
+intro_dialogue = SubResource("Resource_8crae")
+robot_cue_on_win = "celebrate"

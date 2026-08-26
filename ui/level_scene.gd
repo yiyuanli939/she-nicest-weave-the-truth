@@ -1,18 +1,24 @@
 class_name LevelScene
 extends Control
-## 关卡场景:ProofSession + ProofBoard + 仪器架 + HUD 组装。
-## M1:硬编码一关(A & B ⊢ B & A);M3 起由 Game.current_level 注入 LevelDef。
+## 关卡场景:ProofSession + ProofBoard + 仪器架 + HUD + 入场对话。
+## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
+## 否则用下面的默认字段(冒烟测试直接注入)。
 
 var session := ProofSession.new()
 
+var _game: Node = null
 var _board: ProofBoard
 var _palette: PalettePanel
 var _status: Label
 var _win_flash: ColorRect
 var _editor: PatternEditor
+var _dialogue: DialogueBox
+var _next_btn: Button
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
+var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 
-# 默认关卡(M3 起由 Game 注入 LevelDef 覆盖)
+# 默认配置(无 Game 时生效;冒烟测试注入)
+var level_title := ""
 var assumptions: Array[String] = ["A & B"]
 var goal_text := "B & A"
 var allowed_rules: Array[StringName] = [&"and_intro", &"and_elim"]
@@ -22,13 +28,32 @@ var allow_bot := false
 
 
 func _ready() -> void:
+	_game = get_node_or_null("/root/Game")
+	var lv: LevelDef = _game.current if _game != null else null
+	if lv != null:
+		level_title = lv.title
+		assumptions = lv.assumptions
+		goal_text = lv.goal
+		allowed_rules = lv.allowed_rules
+		atoms = lv.atoms
+		atom_colors = lv.effective_colors()
+		allow_bot = lv.allow_bot
 	add_child(session)
 	_build_ui()
 	session.proof_completed.connect(_on_win)
 	var err := session.setup(assumptions, goal_text)
 	assert(err == "", err)
 	_layout_endpoints()
+	_fresh_state = session.save_state()
 	_palette.set_rules(allowed_rules)
+	if lv != null:
+		var saved: Dictionary = _game.save.board_state(lv.id)
+		if not saved.is_empty():
+			session.load_state(saved)
+			_board.apply_positions()
+		_dialogue.play(lv.intro_dialogue)
+		if lv.robot_cue_on_enter != "":
+			_game.robot_cue(lv.robot_cue_on_enter)
 
 
 func _build_ui() -> void:
@@ -38,19 +63,29 @@ func _build_ui() -> void:
 
 	var hud := HBoxContainer.new()
 	var goal_lbl := Label.new()
-	goal_lbl.text = "  目标纹样:%s" % goal_text
+	var prefix := ("  %s · " % level_title) if level_title != "" else "  "
+	goal_lbl.text = "%s目标纹样:%s" % [prefix, goal_text]
 	hud.add_child(goal_lbl)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hud.add_child(spacer)
 	_status = Label.new()
-	_status.text = ""
 	hud.add_child(_status)
 	for pair in [["撤销", _on_undo], ["重做", _on_redo], ["重置", _on_reset]]:
 		var b := Button.new()
 		b.text = pair[0]
 		b.pressed.connect(pair[1])
 		hud.add_child(b)
+	if _game != null:
+		_next_btn = Button.new()
+		_next_btn.text = "下一关 ▶"
+		_next_btn.visible = false
+		_next_btn.pressed.connect(_on_next)
+		hud.add_child(_next_btn)
+		var back := Button.new()
+		back.text = "选关"
+		back.pressed.connect(_on_back)
+		hud.add_child(back)
 	root.add_child(hud)
 
 	var body := HBoxContainer.new()
@@ -76,6 +111,21 @@ func _build_ui() -> void:
 	_editor.pattern_cleared.connect(_on_pattern_cleared)
 	add_child(_editor)
 	_board.pin_requested.connect(_on_pin_requested)
+
+	_dialogue = DialogueBox.new()
+	if _game != null:
+		_dialogue.cue.connect(_game.robot_cue)
+	add_child(_dialogue)
+
+
+## 线轴排左列、目标织机放右侧
+func _layout_endpoints() -> void:
+	var y := 80.0
+	for id in session.assumption_ids:
+		session.set_node_position(id, Vector2(60, y))
+		y += 130
+	session.set_node_position(session.goal_id, Vector2(760, 140))
+	_board.apply_positions()
 
 
 # ---- 假设口钉纹样 ----
@@ -111,21 +161,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-## 线轴排左列、目标织机放右侧
-func _layout_endpoints() -> void:
-	var y := 80.0
-	for id in session.assumption_ids:
-		session.set_node_position(id, Vector2(60, y))
-		y += 130
-	session.set_node_position(session.goal_id, Vector2(760, 140))
-	_board.apply_positions()
-
+# ---- 胜负与流程 ----
 
 func _on_win() -> void:
 	_status.text = "织成了!  "
 	var tw := create_tween()
 	tw.tween_property(_win_flash, "color:a", 0.35, 0.25)
 	tw.tween_property(_win_flash, "color:a", 0.0, 0.9)
+	if _game != null:
+		_game.notify_solved(session.save_state())
+		if _next_btn != null and _game.next_level() != null:
+			_next_btn.visible = true
+
+
+func _on_next() -> void:
+	_game.store_board(session.save_state())
+	_game.start_level(_game.next_level())
+
+
+func _on_back() -> void:
+	_game.store_board(session.save_state())
+	_game.goto_select()
 
 
 func _on_undo() -> void:
@@ -138,6 +194,6 @@ func _on_redo() -> void:
 
 
 func _on_reset() -> void:
-	session.reset()
+	session.load_state(_fresh_state)
 	_layout_endpoints()
 	_status.text = ""

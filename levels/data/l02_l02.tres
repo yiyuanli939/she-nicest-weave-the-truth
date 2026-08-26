@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="LevelDef" format=3]
+
+[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_vrjea"]
+[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_qrgu5"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="3_5gm61"]
+
+[sub_resource type="Resource" id="Resource_nqpor"]
+script = ExtResource("1_vrjea")
+speaker = "阿梭"
+text = "[占位] 两股丝可以并成一幅纹样——试试并织机。"
+
+[sub_resource type="Resource" id="Resource_y4vb5"]
+script = ExtResource("2_qrgu5")
+lines = Array[ExtResource("1_vrjea")]([SubResource("Resource_nqpor")])
+
+[resource]
+script = ExtResource("3_5gm61")
+id = &"l02"
+title = "并织初试"
+assumptions = Array[String](["A", "B"])
+goal = "A & B"
+allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
+atoms = Array[StringName]([&"A", &"B"])
+intro_dialogue = SubResource("Resource_y4vb5")
+robot_cue_on_win = "celebrate"

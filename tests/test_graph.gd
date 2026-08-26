@@ -37,6 +37,22 @@ func test_nested_imp_solved() -> bool:
 		and check(r.value_out(outer, 0).equals(f("A > (B > A)")), "封程机应织出 A→(B→A)")
 
 
+## ⊢ A→A:假设口自环(接回本机封存口)是合法且必需的;普通口自环仍拒绝
+func test_identity_self_hyp_edge() -> bool:
+	var g := ProofGraph.new()
+	var goal := g.add_goal_node(f("A > A"))
+	var m := g.add_rule_node(&"imp_intro")
+	g.pin_hypothesis(m, 1, f("A"))
+	var hyp_loop := g.add_edge(Vector4i(m, 1, m, 0))
+	var plain_loop := g.add_edge(Vector4i(m, 0, m, 0))
+	g.add_edge(Vector4i(m, 0, goal, 0))
+	var r := g.solve()
+	return check(hyp_loop, "假设口自环应放行") \
+		and check(not plain_loop, "普通输出口自环仍应拒绝") \
+		and check(r.solved, "⊢ A→A 应完成") \
+		and check(r.value_out(m, 0).equals(f("A > A")), "封程机应织出 A→A")
+
+
 func test_missing_input_blocks() -> bool:
 	var g := ProofGraph.new()
 	var assum := g.add_assumption_node(f("A & B"))

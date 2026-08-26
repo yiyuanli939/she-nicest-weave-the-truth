@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="NotebookCatalog" format=3]
+
+[ext_resource type="Script" path="res://narrative/notebook_entry.gd" id="1_v15ww"]
+[ext_resource type="Script" path="res://narrative/notebook_catalog.gd" id="2_4mggw"]
+
+[sub_resource type="Resource" id="Resource_ajpst"]
+script = ExtResource("1_v15ww")
+id = &"notebook_and"
+title = "并织即「与」"
+body = "[占位] 档案室手稿:竖分的纹样,恰是逻辑学里的合取 A ∧ B。"
+demo_formula = "A & B"
+
+[sub_resource type="Resource" id="Resource_g45pq"]
+script = ExtResource("1_v15ww")
+id = &"notebook_imp"
+title = "迭层即「蕴含」"
+body = "[占位] 上层作前提,下层作结论:A → B。"
+demo_formula = "A > B"
+
+[sub_resource type="Resource" id="Resource_33mp1"]
+script = ExtResource("1_v15ww")
+id = &"notebook_or"
+title = "岔纹即「或」"
+body = "[占位] 对角一分,两可之间:A ∨ B。"
+demo_formula = "A | B"
+
+[sub_resource type="Resource" id="Resource_n1i1x"]
+script = ExtResource("1_v15ww")
+id = &"notebook_bot"
+title = "焦纹即「谬」"
+body = "[占位] 烧穿之处,万物皆可织出:⊥。"
+demo_formula = "false"
+
+[sub_resource type="Resource" id="Resource_fwrau"]
+script = ExtResource("1_v15ww")
+id = &"notebook_tnd"
+title = "两仪即「排中」"
+body = "[占位] 有或没有,天下无第三种布:A ∨ ¬A。"
+demo_formula = "A | (A > false)"
+
+[resource]
+script = ExtResource("2_4mggw")
+entries = Array[ExtResource("1_v15ww")]([SubResource("Resource_ajpst"), SubResource("Resource_g45pq"), SubResource("Resource_33mp1"), SubResource("Resource_n1i1x"), SubResource("Resource_fwrau")])

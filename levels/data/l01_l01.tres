@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="LevelDef" format=3]
+
+[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_j62nj"]
+[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_a3600"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="3_2xnmh"]
+
+[sub_resource type="Resource" id="Resource_f6csw"]
+script = ExtResource("1_j62nj")
+speaker = "阿梭"
+text = "[占位] 欢迎来到织坊。把线轴上的纹样引到目标织机,轻点连线即可。"
+robot_cue = "greet"
+
+[sub_resource type="Resource" id="Resource_36a6t"]
+script = ExtResource("2_a3600")
+lines = Array[ExtResource("1_j62nj")]([SubResource("Resource_f6csw")])
+
+[resource]
+script = ExtResource("3_2xnmh")
+id = &"l01"
+title = "第一缕丝"
+assumptions = Array[String](["A"])
+goal = "A"
+allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
+atoms = Array[StringName]([&"A"])
+intro_dialogue = SubResource("Resource_36a6t")
+robot_cue_on_win = "celebrate"

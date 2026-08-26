@@ -1,0 +1,35 @@
+class_name LevelDef
+extends Resource
+## 一关的全部配置。策划改关卡 = 在 Inspector 改这些字段(见 docs/CONTENT_INTERFACE.md)。
+## 公式一律用 FormulaParser 文本格式:`&` `|` `>`、`false`=⊥。
+
+@export var id: StringName
+@export var title: String = ""
+@export var assumptions: Array[String] = []
+@export var goal: String = ""
+@export var allowed_rules: Array[StringName] = []
+@export var atoms: Array[StringName] = []             # 纹样编辑器可用的原子
+@export var atom_colors: Dictionary = {}              # 留空 → 用默认三色/hash 回退
+@export var allow_bot: bool = false                   # 纹样编辑器解锁焦纹笔刷
+@export var intro_dialogue: DialogueRes
+@export var notebook_unlocks: Array[StringName] = []  # 通关时解锁的笔记本条目
+@export var robot_cue_on_enter: String = ""           # 进关机器人动作(第五章 "panic")
+@export var robot_cue_on_win: String = ""             # 通关机器人动作(默认 celebrate)
+
+const DEFAULT_COLORS: Dictionary = {
+	&"A": Color(0.82, 0.35, 0.30),
+	&"B": Color(0.27, 0.42, 0.70),
+	&"C": Color(0.32, 0.62, 0.38),
+	&"D": Color(0.72, 0.55, 0.25),
+}
+
+
+## 实际使用的调色板:显式配置优先,常用原子给默认色,其余 PatternView hash 回退
+func effective_colors() -> Dictionary:
+	var out := {}
+	for a in atoms:
+		if atom_colors.has(a):
+			out[a] = atom_colors[a]
+		elif DEFAULT_COLORS.has(a):
+			out[a] = DEFAULT_COLORS[a]
+	return out

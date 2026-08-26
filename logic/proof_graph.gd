@@ -67,13 +67,17 @@ func remove_node(id: int) -> void:
 	edges = kept
 
 
-## 连线。拒绝:节点/口不存在、自环、输入口已被占用(单口单线)。
+## 连线。拒绝:节点/口不存在、自环(假设口除外)、输入口已被占用(单口单线)。
+## 假设口的自环合法且必需:⊢A→A 就是封程机假设口直接接回本机封存口;
+## 假设边不算依赖(_topo_order 排除),不会造成循环论证。
 func add_edge(e: Vector4i) -> bool:
 	var from: ProofNode = nodes.get(e.x)
 	var to: ProofNode = nodes.get(e.z)
-	if from == null or to == null or e.x == e.z:
+	if from == null or to == null:
 		return false
 	if e.y < 0 or e.y >= from.ports_out.size() or e.w < 0 or e.w >= to.ports_in.size():
+		return false
+	if e.x == e.z and not _is_hyp_edge(e):
 		return false
 	for old in edges:
 		if old.z == e.z and old.w == e.w:

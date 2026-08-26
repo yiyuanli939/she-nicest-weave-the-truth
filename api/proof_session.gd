@@ -149,10 +149,12 @@ func remove_machine(node_id: int) -> void:
 func connect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> bool:
 	var from: ProofGraph.ProofNode = _graph.nodes.get(from_id)
 	var to: ProofGraph.ProofNode = _graph.nodes.get(to_id)
-	if from == null or to == null or from_id == to_id:
+	if from == null or to == null:
 		return false
 	if from_port < 0 or from_port >= from.ports_out.size() \
 			or to_port < 0 or to_port >= to.ports_in.size():
+		return false
+	if from_id == to_id and not _is_hyp_out(from, from_port):
 		return false
 	_push_undo()
 	for e in _graph.edges.duplicate():
@@ -384,6 +386,12 @@ func _notify(rebuilt: bool) -> void:
 func _kind(node_id: int) -> int:
 	var n: ProofGraph.ProofNode = _graph.nodes.get(node_id)
 	return n.kind if n != null else -1
+
+
+static func _is_hyp_out(n: ProofGraph.ProofNode, out_port: int) -> bool:
+	if n.kind != ProofGraph.NodeKind.RULE:
+		return false
+	return Rules.get_rule(n.rule_id).outputs[out_port].is_hypothesis
 
 
 static func _port_info(p: RuleSchema.PortSpec) -> PortInfo:
