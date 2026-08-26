@@ -17,6 +17,7 @@ var _next_btn: Button
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
+var _restoring := false               # 载入旧棋盘触发的 proof_completed 不算新胜利
 
 const IDLE_HINT_SEC := 45.0
 
@@ -54,7 +55,9 @@ func _ready() -> void:
 	if lv != null:
 		var saved: Dictionary = _game.save.board_state(lv.id)
 		if not saved.is_empty():
+			_restoring = true
 			session.load_state(saved)
+			_restoring = false
 			_board.apply_positions()
 		_dialogue.play(lv.intro_dialogue)
 		if lv.robot_cue_on_enter != "":
@@ -82,6 +85,18 @@ func _build_ui() -> void:
 		b.pressed.connect(pair[1])
 		hud.add_child(b)
 	if _game != null:
+		var robot := get_node("/root/Robot")
+		var tele := Button.new()
+		var sync_tele := func() -> void:
+			tele.text = "手势:开" if robot.teleop_running() else "手势:关"
+		tele.pressed.connect(func() -> void:
+			if robot.teleop_running():
+				robot.teleop_stop()
+			elif robot.connected:
+				robot.teleop_start())
+		robot.teleop_state_changed.connect(func(_on: bool) -> void: sync_tele.call())
+		sync_tele.call()
+		hud.add_child(tele)
 		_next_btn = Button.new()
 		_next_btn.text = "下一关 ▶"
 		_next_btn.visible = false
@@ -190,13 +205,15 @@ func _on_conflict_check() -> void:
 
 func _on_win() -> void:
 	_status.text = "织成了!  "
+	if _next_btn != null and _game != null and _game.next_level() != null:
+		_next_btn.visible = true
+	if _restoring:
+		return   # 只是恢复旧棋盘:不闪光、不叫小机、不重复记档
 	var tw := create_tween()
 	tw.tween_property(_win_flash, "color:a", 0.35, 0.25)
 	tw.tween_property(_win_flash, "color:a", 0.0, 0.9)
 	if _game != null:
 		_game.notify_solved(session.save_state())
-		if _next_btn != null and _game.next_level() != null:
-			_next_btn.visible = true
 
 
 func _on_next() -> void:

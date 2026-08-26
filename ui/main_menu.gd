@@ -34,12 +34,36 @@ func _ready() -> void:
 		_notebook_ui.open(game.notebook, game.save.notebook))
 	_add_btn(box, "校准小机", func() -> void:
 		_cal_ui.open(get_node("/root/Robot")))
-	_add_btn(box, "退出", get_tree().quit)
+	var robot := get_node("/root/Robot")
+	var tele := Button.new()
+	tele.custom_minimum_size = Vector2(240, 42)
+	var sync_tele := func() -> void:
+		tele.text = "手势操控:开" if robot.teleop_running() else "手势操控:关"
+	tele.pressed.connect(func() -> void:
+		if robot.teleop_running():
+			robot.teleop_stop()
+		elif not robot.connected:
+			tele.text = "先启动桥接(hardware/bridge)"
+		else:
+			robot.teleop_start())
+	robot.teleop_state_changed.connect(func(_on: bool) -> void: sync_tele.call())
+	sync_tele.call()
+	box.add_child(tele)
+	_add_btn(box, "退出", func() -> void:
+		get_node("/root/Robot").cue("sleep")   # 小机道晚安
+		await get_tree().create_timer(0.2).timeout
+		get_tree().quit())
 
 	_notebook_ui = NotebookUI.new()
 	add_child(_notebook_ui)
 	_cal_ui = RobotCalUI.new()
 	add_child(_cal_ui)
+
+	if not game.menu_greeted:
+		game.menu_greeted = true
+		# 稍等 WebSocket 连上桥接再问候(连不上则静默)
+		get_tree().create_timer(1.2).timeout.connect(func() -> void:
+			game.robot_cue("greet"))
 
 
 func _add_btn(box: VBoxContainer, label: String, cb: Callable) -> void:

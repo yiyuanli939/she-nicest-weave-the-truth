@@ -8,6 +8,7 @@ var catalog: LevelCatalog
 var notebook: NotebookCatalog
 var save: SaveManager
 var current: LevelDef = null
+var menu_greeted := false   # 每次开游戏只在主菜单问候一次
 
 
 func _ready() -> void:

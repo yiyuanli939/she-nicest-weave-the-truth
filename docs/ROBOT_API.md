@@ -66,6 +66,35 @@ BOOT 键=GPIO0。
 - 手动:←→↑↓ 微调 + 保存。
 结果持久化,之后 `hint` 的"看电脑"就朝这个方向。
 
+## 手势遥操模式(深度学习,可开关)
+
+Mac 摄像头 + MediaPipe(21 手部关键点 + DL 手势分类)→ 隔空玩游戏,小机同步跟手当体感伙伴。
+
+**开关**:主菜单或关卡 HUD 的「手势操控」按钮(需桥接在跑);也可命令行:
+```bash
+hardware/.venv-teleop/bin/python hardware/teleop/teleop.py            # 摄像头模式
+hardware/.venv-teleop/bin/python hardware/teleop/teleop.py --preview  # 带关键点预览窗
+hardware/.venv-teleop/bin/python hardware/teleop/teleop.py --test     # 合成手,无摄像头验证链路
+```
+首次运行 macOS 会弹摄像头授权;模型文件首跑自动下载(hardware/teleop/gesture_recognizer.task)。
+
+**映射**(游戏内 + 小机;遥操不触发语音):
+
+| 手势 | 游戏 | 小机 |
+|---|---|---|
+| 手移动 | 虚拟光标跟随(EMA 平滑) | 云台跟手(≤10Hz) |
+| 捏合(拇指-食指) | 左键按下/抬起 → 点击、拉线、拖节点 | — |
+| 握拳 Closed_Fist | 右键 → GraphEdit 拖过线=断线 | glitch 表情 |
+| 竖大拇指 Thumb_Up | — | happy+点头 |
+| 比 V Victory | — | happy+欢呼舞 |
+| 张开手掌 Open_Palm | — | think |
+| 无手 >0.6s | 光标隐藏(自动松开按键) | 3s 后回中+idle |
+
+实现链:`teleop.py`(映射表在文件顶部 GESTURE_CMDS 可改)→ 桥接路由(含 `cmd`→串口,其余→广播)→
+游戏 `Robot.teleop_hand` → `game/gesture_input.gd` 合成鼠标事件(全部 UI 免改可用)。
+**环境**:mediapipe 在 mac 需 py3.12(`hardware/.venv-teleop`,uv 创建);遥操与游戏动画共用舵机属预期。
+自动化回归:`godot --path . --script res://tests/teleop_smoke.gd`(bridge 需在跑)。
+
 ## 运维
 
 ```bash
@@ -74,8 +103,10 @@ hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 flash-id   # �
 hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 fs cp hardware/firmware/main.py :main.py  # 更新固件脚本
 hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset
 
-# 语音重生成(macOS say,婷婷嗓音;改台词后重跑再上传 :sounds/)
-say -v Tingting -o x.aiff "文本" && afconvert -f WAVE -d LEI16@16000 -c 1 x.aiff hardware/firmware/sounds/x.wav
+# 语音重生成(微软神经语音 XiaoyiNeural,小智同款音色;需联网)
+hardware/.venv/bin/edge-tts --voice zh-CN-XiaoyiNeural --text "文本" --write-media t.mp3
+afconvert -f WAVE -d LEI16@16000 -c 1 t.mp3 hardware/firmware/sounds/x.wav && rm t.mp3
+# (生成后建议做峰值归一化,离线备选:say -v Tingting/Meijia)
 
 # 恢复原厂小智固件(整片写回)
 hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 erase-flash

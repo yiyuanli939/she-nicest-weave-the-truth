@@ -15,20 +15,28 @@ const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 wss.on("listening", () => log(`WebSocket 就绪 ws://127.0.0.1:${WS_PORT}`));
 wss.on("connection", (ws) => {
-  log("游戏已连入");
+  log("客户端连入");
   ws.on("message", (data) => {
     const line = data.toString().trim();
     if (!line) return;
+    // 路由:含 cmd → 串口(机器人);其余(teleop 手部数据等)→ 广播给其他客户端(游戏)
+    let obj = null;
+    try { obj = JSON.parse(line); } catch { /* 非 JSON 一律当 cmd 透传 */ }
+    if (obj !== null && obj.cmd === undefined) {
+      broadcast(line, ws);
+      return;
+    }
     if (serial?.isOpen) {
       serial.write(line + "\n");
-      log("» ", line);
+      if (obj?.cmd !== "gimbal") log("» ", line);   // 跟手流太密,不刷日志
     } else log("丢弃(串口未连):", line);
   });
-  ws.on("close", () => log("游戏断开"));
+  ws.on("close", () => log("客户端断开"));
 });
 
-function broadcast(line) {
-  for (const c of wss.clients) if (c.readyState === 1) c.send(line);
+function broadcast(line, except = null) {
+  for (const c of wss.clients)
+    if (c !== except && c.readyState === 1) c.send(line);
 }
 
 async function pickPort() {
