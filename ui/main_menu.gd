@@ -3,6 +3,7 @@ extends Control
 ## 主菜单(占位级 UI,换装走 theme)。
 
 var _notebook_ui: NotebookUI
+var _cal_ui: RobotCalUI
 
 
 func _ready() -> void:
@@ -31,10 +32,14 @@ func _ready() -> void:
 	_add_btn(box, "选关", game.goto_select)
 	_add_btn(box, "织者笔记", func() -> void:
 		_notebook_ui.open(game.notebook, game.save.notebook))
+	_add_btn(box, "校准小机", func() -> void:
+		_cal_ui.open(get_node("/root/Robot")))
 	_add_btn(box, "退出", get_tree().quit)
 
 	_notebook_ui = NotebookUI.new()
 	add_child(_notebook_ui)
+	_cal_ui = RobotCalUI.new()
+	add_child(_cal_ui)
 
 
 func _add_btn(box: VBoxContainer, label: String, cb: Callable) -> void:

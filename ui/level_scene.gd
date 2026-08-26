@@ -16,6 +16,9 @@ var _dialogue: DialogueBox
 var _next_btn: Button
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
+var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
+
+const IDLE_HINT_SEC := 45.0
 
 # 默认配置(无 Game 时生效;冒烟测试注入)
 var level_title := ""
@@ -41,6 +44,8 @@ func _ready() -> void:
 	add_child(session)
 	_build_ui()
 	session.proof_completed.connect(_on_win)
+	session.board_updated.connect(_on_conflict_check)
+	session.board_updated.connect(func() -> void: _idle_sec = 0.0)
 	var err := session.setup(assumptions, goal_text)
 	assert(err == "", err)
 	_layout_endpoints()
@@ -159,6 +164,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_redo"):
 		session.redo()
 		get_viewport().set_input_as_handled()
+
+
+## 发呆太久 → 小机语音引导(Robot 侧对 hint 也有节流)
+func _process(delta: float) -> void:
+	if _game == null or session.is_solved():
+		return
+	_idle_sec += delta
+	if _idle_sec >= IDLE_HINT_SEC:
+		_idle_sec = 0.0
+		_game.robot_cue("hint")
+
+
+## 接出冲突线 → 小机困惑(Robot 侧自带节流,这里只管报)
+func _on_conflict_check() -> void:
+	if _game == null:
+		return
+	for w in session.get_wires():
+		if w.state == ProofSession.WireState.CONFLICT:
+			_game.robot_cue("confused")
+			return
 
 
 # ---- 胜负与流程 ----

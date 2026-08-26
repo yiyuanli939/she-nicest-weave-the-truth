@@ -63,4 +63,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 
 ## 当前进度
 
-M0 逻辑引擎 ✅(27/27 测试绿)→ 下一步 M1:GraphEdit 灰盒证明板(见 plan.md §4)。
+M0 引擎 ✅ → API(ProofSession/PatternView)✅ → M1 灰盒板 ✅ → M2 编辑器/全规则 ✅ →
+M3 内容层(17 关+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅。
+剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
+机器人手册见 `docs/ROBOT_API.md`。全流程回归:`tests/visual_smoke_m3.gd`(17 关自动通关)。

@@ -1,0 +1,15 @@
+{
+  "name": "she-nicest-robot-bridge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "串口(ESP32-S3 小机) ↔ WebSocket(游戏) 桥接",
+  "scripts": {
+    "bridge": "node bridge.js",
+    "send": "node send.js"
+  },
+  "dependencies": {
+    "serialport": "^12.0.0",
+    "ws": "^8.18.0"
+  }
+}
