@@ -48,11 +48,11 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 		set_slot(row,
 				row < info.inputs.size(), 0, GOAL_COLOR if info.type == ProofSession.NodeType.GOAL else PORT_COLOR,
 				row < info.outputs.size(), 0, HYP_COLOR if out_is_hyp else PORT_COLOR)
-	if not _hyp_ports.is_empty():
+	for p in _hyp_ports:
 		var btn := Button.new()
-		btn.text = "钉纹样"
+		btn.text = "钉纹样" if _hyp_ports.size() == 1 else "钉%d" % p
 		btn.tooltip_text = "为假设口指定纹样(线轴口)"
-		btn.pressed.connect(_on_pin_pressed)
+		btn.pressed.connect(pin_requested.emit.bind(p))
 		get_titlebar_hbox().add_child(btn)
 
 
@@ -87,7 +87,3 @@ func refresh(session: ProofSession) -> void:
 
 func _port_label_of(v: PatternView) -> Label:
 	return v.get_parent().get_child(0) as Label
-
-
-func _on_pin_pressed() -> void:
-	pin_requested.emit(_hyp_ports[0])

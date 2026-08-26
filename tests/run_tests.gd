@@ -13,6 +13,7 @@ const FILES: Array[String] = [
 	"res://tests/test_serialize.gd",
 	"res://tests/test_session.gd",
 	"res://tests/test_pattern_layout.gd",
+	"res://tests/test_pattern_editor.gd",
 ]
 
 
@@ -21,7 +22,13 @@ func _initialize() -> void:
 	var fails := 0
 	for path in FILES:
 		print(path.get_file())
-		var t: RefCounted = (load(path) as GDScript).new()
+		var scr := load(path) as GDScript
+		if scr == null or not scr.can_instantiate():
+			print("  ✗ 脚本加载失败(语法错误?)")
+			total += 1
+			fails += 1
+			continue
+		var t: RefCounted = scr.new()
 		for m in t.get_method_list():
 			if not String(m.name).begins_with("test_"):
 				continue

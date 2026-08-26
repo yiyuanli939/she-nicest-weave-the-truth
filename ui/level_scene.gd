@@ -9,12 +9,16 @@ var _board: ProofBoard
 var _palette: PalettePanel
 var _status: Label
 var _win_flash: ColorRect
+var _editor: PatternEditor
+var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 
-# M1 硬编码关卡(M3 换成 LevelDef.tres)
+# 默认关卡(M3 起由 Game 注入 LevelDef 覆盖)
 var assumptions: Array[String] = ["A & B"]
 var goal_text := "B & A"
 var allowed_rules: Array[StringName] = [&"and_intro", &"and_elim"]
 var atom_colors: Dictionary = {&"A": Color(0.82, 0.35, 0.30), &"B": Color(0.27, 0.42, 0.70)}
+var atoms: Array[StringName] = [&"A", &"B"]
+var allow_bot := false
 
 
 func _ready() -> void:
@@ -66,6 +70,45 @@ func _build_ui() -> void:
 	_win_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_win_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_win_flash)
+
+	_editor = PatternEditor.new()
+	_editor.pattern_committed.connect(_on_pattern_committed)
+	_editor.pattern_cleared.connect(_on_pattern_cleared)
+	add_child(_editor)
+	_board.pin_requested.connect(_on_pin_requested)
+
+
+# ---- 假设口钉纹样 ----
+
+func _on_pin_requested(node_id: int, out_port: int) -> void:
+	_pin_target = Vector2i(node_id, out_port)
+	var info := session.describe_node(node_id)
+	var initial: Formula = null
+	var pinned := info != null and info.pinned.has(out_port)
+	if pinned:
+		initial = FormulaParser.parse(info.pinned[out_port])
+	_editor.open_for(atoms, atom_colors, initial, allow_bot, pinned)
+
+
+func _on_pattern_committed(f: Formula) -> void:
+	var err := session.pin_hypothesis(_pin_target.x, _pin_target.y, FormulaParser.to_text(f))
+	if err != "":
+		_status.text = err
+	elif not session.is_solved():
+		_status.text = ""
+
+
+func _on_pattern_cleared() -> void:
+	session.unpin_hypothesis(_pin_target.x, _pin_target.y)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_undo"):
+		session.undo()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_redo"):
+		session.redo()
+		get_viewport().set_input_as_handled()
 
 
 ## 线轴排左列、目标织机放右侧
