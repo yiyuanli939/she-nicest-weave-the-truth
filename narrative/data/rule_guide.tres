@@ -7,56 +7,56 @@
 script = ExtResource("1_ry4gq")
 rule_id = &"and_intro"
 title = "并织机"
-summary = "[占位] 两股丝并成一幅。"
-body = "[占位] 左口收 A、右口收 B,织出并纹 [b]A ∧ B[/b]。要两样都在场,才织得出。"
+summary = "[占位] 两股丝,并作一幅。"
+body = "[占位] 左右两口各收一幅纹样,织成一幅左右并排的并纹。少了任何一股,机器都不开工。"
 demo_formula = "A & B"
 
 [sub_resource type="Resource" id="Resource_wfa5t"]
 script = ExtResource("1_ry4gq")
 rule_id = &"and_elim"
 title = "拆股机"
-summary = "[占位] 把并纹拆回两股。"
-body = "[占位] 收一幅 [b]A ∧ B[/b],上口吐 A、下口吐 B。任取一股接着用。"
+summary = "[占位] 并纹拆回两股。"
+body = "[占位] 收一幅并纹,上口吐出它的左半,下口吐出右半。想用哪股接哪股。"
 demo_formula = "A & B"
 
 [sub_resource type="Resource" id="Resource_s01ur"]
 script = ExtResource("1_ry4gq")
 rule_id = &"or_intro"
 title = "岔纹机"
-summary = "[占位] 已有其一,便可宣称二者有其一。"
-body = "[占位] 收 A,上口织 [b]A ∨ ?[/b]、下口织 [b]? ∨ A[/b]。另一支不来自输入,点标题「钉上口/钉下口」自己指定。"
+summary = "[占位] 一股丝,岔出两可。"
+body = "[占位] 收一幅纹样,织成对角分岔的岔纹:上口把它排在岔口一侧、下口排在另一侧。岔纹的另一支机器自己不知道该织什么——点标题栏的「钉上口/钉下口」,由你来定。"
 demo_formula = "A | B"
 
 [sub_resource type="Resource" id="Resource_baxx4"]
 script = ExtResource("1_ry4gq")
 rule_id = &"or_elim"
 title = "汇路机"
-summary = "[占位] 无论走哪条岔路,终点相同,结论便立。"
-body = "[占位] 收一个 [b]A ∨ B[/b] 和两条各自得出同一结论的支路,汇成那个结论。两个假设口的纹样由 0 号口自动定,不用钉。"
+summary = "[占位] 岔路汇流,殊途同归。"
+body = "[占位] 0 号口收一幅岔纹,两个线轴口各吐出岔纹的一支,交给两条支路分头去织;两条支路织回同样的成品,机器才把它吐出来。线轴口的纹样随 0 号口自动定,不用钉。"
 demo_formula = "A | B"
 
 [sub_resource type="Resource" id="Resource_xprj8"]
 script = ExtResource("1_ry4gq")
 rule_id = &"imp_intro"
 title = "封程机"
-summary = "[占位] 空手立一张「若…则…」的承诺。"
-body = "[占位] 最难的一台。① 点「钉纹样」钉住假设 P;② 用它织出 Q;③ 封装成 [b]P → Q[/b],假设就此放电。详见织者笔记。"
+summary = "[占位] 空手立一张「若…则…」的封单。"
+body = "[占位] 全场最讲究的一台。线轴口凭空吐出一幅你钉住的纹样,当作暂借的丝;拿去织出成品、汇回散口,机器便把整段织程封成一张迭层纹封单,借来的丝就此还清。详见织者笔记。"
 demo_formula = "A > B"
 
 [sub_resource type="Resource" id="Resource_i5tw1"]
 script = ExtResource("1_ry4gq")
 rule_id = &"imp_elim"
 title = "引渡机"
-summary = "[占位] 有承诺又有前件,兑现后件。"
-body = "[占位] 收 [b]A → B[/b] 和 A,吐出 B。承诺加上钥匙,取出里面的货。"
+summary = "[占位] 凭单取货。"
+body = "[占位] 一口收一张迭层纹封单,另一口收它上层的纹样,机器兑出下层的货。"
 demo_formula = "A > B"
 
 [sub_resource type="Resource" id="Resource_5cghl"]
 script = ExtResource("1_ry4gq")
 rule_id = &"false_elim"
 title = "溃散机"
-summary = "[占位] 从谬误里,能织出任何纹样。"
-body = "[占位] 收一幅焦纹 [b]⊥[/b],想织什么由你钉 —— 爆炸原理。烧穿的布,织什么都「成立」,故极危险。"
+summary = "[占位] 焦纹入机,百无禁忌。"
+body = "[占位] 收进一幅烧穿的焦纹后,这台机器什么都肯织——织什么由你钉。工坊严令:慎用。"
 demo_formula = "A"
 
 [resource]

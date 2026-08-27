@@ -7,29 +7,29 @@
 [sub_resource type="Resource" id="Resource_568a1"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 封程机是最难的一台。别急,我一步步带你。"
+text = "[占位] 封程机是全场最讲究的一台。别急,我一步步带你。"
 robot_cue = "think"
 
 [sub_resource type="Resource" id="Resource_8tgij"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 它要立的是一张「若…则…」的承诺,可你手上一根线都没有。"
+text = "[占位] 它要立一张「若…则…」的封单,可你现在手上一根线都没有。"
 
 [sub_resource type="Resource" id="Resource_bpotd"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 那就先「假设」有:点封程机的「钉纹样」,钉住一个 A —— 这是凭空借来的前提。"
+text = "[占位] 那就先借:点封程机的「钉纹样」,钉住一幅 A —— 线轴口会吐出这幅暂借的丝。"
 robot_cue = "think"
 
 [sub_resource type="Resource" id="Resource_hnd1j"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 拿这个假设的 A 去织出你要的结论(这关结论也是 A,原样交还即可)。"
+text = "[占位] 拿借来的 A 去织要交的成品。这一关要交的恰好也是 A,原样送回散口即可。"
 
 [sub_resource type="Resource" id="Resource_jljsi"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 封程机把整段封装成「若 A 则 A」,借来的假设就此还清 —— 这叫放电。翻开右边的笔记有详解。"
+text = "[占位] 封程机会把整段织程封成「若 A 则 A」,借来的丝就此还清。细节翻右边的笔记。"
 
 [sub_resource type="Resource" id="Resource_nnnp4"]
 script = ExtResource("2_e2nhv")
