@@ -80,4 +80,5 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 (自由纹样一律由玩家钉)✅。
 剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
 机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
+关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

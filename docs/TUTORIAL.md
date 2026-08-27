@@ -143,6 +143,7 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 |---|---|
 | 改台词/立绘/背景/地点 | 关卡 .tres 的 `intro_dialogue`(Inspector),字段见 `docs/CONTENT_INTERFACE.md`;批量改走 `tools/gen_levels.gd` 的 `LEVELS` 表 |
 | 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*`/`NOTEBOOK` 表)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `tests/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
+| 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
 | 加一台仪器 | `logic/rules.gd` 一行链式定义(自由变量所在口标 `pinnable`)→ `CH_RULES` 放进某章 → 测试 `test_describe_rule_metadata` 的台数 → 解法 |
 | 改"钉"的规则(哪些口可钉) | 只改 `rules.gd` 的 `pinnable` 标记;`_port_free_meta` 要求可钉口恰有一个自由变量 |
 | 改求解语义 | `logic/proof_graph.gd solve()` + `logic/unifier.gd match_into`;先看 `tests/test_graph.gd` 末尾的正向语义测试和 `test_unifier.test_match_into_is_one_way` |
