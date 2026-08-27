@@ -39,6 +39,7 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 		var spacer := Control.new()
 		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		spacer.custom_minimum_size.x = 12
+		spacer.mouse_filter = Control.MOUSE_FILTER_IGNORE   # 节点中央这条带也要能右键删/左键拖
 		h.add_child(spacer)
 		if row < info.outputs.size():
 			var cell := _make_port_cell(info.outputs[row], _out_views, big)
@@ -62,13 +63,14 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 		get_titlebar_hbox().add_child(btn)
 
 
-## 右键点节点体 = 请求删除本机(线轴/目标由模型层拒绝);拖线中放行给 GraphEdit 取消拖线
+## 右键点节点体 = 请求删除本机(线轴/目标由模型层拒绝)。
+## 左键还按着(正在拖节点)时的右键不算:触控板误触不该把手里的节点删了。
+## 拖线中的右键到不了这里(GraphEdit 的连线层持有鼠标焦点,自己取消拖线)。
 func _gui_input(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
 	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_RIGHT:
 		return
-	var board := get_parent() as ProofBoard
-	if board != null and board.wire_dragging:
+	if mb.button_mask & MOUSE_BUTTON_MASK_LEFT:
 		return
 	accept_event()
 	delete_requested.emit()

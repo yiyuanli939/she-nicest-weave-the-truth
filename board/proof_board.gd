@@ -11,7 +11,6 @@ signal pin_requested(node_id: int, out_port: int)
 
 var session: ProofSession
 var atom_colors: Dictionary = {}
-var wire_dragging := false   # 拖线中右键 = GraphEdit 取消拖线,MachineNode 据此放行不删
 
 var _overlay: WireOverlay
 
@@ -29,15 +28,12 @@ func _ready() -> void:
 	disconnection_request.connect(_on_disconnection_request)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 	end_node_move.connect(_on_end_node_move)
-	connection_drag_started.connect(func(_f: StringName, _p: int, _o: bool) -> void: wire_dragging = true)
-	connection_drag_ended.connect(func() -> void: wire_dragging = false)
 	add_child(_overlay)
 
 
 func bind(s: ProofSession) -> void:
 	session = s
 	_overlay.session = s
-	_overlay.atom_colors = atom_colors
 	s.board_rebuilt.connect(_on_board_rebuilt)
 	s.board_updated.connect(_on_board_updated)
 

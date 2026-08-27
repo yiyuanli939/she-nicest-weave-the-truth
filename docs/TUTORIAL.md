@@ -45,9 +45,11 @@ tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
 ### 2.2 solve() 五步管线(当前语义)
 
 1. **钉纹样赋值**:每个 pinned 口找出它的自由元变量(出现在该口、不出现在任何输入口),直接 `subst[k] = 玩家纹样`。
-2. **严格正向传播**:反复遍历边,把上游 `resolve` 后的纹样用 `match_into` 灌进下游入口模板,**只绑下游节点自己的元变量**;
+2. **环检测**:Kahn 拓扑排序,假设口发出的边不算依赖(封程机假设口→子证明→回本机输入口不是循环论证);
+   环上的边标 `CYCLE` 且不参与下一步传播。
+3. **严格正向传播**:反复遍历边,把上游 `resolve` 后的纹样用 `match_into` 灌进下游入口模板,
+   **只绑这条边入口模板里的元变量**(按口不按机——汇路机支路口 R 会成为假设 P 的别名,允许整机元变量就能反绑 P);
    上游还没织好的部分刚性跳过;两侧具体结构对不上才标 `CONFLICT`。绑定只增不减,轮数有上界,边按插入序遍历所以冲突归因稳定。
-3. **环检测**:Kahn 拓扑排序,假设口发出的边不算依赖(封程机假设口→子证明→回本机输入口不是循环论证)。
 4. **辖域检查**:沿拓扑序传播每条边"搭载"的未封存假设,流进目标的非空 → `ESCAPED_HYP`。
 5. **胜利判定**:从目标反向 BFS,祖先子图里每个输入口有线、每条边 OK。
 
@@ -121,6 +123,20 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 旧语义下能"白拿"的东西现在必须钉:封程机的假设 P(原本可靠连目标反推)、岔纹机的另一支、溃散机织出的纹样。
 没钉时连线显示"? 欠定"徽章、端口是未染纱幽灵——这正是引导玩家去点钉按钮的提示。
 
+### 3.3 审查后修掉的 bug(值得记住的坑)
+
+| 问题 | 根因 | 修法 |
+|---|---|---|
+| 汇路机支路线能反绑假设 P,冲突徽章随接线顺序漂移 | `match_into` 的允许集给的是整机元变量;支路口 R 绑成 P 的别名后,`walk` 走到 P 就能绑 | 允许集改为**这条边入口模板里**的元变量(`solve()` 里的 `allowed_of`) |
+| 坏存档钉了含 `?` 的纹样 → `Unifier.walk` 追自己死循环 | `from_dict` 只查可钉口,不查 ground | `from_dict` 只收"可钉口 + 全染色 + 自由变量唯一"的钉 |
+| 真环上的边报 CONFLICT 而非 CYCLE | occurs check 先于环检测触发 | 环检测提前,环上的边不参与传播 |
+| 点在对话面板/台词上不推进 | 面板是全屏捕捉层的兄弟,PanelContainer 默认 STOP 吃掉点击 | 去掉捕捉层,`DialogueBox._input` 在输入层截获左键(模态) |
+| 右键节点正中不删、左键拖不动 | 行中间的 spacer `Control` 默认 STOP | spacer `mouse_filter = IGNORE` |
+| 左键拖节点时按右键会误删手里的节点 | 右键事件发给鼠标焦点节点 | `_gui_input` 里 `button_mask` 含左键则忽略 |
+| 旧档在新语义下"已通关但棋盘欠定",没有下一关按钮 | 按钮只在 `_on_win` 显示 | 进关时记档已通关就显示"下一关" |
+
+教训:UI 交互回归要走 `Window.push_input` 的真实输入管线(见 `visual_smoke_m3.gd` 的 `_click`),直接调 `_on_click/_gui_input` 测不出 mouse_filter 这类问题。
+
 ## 4. 想改 X,去哪改
 
 | 想做的事 | 去哪 |
@@ -143,7 +159,7 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 61 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 65 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path .                                                  # 实跑看手感

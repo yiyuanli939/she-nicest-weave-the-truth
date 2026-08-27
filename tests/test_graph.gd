@@ -198,3 +198,50 @@ func test_or_elim_hyps_forward_from_input() -> bool:
 	return check(not dangling.value_out(oe, 1).is_ground(), "入口没接线时假设口是未染纱") \
 		and check(r.value_out(oe, 1).equals(f("A")) and r.value_out(oe, 2).equals(f("B")),
 				"接上 A∨B 后两个假设口正向得到 A、B")
+
+
+func test_branch_cannot_bind_or_elim_hypothesis() -> bool:
+	# 汇路机支路口 R 被绑成假设 P 的别名后,支路线不得顺着别名把 P 绑掉(P 只由 0 号入口决定)
+	var g := ProofGraph.new()
+	var oe := g.add_rule_node(&"or_elim")
+	var a := g.add_assumption_node(f("A"))
+	var bc := g.add_assumption_node(f("B | C"))
+	g.add_edge(Vector4i(oe, 1, oe, 1))   # 假设 P 直接当支路 1 的结论(退化子证明)
+	var e_a := Vector4i(a, 0, oe, 2)
+	g.add_edge(e_a)
+	var before := g.solve()
+	var e_in0 := Vector4i(bc, 0, oe, 0)
+	g.add_edge(e_in0)
+	var after := g.solve()
+	return check(not before.value_out(oe, 1).is_ground(), "入口没接线时支路不能反过来定假设 P") \
+		and check(after.value_out(oe, 1).equals(f("B")), "P 只由 0 号入口决定") \
+		and check(after.edge_status[e_in0] == SolveResult.EdgeStatus.OK, "线轴线本身没错") \
+		and check(after.edge_status[e_a] == SolveResult.EdgeStatus.CONFLICT, "冲突应落在对不上的支路线上")
+
+
+func test_cycle_beats_conflict() -> bool:
+	var g := ProofGraph.new()
+	var u := g.add_rule_node(&"imp_intro")
+	var d := g.add_rule_node(&"imp_intro")
+	var e1 := Vector4i(d, 0, u, 0)
+	var e2 := Vector4i(u, 0, d, 0)
+	g.add_edge(e1)
+	g.add_edge(e2)
+	var r := g.solve()
+	return check(r.edge_status[e1] == SolveResult.EdgeStatus.CYCLE
+			and r.edge_status[e2] == SolveResult.EdgeStatus.CYCLE,
+			"真环上的两条边都应标 CYCLE,而不是被 occurs check 判成 CONFLICT")
+
+
+func test_pinnable_ports_have_one_free_meta() -> bool:
+	var g := ProofGraph.new()
+	var ok := true
+	for rid in Rules.all_ids():
+		var id := g.add_rule_node(rid)
+		var n: ProofGraph.ProofNode = g.nodes[id]
+		var schema := Rules.get_rule(rid)
+		for p in schema.outputs.size():
+			if schema.outputs[p].pinnable:
+				ok = check(ProofGraph._port_free_meta(n, p) != &"",
+						"%s 出口 %d 标了可钉,但自由元变量不是恰好一个" % [rid, p]) and ok
+	return ok

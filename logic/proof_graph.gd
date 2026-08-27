@@ -120,32 +120,14 @@ func solve() -> SolveResult:
 	# 1) 钉纹样 = 给该口的自由元变量赋值。自由变量没有别的绑定来源,钉本身永不冲突;
 	#    对不上的责任全落在连线上。
 	var subst: Dictionary = {}
-	var node_metas: Dictionary = {}   # 节点 id -> {元变量名: true}
 	for id: int in nodes:
 		var n: ProofNode = nodes[id]
-		node_metas[id] = _node_metas(n)
 		for port: int in n.pinned:
-			subst[_port_free_meta(n, port)] = n.pinned[port]
+			var k := _port_free_meta(n, port)
+			if k != &"":
+				subst[k] = n.pinned[port]
 
-	# 2) 严格正向传播到不动点:每条边把上游织好的纹样灌进下游入口模板,只绑下游
-	#    自己的元变量,绝不反过来改上游(输出只由输入 + 钉纹样决定)。绑定只增不减,
-	#    轮数有上界;边按插入序遍历,冲突归因稳定。
-	var conflicted: Dictionary = {}
-	var changed := true
-	while changed:
-		changed = false
-		for e in edges:
-			if conflicted.has(e):
-				continue
-			var before := subst.size()
-			var value := Unifier.resolve(_out_formula(e), subst)
-			if not Unifier.match_into(value, _in_formula(e), subst, node_metas[e.z]):
-				conflicted[e] = true
-				result.edge_status[e] = SolveResult.EdgeStatus.CONFLICT
-			if subst.size() != before:
-				changed = true
-
-	# 3) 环检测(顺便得到辖域检查要用的拓扑序)
+	# 2) 环检测先行:环上的边不参与传播(结论依赖了自己,织不出可信纹样),统一标 CYCLE
 	var topo := _topo_order()
 	var on_cycle: Dictionary = {}
 	for id: int in nodes:
@@ -154,6 +136,32 @@ func solve() -> SolveResult:
 	for e in edges:
 		if on_cycle.has(e.x) or on_cycle.has(e.z):
 			_mark(result, e, SolveResult.EdgeStatus.CYCLE)
+
+	# 3) 严格正向传播到不动点:每条边把上游织好的纹样灌进下游入口模板,只绑**这条边
+	#    入口模板里**的元变量,绝不反过来改上游(输出只由输入 + 钉纹样决定)。
+	#    允许集必须按口而不是按机:汇路机的支路口 R 会被绑成假设 P 的别名,若允许整机
+	#    元变量,支路线就能顺着别名把本该只由 0 号入口决定的 P 绑掉。
+	#    绑定只增不减,轮数有上界;边按插入序遍历,冲突归因稳定。
+	var allowed_of: Dictionary = {}   # 边 -> {入口模板元变量: true}
+	for e in edges:
+		var allowed: Dictionary = {}
+		for m in _in_formula(e).metas():
+			allowed[m] = true
+		allowed_of[e] = allowed
+	var conflicted: Dictionary = {}
+	var changed := true
+	while changed:
+		changed = false
+		for e in edges:
+			if conflicted.has(e) or on_cycle.has(e.x) or on_cycle.has(e.z):
+				continue
+			var before := subst.size()
+			var value := Unifier.resolve(_out_formula(e), subst)
+			if not Unifier.match_into(value, _in_formula(e), subst, allowed_of[e]):
+				conflicted[e] = true
+				result.edge_status[e] = SolveResult.EdgeStatus.CONFLICT
+			if subst.size() != before:
+				changed = true
 
 	# 4) 辖域检查
 	var edge_hyps := _propagate_hyps(topo)
@@ -218,17 +226,12 @@ func _check_victory(result: SolveResult, goal: ProofNode) -> bool:
 
 # ---- 求解的内部步骤 ----
 
-## 节点拥有的全部元变量(放置时发的新鲜名,跨节点绝不重名)
-static func _node_metas(n: ProofNode) -> Dictionary:
-	var out: Dictionary = {}
-	for f in n.ports_in + n.ports_out:
-		for m in f.metas():
-			out[m] = true
-	return out
-
-
-## 某输出口的自由元变量:出现在该口模板、却不在任何输入口模板里的那一个(可钉口恰有一个)
+## 某输出口的自由元变量:出现在该口模板、却不在任何输入口模板里的那一个。
+## 规则表里的可钉口恰有一个(test_pinnable_ports_have_one_free_meta 盯着);
+## 不是恰好一个(手改过的存档)返回空名,调用方跳过该钉。
 static func _port_free_meta(n: ProofNode, out_port: int) -> StringName:
+	if out_port < 0 or out_port >= n.ports_out.size():
+		return &""
 	var in_metas: Dictionary = {}
 	for f in n.ports_in:
 		for m in f.metas():
@@ -237,8 +240,7 @@ static func _port_free_meta(n: ProofNode, out_port: int) -> StringName:
 	for m in n.ports_out[out_port].metas():
 		if not in_metas.has(m):
 			free.append(m)
-	assert(free.size() == 1, "可钉口应恰有一个自由元变量,实际 %d" % free.size())
-	return free[0]
+	return free[0] if free.size() == 1 else &""
 
 
 static func _pinnable(n: ProofNode, out_port: int) -> bool:
@@ -385,9 +387,12 @@ static func from_dict(d: Dictionary) -> ProofGraph:
 		for t: String in nd.ports_out:
 			n.ports_out.append(FormulaParser.parse(t))
 		for port_key: String in nd.pinned:
-			# 旧档可能钉在如今不可钉的口上(如汇路机假设口):静默丢弃,求解只认可钉口
-			if _pinnable(n, int(port_key)):
-				n.pinned[int(port_key)] = FormulaParser.parse(nd.pinned[port_key])
+			# 存档是外部边界:只收"可钉口 + 全染色纹样"的钉。旧档钉在汇路机假设口、
+			# 坏档钉了含 ? 的纹样(会让 walk 追自己死循环)一律静默丢弃。
+			var port := int(port_key)
+			var pf := FormulaParser.parse(nd.pinned[port_key])
+			if pf != null and pf.is_ground() and _pinnable(n, port) and _port_free_meta(n, port) != &"":
+				n.pinned[port] = pf
 		g.nodes[n.id] = n
 		g._next_id = maxi(g._next_id, n.id + 1)
 	for e: Array in d.edges:

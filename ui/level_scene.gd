@@ -60,6 +60,9 @@ func _ready() -> void:
 			session.load_state(saved)
 			_restoring = false
 			_board.apply_positions()
+		# 记档已通关的关卡总能推进:旧档棋盘可能因求解语义变更不再是通关态
+		if _next_btn != null and _game.save.is_solved(lv.id) and _game.next_level() != null:
+			_next_btn.visible = true
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
 

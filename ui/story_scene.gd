@@ -3,7 +3,7 @@ extends Control
 ## 进关前的全屏开场对话场景:底图 + 背景插图 + 地点铭牌 + 左右立绘 + 对话框。
 ## 美术全为占位:DialogueRes.background / DialogueLine.portrait 为 null 时
 ## 用程序化色块/剪影回退(槽位约定见 docs/ART_INTERFACE.md)。
-## 播完(或对话为空)切入棋盘;点击任意处推进由 DialogueBox 的全屏捕捉层负责。
+## 播完(或对话为空)切入棋盘;点击任意处推进由 DialogueBox 在 _input 层截获左键负责。
 
 const BASE_COLOR := Color(0.16, 0.13, 0.10)        # 底图:深羊皮纸
 const CANVAS_COLOR := Color(0.82, 0.74, 0.58)      # 插图占位:亮羊皮纸
@@ -144,3 +144,6 @@ func _go_board() -> void:
 	var game := get_node_or_null("/root/Game")
 	if game != null:
 		game.enter_board()
+	else:
+		push_warning("StoryScene: 没有 Game autoload,直接进默认关卡场景(调试路径)")
+		get_tree().change_scene_to_file("res://ui/level_scene.tscn")

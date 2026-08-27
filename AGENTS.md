@@ -49,7 +49,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/unifier.gd` | 一阶合一(occurs check;union-find 式 walk/resolve) |
 | `logic/proof_graph.gd` | 棋盘模型 + solve 五步管线(方程→合一→环→辖域→胜负) |
 | `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
-| `tests/` | headless 测试,61 例;`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,65 例;`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -61,11 +61,15 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 - **新 class_name 不生效**:命令行跑脚本前需 `--import` 重建缓存(编辑器开着
   的话它会自己扫)。
 - **求解是严格正向的,禁止反推**:`solve()` 不再做全局对称合一,而是按边把上游
-  纹样用 `Unifier.match_into` 灌进下游模板、只绑下游自己的元变量。仪器输出只由
+  纹样用 `Unifier.match_into` 灌进下游模板、只绑**这条边入口模板里**的元变量
+  (按口不按机:汇路机支路口 R 会成为假设 P 的别名,允许整机元变量就能顺着别名
+  反绑 P,有 `test_branch_cannot_bind_or_elim_hypothesis` 盯着)。仪器输出只由
   输入 + 钉纹样决定;自由元变量所在的口由 `RuleSchema.pinnable` **白名单**标记
   (不是"含自由变量即可钉",否则封程机 P→Q 口会重复出按钮)。`match_into` 的
-  判断顺序有讲究(模板侧可绑先于值侧刚性跳过,occurs check 不能省),动它前看
-  `test_unifier.test_match_into_is_one_way`。
+  判断顺序有讲究(模板侧可钉先于值侧刚性跳过,occurs check 不能省),动它前看
+  `test_unifier.test_match_into_is_one_way`。环检测在传播之前,环上的边不参与传播。
+- **存档里的钉是外部边界**:`from_dict` 只收"可钉口 + 全染色"的钉;含 `?` 的钉值
+  会让 `Unifier.walk` 追自己死循环。
 
 ## 当前进度
 

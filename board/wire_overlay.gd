@@ -19,7 +19,6 @@ const BADGE_COLOR: Dictionary = {
 
 var board: GraphEdit
 var session: ProofSession
-var atom_colors: Dictionary = {}
 
 var _chips: Array[Dictionary] = []   # {ctrl: Control, wire: ProofSession.WireInfo}
 

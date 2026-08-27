@@ -46,8 +46,8 @@ static func unify_one(a: Formula, b: Formula, subst: Dictionary) -> bool:
 
 
 ## 单向匹配:把上游的 value 灌进下游的 template,只允许绑定 allowed 里的元变量
-## (下游节点自己的);value 里未定的元变量视为刚性、直接跳过(上游还没织好,
-## 不算冲突,最终由"不 ground"判为欠定)。只有两侧都是具体结构且对不上才返回 false。
+## (调用方传这条边入口模板里的元变量);value 里未定的元变量视为刚性、直接跳过
+## (上游还没织好,不算冲突,最终由"不 ground"判为欠定)。只有两侧都是具体结构且对不上才返回 false。
 ##
 ## 判断顺序是有意的:先看 template 侧可绑(哪怕 value 也是元变量,照样绑成别名链,
 ## 这样上游之后织好了下游会自动跟着展开),再看 value 侧刚性跳过。

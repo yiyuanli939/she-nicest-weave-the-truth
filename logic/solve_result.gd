@@ -17,8 +17,8 @@ var port_values: Dictionary = {}
 ## 每条边的状态。键 = 边 Vector4i,值 = EdgeStatus
 var edge_status: Dictionary = {}
 
-## 有边挂着(或假设口被钉住)的端口集合。键同 port_values 的 Vector3i,值恒 true。
-## port_values 是合一推导值,未连线口也会被同机共享的元变量实例化;
+## 有边挂着(或可钉口被钉住)的端口集合。键同 port_values 的 Vector3i,值恒 true。
+## port_values 是正向推导值,未连线口也会被同机共享的元变量实例化(如汇路机另一条支路);
 ## UI 用本集合区分"实际有线在跑/玩家钉过"与"仅推导出的期望值"(后者画幽灵纹样)。
 var connected_ports: Dictionary = {}
 

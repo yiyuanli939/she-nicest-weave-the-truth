@@ -35,6 +35,17 @@ func _settle() -> void:
 	await process_frame
 
 
+## 走真实输入管线点一下(按下 + 抬起),坐标为视口全局坐标
+func _click(at: Vector2, button: MouseButton) -> void:
+	for pressed in [true, false]:
+		var ev := InputEventMouseButton.new()
+		ev.button_index = button
+		ev.pressed = pressed
+		ev.position = at
+		ev.global_position = at
+		root.push_input(ev)
+
+
 ## 进关前的全屏开场对话:一键播完并等切入棋盘
 func _skip_story() -> void:
 	if current_scene is StoryScene:
@@ -91,13 +102,12 @@ func _run() -> void:
 	_shot("m3_l15_dialogue")
 	if story != null:
 		_check(story._dialogue.visible, "l15 开场对话显示")
-		var mb := InputEventMouseButton.new()
-		mb.button_index = MOUSE_BUTTON_LEFT
-		mb.pressed = true
+		# 走真实输入管线,且点在对话面板正中(曾是死区:面板吃掉点击、捕捉层收不到)
+		var at: Vector2 = story._dialogue._panel.get_global_rect().get_center()
 		for j in game.current.intro_dialogue.lines.size():
-			story._dialogue._on_click(mb)   # 打字中:点击全显
-			story._dialogue._on_click(mb)   # 已全显:点击下一句/关闭
-		_check(not story._dialogue.visible, "点击播完最后一句后再点即关闭")
+			_click(at, MOUSE_BUTTON_LEFT)   # 打字中:点击全显
+			_click(at, MOUSE_BUTTON_LEFT)   # 已全显:点击下一句/关闭
+		_check(not story._dialogue.visible, "点在面板上也能推进,播完最后一句再点即关闭")
 		await _settle()
 		_check(current_scene is LevelScene, "对话播完自动进棋盘")
 
@@ -110,13 +120,10 @@ func _run() -> void:
 	_check(l03.session.is_solved(), "l03 恢复后仍通关")
 	_shot("m3_l03_restored")
 
-	# 右键删节点回归:右键仪器 → 删;右键线轴 → 不删;Ctrl+Z 撤回
-	var rmb := InputEventMouseButton.new()
-	rmb.button_index = MOUSE_BUTTON_RIGHT
-	rmb.pressed = true
+	# 右键删节点回归(真实输入,点在节点正中):右键仪器 → 删;右键线轴 → 不删;Ctrl+Z 撤回
 	var l03_board: ProofBoard = l03.find_children("*", "ProofBoard", true, false)[0]
 	var spool_node := l03_board.get_node("n%d" % l03.session.assumption_ids[0]) as MachineNode
-	spool_node._gui_input(rmb)
+	_click(spool_node.get_global_rect().get_center(), MOUSE_BUTTON_RIGHT)
 	await _settle()
 	_check(l03.session.get_node_ids().size() == 4, "右键线轴不应删除")
 	var machine_id := -1
@@ -124,9 +131,10 @@ func _run() -> void:
 		if l03.session.describe_node(id).type == ProofSession.NodeType.MACHINE:
 			machine_id = id
 			break
-	(l03_board.get_node("n%d" % machine_id) as MachineNode)._gui_input(rmb)
+	var machine_node := l03_board.get_node("n%d" % machine_id) as MachineNode
+	_click(machine_node.get_global_rect().get_center(), MOUSE_BUTTON_RIGHT)
 	await _settle()
-	_check(l03.session.get_node_ids().size() == 3, "右键仪器应删除该节点")
+	_check(l03.session.get_node_ids().size() == 3, "右键仪器正中(曾是 spacer 死区)应删除该节点")
 	_check(l03_board.get_node_or_null("n%d" % machine_id) == null, "视图节点应同步移除")
 	l03.session.undo()
 	await _settle()

@@ -1,6 +1,8 @@
 class_name DialogueBox
 extends CanvasLayer
 ## 入场对话框:打字机 + 点击推进(打字中点击=全显,播完再点=下一句/关闭)。
+## 显示期间是模态的:左键在 _input 层截获(点面板、点台词、点任意处都推进),
+## 不用全屏捕捉 Control —— 那样面板本身会先吃掉点击,点在台词上就不推进。
 ## robot_cue 逐行转发(cue 信号)。视觉为占位级;美术换装走 theme(见 docs/ART_INTERFACE.md)。
 
 signal finished
@@ -15,16 +17,10 @@ var _panel: PanelContainer
 var _speaker: Label
 var _text: RichTextLabel
 var _tween: Tween
-var _click_catcher: Control
 
 
 func _init() -> void:
 	layer = 50
-	_click_catcher = Control.new()
-	_click_catcher.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_click_catcher.gui_input.connect(_on_click)
-	add_child(_click_catcher)
-
 	_panel = PanelContainer.new()
 	_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	_panel.offset_top = -170
@@ -87,9 +83,20 @@ func _advance() -> void:
 	_tween.tween_property(_text, "visible_characters", total, total / CHARS_PER_SEC)
 
 
+func _input(event: InputEvent) -> void:
+	if not visible:
+		return
+	var mb := event as InputEventMouseButton
+	if mb == null or mb.button_index != MOUSE_BUTTON_LEFT:
+		return
+	get_viewport().set_input_as_handled()   # 按下与抬起都不放给下层 UI(模态)
+	if mb.pressed:
+		_on_click(mb)
+
+
 func _on_click(event: InputEvent) -> void:
 	var mb := event as InputEventMouseButton
-	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT:
+	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT or not visible:
 		return
 	if _text.visible_characters < _text.get_total_character_count():
 		if _tween != null:
@@ -100,7 +107,10 @@ func _on_click(event: InputEvent) -> void:
 		_advance()
 
 
+## 幂等:已经关掉的对话再调不会重复发 finished
 func _finish() -> void:
+	if not visible:
+		return
 	if _tween != null:
 		_tween.kill()
 	visible = false
