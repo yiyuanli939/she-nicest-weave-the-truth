@@ -105,10 +105,12 @@ func _scenario_or() -> void:
 	var spool: int = s.session.assumption_ids[0]
 	_wire(b, spool, 0, elim, 0)
 	_wire(b, elim, 1, i1, 0)                     # hyp A → 岔纹机1
-	_wire(b, i1, 1, elim, 1)                     # Q∨P 口:?∨A → 散口1(R=B∨A)
+	_wire(b, i1, 1, elim, 1)                     # 下口 R∨P:B∨A → 散口1
 	_wire(b, elim, 2, i2, 0)                     # hyp B → 岔纹机2
-	_wire(b, i2, 0, elim, 2)                     # P∨Q 口:B∨? → 散口2
+	_wire(b, i2, 0, elim, 2)                     # 上口 P∨Q:B∨A → 散口2
 	_wire(b, elim, 0, s.session.goal_id, 0)
+	_pin_atom(s, i1, 1, "B")                     # 另一支由玩家钉,不从汇路机反推
+	_pin_atom(s, i2, 0, "A")
 	await _finish(s, "or_commute")
 
 
@@ -122,4 +124,5 @@ func _scenario_bot() -> void:
 	b.apply_positions()
 	_wire(b, s.session.assumption_ids[0], 0, elim, 0)
 	_wire(b, elim, 0, s.session.goal_id, 0)
+	_pin_atom(s, elim, 0, "A")                   # 溃散机织什么由玩家钉
 	await _finish(s, "explosion")

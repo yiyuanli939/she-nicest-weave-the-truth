@@ -9,11 +9,16 @@ extends RefCounted
 ## 局部假设口(is_hypothesis):封程机/汇路机特有的输出口。它吐出的命题
 ## 只能用在"最终汇入本机 scope_input 号输入口"的子证明里,越界即
 ## ESCAPED_HYP 错误 —— 这是自然演绎"假设只在子证明内有效"的图形化表达。
+##
+## 可钉口(pinnable):模板里含"自由元变量"(不由任何输入口决定)的输出口,
+## 由玩家用钉纹样窗口给那个自由变量赋值;求解严格正向,绝不从下游反推。
+## 用白名单而不是"含自由变量即可钉":封程机的 P→Q 口也含 P,但钉的入口只放在假设口。
 
 class PortSpec:
 	var template: Formula
 	var is_hypothesis: bool = false
 	var scope_input: int = -1     ## 假设口对应的封存输入口下标(仅假设口有效)
+	var pinnable: bool = false    ## 玩家可给本口的自由元变量钉纹样
 
 
 var id: StringName
@@ -34,15 +39,18 @@ func inp(template: Formula) -> RuleSchema:
 	return self
 
 
-func out(template: Formula) -> RuleSchema:
-	outputs.append(_port(template))
+func out(template: Formula, p_pinnable := false) -> RuleSchema:
+	var p := _port(template)
+	p.pinnable = p_pinnable
+	outputs.append(p)
 	return self
 
 
-func hyp(template: Formula, p_scope_input: int) -> RuleSchema:
+func hyp(template: Formula, p_scope_input: int, p_pinnable := false) -> RuleSchema:
 	var p := _port(template)
 	p.is_hypothesis = true
 	p.scope_input = p_scope_input
+	p.pinnable = p_pinnable
 	outputs.append(p)
 	return self
 

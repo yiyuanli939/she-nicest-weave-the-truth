@@ -32,6 +32,7 @@ class PortInfo:
 	var label: String            ## 展示文本:仪器口=模板(如 "P & Q"),线轴/目标=实际命题
 	var is_hypothesis: bool = false
 	var scope_input: int = -1    ## 假设口对应的封存输入口下标;非假设口为 -1
+	var pinnable: bool = false   ## 玩家可给本口的自由元变量钉纹样(UI 据此出钉按钮)
 
 class MachineInfo:
 	var rule_id: StringName
@@ -46,7 +47,7 @@ class NodeInfo:
 	var rule_id: StringName      ## 仅 MACHINE 有
 	var inputs: Array[PortInfo] = []
 	var outputs: Array[PortInfo] = []
-	var pinned: Dictionary = {}  ## {假设口下标: 公式文本} 当前钉住的纹样
+	var pinned: Dictionary = {}  ## {可钉口下标: 公式文本} 当前钉住的纹样
 
 class WireInfo:
 	var from_id: int
@@ -174,14 +175,15 @@ func disconnect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> 
 	_notify(false)
 
 
-## 在封程机的假设口钉住玩家给的纹样。返回 "" 成功,否则可直接显示的错误文案。
+## 给可钉口的自由元变量钉住玩家给的纹样(封程机假设口 / 溃散机出口 = 整口;
+## 岔纹机出口 = 析取式的另一支)。返回 "" 成功,否则可直接显示的错误文案。
 func pin_hypothesis(node_id: int, out_port: int, formula_text: String) -> String:
 	if _kind(node_id) != ProofGraph.NodeKind.RULE:
 		return "该节点不是仪器"
 	var schema := Rules.get_rule((_graph.nodes[node_id] as ProofGraph.ProofNode).rule_id)
 	if out_port < 0 or out_port >= schema.outputs.size() \
-			or not schema.outputs[out_port].is_hypothesis:
-		return "该口不是假设口"
+			or not schema.outputs[out_port].pinnable:
+		return "该口不可钉纹样"
 	var f := FormulaParser.parse(formula_text)
 	if f == null:
 		return "解析失败: " + FormulaParser.last_error
@@ -409,6 +411,7 @@ static func _port_info(p: RuleSchema.PortSpec) -> PortInfo:
 	info.label = FormulaParser.to_text(p.template)
 	info.is_hypothesis = p.is_hypothesis
 	info.scope_input = p.scope_input
+	info.pinnable = p.pinnable
 	return info
 
 

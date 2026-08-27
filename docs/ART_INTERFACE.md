@@ -13,7 +13,7 @@
 
 | 路径 | 内容 | 数量 | 现状 |
 |---|---|---|---|
-| `assets/svg/machines/<rule_id>.svg` | 八台仪器徽记(and_intro…tnd)+ spool(线轴)+ goal(目标织机) | 10 | 缺→节点只显中文名 |
+| `assets/svg/machines/<rule_id>.svg` | 七台仪器徽记(and_intro…false_elim)+ spool(线轴)+ goal(目标织机) | 9 | 缺→节点只显中文名 |
 | `assets/svg/badges/{conflict,underspec,cycle,escaped}.svg` | 骷髅/问号线轴/衔尾蛇/剪刀 | 4 | 缺→WireOverlay 文字徽章 |
 | `assets/svg/ui/panel_parchment.svg` 等 | 羊皮纸面板/黄铜按钮三态/蜡封(未解+已解)/笔记本皮面/对话框 | ~8 | 缺→StyleBoxFlat |
 

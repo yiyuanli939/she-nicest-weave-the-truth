@@ -1,7 +1,7 @@
 extends SceneTree
 ## 游戏内机器人联动冒烟(需桥接+实机在线,且已跑过 m3 全通存档):
 ##   godot --path . --script res://tests/robot_ingame_smoke.gd
-## 验证:l16 入场对话行 robot_cue=panic 触发 → 已通关棋盘载入 celebrate →
+## 验证:l15 开场对话行 robot_cue=glitch 触发 → 已通关棋盘载入 celebrate →
 ##       l03 接冲突线 encourage → cal_set 回 cal_done。退出码 = 失败数。
 
 var _fails := 0
@@ -40,16 +40,16 @@ func _run() -> void:
 		return
 	robot.robot_event.connect(func(d: Dictionary) -> void: _events.append(d))
 
-	# 1) l16:进关 → 全屏开场对话首行(小机,cue=panic);播完进棋盘再触发 robot_cue_on_enter
-	game.start_level(game.catalog.all_levels()[15])
+	# 1) l15:进关 → 全屏开场对话首行(档案员,cue=glitch);播完进棋盘
+	game.start_level(game.catalog.all_levels()[14])
 	await _wait(2.5)
 	var story := current_scene as StoryScene
-	_check(story != null and story._dialogue.visible, "l16 全屏开场对话显示(首行含 panic cue)")
+	_check(story != null and story._dialogue.visible, "l15 全屏开场对话显示(首行含 glitch cue)")
 	if story != null:
 		story.finish()
 	await _wait(1.0)
 	var scene := current_scene as LevelScene
-	_check(scene != null and scene.session.is_solved(), "l16 已通关棋盘载入(恢复不应重复庆祝)")
+	_check(scene != null and scene.session.is_solved(), "l15 已通关棋盘载入(恢复不应重复庆祝)")
 	await _wait(4.0)
 
 	# 2) l03:接一条冲突线 → encourage

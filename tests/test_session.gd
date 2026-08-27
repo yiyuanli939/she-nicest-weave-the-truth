@@ -50,7 +50,7 @@ func test_pin_errors_and_success() -> bool:
 	s.setup([], "A > A")
 	var m := s.place_machine(&"imp_intro")
 	var ok := check(s.pin_hypothesis(m, 1, "A &") != "", "解析失败应返回文案") \
-		and check(s.pin_hypothesis(m, 0, "A") == "该口不是假设口", "非假设口应被拦下") \
+		and check(s.pin_hypothesis(m, 0, "A") == "该口不可钉纹样", "非可钉口应被拦下") \
 		and check(s.pin_hypothesis(m, 1, "?x") != "", "含未染纱应被拦下") \
 		and check(s.pin_hypothesis(m, 1, "A") == "", "合法钉入应返回空串") \
 		and check(s.describe_node(m).pinned[1] == "A", "钉住的纹样应出现在节点描述里")
@@ -126,12 +126,15 @@ func test_save_load_json_roundtrip() -> bool:
 
 func test_describe_rule_metadata() -> bool:
 	var m := ProofSession.describe_rule(&"imp_intro")
-	return check(ProofSession.all_rule_ids().size() == 8, "应有八台仪器") \
+	return check(ProofSession.all_rule_ids().size() == 7, "应有七台仪器") \
 		and check(m.cn_name == "封程机" and m.inputs.size() == 1 and m.outputs.size() == 2,
 				"封程机应为 1 入 2 出") \
 		and check(m.outputs[1].is_hypothesis and m.outputs[1].scope_input == 0,
 				"1 号输出应是假设口、封存于 0 号输入") \
 		and check(not m.outputs[0].is_hypothesis, "0 号输出是普通口") \
+		and check(m.outputs[1].pinnable and not m.outputs[0].pinnable, "封程机只有假设口可钉") \
+		and check(ProofSession.describe_rule(&"or_intro").outputs[1].pinnable, "岔纹机两口可钉") \
+		and check(not ProofSession.describe_rule(&"or_elim").outputs[1].pinnable, "汇路机假设口不可钉") \
 		and check(ProofSession.describe_rule(&"nope") == null, "未知仪器应返回 null")
 
 
@@ -153,9 +156,12 @@ func test_connected_getters() -> bool:
 	s.connect_wire(s.assumption_ids[0], 0, oe, 0)
 	var ok := check(s.is_input_connected(oe, 0), "已接线输入口应 connected") \
 		and check(not s.is_input_connected(oe, 1), "未接线支路口不应 connected") \
-		and check(not s.is_output_connected(oe, 0), "未接线输出口不应 connected")
-	var err := s.pin_hypothesis(oe, 1, "A")
-	ok = ok and check(err == "", "钉假设口应成功,实际: " + err) \
-		and check(s.is_output_connected(oe, 1), "钉住的假设口应算 connected(玩家显式承诺,实显)")
+		and check(not s.is_output_connected(oe, 0), "未接线输出口不应 connected") \
+		and check(s.pin_hypothesis(oe, 1, "A") != "", "汇路机假设口由入口正向决定,不可钉")
+	var oi := s.place_machine(&"or_intro", Vector2.ZERO)
+	var err := s.pin_hypothesis(oi, 0, "B")
+	ok = ok and check(err == "", "钉岔纹机上口应成功,实际: " + err) \
+		and check(s.is_output_connected(oi, 0), "钉住的口应算 connected(玩家显式承诺,实显)") \
+		and check(not s.is_output_connected(oi, 1), "没钉没线的另一口不算 connected")
 	s.free()
 	return ok

@@ -126,3 +126,75 @@ func test_connected_ports() -> bool:
 		and check(not r.output_connected(oe, 0), "没接线的输出口不算 connected") \
 		and check(r.output_connected(assum, 0), "线轴的输出端应记进 connected") \
 		and check(r.value_in(oe, 1) != null, "未连线口的推导值仍应存在(幽灵化只是视图行为)")
+
+
+# ---- 严格正向语义:输出只由输入 + 钉纹样决定,绝不从下游反推 ----
+
+func test_no_backward_inference() -> bool:
+	var g := ProofGraph.new()
+	var goal := g.add_goal_node(f("B & A"))
+	var join := g.add_rule_node(&"and_intro")
+	var e := Vector4i(join, 0, goal, 0)
+	g.add_edge(e)   # 悬空的并织机直接接目标:旧语义会把 B、A 反推进两个输入口
+	var r := g.solve()
+	return check(not r.value_in(join, 0).is_ground(), "输入口不能被目标反推染色") \
+		and check(not r.value_out(join, 0).is_ground(), "输出口仍是未染纱") \
+		and check(r.edge_status[e] == SolveResult.EdgeStatus.UNDERSPEC, "这条线应是欠定而非 OK") \
+		and check(not r.solved, "不能算赢")
+
+
+func test_or_intro_needs_pin() -> bool:
+	var g := ProofGraph.new()
+	var assum := g.add_assumption_node(f("A"))
+	var goal := g.add_goal_node(f("A | B"))
+	var oi := g.add_rule_node(&"or_intro")
+	g.add_edge(Vector4i(assum, 0, oi, 0))
+	var e := Vector4i(oi, 0, goal, 0)
+	g.add_edge(e)
+	var before := g.solve()
+	g.pin_hypothesis(oi, 0, f("B"))   # 上口 P∨Q 的自由变量 Q
+	var after := g.solve()
+	return check(before.edge_status[e] == SolveResult.EdgeStatus.UNDERSPEC, "没钉另一支:欠定") \
+		and check(not before.solved, "没钉不能赢") \
+		and check(after.value_out(oi, 0).equals(f("A | B")), "钉 B 后上口织出 A∨B") \
+		and check(after.solved, "钉 B 后通关")
+
+
+func test_false_elim_needs_pin() -> bool:
+	var g := ProofGraph.new()
+	var assum := g.add_assumption_node(f("false"))
+	var goal := g.add_goal_node(f("A"))
+	var fe := g.add_rule_node(&"false_elim")
+	g.add_edge(Vector4i(assum, 0, fe, 0))
+	g.add_edge(Vector4i(fe, 0, goal, 0))
+	var before := g.solve()
+	g.pin_hypothesis(fe, 0, f("A"))
+	var after := g.solve()
+	return check(not before.solved, "溃散机没钉不能赢") \
+		and check(after.solved, "钉 A 后通关")
+
+
+func test_pin_conflict_lands_on_wire() -> bool:
+	var g := ProofGraph.new()
+	var assum := g.add_assumption_node(f("false"))
+	var goal := g.add_goal_node(f("A"))
+	var fe := g.add_rule_node(&"false_elim")
+	g.add_edge(Vector4i(assum, 0, fe, 0))
+	var e := Vector4i(fe, 0, goal, 0)
+	g.add_edge(e)
+	g.pin_hypothesis(fe, 0, f("B"))   # 钉错了
+	var r := g.solve()
+	return check(r.edge_status[e] == SolveResult.EdgeStatus.CONFLICT, "钉的值与目标不合应在连线上标冲突") \
+		and check(r.value_out(fe, 0).equals(f("B")), "输出口仍是玩家钉的 B(不被目标改写)")
+
+
+func test_or_elim_hyps_forward_from_input() -> bool:
+	var g := ProofGraph.new()
+	var assum := g.add_assumption_node(f("A | B"))
+	var oe := g.add_rule_node(&"or_elim")
+	var dangling := g.solve()
+	g.add_edge(Vector4i(assum, 0, oe, 0))
+	var r := g.solve()
+	return check(not dangling.value_out(oe, 1).is_ground(), "入口没接线时假设口是未染纱") \
+		and check(r.value_out(oe, 1).equals(f("A")) and r.value_out(oe, 2).equals(f("B")),
+				"接上 A∨B 后两个假设口正向得到 A、B")

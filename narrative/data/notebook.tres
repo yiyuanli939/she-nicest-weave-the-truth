@@ -31,13 +31,6 @@ title = "焦纹即「谬」"
 body = "[占位] 烧穿之处,万物皆可织出:⊥。"
 demo_formula = "false"
 
-[sub_resource type="Resource" id="Resource_fwrau"]
-script = ExtResource("1_v15ww")
-id = &"notebook_tnd"
-title = "两仪即「排中」"
-body = "[占位] 有或没有,天下无第三种布:A ∨ ¬A。"
-demo_formula = "A | (A > false)"
-
 [resource]
 script = ExtResource("2_4mggw")
-entries = Array[ExtResource("1_v15ww")]([SubResource("Resource_ajpst"), SubResource("Resource_g45pq"), SubResource("Resource_33mp1"), SubResource("Resource_n1i1x"), SubResource("Resource_fwrau")])
+entries = Array[ExtResource("1_v15ww")]([SubResource("Resource_ajpst"), SubResource("Resource_g45pq"), SubResource("Resource_33mp1"), SubResource("Resource_n1i1x")])

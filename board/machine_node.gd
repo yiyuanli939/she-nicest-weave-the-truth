@@ -2,7 +2,8 @@ class_name MachineNode
 extends GraphNode
 ## 棋盘上的一个节点(仪器/线轴/目标织机)的视图。
 ## 只认 ProofSession 的 NodeInfo/查询函数;一行 slot = 一对(输入口, 输出口)。
-## 假设口(线轴口)用强调色;titlebar 的"钉纹样"按钮由 M2 的纹样编辑器接管。
+## 假设口(线轴口)用强调色;每个可钉口(pinnable)在 titlebar 出一个钉按钮,
+## 由纹样编辑器接管(钉的是该口的自由纹样,求解不会从下游反推)。
 
 signal pin_requested(out_port: int)
 signal delete_requested
@@ -17,7 +18,7 @@ var atom_colors: Dictionary = {}
 
 var _in_views: Array[PatternView] = []
 var _out_views: Array[PatternView] = []
-var _hyp_ports: Array[int] = []
+var _pin_ports: Array[int] = []   # 可钉的输出口下标
 
 
 func build_from(info: ProofSession.NodeInfo) -> void:
@@ -27,7 +28,7 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 	title = info.title
 	_in_views.clear()
 	_out_views.clear()
-	_hyp_ports.clear()
+	_pin_ports.clear()
 	var big := info.type != ProofSession.NodeType.MACHINE   # 线轴/目标:单口大纹样
 	var rows := maxi(info.inputs.size(), info.outputs.size())
 	for row in rows:
@@ -41,20 +42,23 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 		h.add_child(spacer)
 		if row < info.outputs.size():
 			var cell := _make_port_cell(info.outputs[row], _out_views, big)
-			if info.outputs[row].is_hypothesis:
-				_hyp_ports.append(row)
+			if info.outputs[row].pinnable:
+				_pin_ports.append(row)
 			h.add_child(cell)
 		add_child(h)
 		var out_is_hyp := row < info.outputs.size() and info.outputs[row].is_hypothesis
 		set_slot(row,
 				row < info.inputs.size(), 0, GOAL_COLOR if info.type == ProofSession.NodeType.GOAL else PORT_COLOR,
 				row < info.outputs.size(), 0, HYP_COLOR if out_is_hyp else PORT_COLOR)
-	# 只有单假设口(封程机)给钉按钮;汇路机的双假设口靠连线合一自动定纹样
-	if _hyp_ports.size() == 1:
+	# 每个可钉口一个 titlebar 按钮:单口(封程机/溃散机)叫"钉纹样",岔纹机两口按行区分
+	for p in _pin_ports:
 		var btn := Button.new()
-		btn.text = "钉纹样"
-		btn.tooltip_text = "为假设口指定纹样(线轴口)"
-		btn.pressed.connect(pin_requested.emit.bind(_hyp_ports[0]))
+		if _pin_ports.size() == 1:
+			btn.text = "钉纹样"
+		else:
+			btn.text = "钉上口" if p == _pin_ports[0] else "钉下口"
+		btn.tooltip_text = "给本口的自由纹样赋值(求解只看输入和钉住的纹样,不从下游反推)"
+		btn.pressed.connect(pin_requested.emit.bind(p))
 		get_titlebar_hbox().add_child(btn)
 
 
@@ -98,8 +102,8 @@ func refresh(session: ProofSession) -> void:
 		_out_views[i].formula = session.get_output_pattern(node_id, i)
 		_out_views[i].ghost = is_machine and not session.is_output_connected(node_id, i)
 	var info := session.describe_node(node_id)
-	if info != null and not _hyp_ports.is_empty():
-		for p in _hyp_ports:
+	if info != null and not _pin_ports.is_empty():
+		for p in _pin_ports:
 			var lbl := _port_label_of(_out_views[p])
 			var base := info.outputs[p].label
 			lbl.text = ("📌 " + str(info.pinned[p])) if info.pinned.has(p) else base

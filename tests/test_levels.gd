@@ -2,11 +2,11 @@ extends TestBase
 ## 关卡/笔记本数据校验:catalog 载入、公式可解析、规则存在、解锁链完整。
 
 
-func test_catalog_loads_17_levels() -> bool:
+func test_catalog_loads_15_levels() -> bool:
 	var cat := LevelCatalog.load_default()
 	return check(cat != null, "catalog.tres 应能加载") \
-		and check(cat.chapters.size() == 5, "5 章 (得 %d)" % cat.chapters.size()) \
-		and check(cat.all_levels().size() == 17, "17 关 (得 %d)" % cat.all_levels().size())
+		and check(cat.chapters.size() == 4, "4 章 (得 %d)" % cat.chapters.size()) \
+		and check(cat.all_levels().size() == 15, "15 关 (得 %d)" % cat.all_levels().size())
 
 
 func test_levels_wellformed() -> bool:
@@ -40,7 +40,7 @@ func test_setup_every_level() -> bool:
 func test_notebook_unlocks_exist() -> bool:
 	var nb := NotebookCatalog.load_default()
 	var cat := LevelCatalog.load_default()
-	var ok := check(nb != null and nb.entries.size() == 5, "笔记本 5 条")
+	var ok := check(nb != null and nb.entries.size() == 4, "笔记本 4 条")
 	for lv in cat.all_levels():
 		for entry_id in lv.notebook_unlocks:
 			ok = check(nb.entry(entry_id) != null, "%s 解锁了不存在的条目 %s" % [lv.id, entry_id]) and ok

@@ -85,13 +85,13 @@ func cue(cue_name: String) -> void:
 			send({cmd = "say", name = "hint"})
 		"think":
 			send({cmd = "emote", name = "think"})
-		"panic":       # 第五章失控演出
+		"panic":       # 失控演出(原第五章;关卡内暂无入口,手动冒烟仍用)
 			send({cmd = "emote", name = "glitch"})
 			send({cmd = "anim", name = "panic"})
 			send({cmd = "say", name = "panic"})
 		"glitch":
 			send({cmd = "emote", name = "glitch"})
-		"calm":        # 第五章通关归于平静
+		"calm":        # 归于平静(原第五章通关;同上保留)
 			send({cmd = "emote", name = "happy"})
 			send({cmd = "anim", name = "nod"})
 			send({cmd = "say", name = "calm"})

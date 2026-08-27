@@ -41,3 +41,22 @@ func test_order_independence() -> bool:
 	var want := f("(A & B) > C")
 	return check(Unifier.resolve(f("?x"), ra.subst).equals(want), "顺序 a 应解出 (A∧B)→C") \
 		and check(Unifier.resolve(f("?x"), rb.subst).equals(want), "顺序 b 应解出同样结果")
+
+
+func test_match_into_is_one_way() -> bool:
+	var subst: Dictionary = {}
+	var allowed: Dictionary = {&"u": true, &"v": true}
+	var ok := check(Unifier.match_into(f("A & B"), f("?u & ?v"), subst, allowed), "具体值灌进模板") \
+		and check(subst[&"u"].equals(f("A")) and subst[&"v"].equals(f("B")), "只绑模板侧的元变量")
+	var s2: Dictionary = {}
+	ok = ok and check(Unifier.match_into(f("?x & B"), f("A & B"), s2, {}), "值侧未定元变量刚性跳过,不算冲突") \
+		and check(s2.is_empty(), "刚性一侧绝不被绑定")
+	var s3: Dictionary = {}
+	ok = ok and check(not Unifier.match_into(f("A"), f("B"), s3, {}), "两侧具体且不同才是冲突") \
+		and check(not Unifier.match_into(f("A & B"), f("A | B"), s3, {}), "连接词不同是冲突")
+	var s4: Dictionary = {}
+	ok = ok and check(Unifier.match_into(f("A & ?y"), f("?u & ?v"), s4, allowed), "值侧含未定变量时仍匹配") \
+		and check(s4[&"v"].kind == Formula.Kind.META and s4[&"v"].name == &"y", "下游变量绑成上游变量的别名,之后随上游展开")
+	var s5: Dictionary = {}
+	ok = ok and check(not Unifier.match_into(f("?u & B"), f("?u"), s5, allowed), "occurs check 仍生效")
+	return ok

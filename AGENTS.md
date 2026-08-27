@@ -45,11 +45,11 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/formula.gd` | 命题 AST(不可变;`key()` 规范串 = 相等/哈希/序列化基础) |
 | `logic/formula_parser.gd` | 公式文本 ↔ AST(递归下降;`to_text` 保证往返) |
 | `logic/rule_schema.gd` | 仪器模式:端口模板 + 假设口(`is_hypothesis`/`scope_input`) |
-| `logic/rules.gd` | 八台仪器规则表(id 与 incredible.pm 规则名对应) |
+| `logic/rules.gd` | 七台仪器规则表(id 与 incredible.pm 规则名对应;`pinnable` 标可钉口) |
 | `logic/unifier.gd` | 一阶合一(occurs check;union-find 式 walk/resolve) |
 | `logic/proof_graph.gd` | 棋盘模型 + solve 五步管线(方程→合一→环→辖域→胜负) |
 | `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
-| `tests/` | headless 测试,27 例;`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,61 例;`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -60,12 +60,20 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   里已统一 `int()` 转回;新增序列化字段时照做。
 - **新 class_name 不生效**:命令行跑脚本前需 `--import` 重建缓存(编辑器开着
   的话它会自己扫)。
+- **求解是严格正向的,禁止反推**:`solve()` 不再做全局对称合一,而是按边把上游
+  纹样用 `Unifier.match_into` 灌进下游模板、只绑下游自己的元变量。仪器输出只由
+  输入 + 钉纹样决定;自由元变量所在的口由 `RuleSchema.pinnable` **白名单**标记
+  (不是"含自由变量即可钉",否则封程机 P→Q 口会重复出按钮)。`match_into` 的
+  判断顺序有讲究(模板侧可绑先于值侧刚性跳过,occurs check 不能省),动它前看
+  `test_unifier.test_match_into_is_one_way`。
 
 ## 当前进度
 
 M0 引擎 ✅ → API(ProofSession/PatternView)✅ → M1 灰盒板 ✅ → M2 编辑器/全规则 ✅ →
-M3 内容层(17 关+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅ →
+M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅ →
 交互改版(进关前全屏开场对话 StoryScene、右键删节点、无跳过键点击推进、
-连线只留错误徽章、汇路机免手动钉、未连线口幽灵纹样)✅。
+连线只留错误徽章、未连线口幽灵纹样)✅ → 删第五章(4 章 15 关)+ 严格正向求解
+(自由纹样一律由玩家钉)✅。
 剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
-机器人手册见 `docs/ROBOT_API.md`。全流程回归:`tests/visual_smoke_m3.gd`(17 关自动通关)。
+机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
+全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关)。

@@ -13,7 +13,7 @@ extends Resource
 @export var allow_bot: bool = false                   # 纹样编辑器解锁焦纹笔刷
 @export var intro_dialogue: DialogueRes
 @export var notebook_unlocks: Array[StringName] = []  # 通关时解锁的笔记本条目
-@export var robot_cue_on_enter: String = ""           # 进关机器人动作(第五章 "panic")
+@export var robot_cue_on_enter: String = ""           # 进关机器人动作(如 "glitch";当前无关卡使用)
 @export var robot_cue_on_win: String = ""             # 通关机器人动作(默认 celebrate)
 
 const DEFAULT_COLORS: Dictionary = {

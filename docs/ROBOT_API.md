@@ -53,8 +53,8 @@ BOOT 键=GPIO0。
 | `celebrate` | 通关(`robot_cue_on_win`) | happy + 欢呼舞 + "太棒了!织成了!" |
 | `confused` | 接出冲突线(节流 8s) | 困惑脸 + 摇头 + **鼓励**"别灰心,换个口试试,你可以的!" |
 | `hint` | 发呆 45s(节流 15s) | 先 `look_pc` **装作看一眼电脑再转回来**,think 脸 + "要不要试试仪器架上的新机器?" |
-| `panic` | 第五章失控(`robot_cue_on_enter`) | 故障脸 + 云台乱动 + "警告!推理核心过热!" |
-| `calm` | 第五章通关 | happy + 点头 + "谢谢你,织者……" |
+| `panic` | (原第五章失控;该章已删,关卡内暂无入口,保留给 `tests/robot_smoke.gd` 与策划) | 故障脸 + 云台乱动 + "警告!推理核心过热!" |
+| `calm` | (原第五章通关;同上保留) | happy + 点头 + "谢谢你,织者……" |
 | `glitch` `think` `sleep` `idle` | 对话行 robot_cue 任意挂 | 单表情 |
 
 未知 cue 会按 `emote` 原样下发,策划可直接扩展。

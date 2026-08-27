@@ -6,7 +6,7 @@ extends RefCounted
 ##
 ## 节点三类:ASSUMPTION(线轴,给定命题)、GOAL(目标织机)、RULE(仪器)。
 ## 边 Vector4i(from 节点, from 输出口, to 节点, to 输入口),按插入序存放
-## —— 这个顺序同时决定合一的方程顺序,保证冲突归因稳定。
+## —— 这个顺序同时决定正向传播的匹配顺序,保证冲突归因稳定。
 
 enum NodeKind { ASSUMPTION, GOAL, RULE }
 
@@ -16,7 +16,7 @@ class ProofNode:
 	var rule_id: StringName            ## 仅 RULE 有
 	var ports_in: Array[Formula] = []  ## 实例化后的输入口命题
 	var ports_out: Array[Formula] = [] ## 实例化后的输出口命题
-	var pinned: Dictionary = {}        ## {假设口下标: Formula} 玩家钉住的假设纹样
+	var pinned: Dictionary = {}        ## {可钉口下标: Formula} 玩家给该口自由元变量钉的纹样
 
 
 var nodes: Dictionary = {}        # id -> ProofNode
@@ -90,11 +90,11 @@ func remove_edge(e: Vector4i) -> void:
 	edges.erase(e)
 
 
-## 玩家在封程机上"钉住"假设纹样(f 必须是编辑器产出的全染色纹样)
+## 玩家给可钉口的自由元变量"钉住"一个纹样(f 必须是编辑器产出的全染色纹样)。
+## 封程机假设口/溃散机出口整口就是那个变量;岔纹机钉的是出口析取式里的另一支。
 func pin_hypothesis(node_id: int, out_port: int, f: Formula) -> void:
 	var n: ProofNode = nodes[node_id]
-	var schema := Rules.get_rule(n.rule_id)
-	assert(schema.outputs[out_port].is_hypothesis, "只有假设口可以钉纹样")
+	assert(_pinnable(n, out_port), "只有可钉口可以钉纹样")
 	assert(f.is_ground(), "钉住的纹样不能含未染纱")
 	n.pinned[out_port] = f
 
@@ -117,22 +117,33 @@ func _new_node(kind: int) -> ProofNode:
 func solve() -> SolveResult:
 	var result := SolveResult.new()
 
-	# 1) 收集方程。钉住的假设放最前(它们两端一定能合一,冲突就都归因到连线上)。
-	var eqs: Array = []
+	# 1) 钉纹样 = 给该口的自由元变量赋值。自由变量没有别的绑定来源,钉本身永不冲突;
+	#    对不上的责任全落在连线上。
+	var subst: Dictionary = {}
+	var node_metas: Dictionary = {}   # 节点 id -> {元变量名: true}
 	for id: int in nodes:
 		var n: ProofNode = nodes[id]
+		node_metas[id] = _node_metas(n)
 		for port: int in n.pinned:
-			eqs.append([n.ports_out[port], n.pinned[port]])
-	var first_edge_eq := eqs.size()
-	for e in edges:
-		eqs.append([_out_formula(e), _in_formula(e)])
+			subst[_port_free_meta(n, port)] = n.pinned[port]
 
-	# 2) 合一
-	var uni := Unifier.solve(eqs)
-	var subst: Dictionary = uni.subst
-	for i: int in uni.conflicts:
-		if i >= first_edge_eq:
-			result.edge_status[edges[i - first_edge_eq]] = SolveResult.EdgeStatus.CONFLICT
+	# 2) 严格正向传播到不动点:每条边把上游织好的纹样灌进下游入口模板,只绑下游
+	#    自己的元变量,绝不反过来改上游(输出只由输入 + 钉纹样决定)。绑定只增不减,
+	#    轮数有上界;边按插入序遍历,冲突归因稳定。
+	var conflicted: Dictionary = {}
+	var changed := true
+	while changed:
+		changed = false
+		for e in edges:
+			if conflicted.has(e):
+				continue
+			var before := subst.size()
+			var value := Unifier.resolve(_out_formula(e), subst)
+			if not Unifier.match_into(value, _in_formula(e), subst, node_metas[e.z]):
+				conflicted[e] = true
+				result.edge_status[e] = SolveResult.EdgeStatus.CONFLICT
+			if subst.size() != before:
+				changed = true
 
 	# 3) 环检测(顺便得到辖域检查要用的拓扑序)
 	var topo := _topo_order()
@@ -164,7 +175,8 @@ func solve() -> SolveResult:
 		result.connected_ports[Vector3i(e.x, 1, e.y)] = true
 		result.connected_ports[Vector3i(e.z, 0, e.w)] = true
 	for e in edges:
-		if not Unifier.resolve(_in_formula(e), subst).is_ground():
+		if not Unifier.resolve(_out_formula(e), subst).is_ground() \
+				or not Unifier.resolve(_in_formula(e), subst).is_ground():
 			_mark(result, e, SolveResult.EdgeStatus.UNDERSPEC)
 	for e in edges:
 		if not result.edge_status.has(e):
@@ -205,6 +217,38 @@ func _check_victory(result: SolveResult, goal: ProofNode) -> bool:
 
 
 # ---- 求解的内部步骤 ----
+
+## 节点拥有的全部元变量(放置时发的新鲜名,跨节点绝不重名)
+static func _node_metas(n: ProofNode) -> Dictionary:
+	var out: Dictionary = {}
+	for f in n.ports_in + n.ports_out:
+		for m in f.metas():
+			out[m] = true
+	return out
+
+
+## 某输出口的自由元变量:出现在该口模板、却不在任何输入口模板里的那一个(可钉口恰有一个)
+static func _port_free_meta(n: ProofNode, out_port: int) -> StringName:
+	var in_metas: Dictionary = {}
+	for f in n.ports_in:
+		for m in f.metas():
+			in_metas[m] = true
+	var free: Array[StringName] = []
+	for m in n.ports_out[out_port].metas():
+		if not in_metas.has(m):
+			free.append(m)
+	assert(free.size() == 1, "可钉口应恰有一个自由元变量,实际 %d" % free.size())
+	return free[0]
+
+
+static func _pinnable(n: ProofNode, out_port: int) -> bool:
+	if n.kind != NodeKind.RULE:
+		return false
+	var schema := Rules.get_rule(n.rule_id)
+	if schema == null or out_port < 0 or out_port >= schema.outputs.size():
+		return false
+	return schema.outputs[out_port].pinnable
+
 
 func _out_formula(e: Vector4i) -> Formula:
 	return (nodes[e.x] as ProofNode).ports_out[e.y]
@@ -341,7 +385,9 @@ static func from_dict(d: Dictionary) -> ProofGraph:
 		for t: String in nd.ports_out:
 			n.ports_out.append(FormulaParser.parse(t))
 		for port_key: String in nd.pinned:
-			n.pinned[int(port_key)] = FormulaParser.parse(nd.pinned[port_key])
+			# 旧档可能钉在如今不可钉的口上(如汇路机假设口):静默丢弃,求解只认可钉口
+			if _pinnable(n, int(port_key)):
+				n.pinned[int(port_key)] = FormulaParser.parse(nd.pinned[port_key])
 		g.nodes[n.id] = n
 		g._next_id = maxi(g._next_id, n.id + 1)
 	for e: Array in d.edges:
