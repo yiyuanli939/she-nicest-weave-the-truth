@@ -15,8 +15,12 @@ func _init() -> void:
 	dim.color = Color(0, 0, 0, 0.45)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(dim)
+	# 用 CenterContainer 包 panel 才是真居中(裸 PRESET_CENTER 只设锚点不设 offset,会向右下溢出)
+	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(center)
 	var panel := PanelContainer.new()
-	panel.set_anchors_preset(Control.PRESET_CENTER)
 	panel.custom_minimum_size = Vector2(460, 0)
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
@@ -58,7 +62,7 @@ func _init() -> void:
 	close.pressed.connect(func() -> void: visible = false)
 	box.add_child(close)
 	panel.add_child(box)
-	add_child(panel)
+	center.add_child(panel)
 
 
 func open(robot: Node) -> void:

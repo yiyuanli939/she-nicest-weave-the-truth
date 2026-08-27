@@ -7,12 +7,33 @@
 [sub_resource type="Resource" id="Resource_568a1"]
 script = ExtResource("1_flmij")
 speaker = "莉娅"
-text = "[占位] 空手也能立诺:钉住一个假设,再原样交还。点封程机上的「钉纹样」。"
+text = "[占位] 封程机是最难的一台。别急,我一步步带你。"
 robot_cue = "think"
 
 [sub_resource type="Resource" id="Resource_8tgij"]
+script = ExtResource("1_flmij")
+speaker = "莉娅"
+text = "[占位] 它要立的是一张「若…则…」的承诺,可你手上一根线都没有。"
+
+[sub_resource type="Resource" id="Resource_bpotd"]
+script = ExtResource("1_flmij")
+speaker = "莉娅"
+text = "[占位] 那就先「假设」有:点封程机的「钉纹样」,钉住一个 A —— 这是凭空借来的前提。"
+robot_cue = "think"
+
+[sub_resource type="Resource" id="Resource_hnd1j"]
+script = ExtResource("1_flmij")
+speaker = "莉娅"
+text = "[占位] 拿这个假设的 A 去织出你要的结论(这关结论也是 A,原样交还即可)。"
+
+[sub_resource type="Resource" id="Resource_jljsi"]
+script = ExtResource("1_flmij")
+speaker = "莉娅"
+text = "[占位] 封程机把整段封装成「若 A 则 A」,借来的假设就此还清 —— 这叫放电。翻开右边的笔记有详解。"
+
+[sub_resource type="Resource" id="Resource_nnnp4"]
 script = ExtResource("2_e2nhv")
-lines = Array[ExtResource("1_flmij")]([SubResource("Resource_568a1")])
+lines = Array[ExtResource("1_flmij")]([SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j"), SubResource("Resource_jljsi")])
 location_title = "[占位] 封程工房"
 
 [resource]
@@ -22,5 +43,6 @@ title = "自证"
 goal = "A > A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim"])
 atoms = Array[StringName]([&"A"])
-intro_dialogue = SubResource("Resource_8tgij")
+intro_dialogue = SubResource("Resource_nnnp4")
+notebook_unlocks = Array[StringName]([&"notebook_imp_intro"])
 robot_cue_on_win = "celebrate"

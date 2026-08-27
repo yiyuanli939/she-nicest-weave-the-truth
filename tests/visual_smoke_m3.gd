@@ -1,6 +1,6 @@
 extends SceneTree
 ## M3 全流程验收:清档 → 主菜单 → 逐关(15)开场对话→解题→「下一关」推进 →
-## 选关页金印 → 笔记本 4 条 → 重进旧关棋盘恢复。
+## 选关页金印 → 笔记本 5 条 → 重进旧关棋盘恢复。
 ##   godot --path . --script res://tests/visual_smoke_m3.gd
 ## 退出码 0 = 全部通过。截图在 tests/screenshots/。
 
@@ -86,7 +86,7 @@ func _run() -> void:
 			await _settle()
 
 	_check(game.save.solved.size() == 15, "存档记录 15 关 (得 %d)" % game.save.solved.size())
-	_check(game.save.notebook.size() == 4, "笔记本解锁 4 条 (得 %d)" % game.save.notebook.size())
+	_check(game.save.notebook.size() == 5, "笔记本解锁 5 条 (得 %d)" % game.save.notebook.size())
 
 	# 选关页金印
 	game.goto_select()

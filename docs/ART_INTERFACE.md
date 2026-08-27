@@ -4,6 +4,11 @@
 美术把成品放进对应槽位 + 改 `theme/main_theme.tres`,零代码改动换装。
 风格规范见 `plan.md` §7(黄铜三阶 #B08D57/#8C6F45/#5C4A2E + 墨 + 羊皮纸;128px 网格,2px 描边,九宫格 margin 24px)。
 
+UI 布局原型(藕粉竖条标签 `Color(0.66,0.53,0.53)`):
+`information/ui_关卡界面_笔记入口.png`(仪器架 | 关卡棋盘 | 右缘竖排「笔记」标签)、
+`information/ui_笔记页面_翻书.png`(左缘「继续工作」| 书页 | 右缘「翻页」)。
+对应实现:`ui/level_scene.gd` 的笔记标签、`narrative/notebook_ui.gd` 的翻书式笔记。
+
 ## 1. 全局主题
 
 `theme/main_theme.tres` — 全部 Control 的字体/StyleBox/配色入口(Project Settings → GUI → Theme 已指向它)。

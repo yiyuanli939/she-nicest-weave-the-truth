@@ -40,7 +40,7 @@ func test_setup_every_level() -> bool:
 func test_notebook_unlocks_exist() -> bool:
 	var nb := NotebookCatalog.load_default()
 	var cat := LevelCatalog.load_default()
-	var ok := check(nb != null and nb.entries.size() == 4, "笔记本 4 条")
+	var ok := check(nb != null and nb.entries.size() == 5, "笔记本 5 条")
 	for lv in cat.all_levels():
 		for entry_id in lv.notebook_unlocks:
 			ok = check(nb.entry(entry_id) != null, "%s 解锁了不存在的条目 %s" % [lv.id, entry_id]) and ok

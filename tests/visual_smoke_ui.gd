@@ -264,6 +264,56 @@ func _run() -> void:
 	await _settle()
 	_check(s.get_node_ids().size() == 2 and s.get_wires().is_empty(), "重置回到只有线轴和目标")
 
+	# ---- L. 关卡右缘「笔记」标签 → 翻书式笔记:打开 / 翻页 / 继续工作关闭 ----
+	var nb_tab: Button = null
+	for b in scene.find_children("*", "Button", true, false):
+		if (b as Button).text.contains("笔"):
+			nb_tab = b
+	_check(nb_tab != null, "关卡界面右缘有「笔记」标签")
+	if nb_tab != null:
+		_click(_center(nb_tab), MOUSE_BUTTON_LEFT)
+		await _settle()
+		var nbui := scene._notebook_ui
+		_check(nbui.visible, "点「笔记」标签打开笔记")
+		# 强制塞两条已解锁条目以验证翻页(存档此刻可能没解锁)
+		nbui.open(game.notebook, ["notebook_and", "notebook_imp_intro"])
+		await _settle()
+		_check(nbui._page == 0 and nbui._entries.size() == 2, "笔记从第 1 页开始,两条")
+		var flip: Button = null
+		var backtab: Button = null
+		for b in nbui.find_children("*", "Button", true, false):
+			if (b as Button).text.contains("翻"):
+				flip = b
+			elif (b as Button).text.contains("继"):
+				backtab = b
+		_check(flip != null and backtab != null, "笔记有「翻页」和「继续工作」标签")
+		_click(_center(flip), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(nbui._page == 1, "点「翻页」到第 2 页")
+		_click(_center(flip), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(nbui._page == 0, "再翻回绕到第 1 页")
+		_click(_center(backtab), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(not nbui.visible, "点「继续工作」关闭笔记")
+
+	# ---- M. 拖机器到仪器架(左)删除 ----
+	_click(_center(_button_named(scene._palette, "并织机")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	var drag_id: int = s.get_node_ids()[-1]
+	s.set_node_position(drag_id, Vector2(-600, 200))   # 拖到远左(仪器架方向)
+	board.apply_positions()
+	await _settle()
+	board._on_end_node_move()   # 模拟拖动松手
+	await _settle()
+	_check(s.describe_node(drag_id) == null, "把机器拖到仪器架松手即删除")
+	_check(board.get_node_or_null("n%d" % drag_id) == null, "视图节点同步移除")
+	_action("ui_undo")
+	await _settle()
+	_check(s.describe_node(drag_id) != null, "撤回拖删")
+	s.remove_machine(drag_id)
+	await _settle()
+
 	# ---- K. 选关页真实点击进关 ----
 	game.goto_select()
 	await _settle()

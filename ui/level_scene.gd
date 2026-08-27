@@ -14,7 +14,10 @@ var _status: Label
 var _win_flash: ColorRect
 var _editor: PatternEditor
 var _dialogue: DialogueBox
+var _notebook_ui: NotebookUI
 var _next_btn: Button
+
+const NOTEBOOK_TAB_COLOR := Color(0.66, 0.53, 0.53)   # 藕粉竖条(与笔记页一致)
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
@@ -108,7 +111,20 @@ func _build_ui() -> void:
 	_board.atom_colors = atom_colors
 	_board.bind(session)
 	body.add_child(_board)
+	_board.delete_zone = _palette   # 把机器拖回仪器架即删除
 	_palette.machine_requested.connect(_board.place_machine_at_center)
+
+	# 右缘竖排「笔记」标签:点开翻书式笔记(布局参考 information/ui_关卡界面_笔记入口.png)
+	var notebook_tab := Button.new()
+	notebook_tab.text = "笔\n记"
+	notebook_tab.custom_minimum_size.x = 48
+	notebook_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var tab_sb := StyleBoxFlat.new()
+	tab_sb.bg_color = NOTEBOOK_TAB_COLOR
+	notebook_tab.add_theme_stylebox_override("normal", tab_sb)
+	notebook_tab.add_theme_color_override("font_color", Color.WHITE)
+	notebook_tab.pressed.connect(_on_open_notebook)
+	body.add_child(notebook_tab)
 
 	_win_flash = ColorRect.new()
 	_win_flash.color = Color(0.2, 0.85, 0.35, 0.0)
@@ -126,6 +142,14 @@ func _build_ui() -> void:
 	if _game != null:
 		_dialogue.cue.connect(_game.robot_cue)
 	add_child(_dialogue)
+
+	_notebook_ui = NotebookUI.new()
+	add_child(_notebook_ui)
+
+
+func _on_open_notebook() -> void:
+	if _game != null:
+		_notebook_ui.open(_game.notebook, _game.save.notebook)
 
 
 ## 线轴排左列、目标织机放右侧
