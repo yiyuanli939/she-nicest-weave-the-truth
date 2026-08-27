@@ -157,6 +157,7 @@ func _run() -> void:
 	# ---- C. HUD:没有撤销/重做按钮,有重置 ----
 	_check(_button_named(scene, "撤销") == null and _button_named(scene, "重做") == null, "HUD 无撤销/重做按钮")
 	_check(_button_named(scene, "重置") != null, "HUD 有重置按钮")
+	_check(_button_named(scene, "示答") == null, "没有脚本化解法的关不显示示答按钮")
 
 	# ---- D. 仪器架真实点击放置岔纹机 ----
 	var board: ProofBoard = scene._board
@@ -352,6 +353,16 @@ func _run() -> void:
 				(current_scene as StoryScene).finish()
 				await _settle()
 				_check(current_scene is LevelScene and game.current.id == &"l01", "播完进 l01 棋盘")
+
+	# ---- N. 测试用「示答」按钮:点了自动摆出本关答案并通关 ----
+	var l01 := current_scene as LevelScene
+	if l01 != null:
+		var answer_btn := _button_named(l01, "示答")
+		_check(answer_btn != null, "有脚本化解法的关(调试版)显示示答按钮")
+		if answer_btn != null:
+			_click(_center(answer_btn), MOUSE_BUTTON_LEFT)
+			await _settle()
+			_check(l01.session.is_solved(), "点「示答」自动摆出答案并通关")
 
 	_finish()
 

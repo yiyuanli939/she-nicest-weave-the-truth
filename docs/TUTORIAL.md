@@ -157,6 +157,7 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 | 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR` |
 | 改全屏对话场景布局/占位色 | `ui/story_scene.gd` 顶部常量与 `_build_ui/_fill_portrait` |
 | 改关卡 HUD/快捷键/发呆提示 | `ui/level_scene.gd` |
+| 测试开答案 | HUD「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `tests/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
 | 改进关流程 | `game/game.gd start_level/enter_board` |
 | 机器人动作/语音 | `game/robot_link.gd` + `docs/ROBOT_API.md` |
 

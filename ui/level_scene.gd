@@ -19,6 +19,8 @@ var _guide_panel: MachineGuidePanel
 var _next_btn: Button
 
 const NOTEBOOK_TAB_COLOR := Color(0.66, 0.53, 0.53)   # 藕粉竖条(与笔记页一致)
+# 测试用示答:动态加载而非 class_name 引用,导出正式版即使裁掉 tests/ 也不影响本脚本
+const SOLUTIONS_PATH := "res://tests/level_solutions.gd"
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
@@ -91,6 +93,16 @@ func _build_ui() -> void:
 	reset_btn.pressed.connect(_on_reset)
 	hud.add_child(reset_btn)
 	if _game != null:
+		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
+		if OS.is_debug_build() and _game.current != null and ResourceLoader.exists(SOLUTIONS_PATH):
+			var sols := load(SOLUTIONS_PATH)
+			if sols.DATA.has(_game.current.id):
+				var answer_btn := Button.new()
+				answer_btn.text = "示答"
+				answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
+				answer_btn.modulate.a = 0.7
+				answer_btn.pressed.connect(_on_show_answer)
+				hud.add_child(answer_btn)
 		_next_btn = Button.new()
 		_next_btn.text = "下一关 ▶"
 		_next_btn.visible = false
@@ -262,3 +274,10 @@ func _on_reset() -> void:
 	session.load_state(_fresh_state)
 	_layout_endpoints()
 	_status.text = ""
+
+
+## 测试用:重置后按 tests/level_solutions.gd 的脚本化解法自动通关(仅调试版有入口)
+func _on_show_answer() -> void:
+	_on_reset()
+	var sols := load(SOLUTIONS_PATH)
+	sols.apply(self, _board, _game.current.id)
