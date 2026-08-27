@@ -111,7 +111,6 @@ func _build_ui() -> void:
 	_board.atom_colors = atom_colors
 	_board.bind(session)
 	body.add_child(_board)
-	_board.delete_zone = _palette   # 把机器拖回仪器架即删除
 	_palette.machine_requested.connect(_board.place_machine_at_center)
 
 	# 右缘竖排「笔记」标签:点开翻书式笔记(布局参考 information/ui_关卡界面_笔记入口.png)

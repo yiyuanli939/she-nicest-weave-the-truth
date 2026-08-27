@@ -11,7 +11,6 @@ signal pin_requested(node_id: int, out_port: int)
 
 var session: ProofSession
 var atom_colors: Dictionary = {}
-var delete_zone: Control   # 拖机器到这块区域(仪器架)松手即删;level_scene 建好后注入
 
 var _overlay: WireOverlay
 
@@ -124,21 +123,7 @@ func _remove_machine(id: int) -> void:
 
 func _on_end_node_move() -> void:
 	for mn in _machine_nodes():
-		if _dragged_onto_delete_zone(mn):
-			_remove_machine(mn.node_id)
-		else:
-			session.set_node_position(mn.node_id, mn.position_offset)
-
-
-## 机器节点被拖到仪器架(左侧)→ 请求删除。线轴/目标不算。
-## 判据是"节点中心 x 到了仪器架右缘以左"而非"落进矩形":GraphEdit 会把节点裁在自己
-## 区域里、仪器架又在其左外侧,拖过头(中心越过仪器架左缘)也该算,所以按 x 阈值。
-func _dragged_onto_delete_zone(mn: MachineNode) -> bool:
-	if delete_zone == null or mn.node_type != ProofSession.NodeType.MACHINE:
-		return false
-	var zone := delete_zone.get_global_rect()
-	var c := mn.get_global_rect().get_center()
-	return c.x <= zone.end.x and c.y >= zone.position.y and c.y <= zone.end.y
+		session.set_node_position(mn.node_id, mn.position_offset)
 
 
 static func _id_of(node_name: StringName) -> int:

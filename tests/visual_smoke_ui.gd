@@ -54,6 +54,15 @@ func _action(name: String) -> void:
 		root.push_input(ev)
 
 
+func _key(keycode: Key) -> void:
+	for pressed in [true, false]:
+		var ev := InputEventKey.new()
+		ev.keycode = keycode
+		ev.physical_keycode = keycode
+		ev.pressed = pressed
+		root.push_input(ev)
+
+
 func _button_named(from: Node, text: String) -> Button:
 	for b in from.find_children("*", "Button", true, false):
 		if (b as Button).text == text:
@@ -248,16 +257,27 @@ func _run() -> void:
 	await _settle()
 	_check(s.get_node_ids().size() == 3, "Ctrl+Shift+Z 重做(并织机再次删除)")
 
-	# ---- I. Delete 键删除选中节点 ----
+	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键) ----
 	mn = board.get_node("n%d" % mid) as MachineNode
-	mn.selected = true
-	board.grab_focus()
-	_action("ui_graph_delete")
+	_click(_center(mn), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(s.describe_node(mid) == null, "Delete 键删除选中仪器")
+	_check(mn.selected and board.has_focus(), "左键点节点选中它、板获得焦点")
+	_key(KEY_BACKSPACE)   # Mac 笔记本的"delete"就是 Backspace
+	await _settle()
+	_check(s.describe_node(mid) == null, "选中后按 Backspace 删除仪器")
 	_action("ui_undo")
 	await _settle()
-	_check(s.describe_node(mid) != null, "撤回 Delete")
+	# 正向 Delete 键也要能删
+	mn = board.get_node("n%d" % mid) as MachineNode
+	_check(mn != null, "撤回后节点回来")
+	_click(_center(mn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_key(KEY_DELETE)
+	await _settle()
+	_check(s.describe_node(mid) == null, "选中后按正向 Delete 也删除")
+	_action("ui_undo")
+	await _settle()
+	_check(s.describe_node(mid) != null, "撤回删除")
 
 	# ---- J. 重置按钮真实点击 ----
 	_click(_center(_button_named(scene, "重置")), MOUSE_BUTTON_LEFT)
@@ -296,23 +316,6 @@ func _run() -> void:
 		_click(_center(backtab), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(not nbui.visible, "点「继续工作」关闭笔记")
-
-	# ---- M. 拖机器到仪器架(左)删除 ----
-	_click(_center(_button_named(scene._palette, "并织机")), MOUSE_BUTTON_LEFT)
-	await _settle()
-	var drag_id: int = s.get_node_ids()[-1]
-	s.set_node_position(drag_id, Vector2(-600, 200))   # 拖到远左(仪器架方向)
-	board.apply_positions()
-	await _settle()
-	board._on_end_node_move()   # 模拟拖动松手
-	await _settle()
-	_check(s.describe_node(drag_id) == null, "把机器拖到仪器架松手即删除")
-	_check(board.get_node_or_null("n%d" % drag_id) == null, "视图节点同步移除")
-	_action("ui_undo")
-	await _settle()
-	_check(s.describe_node(drag_id) != null, "撤回拖删")
-	s.remove_machine(drag_id)
-	await _settle()
 
 	# ---- K. 选关页真实点击进关 ----
 	game.goto_select()
