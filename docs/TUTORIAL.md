@@ -159,10 +159,23 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 65 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 72 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
+"$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
 "$GODOT" --path .                                                  # 实跑看手感
 ```
 
 改 `logic/` 必跑 headless;改 UI 看 `tests/screenshots/` 的截图对比;改关卡数据两者都跑。
+
+**测试分层**(想知道"某种情况有没有被测到"先看这里):
+- `tests/test_solver_exhaustive.gd` — 穷举/随机:七台机器两两每个口互接、每台机自环、每个可钉口钉每种纹样;
+  300 张固定种子随机图跑不变量(每口有纹样、OK 边两侧全染色相等、欠定边含未染纱、CYCLE 边在环上、
+  钉值不被改写、**摘掉下游普通线上游出口不变(禁反推)**、重解确定、JSON 往返不变、接线乱序胜负一致);
+  每关解法"完整通关 / 少任一钉不通关 / 少任一线不通关 / 4 种接线顺序仍通关 / 要钉的原子本关可用";
+  存档残留 l16/l17/notebook_tnd 无害;ProofSession 随机操作序列 undo 全回初态、redo 全回终态。
+- `tests/visual_smoke_ui.gd` — 真实输入:对话在名牌/正文/面板角/面板外/立绘/插图六个落点都能推进,
+  立绘与背景贴图槽位,无对话关直进棋盘;右键在标题/纹样/标签/spacer/几何中心六个落点都能删,
+  拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→编辑器→钉住→📌;
+  幽灵态切换;欠定/冲突徽章与断线;重置按钮;选关页点按钮进关。
+- `tests/visual_smoke_m3.gd` / `m2.gd` — 端到端流程与三个代表性证明。

@@ -49,7 +49,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/unifier.gd` | 一阶合一(occurs check;union-find 式 walk/resolve) |
 | `logic/proof_graph.gd` | 棋盘模型 + solve 五步管线(方程→合一→环→辖域→胜负) |
 | `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
-| `tests/` | headless 测试,65 例;`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,72 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -80,4 +80,4 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 (自由纹样一律由玩家钉)✅。
 剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
 机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
-全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关)。
+全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
