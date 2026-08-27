@@ -144,3 +144,18 @@ func _build_conj_proof(s: ProofSession) -> void:
 	s.connect_wire(split, 1, join, 0)
 	s.connect_wire(split, 0, join, 1)
 	s.connect_wire(join, 0, s.goal_id, 0)
+
+
+func test_connected_getters() -> bool:
+	var s := ProofSession.new()
+	s.setup(["A | B"], "B | A")
+	var oe := s.place_machine(&"or_elim", Vector2.ZERO)
+	s.connect_wire(s.assumption_ids[0], 0, oe, 0)
+	var ok := check(s.is_input_connected(oe, 0), "已接线输入口应 connected") \
+		and check(not s.is_input_connected(oe, 1), "未接线支路口不应 connected") \
+		and check(not s.is_output_connected(oe, 0), "未接线输出口不应 connected")
+	var err := s.pin_hypothesis(oe, 1, "A")
+	ok = ok and check(err == "", "钉假设口应成功,实际: " + err) \
+		and check(s.is_output_connected(oe, 1), "钉住的假设口应算 connected(玩家显式承诺,实显)")
+	s.free()
+	return ok

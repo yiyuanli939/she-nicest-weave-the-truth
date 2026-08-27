@@ -112,3 +112,17 @@ func test_edge_rules() -> bool:
 		and check(not g.add_edge(Vector4i(a, 0, join, 0)), "输入口已占用应拒绝(单口单线)") \
 		and check(not g.add_edge(Vector4i(join, 0, join, 1)), "自环应拒绝") \
 		and check(not g.add_edge(Vector4i(a, 5, join, 1)), "不存在的端口应拒绝")
+
+
+func test_connected_ports() -> bool:
+	var g := ProofGraph.new()
+	var assum := g.add_assumption_node(f("A | B"))
+	var oe := g.add_rule_node(&"or_elim")
+	g.add_edge(Vector4i(assum, 0, oe, 0))
+	var r := g.solve()
+	return check(r.input_connected(oe, 0), "接了线的输入口应算 connected") \
+		and check(not r.input_connected(oe, 1), "没接线的支路口不算 connected") \
+		and check(not r.input_connected(oe, 2), "没接线的支路口不算 connected") \
+		and check(not r.output_connected(oe, 0), "没接线的输出口不算 connected") \
+		and check(r.output_connected(assum, 0), "线轴的输出端应记进 connected") \
+		and check(r.value_in(oe, 1) != null, "未连线口的推导值仍应存在(幽灵化只是视图行为)")

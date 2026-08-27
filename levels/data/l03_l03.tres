@@ -12,6 +12,7 @@ text = "[占位] 拆开,再反着织回去。"
 [sub_resource type="Resource" id="Resource_8crae"]
 script = ExtResource("2_f8yfv")
 lines = Array[ExtResource("1_kjkf3")]([SubResource("Resource_odvgm")])
+location_title = "[占位] 织坊"
 
 [resource]
 script = ExtResource("3_jjorm")

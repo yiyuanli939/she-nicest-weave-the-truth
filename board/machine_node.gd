@@ -5,6 +5,7 @@ extends GraphNode
 ## 假设口(线轴口)用强调色;titlebar 的"钉纹样"按钮由 M2 的纹样编辑器接管。
 
 signal pin_requested(out_port: int)
+signal delete_requested
 
 const PORT_COLOR := Color(0.72, 0.58, 0.34)   # 黄铜
 const HYP_COLOR := Color(0.85, 0.42, 0.55)    # 假设口强调色
@@ -48,12 +49,25 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 		set_slot(row,
 				row < info.inputs.size(), 0, GOAL_COLOR if info.type == ProofSession.NodeType.GOAL else PORT_COLOR,
 				row < info.outputs.size(), 0, HYP_COLOR if out_is_hyp else PORT_COLOR)
-	for p in _hyp_ports:
+	# 只有单假设口(封程机)给钉按钮;汇路机的双假设口靠连线合一自动定纹样
+	if _hyp_ports.size() == 1:
 		var btn := Button.new()
-		btn.text = "钉纹样" if _hyp_ports.size() == 1 else "钉%d" % p
+		btn.text = "钉纹样"
 		btn.tooltip_text = "为假设口指定纹样(线轴口)"
-		btn.pressed.connect(pin_requested.emit.bind(p))
+		btn.pressed.connect(pin_requested.emit.bind(_hyp_ports[0]))
 		get_titlebar_hbox().add_child(btn)
+
+
+## 右键点节点体 = 请求删除本机(线轴/目标由模型层拒绝);拖线中放行给 GraphEdit 取消拖线
+func _gui_input(event: InputEvent) -> void:
+	var mb := event as InputEventMouseButton
+	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_RIGHT:
+		return
+	var board := get_parent() as ProofBoard
+	if board != null and board.wire_dragging:
+		return
+	accept_event()
+	delete_requested.emit()
 
 
 func _make_port_cell(port: ProofSession.PortInfo, views: Array[PatternView], big: bool) -> Control:
@@ -66,17 +80,23 @@ func _make_port_cell(port: ProofSession.PortInfo, views: Array[PatternView], big
 	var v := PatternView.new()
 	v.atom_colors = atom_colors
 	v.min_size = Vector2(72, 40) if big else Vector2(48, 26)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE   # 纹样不吃鼠标:右键删除/拖动节点都要穿透到 GraphNode
 	views.append(v)
 	box.add_child(v)
 	return box
 
 
-## 每次 board_updated 后拉取最新纹样
+## 每次 board_updated 后拉取最新纹样。
+## 仪器上没线(也没钉)的口画幽灵:值只是合一推导的期望,不是已流入的事实;
+## 线轴/目标永远实显(给定事实/要织的样张)。
 func refresh(session: ProofSession) -> void:
+	var is_machine := node_type == ProofSession.NodeType.MACHINE
 	for i in _in_views.size():
 		_in_views[i].formula = session.get_input_pattern(node_id, i)
+		_in_views[i].ghost = is_machine and not session.is_input_connected(node_id, i)
 	for i in _out_views.size():
 		_out_views[i].formula = session.get_output_pattern(node_id, i)
+		_out_views[i].ghost = is_machine and not session.is_output_connected(node_id, i)
 	var info := session.describe_node(node_id)
 	if info != null and not _hyp_ports.is_empty():
 		for p in _hyp_ports:

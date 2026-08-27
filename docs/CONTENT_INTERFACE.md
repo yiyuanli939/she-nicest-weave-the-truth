@@ -5,9 +5,13 @@
 ## 改台词
 
 1. Godot 打开 `levels/data/lXX_*.tres`,Inspector 展开 `intro_dialogue → lines`。
-2. 每行 `DialogueLine`:`speaker`(名牌)/ `text`(BBCode 可用)/ `side_right`(名牌靠右,小机=on)/
-   **`robot_cue`**(播到该行触发实体小机演出,可填:`greet celebrate confused hint panic glitch calm think sleep idle`,留空=无)。
-3. 保存即生效(对话在进关时播放,点击推进,右上跳过)。
+2. 每行 `DialogueLine`:`speaker`(名牌)/ `text`(BBCode 可用)/ `side_right`(名牌/立绘靠右,小机=on)/
+   **`robot_cue`**(播到该行触发实体小机演出,可填:`greet celebrate confused hint panic glitch calm think sleep idle`,留空=无)/
+   `portrait`(立绘贴图,留空=按 speaker 着色的剪影占位)。
+3. `intro_dialogue` 本体还有场景级字段:`location_title`(全屏对话左上的地点铭牌,空=用关卡标题)、
+   `background`(背景插图,留空=羊皮纸色块占位)。
+4. 保存即生效。开场对话在**进关前的全屏对话场景**播放:点击任意处推进
+   (打字中点击=整句显示,显示完点击=下一句),最后一句后再点即进棋盘,无跳过键。
 
 ## 改/加关卡
 

@@ -11,6 +11,7 @@ signal pin_requested(node_id: int, out_port: int)
 
 var session: ProofSession
 var atom_colors: Dictionary = {}
+var wire_dragging := false   # 拖线中右键 = GraphEdit 取消拖线,MachineNode 据此放行不删
 
 var _overlay: WireOverlay
 
@@ -28,6 +29,8 @@ func _ready() -> void:
 	disconnection_request.connect(_on_disconnection_request)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 	end_node_move.connect(_on_end_node_move)
+	connection_drag_started.connect(func(_f: StringName, _p: int, _o: bool) -> void: wire_dragging = true)
+	connection_drag_ended.connect(func() -> void: wire_dragging = false)
 	add_child(_overlay)
 
 
@@ -54,6 +57,7 @@ func _spawn_node(id: int) -> void:
 	mn.build_from(info)
 	mn.position_offset = session.get_node_position(id)
 	mn.pin_requested.connect(func(port: int) -> void: pin_requested.emit(id, port))
+	mn.delete_requested.connect(_on_node_delete_requested.bind(id))
 	add_child(mn)
 	mn.refresh(session)
 
@@ -104,13 +108,21 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 
 func _on_delete_nodes_request(nodes: Array[StringName]) -> void:
 	for nm in nodes:
-		var id := _id_of(nm)
-		session.remove_machine(id)
-		if session.describe_node(id) == null:
-			var mn := get_node_or_null(NodePath(nm)) as MachineNode
-			if mn != null:
-				mn.name = str(mn.name) + "_dead"
-				mn.queue_free()
+		_remove_machine(_id_of(nm))
+
+
+## 右键点节点体的删除入口(见 MachineNode._gui_input)
+func _on_node_delete_requested(id: int) -> void:
+	_remove_machine(id)
+
+
+func _remove_machine(id: int) -> void:
+	session.remove_machine(id)
+	if session.describe_node(id) == null:   # 线轴/目标模型层拒删,视图保持不动
+		var mn := get_node_or_null(NodePath("n%d" % id)) as MachineNode
+		if mn != null:
+			mn.name = str(mn.name) + "_dead"
+			mn.queue_free()
 
 
 func _on_end_node_move() -> void:

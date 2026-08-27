@@ -49,6 +49,14 @@ func next_level() -> LevelDef:
 
 func start_level(lv: LevelDef) -> void:
 	current = lv
+	if lv != null and lv.intro_dialogue != null and not lv.intro_dialogue.lines.is_empty():
+		get_tree().change_scene_to_file("res://ui/story_scene.tscn")
+	else:
+		enter_board()
+
+
+## 开场对话播完(或没有对话)后进棋盘;场景路径收口在这里
+func enter_board() -> void:
 	get_tree().change_scene_to_file("res://ui/level_scene.tscn")
 
 

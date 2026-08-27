@@ -1,6 +1,7 @@
 class_name LevelScene
 extends Control
-## 关卡场景:ProofSession + ProofBoard + 仪器架 + HUD + 入场对话。
+## 关卡场景:ProofSession + ProofBoard + 仪器架 + HUD + 关内对话框。
+## 开场对话已移到进关前的 StoryScene(见 game.start_level);_dialogue 留给关内剧情用。
 ## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
 ## 否则用下面的默认字段(冒烟测试直接注入)。
 
@@ -59,7 +60,6 @@ func _ready() -> void:
 			session.load_state(saved)
 			_restoring = false
 			_board.apply_positions()
-		_dialogue.play(lv.intro_dialogue)
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
 
@@ -79,11 +79,10 @@ func _build_ui() -> void:
 	hud.add_child(spacer)
 	_status = Label.new()
 	hud.add_child(_status)
-	for pair in [["撤销", _on_undo], ["重做", _on_redo], ["重置", _on_reset]]:
-		var b := Button.new()
-		b.text = pair[0]
-		b.pressed.connect(pair[1])
-		hud.add_child(b)
+	var reset_btn := Button.new()
+	reset_btn.text = "重置"
+	reset_btn.pressed.connect(_on_reset)
+	hud.add_child(reset_btn)
 	if _game != null:
 		_next_btn = Button.new()
 		_next_btn.text = "下一关 ▶"
@@ -163,6 +162,7 @@ func _on_pattern_cleared() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_undo"):
 		session.undo()
+		_status.text = ""
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_redo"):
 		session.redo()
@@ -212,15 +212,6 @@ func _on_next() -> void:
 func _on_back() -> void:
 	_game.store_board(session.save_state())
 	_game.goto_select()
-
-
-func _on_undo() -> void:
-	session.undo()
-	_status.text = ""
-
-
-func _on_redo() -> void:
-	session.redo()
 
 
 func _on_reset() -> void:

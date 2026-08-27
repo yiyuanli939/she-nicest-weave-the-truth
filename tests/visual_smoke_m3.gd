@@ -35,6 +35,13 @@ func _settle() -> void:
 	await process_frame
 
 
+## 进关前的全屏开场对话:一键播完并等切入棋盘
+func _skip_story() -> void:
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+
+
 func _run() -> void:
 	await _settle()
 	var game := _game()
@@ -51,13 +58,12 @@ func _run() -> void:
 	game.start_level(game.first_unsolved())
 	await _settle()
 	for i in 17:
+		await _skip_story()   # 开场对话在进关前的 StoryScene 播,先跳过
 		var scene := current_scene as LevelScene
 		if scene == null:
 			_check(false, "第 %d 关场景未加载" % (i + 1))
 			break
 		var lv: LevelDef = game.current
-		scene._dialogue._finish()   # 跳过入场对话(对话展示单独截屏)
-		await _settle()
 		var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 		LevelSolutions.apply(scene, board, lv.id)
 		await _settle()
@@ -77,19 +83,29 @@ func _run() -> void:
 	_shot("m3_select_all_solved")
 	_check(current_scene is LevelSelect, "选关页加载")
 
-	# 对话与笔记本展示
+	# 全屏开场对话展示 + 点击推进回归(无跳过键:每行点两次 = 全显→下一句,播完即关)
 	game.start_level(game.catalog.all_levels()[15])   # l16:小机 panic 台词
 	await _settle()
+	var story := current_scene as StoryScene
+	_check(story != null, "l16 进关前应是全屏开场对话场景")
 	_shot("m3_l16_dialogue")
-	var l16 := current_scene as LevelScene
-	_check(l16._dialogue.visible, "l16 入场对话显示")
-	l16._dialogue._finish()
+	if story != null:
+		_check(story._dialogue.visible, "l16 开场对话显示")
+		var mb := InputEventMouseButton.new()
+		mb.button_index = MOUSE_BUTTON_LEFT
+		mb.pressed = true
+		for j in game.current.intro_dialogue.lines.size():
+			story._dialogue._on_click(mb)   # 打字中:点击全显
+			story._dialogue._on_click(mb)   # 已全显:点击下一句/关闭
+		_check(not story._dialogue.visible, "点击播完最后一句后再点即关闭")
+		await _settle()
+		_check(current_scene is LevelScene, "对话播完自动进棋盘")
 
 	# 棋盘恢复:重进 l03 应已是通关棋盘
 	game.start_level(game.catalog.all_levels()[2])
 	await _settle()
+	await _skip_story()
 	var l03 := current_scene as LevelScene
-	l03._dialogue._finish()
 	_check(l03.session.get_node_ids().size() == 4, "l03 棋盘恢复(线轴+目标+两台仪器)")
 	_check(l03.session.is_solved(), "l03 恢复后仍通关")
 	_shot("m3_l03_restored")

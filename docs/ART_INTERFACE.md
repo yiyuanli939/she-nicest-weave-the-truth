@@ -17,6 +17,10 @@
 | `assets/svg/badges/{conflict,underspec,cycle,escaped}.svg` | 骷髅/问号线轴/衔尾蛇/剪刀 | 4 | 缺→WireOverlay 文字徽章 |
 | `assets/svg/ui/panel_parchment.svg` 等 | 羊皮纸面板/黄铜按钮三态/蜡封(未解+已解)/笔记本皮面/对话框 | ~8 | 缺→StyleBoxFlat |
 
+全屏开场对话(`ui/story_scene.gd`)的美术走数据槽位而非文件路径:
+`DialogueRes.background`(背景插图)与 `DialogueLine.portrait`(立绘)在关卡 .tres 的
+`intro_dialogue` 里直接填 Texture2D;留空回退程序化占位(羊皮纸色块 / speaker 哈希着色剪影)。
+
 导入设置:svg/scale=2.0 + mipmaps(见 plan.md §7 开头)。
 
 ## 3. 程序化视觉的调参点
@@ -26,7 +30,9 @@
 | 命题纹样配色 | 关卡 .tres 的 `atom_colors`;缺省表在 `levels/level_def.gd DEFAULT_COLORS`;hash 回退在 `api/pattern_view.gd atom_color()` |
 | 纹样底色/焦纹/线宽 | `api/pattern_view.gd` 顶部常量(LINEN/CHAR_BLACK/SPLIT_COLOR/BASE_LINE_W) |
 | 端口/假设口/目标配色 | `board/machine_node.gd` 顶部常量 |
-| 错误徽章文字与颜色 | `board/wire_overlay.gd` BADGE/BADGE_COLOR(换 SVG 时改 `_make_chip`) |
+| 错误徽章文字与颜色 | `board/wire_overlay.gd` BADGE/BADGE_COLOR(换 SVG 时改 `_make_chip`;只有出错的线有浮层) |
+| 未连线端口的幽灵纹样透明度 | `api/pattern_view.gd GHOST_ALPHA` |
+| 开场对话场景底色/插图占位/立绘剪影 | `ui/story_scene.gd` 顶部常量与 `_fill_portrait()` |
 | 胜利绿光 | `ui/level_scene.gd _on_win()` |
 | 机器人 OLED 表情 | `hardware/firmware/main.py draw_face()`(128×64 单色点阵) |
 

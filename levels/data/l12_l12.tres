@@ -12,6 +12,7 @@ text = "[占位] 无论走哪条岔路,终点相同,结论便立。"
 [sub_resource type="Resource" id="Resource_2v3ua"]
 script = ExtResource("2_s6a8h")
 lines = Array[ExtResource("1_v2tng")]([SubResource("Resource_jl3nv")])
+location_title = "[占位] 档案室"
 
 [resource]
 script = ExtResource("3_you30")

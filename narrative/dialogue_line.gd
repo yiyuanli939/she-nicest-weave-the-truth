@@ -7,3 +7,4 @@ extends Resource
 @export_multiline var text: String = ""      # 支持 BBCode
 @export var side_right: bool = false         # 立绘/名牌靠右
 @export var robot_cue: String = ""           # ""=无;如 "happy"/"panic"/"nod"
+@export var portrait: Texture2D = null       # 立绘;null = 按 speaker 着色的剪影占位

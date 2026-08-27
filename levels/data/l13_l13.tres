@@ -13,6 +13,7 @@ robot_cue = "confused"
 [sub_resource type="Resource" id="Resource_7lqpg"]
 script = ExtResource("2_qyfhi")
 lines = Array[ExtResource("1_6k73p")]([SubResource("Resource_5y1rg")])
+location_title = "[占位] 焦纹禁室"
 
 [resource]
 script = ExtResource("3_2v4km")

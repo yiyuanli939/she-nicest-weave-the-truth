@@ -254,6 +254,16 @@ func get_output_pattern(node_id: int, port: int) -> Formula:
 	return _last_result.value_out(node_id, port)
 
 
+## 该输入口是否真的有线接入(false = 纹样只是合一推导的期望值,UI 画幽灵)
+func is_input_connected(node_id: int, port: int) -> bool:
+	return _last_result.input_connected(node_id, port)
+
+
+## 该输出口是否有线接出,或(假设口)已被钉住
+func is_output_connected(node_id: int, port: int) -> bool:
+	return _last_result.output_connected(node_id, port)
+
+
 ## 某条线的状态(WireState.*);线不存在时返回 WireState.OK
 func get_wire_state(from_id: int, from_port: int, to_id: int, to_port: int) -> int:
 	return _last_result.edge_status.get(

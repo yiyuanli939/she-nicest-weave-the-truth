@@ -17,9 +17,17 @@ const LINEN := Color(0.91, 0.87, 0.78)      # 亚麻底
 const CHAR_BLACK := Color(0.12, 0.10, 0.09) # 焦黑
 const SPLIT_COLOR := Color(0.23, 0.18, 0.12)
 
+const GHOST_ALPHA := 0.4
+
 ## 关卡注入的原子调色板 {StringName: Color};缺失回退 hash→HSV
 @export var atom_colors: Dictionary = {}
 @export var min_size := Vector2(24, 24)
+
+## 幽灵态:半透明画"推导出的期望值"(未连线端口),与实际连入的实纹样区分
+@export var ghost := false:
+	set(v):
+		ghost = v
+		self_modulate.a = GHOST_ALPHA if v else 1.0
 
 ## Inspector 预览入口:直接写公式文本(如 "A & B")
 @export var formula_text: String = "":

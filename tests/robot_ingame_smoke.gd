@@ -40,20 +40,26 @@ func _run() -> void:
 		return
 	robot.robot_event.connect(func(d: Dictionary) -> void: _events.append(d))
 
-	# 1) l16:进关 → robot_cue_on_enter=panic + 对话首行(小机,cue=panic)
+	# 1) l16:进关 → 全屏开场对话首行(小机,cue=panic);播完进棋盘再触发 robot_cue_on_enter
 	game.start_level(game.catalog.all_levels()[15])
 	await _wait(2.5)
-	var scene: LevelScene = current_scene
-	_check(scene != null and scene._dialogue.visible, "l16 入场对话显示(首行含 panic cue)")
-	scene._dialogue._finish()
-	_check(scene.session.is_solved(), "l16 已通关棋盘载入(恢复不应重复庆祝)")
+	var story := current_scene as StoryScene
+	_check(story != null and story._dialogue.visible, "l16 全屏开场对话显示(首行含 panic cue)")
+	if story != null:
+		story.finish()
+	await _wait(1.0)
+	var scene := current_scene as LevelScene
+	_check(scene != null and scene.session.is_solved(), "l16 已通关棋盘载入(恢复不应重复庆祝)")
 	await _wait(4.0)
 
 	# 2) l03:接一条冲突线 → encourage
 	game.start_level(game.catalog.all_levels()[2])
 	await _wait(1.5)
-	scene = current_scene
-	scene._dialogue._finish()
+	story = current_scene as StoryScene
+	if story != null:
+		story.finish()
+		await _wait(0.5)
+	scene = current_scene as LevelScene
 	var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 	var s := scene.session
 	board._on_connection_request("n%d" % s.assumption_ids[0], 0, "n%d" % s.goal_id, 0)

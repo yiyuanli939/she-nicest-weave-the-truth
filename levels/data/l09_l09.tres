@@ -12,6 +12,7 @@ text = "[占位] 一次收两股,等于分两次各收一股。档案室里有�
 [sub_resource type="Resource" id="Resource_5o887"]
 script = ExtResource("2_jp15r")
 lines = Array[ExtResource("1_7atkt")]([SubResource("Resource_8tyf4")])
+location_title = "[占位] 封程工房"
 
 [resource]
 script = ExtResource("3_6rfht")

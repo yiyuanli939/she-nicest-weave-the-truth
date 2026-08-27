@@ -14,6 +14,7 @@ robot_cue = "panic"
 [sub_resource type="Resource" id="Resource_5ekrp"]
 script = ExtResource("2_uyl2u")
 lines = Array[ExtResource("1_s5mpa")]([SubResource("Resource_p2el1")])
+location_title = "[占位] 两仪阁"
 
 [resource]
 script = ExtResource("3_moebh")

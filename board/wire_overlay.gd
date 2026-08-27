@@ -1,6 +1,6 @@
 class_name WireOverlay
 extends Control
-## 连线视觉叠加层:每条线中点一枚纹样小片(PatternChip)+ 错误徽章。
+## 连线视觉叠加层:出错的线在中点挂一枚错误徽章(正常线无浮层)。
 ## GraphEdit 的普通 Control 子节点,不吃鼠标;位置每帧重排(棋盘很小,便宜)。
 ## 徽章目前是文字占位;美术接口:换成 assets/svg/badges/*.svg(见 docs/ART_INTERFACE.md)。
 
@@ -29,7 +29,7 @@ func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 
 
-## board_updated 后全量重建小片
+## board_updated 后全量重建徽章;OK 的线不建浮层
 func rebuild() -> void:
 	for c in _chips:
 		(c.ctrl as Control).queue_free()
@@ -37,6 +37,8 @@ func rebuild() -> void:
 	if session == null:
 		return
 	for w in session.get_wires():
+		if not BADGE.has(w.state):
+			continue
 		var chip := _make_chip(w)
 		add_child(chip)
 		_chips.append({ctrl = chip, wire = w})
@@ -45,19 +47,12 @@ func rebuild() -> void:
 func _make_chip(w: ProofSession.WireInfo) -> Control:
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var v := PatternView.new()
-	v.atom_colors = atom_colors
-	v.min_size = Vector2(40, 24)
-	v.formula = session.get_input_pattern(w.to_id, w.to_port)
-	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(v)
-	if BADGE.has(w.state):
-		var b := Label.new()
-		b.text = BADGE[w.state]
-		b.add_theme_font_size_override("font_size", 12)
-		b.add_theme_color_override("font_color", BADGE_COLOR[w.state])
-		b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		box.add_child(b)
+	var b := Label.new()
+	b.text = BADGE[w.state]
+	b.add_theme_font_size_override("font_size", 12)
+	b.add_theme_color_override("font_color", BADGE_COLOR[w.state])
+	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(b)
 	return box
 
 

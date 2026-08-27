@@ -158,6 +158,11 @@ func solve() -> SolveResult:
 			result.port_values[Vector3i(id, 0, i)] = Unifier.resolve(n.ports_in[i], subst)
 		for i in n.ports_out.size():
 			result.port_values[Vector3i(id, 1, i)] = Unifier.resolve(n.ports_out[i], subst)
+		for port: int in n.pinned:
+			result.connected_ports[Vector3i(id, 1, port)] = true
+	for e in edges:
+		result.connected_ports[Vector3i(e.x, 1, e.y)] = true
+		result.connected_ports[Vector3i(e.z, 0, e.w)] = true
 	for e in edges:
 		if not Unifier.resolve(_in_formula(e), subst).is_ground():
 			_mark(result, e, SolveResult.EdgeStatus.UNDERSPEC)

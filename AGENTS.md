@@ -64,6 +64,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 ## 当前进度
 
 M0 引擎 ✅ → API(ProofSession/PatternView)✅ → M1 灰盒板 ✅ → M2 编辑器/全规则 ✅ →
-M3 内容层(17 关+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅。
+M3 内容层(17 关+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅ →
+交互改版(进关前全屏开场对话 StoryScene、右键删节点、无跳过键点击推进、
+连线只留错误徽章、汇路机免手动钉、未连线口幽灵纹样)✅。
 剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
 机器人手册见 `docs/ROBOT_API.md`。全流程回归:`tests/visual_smoke_m3.gd`(17 关自动通关)。

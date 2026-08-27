@@ -17,6 +17,11 @@ var port_values: Dictionary = {}
 ## 每条边的状态。键 = 边 Vector4i,值 = EdgeStatus
 var edge_status: Dictionary = {}
 
+## 有边挂着(或假设口被钉住)的端口集合。键同 port_values 的 Vector3i,值恒 true。
+## port_values 是合一推导值,未连线口也会被同机共享的元变量实例化;
+## UI 用本集合区分"实际有线在跑/玩家钉过"与"仅推导出的期望值"(后者画幽灵纹样)。
+var connected_ports: Dictionary = {}
+
 ## 结论祖先链上还没接线的输入口,Vector2i(节点 id, 输入口下标)
 var missing_inputs: Array[Vector2i] = []
 
@@ -30,3 +35,11 @@ func value_in(node_id: int, port: int) -> Formula:
 
 func value_out(node_id: int, port: int) -> Formula:
 	return port_values.get(Vector3i(node_id, 1, port))
+
+
+func input_connected(node_id: int, port: int) -> bool:
+	return connected_ports.has(Vector3i(node_id, 0, port))
+
+
+func output_connected(node_id: int, port: int) -> bool:
+	return connected_ports.has(Vector3i(node_id, 1, port))

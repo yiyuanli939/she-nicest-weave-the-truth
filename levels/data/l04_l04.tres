@@ -12,6 +12,7 @@ text = "[占位] 括号只是记法,布面自会说话。"
 [sub_resource type="Resource" id="Resource_vltgm"]
 script = ExtResource("2_nkml8")
 lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_0wxft")])
+location_title = "[占位] 织坊"
 
 [resource]
 script = ExtResource("3_lp67d")

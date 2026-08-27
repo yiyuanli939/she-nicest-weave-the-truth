@@ -69,6 +69,7 @@ const LEVELS: Array = [
 ]
 
 const CH_TITLES: Array[String] = ["第一章·并织", "第二章·封程", "第三章·岔纹", "第四章·焦纹", "第五章·两仪"]
+const CH_LOCATIONS: Array[String] = ["[占位] 织坊", "[占位] 封程工房", "[占位] 档案室", "[占位] 焦纹禁室", "[占位] 两仪阁"]
 const CH_OF_LEVEL: Array[int] = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4]
 
 const NOTEBOOK: Array = [
@@ -125,6 +126,7 @@ func _build_level(row: Array, ch_idx: int) -> LevelDef:
 	lv.allowed_rules = rules
 	lv.allow_bot = ch_idx >= 3
 	var dlg := DialogueRes.new()
+	dlg.location_title = CH_LOCATIONS[ch_idx]
 	for line: Array in row[6]:
 		var dl := DialogueLine.new()
 		dl.speaker = line[0]

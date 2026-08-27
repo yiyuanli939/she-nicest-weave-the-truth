@@ -12,6 +12,7 @@ text = "[占位] 迭层纹是一张承诺:给它上层的纹样,它吐出下层�
 [sub_resource type="Resource" id="Resource_cura6"]
 script = ExtResource("2_pogll")
 lines = Array[ExtResource("1_h5fu7")]([SubResource("Resource_nippd")])
+location_title = "[占位] 封程工房"
 
 [resource]
 script = ExtResource("3_ymgb5")

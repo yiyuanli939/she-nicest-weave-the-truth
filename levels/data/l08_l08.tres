@@ -12,6 +12,7 @@ text = "[占位] 诺中之诺。外层的假设,内层也认。"
 [sub_resource type="Resource" id="Resource_dbvdn"]
 script = ExtResource("2_trim7")
 lines = Array[ExtResource("1_1j3q3")]([SubResource("Resource_1trig")])
+location_title = "[占位] 封程工房"
 
 [resource]
 script = ExtResource("3_na7fi")

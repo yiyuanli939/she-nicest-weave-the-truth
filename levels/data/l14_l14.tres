@@ -12,6 +12,7 @@ text = "[占位] 若 B 会烧穿,那给出 A 也终将烧穿。"
 [sub_resource type="Resource" id="Resource_rtuof"]
 script = ExtResource("2_koucd")
 lines = Array[ExtResource("1_83lky")]([SubResource("Resource_24q0c")])
+location_title = "[占位] 焦纹禁室"
 
 [resource]
 script = ExtResource("3_cy8qg")

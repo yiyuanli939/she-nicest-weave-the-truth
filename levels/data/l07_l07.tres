@@ -13,6 +13,7 @@ robot_cue = "think"
 [sub_resource type="Resource" id="Resource_8tgij"]
 script = ExtResource("2_e2nhv")
 lines = Array[ExtResource("1_flmij")]([SubResource("Resource_568a1")])
+location_title = "[占位] 封程工房"
 
 [resource]
 script = ExtResource("3_whgl2")

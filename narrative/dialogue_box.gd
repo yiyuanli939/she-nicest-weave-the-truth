@@ -1,10 +1,11 @@
 class_name DialogueBox
 extends CanvasLayer
-## 入场对话框:打字机 + 点击推进 + 跳过。robot_cue 逐行转发(cue 信号)。
-## 视觉为占位级;美术换装走 theme(见 docs/ART_INTERFACE.md)。
+## 入场对话框:打字机 + 点击推进(打字中点击=全显,播完再点=下一句/关闭)。
+## robot_cue 逐行转发(cue 信号)。视觉为占位级;美术换装走 theme(见 docs/ART_INTERFACE.md)。
 
 signal finished
 signal cue(cue_name: String)
+signal line_shown(line: DialogueLine)
 
 const CHARS_PER_SEC := 40.0
 
@@ -38,10 +39,6 @@ func _init() -> void:
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(sp)
-	var skip := Button.new()
-	skip.text = "跳过 ▷"
-	skip.pressed.connect(_finish)
-	top.add_child(skip)
 	box.add_child(top)
 	_text = RichTextLabel.new()
 	_text.bbcode_enabled = true
@@ -79,6 +76,7 @@ func _advance() -> void:
 	_speaker.text = line.speaker
 	_speaker.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT if line.side_right else HORIZONTAL_ALIGNMENT_LEFT
 	_text.text = line.text
+	line_shown.emit(line)
 	if line.robot_cue != "":
 		cue.emit(line.robot_cue)
 	_text.visible_characters = 0
@@ -96,7 +94,8 @@ func _on_click(event: InputEvent) -> void:
 	if _text.visible_characters < _text.get_total_character_count():
 		if _tween != null:
 			_tween.kill()
-		_text.visible_characters = -1   # 全显
+		# 不能设 -1:getter 也返回 -1,会让上面的"打字中"判断永真,点击就再也推进不了
+		_text.visible_characters = _text.get_total_character_count()
 	else:
 		_advance()
 

@@ -12,6 +12,7 @@ text = "[占位] 承诺可以串成链。你需要封程机来立一张新承诺
 [sub_resource type="Resource" id="Resource_arfvl"]
 script = ExtResource("2_bh56a")
 lines = Array[ExtResource("1_s2jwe")]([SubResource("Resource_tmc7f")])
+location_title = "[占位] 封程工房"
 
 [resource]
 script = ExtResource("3_vn3tj")
