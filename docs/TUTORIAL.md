@@ -153,6 +153,7 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 | 织者笔记(整页翻书) | `narrative/notebook_ui.gd`(左「继续工作」关闭 / 右「翻页」翻条目 / 中间书页);`open(nb, unlocked)` 签名不可改(主菜单/关卡右缘笔记标签/测试都用)。竖排 CJK 用逐字换行 |
 | 关卡右缘「笔记」标签 | `ui/level_scene.gd` `_build_ui` 里 body 最后一个子节点 + `_on_open_notebook` |
 | 笔记条目/封程机教学页 | `tools/gen_levels.gd` `NOTEBOOK` 表(BBCode 正文 + demo_formula)+ 关卡 `notebook_unlocks` 挂接 → 重跑生成器 |
+| 仪器介绍卡(点选机器弹出) | 内容:`tools/gen_levels.gd` `RULE_GUIDE` 表 → `narrative/data/rule_guide.tres`(`RuleGuideCatalog`,按 rule_id 查);视图:`ui/machine_guide_panel.gd`(独立卡,`show_for/clear`);接线:`board/proof_board.gd` 的 `machine_selected`/`selection_cleared` 信号(GraphEdit `node_selected` 转发,只对 MACHINE)→ `ui/level_scene.gd`。三层解耦,换皮/挪位置只动 machine_guide_panel |
 | 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR` |
 | 改全屏对话场景布局/占位色 | `ui/story_scene.gd` 顶部常量与 `_build_ui/_fill_portrait` |
 | 改关卡 HUD/快捷键/发呆提示 | `ui/level_scene.gd` |

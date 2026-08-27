@@ -257,6 +257,22 @@ func _run() -> void:
 	await _settle()
 	_check(s.get_node_ids().size() == 3, "Ctrl+Shift+Z 重做(并织机再次删除)")
 
+	# ---- H2. 点选仪器 → 弹出这台机的介绍卡;点空白处收起 ----
+	mn = board.get_node("n%d" % mid) as MachineNode
+	_click(_center(mn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(scene._guide_panel.visible, "点选仪器弹出介绍卡")
+	_check(scene._guide_panel._title.text.contains("岔纹"), "介绍卡显示这台机(岔纹机)的名字")
+	_check(scene._guide_panel._body.text.length() > 0, "介绍卡有详解正文")
+	# 点棋盘空白处取消选中 → 收起
+	_click(board.get_global_rect().get_center() + Vector2(0, 240), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(not scene._guide_panel.visible, "点空白取消选中,介绍卡收起")
+	# 右键点线轴不该弹介绍卡(线轴不是仪器)
+	_click(_center(board.get_node("n%d" % s.assumption_ids[0])), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(not scene._guide_panel.visible, "点线轴不弹仪器介绍卡")
+
 	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键) ----
 	mn = board.get_node("n%d" % mid) as MachineNode
 	_click(_center(mn), MOUSE_BUTTON_LEFT)

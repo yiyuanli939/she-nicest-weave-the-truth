@@ -30,6 +30,12 @@
 `narrative/data/notebook.tres`:条目 id/标题/正文(BBCode)/示例公式。
 关卡 `notebook_unlocks` 填条目 id,通关即解锁。
 
+## 仪器介绍卡(点选机器时弹出)
+
+`narrative/data/rule_guide.tres`:每台仪器一条 `RuleGuide`(rule_id/展示名/一句话 summary/详解 body(BBCode)/示例公式)。
+玩家在关卡里点选某台仪器,左下角就弹出对应介绍卡(和棋盘/求解解耦,改文案不碰代码)。
+批量改走 `tools/gen_levels.gd` 的 `RULE_GUIDE` 表后重跑生成器;单条改直接在 Inspector 编辑 .tres。
+
 ## 机器人语音台词
 
 `hardware/firmware/sounds/*.wav`(greet/win/encourage/panic/calm/hint),音色为微软 XiaoyiNeural(小智同款)。改词:

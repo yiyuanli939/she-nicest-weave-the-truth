@@ -82,6 +82,24 @@ const NOTEBOOK: Array = [
 	["notebook_bot", "焦纹即「谬」", "[占位] 烧穿之处,万物皆可织出:⊥。", "false"],
 ]
 
+# 仪器介绍卡(点选机器时弹出):[rule_id, 展示名, 一句话, 详解(BBCode), 示例公式]
+const RULE_GUIDE: Array = [
+	["and_intro", "并织机", "[占位] 两股丝并成一幅。",
+		"[占位] 左口收 A、右口收 B,织出并纹 [b]A ∧ B[/b]。要两样都在场,才织得出。", "A & B"],
+	["and_elim", "拆股机", "[占位] 把并纹拆回两股。",
+		"[占位] 收一幅 [b]A ∧ B[/b],上口吐 A、下口吐 B。任取一股接着用。", "A & B"],
+	["or_intro", "岔纹机", "[占位] 已有其一,便可宣称二者有其一。",
+		"[占位] 收 A,上口织 [b]A ∨ ?[/b]、下口织 [b]? ∨ A[/b]。另一支不来自输入,点标题「钉上口/钉下口」自己指定。", "A | B"],
+	["or_elim", "汇路机", "[占位] 无论走哪条岔路,终点相同,结论便立。",
+		"[占位] 收一个 [b]A ∨ B[/b] 和两条各自得出同一结论的支路,汇成那个结论。两个假设口的纹样由 0 号口自动定,不用钉。", "A | B"],
+	["imp_intro", "封程机", "[占位] 空手立一张「若…则…」的承诺。",
+		"[占位] 最难的一台。① 点「钉纹样」钉住假设 P;② 用它织出 Q;③ 封装成 [b]P → Q[/b],假设就此放电。详见织者笔记。", "A > B"],
+	["imp_elim", "引渡机", "[占位] 有承诺又有前件,兑现后件。",
+		"[占位] 收 [b]A → B[/b] 和 A,吐出 B。承诺加上钥匙,取出里面的货。", "A > B"],
+	["false_elim", "溃散机", "[占位] 从谬误里,能织出任何纹样。",
+		"[占位] 收一幅焦纹 [b]⊥[/b],想织什么由你钉 —— 爆炸原理。烧穿的布,织什么都「成立」,故极危险。", "A"],
+]
+
 
 func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute("res://levels/data")
@@ -109,7 +127,19 @@ func _initialize() -> void:
 		e.demo_formula = row[3]
 		nb.entries.append(e)
 	_save(nb, "res://narrative/data/notebook.tres")
-	print("生成完毕: %d 关 + catalog + notebook" % LEVELS.size())
+
+	var guides := RuleGuideCatalog.new()
+	for row in RULE_GUIDE:
+		var g := RuleGuide.new()
+		g.rule_id = StringName(row[0])
+		g.title = row[1]
+		g.summary = row[2]
+		g.body = row[3]
+		g.demo_formula = row[4]
+		guides.entries.append(g)
+	_save(guides, "res://narrative/data/rule_guide.tres")
+
+	print("生成完毕: %d 关 + catalog + notebook + %d 仪器介绍" % [LEVELS.size(), RULE_GUIDE.size()])
 	quit(0)
 
 

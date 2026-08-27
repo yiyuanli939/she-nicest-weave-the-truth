@@ -8,6 +8,8 @@ extends GraphEdit
 ##   * 正常放置由发起方(place 函数)用返回的 id 自己建节点。
 
 signal pin_requested(node_id: int, out_port: int)
+signal machine_selected(rule_id: StringName, node_id: int)   # 点选一台仪器(线轴/目标不发)
+signal selection_cleared                                     # 没有仪器被选中了
 
 var session: ProofSession
 var atom_colors: Dictionary = {}
@@ -28,6 +30,8 @@ func _ready() -> void:
 	disconnection_request.connect(_on_disconnection_request)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 	end_node_move.connect(_on_end_node_move)
+	node_selected.connect(_on_node_selected)
+	node_deselected.connect(_on_node_deselected)
 	add_child(_overlay)
 
 
@@ -124,6 +128,29 @@ func _remove_machine(id: int) -> void:
 func _on_end_node_move() -> void:
 	for mn in _machine_nodes():
 		session.set_node_position(mn.node_id, mn.position_offset)
+
+
+# ---- 选中 → 仪器介绍(视图侧消费,见 ui/machine_guide_panel.gd) ----
+
+func _on_node_selected(node: Node) -> void:
+	var mn := node as MachineNode
+	if mn == null or mn.node_type != ProofSession.NodeType.MACHINE:
+		return
+	var info := session.describe_node(mn.node_id)
+	if info != null:
+		machine_selected.emit(info.rule_id, mn.node_id)
+
+
+func _on_node_deselected(_node: Node) -> void:
+	# 切换选中会先 deselect 旧的再 select 新的,推到帧末再判断有没有仪器仍选中,避免闪
+	_check_selection_cleared.call_deferred()
+
+
+func _check_selection_cleared() -> void:
+	for mn in _machine_nodes():
+		if mn.selected and mn.node_type == ProofSession.NodeType.MACHINE:
+			return
+	selection_cleared.emit()
 
 
 static func _id_of(node_name: StringName) -> int:

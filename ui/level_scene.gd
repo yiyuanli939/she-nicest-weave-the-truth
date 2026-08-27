@@ -15,6 +15,7 @@ var _win_flash: ColorRect
 var _editor: PatternEditor
 var _dialogue: DialogueBox
 var _notebook_ui: NotebookUI
+var _guide_panel: MachineGuidePanel
 var _next_btn: Button
 
 const NOTEBOOK_TAB_COLOR := Color(0.66, 0.53, 0.53)   # 藕粉竖条(与笔记页一致)
@@ -144,6 +145,23 @@ func _build_ui() -> void:
 
 	_notebook_ui = NotebookUI.new()
 	add_child(_notebook_ui)
+
+	# 点选某台仪器 → 左下角弹出它的介绍卡(数据来自 rule_guide.tres,和棋盘解耦)
+	_guide_panel = MachineGuidePanel.new()
+	_guide_panel.set_atom_colors(atom_colors)
+	_guide_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	_guide_panel.grow_horizontal = Control.GROW_DIRECTION_END
+	_guide_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_guide_panel.offset_left = 160
+	_guide_panel.offset_bottom = -16
+	add_child(_guide_panel)
+	_board.machine_selected.connect(_on_machine_selected)
+	_board.selection_cleared.connect(_guide_panel.clear)
+
+
+func _on_machine_selected(rule_id: StringName, _node_id: int) -> void:
+	var info := ProofSession.describe_rule(rule_id)
+	_guide_panel.show_for(rule_id, info.cn_name if info != null else String(rule_id))
 
 
 func _on_open_notebook() -> void:

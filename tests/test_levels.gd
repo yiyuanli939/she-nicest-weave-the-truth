@@ -64,3 +64,18 @@ func test_save_manager_roundtrip() -> bool:
 	sm2.wipe()
 	var sm3 := SaveManager.open()
 	return dup and ok and check(not sm3.is_solved(&"l01"), "wipe 生效")
+
+
+func test_rule_guides_cover_every_machine() -> bool:
+	var cat := RuleGuideCatalog.load_default()
+	var ok := check(cat != null, "rule_guide.tres 应能加载")
+	if cat == null:
+		return false
+	for rid in Rules.all_ids():
+		var g := cat.guide(rid)
+		ok = check(g != null, "仪器 %s 应有介绍卡" % rid) and ok
+		if g != null:
+			ok = check(g.summary != "" and g.body != "", "%s 介绍不为空" % rid) and ok
+			if g.demo_formula != "":
+				ok = check(FormulaParser.parse(g.demo_formula) != null, "%s 示例公式坏" % rid) and ok
+	return ok
