@@ -17,5 +17,5 @@ backup/         原厂小智固件整片备份(16MB,esptool 可恢复)
 .venv/          esptool + mpremote + pyserial + vosk + sounddevice(不入库)
 ```
 
-快速起步:插上机器人 → `bash hardware/speech/get_model.sh`(一次)→ 游戏里 开发者信息 → 小机维护 → 「接入小机」
+快速起步:插上机器人(**USB 通信 + DC 座 5–12V 给舵机供电,两根都要**)→ `bash hardware/speech/get_model.sh`(一次)→ 游戏里 开发者信息 → 小机维护 → 「接入小机」
 (等价于 `bash hardware/run_robot.sh`)→ 第一关对麦克风说「请指导我」。

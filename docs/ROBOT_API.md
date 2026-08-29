@@ -15,7 +15,11 @@ BOOT 键=GPIO0。**板上没有麦克风**,语音识别在电脑侧做(见下)�
 | 原生 USB(丝印 USB) | `/dev/cu.usbmodem2101` | S3 自带 USB(GPIO19/20)→ MicroPython USB-CDC | 桥接优先选它;刷写快。**TinyUSB 拉不了复位线,僵死只能按 RST** |
 | UART(丝印 COM/UART) | `/dev/cu.usbserial-A5069RR4`(FTDI) | USB 转串口 → S3 的 UART0(GPIO43/44) | MicroPython 的 stdio 同时挂在 USB-CDC 和 UART0,这一路同样通;桥接/刷写脚本都会回退到它。FTDI 的 DTR/RTS 接着自动复位线:mpremote 每次开关串口都可能把板子复位一下,所以刷语音改成逐个文件拷 + 失败重试 |
 
-云台和这两个口无关:两只舵机由主控直接 PWM 驱动 —— GPIO11 = 水平 pan(底座转向,50 左 ~ 130 右;回头 / look_pc / shake 用它),
+**舵机供电(2026-08-30 排障结论)**:底板左上角有一个圆形 DC 电源座(印 `5-30Vin`),**舵机的 5V 只从这个座经底板稳压来,USB 不给舵机供电**。
+只插 USB 时主控/屏幕/功放都正常、固件对 `gimbal` 照样 ack,但两只舵机完全不动、手推无阻力。给 DC 座接 5–12 V(≥2 A,5.5×2.1 圆头)后立刻恢复。
+展示时 **USB(通信)和 DC 座(舵机电)两根都要插**。
+
+云台和这两个 USB 口无关:两只舵机由主控直接 PWM 驱动 —— GPIO11 = 水平 pan(底座转向,50 左 ~ 130 右;回头 / look_pc / shake 用它),
 GPIO12 = 垂直 tilt(俯仰,70 抬头 ~ 110 低头;nod / celebrate 用它)。板上两个 3-pin 舵机插座插反的症状:发 `{"cmd":"gimbal","pan":130}` 时头抬/低而不是转。
 固件收到 `gimbal` 会回 ack `{"evt":"gimbal","pan":..,"tilt":..}`,证明命令执行到了 PWM 写入;舵机有没有真的转,用下面的摄像头验证。
 
@@ -60,7 +64,7 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 云台归中抓 3 s 基线(学出 OLED 眨眼那块,判定时忽略)→ pan 130/50、tilt 70/110 各抓一帧比对。
 判定:变化像素占比 > max(2%, 5×基线噪声) 才算动了;方向用变化区域内的光流中位数(pan 期望横向、tilt 期望纵向,只警告)。
 结果:`cam_report.png`(2×2 带标注)、`cam_<axis>_A/B.png`、末行 `DONE` / `FAIL: …`。
-「ack 有 + 没动」= 固件写了 PWM 但舵机没跟 → 查舵机供电/插座;「没 pong」= 固件没在跑 → 按 RST。
+「ack 有 + 没动」= 固件写了 PWM 但舵机没跟 → **先看 DC 座有没有接电**(舵机 5V 只从 DC 座来),再查插座;「没 pong」= 固件没在跑 → 按 RST。
 摄像头权限归拉起进程的应用(终端 / Godot),第一次弹窗要允许;venv 里的 OpenCV 若 `import cv2` 为空,
 `pip install --force-reinstall --no-deps opencv-contrib-python==5.0.0.93`。
 
@@ -145,6 +149,7 @@ flash 脚本与固件崩溃恢复都改成了软复位)。固件现在自愈:OLE
 
 ## 实机验收清单
 
+0. **USB 和 DC 座两根线都插上**(DC 座不接电舵机不动)。
 1. 小机维护 → 接入小机 → 状态三行全部在线(语音助手第一次会弹麦克风权限)。
 2. 「试转一下」云台转到一侧再回正;「试听」六句本机能播。
 3. 刷入固件与语音 → 日志走到 DONE,小机重启后 `ready`。
