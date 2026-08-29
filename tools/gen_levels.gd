@@ -3,7 +3,9 @@ extends SceneTree
 ##   godot --headless --path . --script res://tools/gen_levels.gd
 ## 生成后策划直接在 Inspector 改 .tres;本脚本仅在想整表重生成时再跑
 ## (会覆盖 levels/data/ 与 narrative/data/ 下的同名文件)。
-## 关名按美术要求 = 章内序号「第N纹」,章名按美术图;台词是占位,正式台词用 tools/import_dialogue.gd 从 CSV 灌。
+## 关名按美术要求 = 章内序号「第N纹」,章名按美术图。
+## 台词不在本表:正式台词用 tools/xlsx_to_csv.py + tools/import_dialogue.gd 灌进 .tres,
+## 重生成时从现有 .tres 原样保留 intro/outro 对话(不会被打回占位)。
 
 const CH_RULES: Array = [
 	[&"and_intro", &"and_elim"],
@@ -12,66 +14,29 @@ const CH_RULES: Array = [
 	[&"false_elim"],
 ]
 
-# [id, 假设, 目标, 本关原子, 对话行...]
-# 对话行: [speaker, text, robot_cue]
+# [id, 假设, 目标, 本关原子];台词不在这(见文件头:import_dialogue 管线)
 const LEVELS: Array = [
-	[1, ["A"], "A", ["A"], [
-		["阿梭", "[占位] 欢迎来到织坊。把线轴上的纹样引到目标织机,轻点连线即可。", "greet"],
-	]],
-	[2, ["A", "B"], "A & B", ["A", "B"], [
-		["阿梭", "[占位] 两股丝可以并成一幅纹样——试试并织机。", ""],
-	]],
-	[3, ["A & B"], "B & A", ["A", "B"], [
-		["阿梭", "[占位] 拆开,再反着织回去。", ""],
-	]],
-	[4, ["A & (B & C)"], "(A & B) & C", ["A", "B", "C"], [
-		["阿梭", "[占位] 括号只是记法,布面自会说话。", ""],
-	]],
-	[5, ["A", "A > B"], "B", ["A", "B"], [
-		["莉娅", "[占位] 迭层纹是一张承诺:给它上层的纹样,它吐出下层。", ""],
-	]],
-	[6, ["A > B", "B > C"], "A > C", ["A", "B", "C"], [
-		["莉娅", "[占位] 承诺可以串成链。你需要封程机来立一张新承诺。", ""],
-	]],
-	[7, [], "A > A", ["A"], [
-		["莉娅", "[占位] 封程机是全场最讲究的一台。别急,我一步步带你。", "think"],
-		["莉娅", "[占位] 它要立一张「若…则…」的封单,可你现在手上一根线都没有。", ""],
-		["莉娅", "[占位] 那就先借:点封程机的「钉纹样」,钉住一幅 A —— 线轴口会吐出这幅暂借的丝。", "think"],
-		["莉娅", "[占位] 拿借来的 A 去织要交的成品。这一关要交的恰好也是 A,原样送回散口即可。", ""],
-		["莉娅", "[占位] 封程机会把整段织程封成「若 A 则 A」,借来的丝就此还清。细节翻右边的笔记。", ""],
-	]],
-	[8, [], "A > (B > A)", ["A", "B"], [
-		["莉娅", "[占位] 诺中之诺。外层的假设,内层也认。", ""],
-	]],
-	[9, ["A & B > C"], "A > (B > C)", ["A", "B", "C"], [
-		["莉娅", "[占位] 一次收两股,等于分两次各收一股。档案室里有类似的记载……", ""],
-	]],
-	[10, ["A"], "A | B", ["A", "B"], [
-		["档案员", "[占位] 岔纹机:已有其一,便可宣称「二者有其一」。", ""],
-	]],
-	[11, ["A | B"], "B | A", ["A", "B"], [
-		["档案员", "[占位] 不知道来的是哪股?汇路机让你两头都备好。", ""],
-	]],
-	[12, ["(A > C) & (B > C)"], "(A | B) > C", ["A", "B", "C"], [
-		["档案员", "[占位] 无论走哪条岔路,终点相同,结论便立。", ""],
-	]],
-	[13, ["false"], "A", ["A"], [
-		["档案员", "[占位] 焦纹是烧穿的布。从谬误出发,织机可以吐出任何纹样——这很危险。", "confused"],
-	]],
-	[14, ["A > B"], "(B > false) > (A > false)", ["A", "B"], [
-		["档案员", "[占位] 若 B 会烧穿,那给出 A 也终将烧穿。", ""],
-	]],
-	[15, ["A & (A > false)"], "B", ["A", "B"], [
-		["档案员", "[占位] 同时持有一股丝与它的禁纹,织机就失去了约束……小家伙好像不太安稳。", "glitch"],
-	]],
+	[1, ["A"], "A", ["A"]],
+	[2, ["A", "B"], "A & B", ["A", "B"]],
+	[3, ["A & B"], "B & A", ["A", "B"]],
+	[4, ["A & (B & C)"], "(A & B) & C", ["A", "B", "C"]],
+	[5, ["A", "A > B"], "B", ["A", "B"]],
+	[6, ["A > B", "B > C"], "A > C", ["A", "B", "C"]],
+	[7, [], "A > A", ["A"]],
+	[8, [], "A > (B > A)", ["A", "B"]],
+	[9, ["A & B > C"], "A > (B > C)", ["A", "B", "C"]],
+	[10, ["A"], "A | B", ["A", "B"]],
+	[11, ["A | B"], "B | A", ["A", "B"]],
+	[12, ["(A > C) & (B > C)"], "(A | B) > C", ["A", "B", "C"]],
+	[13, ["false"], "A", ["A"]],
+	[14, ["A > B"], "(B > false) > (A > false)", ["A", "B"]],
+	[15, ["A & (A > false)"], "B", ["A", "B"]],
 ]
 
 # 章名按美术图;关名 = 章内序号「第N纹」
 const CH_TITLES: Array[String] = ["第一章 并纹", "第二章 叠层纹", "第三章 岔纹", "第四章 焦纹"]
 const CN_NUM: Array[String] = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 const CH_OF_LEVEL: Array[int] = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3]
-# 进关时的小机演出:第三章开头(l10)当场故障,第四章开头(l13)修好
-const ENTER_CUE: Dictionary = {10: "panic", 13: "calm"}
 
 # 诺拉的笔记 = 七台仪器说明:[rule_id, 展示名, 一句话, 详解(BBCode), 示例公式(先仅文字,留空)]
 # 顺序 = 仪器架顺序(美术图)。文案守则:只讲机器行为与操作,用纺织语汇;
@@ -107,6 +72,10 @@ func _initialize() -> void:
 		var ch_idx := CH_OF_LEVEL[i]
 		var lv := _build_level(row, ch_idx, catalog.chapters[ch_idx].levels.size())
 		var path := "res://levels/data/l%02d_%s.tres" % [row[0], lv.id]
+		if ResourceLoader.exists(path):   # 正式台词已灌进 .tres:重生成时原样保留
+			var old: LevelDef = load(path)
+			lv.intro_dialogue = old.intro_dialogue
+			lv.outro_dialogue = old.outro_dialogue
 		_save(lv, path)
 		catalog.chapters[ch_idx].levels.append(load(path))
 	_save(catalog, "res://levels/data/catalog.tres")
@@ -139,20 +108,8 @@ func _build_level(row: Array, ch_idx: int, idx_in_chapter: int) -> LevelDef:
 		rules.append_array(CH_RULES[c])
 	lv.allowed_rules = rules
 	lv.allow_bot = ch_idx >= 3
-	# 占位对话:场景一律工坊;发言人若是登记过立绘的配角就站左侧,否则左侧留空;诺拉恒右
-	var dlg := DialogueRes.new()
-	for line: Array in row[4]:
-		var dl := DialogueLine.new()
-		dl.speaker = line[0]
-		dl.text = line[1]
-		dl.robot_cue = line[2]
-		dl.scene = "工坊"
-		var who := StoryArt.character_of(line[0])
-		dl.left_char = who if who != "" and not StoryArt.is_nora(line[0]) else ""
-		dlg.lines.append(dl)
-	lv.intro_dialogue = dlg
-	lv.robot_cue_on_win = "celebrate"
-	lv.robot_cue_on_enter = ENTER_CUE.get(num, "")
+	# 小机剧情弧:3-1(l10)通关瞬间坏掉 → 它的通关演出是故障(panic),其余庆祝;进关一律无演出
+	lv.robot_cue_on_win = "panic" if num == 10 else "celebrate"
 	return lv
 
 

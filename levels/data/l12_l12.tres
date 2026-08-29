@@ -4,15 +4,75 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_s6a8h"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_you30"]
 
+[sub_resource type="Resource" id="Resource_v2tng"]
+script = ExtResource("1_v2tng")
+speaker = "亚瑟·威客利夫"
+text = "异常已经从偶发变成连锁故障。学院封存了第一批自动机，现在要求工坊交出这批静语纹的全部生产记录。"
+scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_s6a8h"]
+script = ExtResource("1_v2tng")
+speaker = "亚瑟·威客利夫"
+text = "所有出问题的机型都使用了这里生产的纹样。学院需要确认是否存在同一类织造误差。"
+scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_you30"]
+script = ExtResource("1_v2tng")
+speaker = "莉娅·科尔宾"
+text = "你们要记录？那把两年前退给我的那张也一起拿走。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "严肃"
+nora_expr = "严肃"
+
 [sub_resource type="Resource" id="Resource_jl3nv"]
 script = ExtResource("1_v2tng")
-speaker = "档案员"
-text = "[占位] 无论走哪条岔路,终点相同,结论便立。"
+speaker = "亚瑟·威客利夫"
+text = "科尔宾女士，那份记录没有进入学院档案。它没有经过合资格观察者复核。"
 scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
 
 [sub_resource type="Resource" id="Resource_2v3ua"]
+script = ExtResource("1_v2tng")
+speaker = "莉娅·科尔宾"
+text = "湿气可没读过你们的资格条例。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "苦恼"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_dbv23"]
+script = ExtResource("1_v2tng")
+speaker = "诺拉·拉芙蒂"
+text = "威客利夫先生，那份记录具体写了什么？"
+scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_voh5c"]
+script = ExtResource("1_v2tng")
+speaker = "亚瑟·威客利夫"
+text = "三号静语丝在高湿环境下可能短暂保留前一状态。学院测试没有复现，因此没有采纳。"
+scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_5mrow"]
+script = ExtResource("1_v2tng")
+speaker = "亚瑟·威客利夫"
+text = "听见警报了吗？又有一整条街区的新式自动机进入紧急停机。情况比学院预想的更快。"
+scene = "工坊"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_u1nut"]
 script = ExtResource("2_s6a8h")
-lines = Array[ExtResource("1_v2tng")]([SubResource("Resource_jl3nv")])
+lines = Array[ExtResource("1_v2tng")]([SubResource("Resource_v2tng"), SubResource("Resource_s6a8h"), SubResource("Resource_you30"), SubResource("Resource_jl3nv"), SubResource("Resource_2v3ua"), SubResource("Resource_dbv23"), SubResource("Resource_voh5c"), SubResource("Resource_5mrow")])
 
 [resource]
 script = ExtResource("3_you30")
@@ -22,5 +82,5 @@ assumptions = Array[String](["(A > C) & (B > C)"])
 goal = "(A | B) > C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_2v3ua")
+intro_dialogue = SubResource("Resource_u1nut")
 robot_cue_on_win = "celebrate"

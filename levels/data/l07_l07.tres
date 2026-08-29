@@ -4,46 +4,60 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_e2nhv"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_whgl2"]
 
+[sub_resource type="Resource" id="Resource_flmij"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_e2nhv"]
+script = ExtResource("1_flmij")
+speaker = "诺拉·拉芙蒂"
+text = "在检验台下面。我昨晚才发现是您的。给您。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_whgl2"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "谢谢。你翻过吗？"
+scene = "工坊"
+left_char = "亚瑟"
+
 [sub_resource type="Resource" id="Resource_568a1"]
 script = ExtResource("1_flmij")
-speaker = "莉娅"
-text = "[占位] 封程机是全场最讲究的一台。别急,我一步步带你。"
+speaker = "诺拉·拉芙蒂"
+text = "只看见了几页。那些规则……和我们的织法很像。"
 scene = "工坊"
-left_char = "莉娅"
-robot_cue = "think"
+left_char = "亚瑟"
 
 [sub_resource type="Resource" id="Resource_8tgij"]
 script = ExtResource("1_flmij")
-speaker = "莉娅"
-text = "[占位] 它要立一张「若…则…」的封单,可你现在手上一根线都没有。"
+speaker = "亚瑟·威客利夫"
+text = "相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。"
 scene = "工坊"
-left_char = "莉娅"
+left_char = "亚瑟"
 
 [sub_resource type="Resource" id="Resource_bpotd"]
 script = ExtResource("1_flmij")
-speaker = "莉娅"
-text = "[占位] 那就先借:点封程机的「钉纹样」,钉住一幅 A —— 线轴口会吐出这幅暂借的丝。"
+speaker = "诺拉·拉芙蒂"
+text = "可如果规则完全一样呢？"
 scene = "工坊"
-left_char = "莉娅"
-robot_cue = "think"
+left_char = "亚瑟"
+nora_expr = "苦恼"
 
 [sub_resource type="Resource" id="Resource_hnd1j"]
 script = ExtResource("1_flmij")
-speaker = "莉娅"
-text = "[占位] 拿借来的 A 去织要交的成品。这一关要交的恰好也是 A,原样送回散口即可。"
+speaker = "亚瑟·威客利夫"
+text = "那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。"
 scene = "工坊"
-left_char = "莉娅"
+left_char = "亚瑟"
+nora_expr = "苦恼"
 
 [sub_resource type="Resource" id="Resource_jljsi"]
-script = ExtResource("1_flmij")
-speaker = "莉娅"
-text = "[占位] 封程机会把整段织程封成「若 A 则 A」,借来的丝就此还清。细节翻右边的笔记。"
-scene = "工坊"
-left_char = "莉娅"
-
-[sub_resource type="Resource" id="Resource_nnnp4"]
 script = ExtResource("2_e2nhv")
-lines = Array[ExtResource("1_flmij")]([SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j"), SubResource("Resource_jljsi")])
+lines = Array[ExtResource("1_flmij")]([SubResource("Resource_flmij"), SubResource("Resource_e2nhv"), SubResource("Resource_whgl2"), SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j")])
 
 [resource]
 script = ExtResource("3_whgl2")
@@ -52,5 +66,5 @@ title = "第三纹"
 goal = "A > A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim"])
 atoms = Array[StringName]([&"A"])
-intro_dialogue = SubResource("Resource_nnnp4")
+intro_dialogue = SubResource("Resource_jljsi")
 robot_cue_on_win = "celebrate"

@@ -10,13 +10,13 @@ func test_every_registered_art_file_exists() -> bool:
 	for sc: String in StoryArt.SCENES:
 		ok = check(ResourceLoader.exists(StoryArt.scene_path(sc)), "场景缺图:%s" % sc) and ok
 	# 美术目前给的表情集合(新图加进来后把这里补上)
-	for pair in [["诺拉", "苦恼"], ["诺拉", "严肃"], ["诺拉", "惊讶"], ["莉娅", "苦恼"]]:
+	for pair in [["诺拉", "苦恼"], ["诺拉", "严肃"], ["诺拉", "惊讶"], ["莉娅", "苦恼"], ["莉娅", "严肃"]]:
 		ok = check(ResourceLoader.exists(StoryArt.portrait_path(pair[0], pair[1])), "立绘缺图:%s %s" % pair) and ok
 	return ok
 
 
 func test_lookup_helpers() -> bool:
-	return check(StoryArt.is_nora("诺拉·拉弗蒂") and StoryArt.is_nora("诺拉"), "is_nora") \
+	return check(StoryArt.is_nora("诺拉·拉芙蒂") and StoryArt.is_nora("诺拉"), "is_nora") \
 		and check(not StoryArt.is_nora("莉娅"), "is_nora 否") \
 		and check(StoryArt.character_of("亚瑟·威客利夫") == "亚瑟", "character_of 全名") \
 		and check(StoryArt.character_of("阿梭") == "", "未登记角色 → 空") \

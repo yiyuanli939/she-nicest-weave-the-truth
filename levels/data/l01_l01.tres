@@ -4,16 +4,95 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_a3600"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_2xnmh"]
 
+[sub_resource type="Resource" id="Resource_j62nj"]
+script = ExtResource("1_j62nj")
+speaker = "莉娅·科尔宾"
+text = "第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_a3600"]
+script = ExtResource("1_j62nj")
+speaker = "莉娅·科尔宾"
+text = "你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_2xnmh"]
+script = ExtResource("1_j62nj")
+speaker = "诺拉·拉芙蒂"
+text = "这些就是静语织机？我以为我们做的是……布料。"
+scene = "工坊"
+left_char = "莉娅"
+nora_expr = "惊讶"
+
 [sub_resource type="Resource" id="Resource_f6csw"]
 script = ExtResource("1_j62nj")
-speaker = "阿梭"
-text = "[占位] 欢迎来到织坊。把线轴上的纹样引到目标织机,轻点连线即可。"
+speaker = "莉娅·科尔宾"
+text = "普通织坊才用那种织布机。我们织的是静语纹。门锁认它，邮报机认它，契约柜和新式自动机也认它。没有这些纹样，半个伦敦都得装聋作哑。"
 scene = "工坊"
-robot_cue = "greet"
+left_char = "莉娅"
 
 [sub_resource type="Resource" id="Resource_36a6t"]
+script = ExtResource("1_j62nj")
+speaker = "诺拉·拉芙蒂"
+text = "我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_jrtdl"]
+script = ExtResource("1_j62nj")
+speaker = "莉娅·科尔宾"
+text = "那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_ykx7h"]
+script = ExtResource("1_j62nj")
+speaker = "诺拉·拉芙蒂"
+text = "可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_fo6kb"]
+script = ExtResource("1_j62nj")
+speaker = "莉娅·科尔宾"
+text = "学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_0waqe"]
+script = ExtResource("1_j62nj")
+speaker = "亚瑟·威客利夫"
+text = "科尔宾女士。今日的学院程式已经送到。新学徒？"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_iunmo"]
+script = ExtResource("1_j62nj")
+speaker = "莉娅·科尔宾"
+text = "诺拉·拉芙蒂。手还生，但眼睛不差。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_8708q"]
+script = ExtResource("1_j62nj")
+speaker = "亚瑟·威客利夫"
+text = "很好。静语纹允许有手工差异，但不允许偏离程式。请记住这一点，拉芙蒂小姐。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_njvcp"]
+script = ExtResource("1_j62nj")
+speaker = "诺拉·拉芙蒂"
+text = "是，威客利夫先生。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_4ku7p"]
 script = ExtResource("2_a3600")
-lines = Array[ExtResource("1_j62nj")]([SubResource("Resource_f6csw")])
+lines = Array[ExtResource("1_j62nj")]([SubResource("Resource_j62nj"), SubResource("Resource_a3600"), SubResource("Resource_2xnmh"), SubResource("Resource_f6csw"), SubResource("Resource_36a6t"), SubResource("Resource_jrtdl"), SubResource("Resource_ykx7h"), SubResource("Resource_fo6kb"), SubResource("Resource_0waqe"), SubResource("Resource_iunmo"), SubResource("Resource_8708q"), SubResource("Resource_njvcp")])
 
 [resource]
 script = ExtResource("3_2xnmh")
@@ -23,5 +102,5 @@ assumptions = Array[String](["A"])
 goal = "A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A"])
-intro_dialogue = SubResource("Resource_36a6t")
+intro_dialogue = SubResource("Resource_4ku7p")
 robot_cue_on_win = "celebrate"

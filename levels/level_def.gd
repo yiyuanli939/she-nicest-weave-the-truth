@@ -12,6 +12,7 @@ extends Resource
 @export var atom_colors: Dictionary = {}              # 留空 → 用默认三色/hash 回退
 @export var allow_bot: bool = false                   # 纹样编辑器解锁焦纹笔刷
 @export var intro_dialogue: DialogueRes
+@export var outro_dialogue: DialogueRes               # 通关后剧情(现仅 l15=4-3;播完「感谢游玩」→ 开发者信息)
 @export var robot_cue_on_enter: String = ""           # 进关机器人动作(如 "glitch";当前无关卡使用)
 @export var robot_cue_on_win: String = ""             # 通关机器人动作(默认 celebrate)
 

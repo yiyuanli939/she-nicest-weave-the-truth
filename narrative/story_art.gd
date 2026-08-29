@@ -6,18 +6,19 @@ extends RefCounted
 
 const DIR := "res://assets/art/story/"
 
-## 角色:中文名 → {id: 文件名用的 id, full_name: 对话区显示的全名}
+## 角色:中文名 → {id: 文件名用的 id, full_name: 对话区显示的全名}(拼法以正式剧情表为准)
 const CHARACTERS: Dictionary = {
-	"诺拉": {id = "nora", full_name = "诺拉·拉弗蒂"},
-	"莉娅": {id = "lia", full_name = "莉娅"},
+	"诺拉": {id = "nora", full_name = "诺拉·拉芙蒂"},
+	"莉娅": {id = "lia", full_name = "莉娅·科尔宾"},
 	"亚瑟": {id = "arthur", full_name = "亚瑟·威客利夫"},
 }
 const EXPRESSIONS: Dictionary = {"默认": "default", "苦恼": "worried", "严肃": "serious", "惊讶": "surprised"}
-const SCENES: Dictionary = {"工坊": "workshop", "宿舍": "dorm", "街景": "street"}
+## 场景中文名可有多个别名(剧情表写「伦敦街上/诺拉房间」,旧占位写「街景/宿舍」),指向同一张图
+const SCENES: Dictionary = {"工坊": "workshop", "宿舍": "dorm", "诺拉房间": "dorm", "街景": "street", "伦敦街上": "street"}
 const NORA := "诺拉"
 
 
-## 发言人是否主角诺拉(显示名可以是 "诺拉" 或 "诺拉·拉弗蒂")
+## 发言人是否主角诺拉(显示名可以是 "诺拉" 或 "诺拉·拉芙蒂")
 static func is_nora(speaker: String) -> bool:
 	return speaker.begins_with(NORA)
 
@@ -30,7 +31,7 @@ static func character_of(speaker: String) -> String:
 	return ""
 
 
-## 对话区显示的名字:登记角色写短名时补全名("莉娅" → "莉娅","诺拉" → "诺拉·拉弗蒂"),其余原样
+## 对话区显示的名字:登记角色写短名时补全名("诺拉" → "诺拉·拉芙蒂"),其余原样(剧情表本就写全名)
 static func display_name(speaker: String) -> String:
 	if CHARACTERS.has(speaker):
 		return CHARACTERS[speaker].full_name

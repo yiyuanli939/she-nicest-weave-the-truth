@@ -4,15 +4,37 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_koucd"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_cy8qg"]
 
+[sub_resource type="Resource" id="Resource_83lky"]
+script = ExtResource("1_83lky")
+speaker = "诺拉·拉芙蒂"
+text = "学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。"
+scene = "诺拉房间"
+nora_expr = "苦恼"
+
+[sub_resource type="Resource" id="Resource_koucd"]
+script = ExtResource("1_83lky")
+speaker = "诺拉·拉芙蒂"
+text = "如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。"
+scene = "诺拉房间"
+nora_expr = "苦恼"
+
+[sub_resource type="Resource" id="Resource_cy8qg"]
+script = ExtResource("1_83lky")
+speaker = "诺拉·拉芙蒂"
+text = "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
+scene = "诺拉房间"
+nora_expr = "苦恼"
+
 [sub_resource type="Resource" id="Resource_24q0c"]
 script = ExtResource("1_83lky")
-speaker = "档案员"
-text = "[占位] 若 B 会烧穿,那给出 A 也终将烧穿。"
-scene = "工坊"
+speaker = "诺拉·拉芙蒂"
+text = "学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。"
+scene = "诺拉房间"
+nora_expr = "苦恼"
 
 [sub_resource type="Resource" id="Resource_rtuof"]
 script = ExtResource("2_koucd")
-lines = Array[ExtResource("1_83lky")]([SubResource("Resource_24q0c")])
+lines = Array[ExtResource("1_83lky")]([SubResource("Resource_83lky"), SubResource("Resource_koucd"), SubResource("Resource_cy8qg"), SubResource("Resource_24q0c")])
 
 [resource]
 script = ExtResource("3_cy8qg")

@@ -67,17 +67,22 @@ func test_notebook_is_machine_manual() -> bool:
 	return ok
 
 
-## 占位对话的场景/人物/表情都要是登记表里的合法值(正式台词也走同一校验)
+## 关卡对话(进关前 intro / 通关后 outro)的场景/人物/表情都要是登记表里的合法值
 func test_dialogue_lines_reference_registered_art() -> bool:
 	var cat := LevelCatalog.load_default()
 	var ok := true
 	for lv in cat.all_levels():
-		if lv.intro_dialogue == null:
-			continue
-		for line: DialogueLine in lv.intro_dialogue.lines:
-			ok = check(line.scene == "" or StoryArt.SCENES.has(line.scene), "%s 场景 %s" % [lv.id, line.scene]) and ok
-			ok = check(line.left_char == "" or (StoryArt.CHARACTERS.has(line.left_char) and not StoryArt.is_nora(line.left_char)), "%s 左侧人物 %s" % [lv.id, line.left_char]) and ok
-			ok = check(StoryArt.EXPRESSIONS.has(line.left_expr) and StoryArt.EXPRESSIONS.has(line.nora_expr), "%s 表情" % lv.id) and ok
+		for dlg: DialogueRes in [lv.intro_dialogue, lv.outro_dialogue]:
+			if dlg == null:
+				continue
+			for line: DialogueLine in dlg.lines:
+				ok = check(line.scene == "" or StoryArt.SCENES.has(line.scene), "%s 场景 %s" % [lv.id, line.scene]) and ok
+				ok = check(line.left_char == "" or (StoryArt.CHARACTERS.has(line.left_char) and not StoryArt.is_nora(line.left_char)), "%s 左侧人物 %s" % [lv.id, line.left_char]) and ok
+				ok = check(StoryArt.EXPRESSIONS.has(line.left_expr) and StoryArt.EXPRESSIONS.has(line.nora_expr), "%s 表情" % lv.id) and ok
+	# 剧情表注意事项②:4-3 是通关后剧情 → 最后一关必须有 outro、没有 intro
+	var last: LevelDef = cat.all_levels()[-1]
+	ok = check(last.outro_dialogue != null and not last.outro_dialogue.lines.is_empty(), "l15 有通关后剧情(4-3)") and ok
+	ok = check(last.intro_dialogue == null or last.intro_dialogue.lines.is_empty(), "l15 无进关对话") and ok
 	return ok
 
 

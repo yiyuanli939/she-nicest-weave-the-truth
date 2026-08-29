@@ -4,16 +4,89 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_bh56a"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_vn3tj"]
 
+[sub_resource type="Resource" id="Resource_s2jwe"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_bh56a"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "还有对于你现在来说可能最难以理解的机器——封程机。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_vn3tj"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "我们可以直接在封程机上绕过一切规则自由钉出纹样。"
+scene = "工坊"
+left_char = "莉娅"
+
 [sub_resource type="Resource" id="Resource_tmc7f"]
 script = ExtResource("1_s2jwe")
-speaker = "莉娅"
-text = "[占位] 承诺可以串成链。你需要封程机来立一张新承诺。"
+speaker = "诺拉·拉芙蒂"
+text = "那代价呢？"
 scene = "工坊"
 left_char = "莉娅"
 
 [sub_resource type="Resource" id="Resource_arfvl"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_centm"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_f46q4"]
+script = ExtResource("1_s2jwe")
+speaker = "诺拉·拉芙蒂"
+text = "如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_ymccg"]
+script = ExtResource("1_s2jwe")
+speaker = "诺拉·拉芙蒂"
+text = "假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_tpyjo"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "学院的写法？"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_7fsxw"]
+script = ExtResource("1_s2jwe")
+speaker = "诺拉·拉芙蒂"
+text = "我只是……在书上见过类似的符号。"
+scene = "工坊"
+left_char = "莉娅"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_2v882"]
+script = ExtResource("1_s2jwe")
+speaker = "莉娅·科尔宾"
+text = "随你怎么记。只要别把线引错地方。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "苦恼"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_w0d3p"]
 script = ExtResource("2_bh56a")
-lines = Array[ExtResource("1_s2jwe")]([SubResource("Resource_tmc7f")])
+lines = Array[ExtResource("1_s2jwe")]([SubResource("Resource_s2jwe"), SubResource("Resource_bh56a"), SubResource("Resource_vn3tj"), SubResource("Resource_tmc7f"), SubResource("Resource_arfvl"), SubResource("Resource_centm"), SubResource("Resource_f46q4"), SubResource("Resource_ymccg"), SubResource("Resource_tpyjo"), SubResource("Resource_7fsxw"), SubResource("Resource_2v882")])
 
 [resource]
 script = ExtResource("3_vn3tj")
@@ -23,5 +96,5 @@ assumptions = Array[String](["A > B", "B > C"])
 goal = "A > C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_arfvl")
+intro_dialogue = SubResource("Resource_w0d3p")
 robot_cue_on_win = "celebrate"

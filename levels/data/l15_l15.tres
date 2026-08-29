@@ -4,16 +4,93 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_rma0b"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_e0k1u"]
 
+[sub_resource type="Resource" id="Resource_l21sb"]
+script = ExtResource("1_l21sb")
+speaker = "诺拉·拉芙蒂"
+text = "威客利夫先生，别再检查推演步骤了。请检查这个前提：三号静语丝在高湿环境中不会保留前一状态。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_rma0b"]
+script = ExtResource("1_l21sb")
+speaker = "亚瑟·威客利夫"
+text = "那是材料规范的一部分。学院做过测试。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_e0k1u"]
+script = ExtResource("1_l21sb")
+speaker = "莉娅·科尔宾"
+text = "那就再做一次。用我们工坊的湿度，用连续工作六个小时后的线，不要用实验室里刚拆封的样品。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "严肃"
+
 [sub_resource type="Resource" id="Resource_vg6pq"]
 script = ExtResource("1_l21sb")
-speaker = "档案员"
-text = "[占位] 同时持有一股丝与它的禁纹,织机就失去了约束……小家伙好像不太安稳。"
+speaker = "莉娅·科尔宾"
+text = "蒸汽阀已经调到工坊平时的湿度了。诺拉，先让三号丝承载“闭合”，马上切成“开启”——看读取器，两道灯同时亮了。"
 scene = "工坊"
-robot_cue = "glitch"
+left_char = "莉娅"
+left_expr = "严肃"
 
 [sub_resource type="Resource" id="Resource_816jo"]
+script = ExtResource("1_l21sb")
+speaker = "诺拉·拉芙蒂"
+text = "前一状态没有消失。莉娅的记录是真的。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_dk4ak"]
+script = ExtResource("1_l21sb")
+speaker = "亚瑟·威客利夫"
+text = "……那么学院写入自动机的材料前提是假的。所有依赖唯一状态的程式，都可能把余响读成矛盾。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_t0i2s"]
+script = ExtResource("1_l21sb")
+speaker = "诺拉·拉芙蒂"
+text = "推理没有背叛你们。它只是忠实地接受了你们允许它接受的前提。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_udjjc"]
+script = ExtResource("1_l21sb")
+speaker = "亚瑟·威客利夫"
+text = "我会要求撤回那条材料前提，并把科尔宾女士的原始记录连同复现实验一并送入公档。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_mjslb"]
+script = ExtResource("1_l21sb")
+speaker = "莉娅·科尔宾"
+text = "这回记得把我的名字也写上。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_fgxun"]
+script = ExtResource("1_l21sb")
+speaker = "亚瑟·威客利夫"
+text = "当然。莉娅·科尔宾。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_f783b"]
+script = ExtResource("1_l21sb")
+speaker = "诺拉·拉芙蒂"
+text = "威客利夫先生向学院和管理局提交了申请，随着管理局协议的变化，机器重新启动了。"
+scene = "诺拉房间"
+
+[sub_resource type="Resource" id="Resource_wkvtd"]
+script = ExtResource("1_l21sb")
+speaker = "诺拉·拉芙蒂"
+text = "织机声和昨天没什么不同……但我似乎感觉到自己对这份工作的心情有所变化，是什么呢……"
+scene = "诺拉房间"
+
+[sub_resource type="Resource" id="Resource_u5mq3"]
 script = ExtResource("2_rma0b")
-lines = Array[ExtResource("1_l21sb")]([SubResource("Resource_vg6pq")])
+lines = Array[ExtResource("1_l21sb")]([SubResource("Resource_l21sb"), SubResource("Resource_rma0b"), SubResource("Resource_e0k1u"), SubResource("Resource_vg6pq"), SubResource("Resource_816jo"), SubResource("Resource_dk4ak"), SubResource("Resource_t0i2s"), SubResource("Resource_udjjc"), SubResource("Resource_mjslb"), SubResource("Resource_fgxun"), SubResource("Resource_f783b"), SubResource("Resource_wkvtd")])
 
 [resource]
 script = ExtResource("3_e0k1u")
@@ -24,5 +101,5 @@ goal = "B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim", &"false_elim"])
 atoms = Array[StringName]([&"A", &"B"])
 allow_bot = true
-intro_dialogue = SubResource("Resource_816jo")
+outro_dialogue = SubResource("Resource_u5mq3")
 robot_cue_on_win = "celebrate"

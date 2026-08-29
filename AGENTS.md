@@ -55,7 +55,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正;各场景 `_ready` 报槽位 |
 | `levels/level_solutions.gd` | 15 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
-| `tests/` | headless 测试,91 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描);`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,99 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -88,10 +88,14 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 连线只留错误徽章、未连线口幽灵纹样)✅ → 删第五章(4 章 15 关)+ 严格正向求解
 (自由纹样一律由玩家钉)✅ → **美术包接入**(2026-08-29:站酷小薇体、3840×2160 逻辑视口 PNG 原尺寸、
 标题/选关/开发者信息/故事界面/仪器架/笔记抽屉全部换成美术图,节点内无公式文字;严格按
-`information/art_spec_20260829/游戏样式美化.md`)✅ → **小机剧情弧 + 语音求助**(玩家说「请指导我/请帮帮我」:一二章小机回头到极限后代解、
-第三章整章故障、第四章修好只回头;电脑麦克风离线识别 `hardware/speech/`;开发者信息页「小机维护」面板可接入/刷固件/校准/设回头方向)✅ → **背景音乐槽位系统 + 标题曲**(2026-08-29:autoload Bgm,
-标题/选关/开发者信息共用 `music/title.mp3`,关内四章暂共用 `music/level.wav`;补曲只放文件 + 填 `TRACKS` 一行,见 `music/音乐bgm位置.md`)✅。
-剧情台词为**占位版**(正式台词等 Excel,`tools/import_dialogue.gd` 灌 CSV),更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
-机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
+`information/art_spec_20260829/游戏样式美化.md`)✅ → **小机剧情弧 + 语音求助**(玩家说「请指导我/请帮帮我」小机回头到极限后代解;
+电脑麦克风离线识别 `hardware/speech/`;开发者信息页「小机维护」面板可接入/刷固件/校准/设回头方向)✅ → **背景音乐槽位系统 + 标题曲**(2026-08-29:autoload Bgm,
+标题/选关/开发者信息共用 `music/title.mp3`,关内四章暂共用 `music/level.wav`;补曲只放文件 + 填 `TRACKS` 一行,见 `music/音乐bgm位置.md`)✅ →
+**正式剧情灌入 + 结局流程 + 小机弧改点**(2026-08-30:策划表 `剧情文件及美术补充/静语纹_四章剧情_无旁白版_v2.xlsx` 经
+`tools/xlsx_to_csv.py` + `tools/import_dialogue.gd` 灌入 15 段正式台词(别名表头/「章-节」关卡号/左位「无」与全名/注意事项行自动跳过);
+**4-3 = l15 通关后剧情**(`LevelDef.outro_dialogue`):l15 通关点「继续」→ 全屏 4-3 → 「感谢游玩」黑屏 → 开发者信息页从黑淡入;
+小机 **3-1(l10)通关瞬间坏掉**(win cue = panic,代解通关也演)、3-2 起整段故障、**结局黑屏才修好**(calm),「look 模式」删除;
+新增莉娅严肃立绘 `char_lia_serious.png`、场景别名 伦敦街上/诺拉房间)✅。
+更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
-全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
+全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

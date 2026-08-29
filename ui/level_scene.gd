@@ -3,8 +3,8 @@ extends Control
 ## 关卡场景(美术参考图 information/art_spec_20260829/image 4.png):
 ## 乳黄底 + 左侧仪器架(图)+ 中间棋盘(GraphEdit,自带工具条挂必需按钮)+ 右缘诺拉的笔记抽屉(图)。
 ## 不显示当前关名/目标文字(美术要求);目标纹样只在棋盘的目标织机节点上看。
-## 小机「请指导我」(Robot.guide_requested):第一二章 小机回头到极限后直接代解(无鼓励无庆祝),
-## 第三章 小机故障只会乱动,第四章 小机只回头看你不代解(章节判定在 Game.robot_mode)。
+## 小机「请指导我」(Robot.guide_requested):坏掉前(3-1 通关前)小机回头到极限后直接代解(无鼓励无庆祝),
+## 坏掉后(3-2 起)只会乱动(判定在 Game.robot_mode;结局 4-3 剧情播完才修好)。
 ## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
 ## 否则用下面的默认字段(冒烟测试直接注入)。
 ## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。
@@ -18,8 +18,7 @@ const TOOLBAR_FONT_SIZE := 44
 const IDLE_HINT_SEC := 45.0
 const GUIDE_TURN_SEC := 0.8    # 小机回头到位后再代解
 const GUIDE_HOLD_SEC := 2.5    # 代解后小机保持回头的时间,再转回来
-const LOOK_HOLD_SEC := 1.5     # 第四章:只回头看你
-const GUIDE_HINT := "有困难可以对小机说:「请指导我」或「请帮帮我」"   # 只在小机会代解的章节(一二章)显示
+const GUIDE_HINT := "有困难可以对小机说:「请指导我」或「请帮帮我」"   # 小机坏掉前(mode == "guide")才显示
 const GUIDE_HINT_FONT_SIZE := 40
 const GUIDE_HINT_POS := Vector2(920, 2090)   # 棋盘左下角外侧
 
@@ -82,8 +81,8 @@ func _ready() -> void:
 			_restoring = false
 			_board.apply_positions()
 		# 记档已通关的关卡总能推进:旧档棋盘可能因求解语义变更不再是通关态
-		if _next_btn != null and _game.save.is_solved(lv.id) and _game.next_level() != null:
-			_next_btn.visible = true
+		if _game.save.is_solved(lv.id):
+			_update_next_button()
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
 
@@ -234,8 +233,7 @@ func _on_conflict_check() -> void:
 
 func _on_win() -> void:
 	_status.text = "织成了!"
-	if _next_btn != null and _game != null and _game.next_level() != null:
-		_next_btn.visible = true
+	_update_next_button()
 	if _restoring:
 		return   # 只是恢复旧棋盘:不闪光、不叫小机、不重复记档
 	var tw := create_tween()
@@ -258,8 +256,6 @@ func _on_guide_requested() -> void:
 			_run_guide(robot)
 		"broken":
 			_game.robot_cue("glitch")   # 故障态:任何 cue 都是故障演出
-		"look":
-			_run_look(robot)
 
 
 ## 第一二章:回头到极限 → 代解(无鼓励无庆祝)→ 停一会儿 → 转回来
@@ -284,19 +280,6 @@ func _run_guide(robot: Node) -> void:
 	_guiding = false
 
 
-## 第四章(已修好):只回头看你,不代解
-func _run_look(robot: Node) -> void:
-	_guiding = true
-	robot.cue("think")
-	robot.turn_to_limit()
-	await get_tree().create_timer(LOOK_HOLD_SEC).timeout
-	if not is_inside_tree():
-		return   # 场景已销毁:回正由 _exit_tree 兜底
-	robot.return_center()
-	robot.cue("idle")
-	_guiding = false
-
-
 ## 演出/代解期间点「下一关/选关」离开:协程随场景销毁,await 之后的回正永不执行 ——
 ## 否则实体小机会永远停在极限角 + think 脸。这里兜底转回正面。
 func _exit_tree() -> void:
@@ -309,9 +292,25 @@ func _exit_tree() -> void:
 		robot.cue("idle")
 
 
+## 通关后的推进按钮:有下一关 →「下一关」;最后一关且有结局剧情 →「继续」(播 4-3 → 感谢游玩)
+func _update_next_button() -> void:
+	if _next_btn == null or _game == null:
+		return
+	if _game.next_level() != null:
+		_next_btn.text = "下一关"
+		_next_btn.visible = true
+	elif _game.current != null and _game.current.outro_dialogue != null \
+			and not _game.current.outro_dialogue.lines.is_empty():
+		_next_btn.text = "继续"
+		_next_btn.visible = true
+
+
 func _on_next() -> void:
 	_game.store_board(session.save_state())
-	_game.start_level(_game.next_level())
+	if _game.next_level() != null:
+		_game.start_level(_game.next_level())
+	else:
+		_game.play_ending()
 
 
 func _on_back() -> void:

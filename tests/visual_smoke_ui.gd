@@ -504,7 +504,7 @@ func _run() -> void:
 			await _settle()
 			_check(l01.session.is_solved(), "点「示答」自动摆出答案并通关")
 
-	# ---- R. 小机「请指导我」:第一二章回头到极限后代解(无庆祝)/ 方向设置 / 第三章故障 / 第四章只回头 ----
+	# ---- R. 小机「请指导我」:坏掉前回头到极限后代解(无庆祝)/ 方向设置 / 3-1 通关瞬间坏掉 / 坏掉后只故障 ----
 	var robot := root.get_node("/root/Robot")
 	game.save.wipe()
 	game.start_level(game.catalog.find(&"l01"))
@@ -514,7 +514,7 @@ func _run() -> void:
 		await _settle()
 	var g1 := current_scene as LevelScene
 	_check(g1 != null and g1._guide_hint.visible and g1._guide_hint.text.contains("请指导我") and g1._guide_hint.text.contains("请帮帮我"),
-			"第一二章关内提示可以说「请指导我」或「请帮帮我」")
+			"坏掉前关内提示可以说「请指导我」或「请帮帮我」")
 	robot.set_turn_dir("right")
 	robot.sent_log.clear()
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
@@ -542,7 +542,7 @@ func _run() -> void:
 	await _wait(1.4)
 	_check(g2.session.is_solved() and robot.sent("gimbal", "", 5) and not robot.sent("gimbal", "", 175), "「请帮帮我」+ 方向设左 → 回头到左极限(5)后代解")
 	robot.set_turn_dir("right")
-	# 第三章:进关当场故障;任何 cue(含「请指导我」)都是故障演出,不代解
+	# 3-1(l10):小机还没坏 —— 进关不故障、提示照显、说「请指导我」仍回头代解;通关瞬间坏掉(panic 演出)
 	game.start_level(game.catalog.find(&"l10"))
 	await _settle()
 	if current_scene is StoryScene:
@@ -550,34 +550,50 @@ func _run() -> void:
 		await _settle()
 	_check(bgm.slot == &"level_3", "进第三章 BGM 槽位 = level_3")
 	var g3 := current_scene as LevelScene
-	_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic")
-			and (robot.sent("say", "glitch1") or robot.sent("say", "glitch2") or robot.sent("say", "glitch3")), "进第三章小机故障:乱动 + 坏掉音效,没有台词")
-	_check(not g3._guide_hint.visible, "第三章不显示求助提示")
+	_check(not robot.broken, "3-1 进关小机还没坏")
+	_check(g3._guide_hint.visible, "3-1 仍显示求助提示")
 	# 离开 l02 时演出还在 hold,LevelScene._exit_tree 兜底启动了缓步回正(gimbal 逐帧回 90,
-	# 由 Robot autoload 跨场景继续走)——等它走完再清日志,别污染下面"不回头"的断言
+	# 由 Robot autoload 跨场景继续走)——等它走完再清日志,别污染下面的断言
 	await _wait(1.6)
+	robot.sent_log.clear()
+	robot._last_guide_ms = -100000
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.4)
+	_check(g3.session.is_solved() and robot.sent("gimbal", "", 175), "3-1 说「请指导我」仍回头代解")
+	_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic")
+			and (robot.sent("say", "glitch1") or robot.sent("say", "glitch2") or robot.sent("say", "glitch3")),
+			"3-1 通关瞬间小机坏掉:乱动 + 坏掉音效,没有台词")
+	# 3-2(l11):坏掉后任何 cue(含「请指导我」)都是故障演出,不回头、不代解
+	game.start_level(game.catalog.find(&"l11"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g3b := current_scene as LevelScene
+	_check(robot.broken, "3-2 起小机坏掉")
+	_check(not g3b._guide_hint.visible, "坏掉后不显示求助提示")
+	await _wait(3.4)                # 等 l10 代解演出的 hold/回正走完(Robot autoload 跨场景继续)
 	robot.sent_log.clear()
 	robot._last_at.clear()          # 模拟故障演出 6 s 节流已过
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
 	await _wait(1.2)
-	_check(not g3.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "第三章说「请指导我」只故障、不回头、不代解")
-	# 第四章:进关修好;「请指导我」只回头看你,不代解
+	_check(not g3b.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "坏掉后说「请指导我」只故障、不回头、不代解")
+	# 第四章(l13):仍是坏的(修好在结局「感谢游玩」黑屏,不在进关)
 	game.start_level(game.catalog.find(&"l13"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
 		await _settle()
 	var g4 := current_scene as LevelScene
-	_check(not robot.broken and robot.sent("say", "calm"), "进第四章小机修好(calm)")
-	_check(not g4._guide_hint.visible, "第四章不代解,不显示求助提示")
+	_check(robot.broken and not robot.sent("say", "calm"), "第四章小机仍坏(修好在结局)")
+	_check(not g4._guide_hint.visible, "第四章不显示求助提示")
 	robot.sent_log.clear()
+	robot._last_at.clear()
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
 	await _wait(1.0)
-	_check(not g4.session.is_solved() and robot.sent("gimbal", "", 175), "第四章说「请指导我」只回头看你")
-	await _wait(1.6)
-	_check(robot.sent("gimbal", "", 90) and not g4.session.is_solved(), "第四章看完转回,仍不代解")
+	_check(not g4.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "第四章说「请指导我」也只故障")
 	game.save.wipe()
 
 	# ---- B. 回标题:BGM 淡入标题曲 ----

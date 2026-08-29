@@ -10,6 +10,7 @@ const TEXT_FONT_SIZE := 52
 const TITLE_COLOR := Color(0.627, 0.275, 0.227)
 const LINE_GAP := 28
 const MAINT_FONT_SIZE := 48
+const ENDING_FADE_SEC := 0.8   # 结局进来时从纯黑淡入(「淡出到开发者信息界面」)
 
 var _maint: RobotMaintUI
 var _maint_btn: Button
@@ -67,6 +68,17 @@ func _ready() -> void:
 	add_child(_maint)
 	_back_btn = BackButton.make(get_node("/root/Game").goto_menu)
 	add_child(_back_btn)
+	var game := get_node_or_null("/root/Game")
+	if game != null and game.credits_fade_pending:
+		game.credits_fade_pending = false
+		var fade := ColorRect.new()
+		fade.color = Color.BLACK
+		fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+		fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(fade)
+		var tw := create_tween()
+		tw.tween_property(fade, "modulate:a", 0.0, ENDING_FADE_SEC)
+		tw.tween_callback(fade.queue_free)
 
 
 func _input(event: InputEvent) -> void:

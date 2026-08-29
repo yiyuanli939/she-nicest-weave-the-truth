@@ -35,6 +35,10 @@ func _settle() -> void:
 	await process_frame
 
 
+func _wait(sec: float) -> void:
+	await create_timer(sec).timeout
+
+
 ## 走真实输入管线点一下(按下 + 抬起),坐标为视口全局坐标
 func _click(at: Vector2, button: MouseButton) -> void:
 	for pressed in [true, false]:
@@ -81,13 +85,18 @@ func _run() -> void:
 		_check(bgm.slot == bgm.slot_for_chapter(game.current_chapter()), "%s BGM 槽位随章节" % lv.id)
 		var robot := root.get_node("/root/Robot")
 		if lv.id == &"l10":
-			_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic"), "进 l10 小机故障(乱动 + 音效,没有台词),第三章 broken")
+			_check(not robot.broken, "l10(3-1)进关小机还没坏")
+		elif lv.id == &"l11":
+			_check(robot.broken, "l11(3-2)起小机坏掉(3-1 通关瞬间)")
 		elif lv.id == &"l13":
-			_check(not robot.broken and robot.sent("say", "calm"), "进 l13 小机修好(calm)")
+			_check(robot.broken and not robot.sent("say", "calm"), "第四章小机仍坏(修好在结局)")
 		var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 		LevelSolutions.apply(scene, board, lv.id)
 		await _settle()
 		_check(scene.session.is_solved(), "%s %s 通关" % [lv.id, lv.title])
+		if lv.id == &"l10":
+			_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic"),
+					"3-1 通关瞬间小机坏掉(乱动 + 音效,没有台词)")
 		if lv.id == &"l08":
 			_shot("m3_l08_board")
 		if game.next_level() != null:
@@ -103,13 +112,13 @@ func _run() -> void:
 	_check(current_scene is LevelSelect, "选关页加载")
 
 	# 全屏开场对话展示 + 点击推进回归(无跳过键:每行点两次 = 全显→下一句,播完即关)
-	game.start_level(game.catalog.all_levels()[14])   # l15:档案员 glitch 台词
+	game.start_level(game.catalog.all_levels()[0])   # l01:正式台词 1-1
 	await _settle()
 	var story := current_scene as StoryScene
-	_check(story != null, "l15 进关前应是全屏开场对话场景")
-	_shot("m3_l15_dialogue")
+	_check(story != null, "l01 进关前应是全屏开场对话场景")
+	_shot("m3_l01_dialogue")
 	if story != null:
-		_check(story._dialogue.visible, "l15 开场对话显示")
+		_check(story._dialogue.visible, "l01 开场对话显示")
 		# 走真实输入管线,且点在台词正文正中(曾是死区:面板吃掉点击、捕捉层收不到)
 		var at: Vector2 = story._dialogue._text.get_global_rect().get_center()
 		for j in game.current.intro_dialogue.lines.size():
@@ -118,6 +127,30 @@ func _run() -> void:
 		_check(not story._dialogue.visible, "点在面板上也能推进,播完最后一句再点即关闭")
 		await _settle()
 		_check(current_scene is LevelScene, "对话播完自动进棋盘")
+
+	# 结局(剧情表注意事项②):l15 无进关对话;通关后「继续」→ 4-3 → 感谢游玩黑屏 → 开发者信息
+	game.start_level(game.catalog.all_levels()[14])
+	await _settle()
+	_check(current_scene is LevelScene, "l15(4-3 移到通关后)进关直接是棋盘")
+	var l15 := current_scene as LevelScene
+	_check(l15._next_btn.visible and l15._next_btn.text == "继续", "已通关的 l15 工具条显示「继续」")
+	var robot_end := root.get_node("/root/Robot")
+	_check(robot_end.broken, "结局前小机仍是坏的")
+	l15._on_next()
+	await _settle()
+	var outro := current_scene as StoryScene
+	_check(outro != null and game.current.outro_dialogue != null and game.current.outro_dialogue.lines.size() > 0,
+			"「继续」→ 全屏结局剧情(l15.outro_dialogue)")
+	if outro != null:
+		_shot("m3_l15_outro")
+		outro.finish()
+		await _wait(StoryScene.THANKS_FADE_SEC + 0.3)
+		_shot("m3_thanks")
+		await _wait(StoryScene.THANKS_HOLD_SEC + 0.6)
+		await _settle()
+		_check(current_scene is CreditsScene, "感谢游玩黑屏后淡出到开发者信息页")
+		_check(not robot_end.broken and robot_end.sent("say", "calm"), "结局黑屏时小机修好(calm)")
+		_shot("m3_credits")
 
 	# 棋盘恢复:重进 l03 应已是通关棋盘
 	game.start_level(game.catalog.all_levels()[2])

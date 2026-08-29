@@ -4,15 +4,54 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_p7gpl"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_adydy"]
 
+[sub_resource type="Resource" id="Resource_fl7da"]
+script = ExtResource("1_fl7da")
+speaker = "诺拉·拉芙蒂"
+text = "连着下了几天雨以后就不对劲了。邮报机把一封信判给两条路，清扫机来回改向，连门禁都能同时亮“允许”和“拒绝”。"
+scene = "伦敦街上"
+nora_expr = "苦恼"
+
+[sub_resource type="Resource" id="Resource_p7gpl"]
+script = ExtResource("1_fl7da")
+speaker = "诺拉·拉芙蒂"
+text = "它不是选错了一条路……它像是同时认出了两条互相冲突的状态。"
+scene = "伦敦街上"
+nora_expr = "苦恼"
+
+[sub_resource type="Resource" id="Resource_adydy"]
+script = ExtResource("1_fl7da")
+speaker = "诺拉·拉芙蒂"
+text = "小织也是，前几天被人不小心放在窗台旁淋了雨，现在连句完整的话都说不出来，机械厂来的维修工却说他们也找不到问题……"
+scene = "伦敦街上"
+nora_expr = "苦恼"
+
 [sub_resource type="Resource" id="Resource_m11vx"]
 script = ExtResource("1_fl7da")
-speaker = "档案员"
-text = "[占位] 不知道来的是哪股?汇路机让你两头都备好。"
-scene = "工坊"
+speaker = "亚瑟·威客利夫"
+text = "请远离那台机器。学院已经收到异常报告。初步判断是部分工坊纹样偏离程式。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
 
 [sub_resource type="Resource" id="Resource_m3g0s"]
+script = ExtResource("1_fl7da")
+speaker = "诺拉·拉芙蒂"
+text = "如果纹样没偏呢？"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_tplwd"]
+script = ExtResource("1_fl7da")
+speaker = "亚瑟·威客利夫"
+text = "那么就只能是推演器本身发生了故障。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_6nyhu"]
 script = ExtResource("2_p7gpl")
-lines = Array[ExtResource("1_fl7da")]([SubResource("Resource_m11vx")])
+lines = Array[ExtResource("1_fl7da")]([SubResource("Resource_fl7da"), SubResource("Resource_p7gpl"), SubResource("Resource_adydy"), SubResource("Resource_m11vx"), SubResource("Resource_m3g0s"), SubResource("Resource_tplwd")])
 
 [resource]
 script = ExtResource("3_adydy")
@@ -22,5 +61,5 @@ assumptions = Array[String](["A | B"])
 goal = "B | A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_m3g0s")
+intro_dialogue = SubResource("Resource_6nyhu")
 robot_cue_on_win = "celebrate"

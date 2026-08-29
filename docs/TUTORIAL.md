@@ -84,20 +84,24 @@ MainMenu(标题页:开始/继续游戏 · 重置进度 · 开发者信息 · 退
                             │                         播完 → Game.enter_board()
                             └─ 无 → enter_board() → LevelScene(仪器架 + 棋盘 + 右缘笔记抽屉)
 LevelScene.proof_completed → Game.notify_solved(记档、robot_cue 庆祝)→ 工具条「下一关」
+末关 l15 通关 → 「继续」→ Game.play_ending() → StoryScene 播 outro_dialogue(4-3,通关后剧情)
+    → 「感谢游玩」黑屏淡入(此刻小机修好)→ Game.finish_ending() → CreditsScene 从黑淡入
 CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```
 
 - `DialogueBox`(Control,只管文字):打字机 + 点击/任意键推进(打字中=整句显示,显示完=下一句,最后一句后=关闭),没有跳过键;
   每行 `robot_cue` 转发给 `Game.robot_cue` → `RobotLink`(有实机才发)。
 - 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
-  主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从 CSV 灌(`tools/import_dialogue.gd`)。
+  主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从策划 xlsx 灌
+  (`python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`;4-3 段写进 l15 的 `outro_dialogue`)。
 - 诺拉的笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),关内按本关 allowed_rules 过滤显示;
   关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
-- 小机剧情弧(`Game.robot_mode()` 按章节):第一二章 `guide` —— 玩家对麦克风说「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 →
-  `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限(`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后
-  `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;第三章 `broken` —— `Robot.broken = true`,任何 cue 都映射成故障三连(`RobotLink.commands_for`);
-  第四章 `look` —— 只回头看你。l10/l13 的 `robot_cue_on_enter` = panic/calm 是坏掉/修好那一刻。
-- 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
+- 小机剧情弧(`Game.robot_mode()` 按关卡序,分界 `Game.BREAK_LEVEL = l10`):坏掉前(l01–l10)`guide` —— 玩家对麦克风说
+  「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 → `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限
+  (`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后 `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;
+  **3-1(l10)通关瞬间坏掉**:win cue = `panic`(坏掉是剧情节点,代解通关也演),`notify_solved` 随即置 `Robot.broken`;
+  l11 起 `broken` —— 任何 cue 都映射成故障三连(`RobotLink.commands_for`);**结局才修好**:「感谢游玩」黑屏时 `broken=false` + `calm`(`ui/story_scene.gd _play_thanks`)。
+- 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖(对话字段除外:重跑原样保留现有 intro/outro 台词)。
 
 **背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;故事界面与关内 = 该章 `level_N`)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。
 
@@ -164,7 +168,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 
 | 想做的事 | 去哪 |
 |---|---|
-| 改台词/场景/立绘/表情 | Excel 另存 CSV → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue`(Inspector);占位批量改走 `tools/gen_levels.gd` 的 `LEVELS` 表 |
+| 改台词/场景/立绘/表情 | 改剧情 xlsx(`剧情文件及美术补充/`)→ `python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue` / `outro_dialogue`(Inspector) |
 | 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
 | 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*` 表;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
 | 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
@@ -183,10 +187,10 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
-| 改进关流程 | `game/game.gd start_level/enter_board` |
+| 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
-| 「请指导我」代解 / 第三章故障 / 第四章回头 | `ui/level_scene.gd` `_on_guide_requested/_run_guide/_run_look`、`game/game.gd robot_mode_for_chapter`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
+| 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
 | 小机维护面板(接入 / 刷固件 / 校准 / 回头方向) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮、标题页 F9);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
 | 语音识别 | `hardware/speech/listen.py`(Vosk 离线,语法只认两句;`get_model.sh` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
 
@@ -195,7 +199,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 91 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 99 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
@@ -218,6 +222,6 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_robot_logic.gd` — 语音命中、章节→模式、故障态 cue 映射、回头目标角、settings 过 wipe;
-  `visual_smoke_ui.gd` R 段直接注入 `{"evt":"speech"}`:一二章代解且不庆祝、方向左右、第三章故障不代解、第四章只回头(无真机也跑)。
+  `visual_smoke_ui.gd` R 段直接注入 `{"evt":"speech"}`:坏掉前代解且不庆祝、方向左右、3-1 通关瞬间坏掉(panic)、坏掉后不代解只故障(无真机也跑)。
   真机:`bash hardware/run_robot.sh` 后 `tests/robot_smoke.gd`;语音自测看 `hardware/.run/speech.log` 的「命中」行。
 - `tests/visual_smoke_m3.gd` / `m2.gd` — 端到端流程与三个代表性证明。

@@ -4,15 +4,79 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_qrgu5"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_5gm61"]
 
+[sub_resource type="Resource" id="Resource_vrjea"]
+script = ExtResource("1_vrjea")
+speaker = "莉娅·科尔宾"
+text = "今天学“并织”。左路已经稳定，右路也已经稳定，就能把两路并成一个纹样；反过来，从完整并织里也能单独取出其中一路。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_qrgu5"]
+script = ExtResource("1_vrjea")
+speaker = "诺拉·拉芙蒂"
+text = "也就是说，不是把两条线搅在一起，而是要保留它们各自成立的结构。"
+scene = "工坊"
+left_char = "莉娅"
+
+[sub_resource type="Resource" id="Resource_5gm61"]
+script = ExtResource("1_vrjea")
+speaker = "莉娅·科尔宾"
+text = "对。记住，静语丝不是越多越好，关系对了才算纹样。"
+scene = "工坊"
+left_char = "莉娅"
+
 [sub_resource type="Resource" id="Resource_nqpor"]
 script = ExtResource("1_vrjea")
-speaker = "阿梭"
-text = "[占位] 两股丝可以并成一幅纹样——试试并织机。"
+speaker = "莉娅·科尔宾"
+text = "哪一步没看明白，也可以问小织。墙边那个小家伙是工坊新进的小型机器人助手，基础织法和机器怎么用，它都能提醒你。"
 scene = "工坊"
+left_char = "莉娅"
 
 [sub_resource type="Resource" id="Resource_y4vb5"]
+script = ExtResource("1_vrjea")
+speaker = "诺拉·拉芙蒂"
+text = "机器人也能教人织静语纹？"
+scene = "工坊"
+left_char = "莉娅"
+nora_expr = "惊讶"
+
+[sub_resource type="Resource" id="Resource_57aw5"]
+script = ExtResource("1_vrjea")
+speaker = "莉娅·科尔宾"
+text = "教你上路而已。别太依赖它——等纹样越来越复杂，现成的提醒就不够用了。真碰上没见过的问题，最后还是得靠你自己想。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_mkamo"]
+script = ExtResource("1_vrjea")
+speaker = "莉娅·科尔宾"
+text = "还有，机器要是出现怪响、回针、余光，都写进工坊记录。学院未必肯收，但我们自己得记。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "苦恼"
+
+[sub_resource type="Resource" id="Resource_47o74"]
+script = ExtResource("1_vrjea")
+speaker = "诺拉·拉芙蒂"
+text = "学院为什么不收？"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "严肃"
+nora_expr = "惊讶"
+
+[sub_resource type="Resource" id="Resource_1re7a"]
+script = ExtResource("1_vrjea")
+speaker = "莉娅·科尔宾"
+text = "他们管这叫“经验现象”。没有学院的人署名，就进不了正式档案。别皱眉，我都抱怨好多年了。"
+scene = "工坊"
+left_char = "莉娅"
+left_expr = "苦恼"
+nora_expr = "惊讶"
+
+[sub_resource type="Resource" id="Resource_vr67b"]
 script = ExtResource("2_qrgu5")
-lines = Array[ExtResource("1_vrjea")]([SubResource("Resource_nqpor")])
+lines = Array[ExtResource("1_vrjea")]([SubResource("Resource_vrjea"), SubResource("Resource_qrgu5"), SubResource("Resource_5gm61"), SubResource("Resource_nqpor"), SubResource("Resource_y4vb5"), SubResource("Resource_57aw5"), SubResource("Resource_mkamo"), SubResource("Resource_47o74"), SubResource("Resource_1re7a")])
 
 [resource]
 script = ExtResource("3_5gm61")
@@ -22,5 +86,5 @@ assumptions = Array[String](["A", "B"])
 goal = "A & B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_y4vb5")
+intro_dialogue = SubResource("Resource_vr67b")
 robot_cue_on_win = "celebrate"

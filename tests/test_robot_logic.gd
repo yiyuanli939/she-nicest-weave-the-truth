@@ -23,10 +23,12 @@ func test_chapter_lookup_and_robot_mode() -> bool:
 	var ok := check(cat.chapter_of(cat.find(&"l01")) == 0 and cat.chapter_of(cat.find(&"l05")) == 1
 			and cat.chapter_of(cat.find(&"l10")) == 2 and cat.chapter_of(cat.find(&"l13")) == 3, "l01/l05/l10/l13 → 第 1/2/3/4 章")
 	ok = check(cat.chapter_of(LevelDef.new()) == -1, "不在目录的关 → -1") and ok
-	ok = check(game.robot_mode_for_chapter(0) == "guide" and game.robot_mode_for_chapter(1) == "guide", "一二章代解") and ok
-	ok = check(game.robot_mode_for_chapter(2) == "broken", "第三章故障") and ok
-	ok = check(game.robot_mode_for_chapter(3) == "look", "第四章只回头") and ok
-	ok = check(game.robot_mode_for_chapter(-1) == "off", "目录外不触发") and ok
+	# 小机弧:3-1(l10)通关瞬间坏掉 —— 含 l10 在内之前代解,l11 起整段故障;修好在结局(不存在 look 模式)
+	var brk := cat.all_levels().find(cat.find(&"l10"))
+	ok = check(brk == 9, "l10 = 第 10 关(序号 9)") and ok
+	ok = check(game.robot_mode_at(0, brk) == "guide" and game.robot_mode_at(brk, brk) == "guide", "坏掉前(含 3-1 当关)代解") and ok
+	ok = check(game.robot_mode_at(brk + 1, brk) == "broken" and game.robot_mode_at(14, brk) == "broken", "3-2 起到第四章全程故障") and ok
+	ok = check(game.robot_mode_at(-1, brk) == "off", "目录外不触发") and ok
 	return ok
 
 
@@ -68,14 +70,15 @@ func test_settings_survive_wipe() -> bool:
 	return ok
 
 
-## 关卡数据:第三章开头当场故障(panic)、第四章开头修好(calm),其余进关无演出
-func test_enter_cues_mark_breakdown_and_repair() -> bool:
+## 关卡数据:3-1(l10)通关瞬间坏掉 → l10 通关演出 = panic(故障),其余庆祝;
+## 进关一律无演出;修好在结局「感谢游玩」黑屏(StoryScene._play_thanks),不在任何关卡数据里
+func test_cues_mark_breakdown_at_l10_win() -> bool:
 	var cat := LevelCatalog.load_default()
-	var ok := check(cat.find(&"l10").robot_cue_on_enter == "panic", "l10 进关 panic")
-	ok = check(cat.find(&"l13").robot_cue_on_enter == "calm", "l13 进关 calm") and ok
+	var ok := true
 	for lv in cat.all_levels():
-		if lv.id != &"l10" and lv.id != &"l13":
-			ok = check(lv.robot_cue_on_enter == "", "%s 进关无演出" % lv.id) and ok
+		ok = check(lv.robot_cue_on_enter == "", "%s 进关无演出" % lv.id) and ok
+		var want := "panic" if lv.id == &"l10" else "celebrate"
+		ok = check(lv.robot_cue_on_win == want, "%s 通关演出 = %s" % [lv.id, want]) and ok
 	return ok
 
 

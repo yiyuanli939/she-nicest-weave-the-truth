@@ -1,45 +1,50 @@
 # 内容更新指南(策划:改台词/关卡/机器人演出,零代码)
 
-当前所有台词为 `[占位]` 测试稿,结构已定。正式剧情按美术约定用 **Excel 表**交付,另存 CSV 后一条命令灌入。
+正式剧情已按策划表灌入(源表:`剧情文件及美术补充/静语纹_四章剧情_无旁白版_v2.xlsx`)。改台词 = 改 xlsx 后两条命令重灌。
 
-## 改台词(推荐:Excel → CSV 导入)
+## 改台词(策划 Excel 表 → 一键导入)
 
-表头(列顺序随意,按名字识别):`关卡id, 发言人, 场景, 左侧人物, 左侧表情, 诺拉表情, 台词, 小机动作`
+```bash
+python3 tools/xlsx_to_csv.py                                            # xlsx → information/dialogue.csv(只做格式转换)
+"$GODOT" --headless --path . --script res://tools/import_dialogue.gd    # 校验并写进 levels/data/*.tres
+```
+换别的表:`python3 tools/xlsx_to_csv.py 新表.xlsx`;导入命令后接 `-- 路径.csv` 可换 CSV。
+
+表头(列顺序随意,按名字识别,新旧写法都认;表头行之前的注意事项行自动跳过):
+`关卡|关卡id, 发言人, 场景, 左位人物|左侧人物, 左位人物表情|左侧表情, 主角表情|诺拉表情, 语句|台词, 小机动作(可省略)`
 
 | 列 | 取值 |
 |---|---|
-| 关卡id | `l01` … `l15`(同一关的行按出现顺序成为该关开场对话) |
-| 发言人 | 显示名,如 `诺拉·拉弗蒂` / `莉娅` / `亚瑟·威客利夫`;登记角色写短名会自动补全名 |
-| 场景 | `工坊` / `宿舍` / `街景`;空 = 沿用上一句 |
-| 左侧人物 | `莉娅` / `亚瑟`;空 = 左侧无人(主角诺拉恒在右侧) |
-| 左侧表情 / 诺拉表情 | `默认` / `苦恼` / `严肃` / `惊讶`(只填美术已给图的组合;空 = 默认) |
-| 台词 | 支持 BBCode;含逗号/换行用引号包住(Excel 另存 CSV 会自动做) |
-| 小机动作 | `greet celebrate confused hint panic glitch calm think sleep idle` 之一或空 |
+| 关卡 | `1-1` … `4-3`(章-节,映射按关卡目录)或 `l01` … `l15`。**`4-3` 是通关后剧情**(表头注意事项②):写进 l15 的 `outro_dialogue`,l15 通关点「继续」才播,播完「感谢游玩」黑屏 → 开发者信息页;其余段落进关前播。表里出现的关,intro/outro 两个字段都会重写(缺的一侧清空) |
+| 发言人 | 显示名,如 `诺拉·拉芙蒂` / `莉娅·科尔宾` / `亚瑟·威客利夫`;登记角色写短名会自动补全名 |
+| 场景 | `工坊` / `诺拉房间`(=宿舍图)/ `伦敦街上`(=街景图);空 = 沿用上一句(每段首句必须给) |
+| 左位人物 | `莉娅` / `亚瑟`(写全名也认);`无` 或空 = 左侧无人(主角诺拉恒在右侧) |
+| 左位人物表情 / 主角表情 | `默认` / `苦恼` / `严肃` / `惊讶`(只填美术已给图的组合;空 = 默认,注意事项①) |
+| 语句 | 支持 BBCode;含逗号/换行用引号包住(xlsx 转换器自动做) |
+| 小机动作 | `greet celebrate confused hint panic glitch calm think sleep idle` 之一或空;正式表没有这列 = 台词行不带演出 |
 
-```bash
-"$GODOT" --headless --path . --script res://tools/import_dialogue.gd            # 默认读 information/dialogue.csv
-"$GODOT" --headless --path . --script res://tools/import_dialogue.gd -- 路径.csv
-```
-非法的场景/人物/表情整行跳过并报错;表里没出现的关卡不动。可用角色/表情/场景在 `narrative/story_art.gd`。
+非法的场景/人物/表情整行跳过并报错,**有任何错误一关都不写**;表里没出现的关卡不动。可用角色/表情/场景在 `narrative/story_art.gd`。
 
-也可以在 Godot 里直接改:打开 `levels/data/lXX_*.tres`,Inspector 展开 `intro_dialogue → lines`,每行字段同上。
+也可以在 Godot 里直接改:打开 `levels/data/lXX_*.tres`,Inspector 展开 `intro_dialogue → lines`(l15 是 `outro_dialogue`),每行字段同上。
 故事界面不显示场景名;两人同在时非发言者自动叠 50% 遮罩;点击任意处或按任意键推进,无跳过键。
 
 ## 改/加关卡
 
 - 关卡字段见 `levels/level_def.gd` 注释。公式格式:`&`=∧ `|`=∨ `>`=→(右结合) `false`=⊥,如 `"A & B > C"`。
 - **关名不要自己取**:美术规定按章内序号叫「第一纹」「第二纹」…;章名 `第一章 并纹 / 第二章 叠层纹 / 第三章 岔纹 / 第四章 焦纹`。
-- `robot_cue_on_enter` / `robot_cue_on_win`:进关/通关的小机演出。现在 l10 进关 `panic`(第三章开头小机当场坏掉)、l13 进关 `calm`(第四章开头修好),
-  其余进关为空、通关一律 `celebrate`。**第三章整章是故障态**:这三关里策划挂的任何 cue(含对话行 robot_cue、通关 celebrate)都会变成故障演出(故障脸 + 乱动 + 故障声)。
+- `robot_cue_on_enter` / `robot_cue_on_win`:进关/通关的小机演出。现在进关一律为空;通关一律 `celebrate`,只有 l10(3-1)是 `panic`——
+  **小机在 3-1 通关瞬间坏掉**(剧情:淋雨),此后(3-2 起到第四章打完)整段故障态:这些关里策划挂的任何 cue(含对话行 robot_cue、通关 celebrate)都会变成故障演出(故障脸 + 乱动 + 故障声);
+  **结局才修好**——l15 通关后 4-3 剧情播完的「感谢游玩」黑屏时 `calm`(在 `ui/story_scene.gd`)。
   `allow_bot`:纹样编辑器是否解锁焦纹笔刷(第四章起 on)。
-- 小机「请指导我 / 请帮帮我」(玩家对麦克风说):第一二章小机回头到极限后**直接代解本关**(不庆祝不鼓励),第三章只故障,第四章只回头看你。
-  关内提示文案在 `ui/level_scene.gd` `GUIDE_HINT`(只在一二章显示);语音识别与小机维护见 docs/ROBOT_API.md。
+- 小机「请指导我 / 请帮帮我」(玩家对麦克风说):坏掉前(l01–l10)小机回头到极限后**直接代解本关**(不庆祝不鼓励),坏掉后只故障演出。
+  关内提示文案在 `ui/level_scene.gd` `GUIDE_HINT`(坏掉前才显示);语音识别与小机维护见 docs/ROBOT_API.md。
 - **设计关卡时注意求解是严格正向的**:仪器输出只由输入 + 玩家钉的纹样决定,不会从目标反推。
   用到封程机(假设 P)、岔纹机(另一支)、溃散机(织出什么)的关,玩家必须点标题栏"钉纹样/钉上口/钉下口"
   给自由纹样赋值;关卡 `atoms` 要包含玩家需要钉的原子。脚本化解法在 `levels/level_solutions.gd` 的 `p` 数组。
 - 新增关卡:复制一个 .tres 改字段 → 在 `levels/data/catalog.tres` 对应章节的 `levels` 数组里加进去。顺序即解锁顺序(全线性)。
-- 批量重生成(会覆盖!):改 `tools/gen_levels.gd` 的表后跑
+- 批量重生成(会覆盖关卡字段!):改 `tools/gen_levels.gd` 的表后跑
   `godot --headless --path . --script res://tools/gen_levels.gd`
+  (对话不会丢:重生成时原样保留现有 .tres 的 intro/outro 台词,不会被打回占位)
 - 仪器架只显示本关 `allowed_rules` 上架的仪器(顺序按美术图,紧凑排列),未上架的不显示。
 
 ## 诺拉的笔记(= 七台仪器的说明)

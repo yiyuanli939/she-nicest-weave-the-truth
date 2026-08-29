@@ -2,7 +2,8 @@ extends Node
 ## Autoload "Robot":实体小机器人链路(WebSocket → 本地桥接 → 串口 ESP32-S3)。
 ## 没跑桥接/没插机器人时静默降级:连接失败每 3 秒重试,cue 全部无害丢弃(sent_log 照记,测试与维护面板用)。
 ## 高层 cue(供 Game/对话 robot_cue 使用):greet celebrate confused hint think panic glitch calm sleep idle
-## 剧情态:broken = true(第三章)时任何 cue(sleep 除外)都变成故障演出:故障脸 + 乱动 + 随机一段「坏掉」音效,没有台词。
+## 剧情态:broken = true(3-1 通关瞬间坏掉,结局「感谢游玩」黑屏时修好)时任何 cue(sleep 除外)
+## 都变成故障演出:故障脸 + 乱动 + 随机一段「坏掉」音效,没有台词。
 ## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
