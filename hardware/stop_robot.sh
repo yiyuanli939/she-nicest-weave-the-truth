@@ -10,6 +10,6 @@ for name in bridge speech; do
 	rm -f "$f"
 done
 # 手动起的(npm run bridge / python listen.py)也一并停掉:刷固件要独占串口
-pkill -f "bridge/bridge.js" 2>/dev/null && echo "已停手动起的桥接"
+pkill -f "bridge.js" 2>/dev/null && echo "已停手动起的桥接"
 pkill -f "speech/listen.py" 2>/dev/null && echo "已停手动起的语音助手"
 exit 0

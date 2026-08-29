@@ -36,8 +36,12 @@ func test_broken_cue_mapping() -> bool:
 	var broken: Array = rl.commands_for("celebrate", true)
 	var ok := check(normal.size() == 3 and normal[2].get("name") == "win", "正常态 celebrate 播 win")
 	ok = check(broken.size() == 3 and broken[0].get("name") == "glitch" and broken[1].get("name") == "panic"
-			and broken[2].get("name") == "panic", "故障态任何 cue 都是故障三连") and ok
+			and String(broken[2].get("name")).begins_with("glitch"), "故障态任何 cue 都是故障脸 + 乱动 + 坏掉音效(没有台词)") and ok
 	ok = check(rl.commands_for("hint", true)[0].get("name") == "glitch", "故障态 hint 也故障") and ok
+	ok = check(rl.commands_for("panic", false)[2].get("name") == "glitch1" and rl.commands_for("panic", false, 2)[2].get("name") == "glitch3"
+			and rl.commands_for("panic", false, 3)[2].get("name") == "glitch1", "panic 没有台词,音效按 variant 循环取 glitch1..3") and ok
+	for c in rl.commands_for("celebrate", true) + rl.commands_for("panic", false):
+		ok = check(not (c.get("cmd") == "say" and c.get("name") == "panic"), "故障演出里没有 say panic(那句台词已删)") and ok
 	ok = check(rl.commands_for("sleep", true) == [{cmd = "emote", name = "sleep"}], "故障态 sleep 例外照发") and ok
 	ok = check(rl.commands_for("自定义", false) == [{cmd = "emote", name = "自定义"}], "未知 cue 原样当 emote") and ok
 	return ok
@@ -75,7 +79,7 @@ func test_enter_cues_mark_breakdown_and_repair() -> bool:
 	return ok
 
 
-## 台词配置 lines.json:六句都有 wav、音色/音量合法、不再出现「织者」
+## 台词配置 lines.json:五句都有 wav、音色/音量合法、不再出现「织者」;故障没有台词(也不许出现警告/核心之类字样),只有三段合成音效
 func test_voice_lines_config() -> bool:
 	var txt := FileAccess.get_file_as_string("res://hardware/firmware/sounds/lines.json")
 	var d: Variant = JSON.parse_string(txt)
@@ -83,9 +87,28 @@ func test_voice_lines_config() -> bool:
 	if not ok:
 		return false
 	var lines: Dictionary = d.lines
-	for cue in ["greet", "win", "encourage", "hint", "panic", "calm"]:
+	ok = check(not lines.has("panic") and not FileAccess.file_exists("res://hardware/firmware/sounds/panic.wav"), "故障没有台词(panic 句已删)") and ok
+	for cue: String in lines:
+		for bad in ["警告", "核心", "过热", "混乱"]:
+			ok = check(not String(lines[cue]).contains(bad), "台词 %s 不得含「%s」" % [cue, bad]) and ok
+	for i in [1, 2, 3]:
+		ok = check(FileAccess.file_exists("res://hardware/firmware/sounds/glitch%d.wav" % i), "坏掉音效 glitch%d.wav 存在" % i) and ok
+	for cue in ["greet", "win", "encourage", "hint", "calm"]:
 		ok = check(lines.has(cue) and String(lines[cue]) != "", "台词 %s 存在" % cue) and ok
 		ok = check(ResourceLoader.exists("res://hardware/firmware/sounds/%s.wav" % cue) or FileAccess.file_exists("res://hardware/firmware/sounds/%s.wav" % cue), "%s.wav 存在" % cue) and ok
 		ok = check(not String(lines[cue]).contains("织者"), "%s 台词称呼用诺拉不用织者" % cue) and ok
 	var gain: float = float(d.get("gain", 0))
 	return ok and check(gain > 0.0 and gain <= 1.0, "音量 0-1") and check(String(d.get("voice", "")).begins_with("zh-CN-"), "音色是中文神经语音")
+
+
+## RobotLink 解析固件回报:gimbal ack 与 ready 的外设标志(不需要真机,直接注入事件)
+func test_robot_link_parses_ack_and_ready() -> bool:
+	var rl: Node = _rl().new()
+	rl._on_event({"evt": "ready", "oled": false, "audio": true})
+	var ok := check(not rl.oled_ok and rl.audio_ok, "ready 带屏幕/功放状态")
+	rl._on_event({"evt": "gimbal", "pan": 130, "tilt": 90})
+	ok = check(rl.last_gimbal_ack.get("pan") == 130 and rl.last_gimbal_ack.get("tilt") == 90, "gimbal ack 记下角度") and ok
+	rl._on_event({"evt": "serial", "open": true})
+	ok = check(rl.serial_open, "serial 事件") and ok
+	rl.free()
+	return ok

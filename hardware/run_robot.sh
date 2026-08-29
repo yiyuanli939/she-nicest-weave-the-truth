@@ -13,7 +13,9 @@ else
 		echo "安装桥接依赖…"
 		(cd "$HW/bridge" && npm install --silent) || { echo "FAIL: npm install 失败"; exit 1; }
 	fi
-	(cd "$HW/bridge" && nohup node bridge.js >> "$RUN/bridge.log" 2>&1 & echo $! > "$RUN/bridge.pid")
+	# exec 让子 shell 直接变成 node,pid 文件里才是 node 本身(否则 stop 只杀掉壳,node 变孤儿继续占串口)
+	(cd "$HW/bridge" && exec nohup node bridge.js >> "$RUN/bridge.log" 2>&1) &
+	echo $! > "$RUN/bridge.pid"
 	echo "桥接已启动(pid $(cat "$RUN/bridge.pid"))"
 fi
 
@@ -24,6 +26,7 @@ elif [ ! -f "$HW/speech/model/graph/HCLr.fst" ]; then
 elif [ ! -x "$HW/.venv/bin/python" ]; then
 	echo "缺 hardware/.venv(pip install vosk sounddevice)"
 else
-	(cd "$HW" && nohup .venv/bin/python speech/listen.py >> "$RUN/speech.log" 2>&1 & echo $! > "$RUN/speech.pid")
+	(cd "$HW" && exec nohup .venv/bin/python speech/listen.py >> "$RUN/speech.log" 2>&1) &
+	echo $! > "$RUN/speech.pid"
 	echo "语音助手已启动(pid $(cat "$RUN/speech.pid"))"
 fi

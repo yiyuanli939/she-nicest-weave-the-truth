@@ -1,8 +1,8 @@
 # She Nicest 小机固件(MicroPython, ESP32-S3N16R8-EMOJI 板)
 # 协议:USB CDC 上的行分隔 JSON(与 hardware/bridge 和游戏 Robot autoload 对应)
 #   下行 {"cmd":"emote","name":"happy|sad|confused|think|glitch|sleep|idle"}
-#        {"cmd":"anim","name":"celebrate|panic|nod|shake"}
-#        {"cmd":"say","name":"greet|win|encourage|panic|calm|hint"}   播 /sounds/<name>.wav
+#        {"cmd":"anim","name":"celebrate(俯仰连点头)|panic|nod|shake|look_pc"}
+#        {"cmd":"say","name":"greet|win|encourage|hint|calm|glitch1..3"}   播 /sounds/<name>.wav
 #        {"cmd":"gimbal","pan":90,"tilt":90,"ms":300}
 #        {"cmd":"text","s":"..."}   {"cmd":"ping"}
 #   上行 {"evt":"ready"...} {"evt":"pong"} {"evt":"button","name":"boot"}
@@ -20,24 +20,48 @@ from paj7620 import PAJ7620
 
 # ---- SSD1306 128x64 I2C 最小驱动(内嵌,免联网装库) ----
 class SSD1306(framebuf.FrameBuffer):
+    # I2C 偶发 ENODEV(曾把整个固件打回 REPL):写失败只标记 ok=False,5 s 后重试初始化,云台/语音照跑
+    INIT = (
+        0xAE, 0x20, 0x00, 0x40, 0xA1, 0xA8, 63, 0xC8, 0xD3, 0x00,
+        0xDA, 0x12, 0xD5, 0x80, 0xD9, 0xF1, 0xDB, 0x30, 0x81, 0xFF,
+        0xA4, 0xA6, 0x8D, 0x14, 0xAF,
+    )
+
     def __init__(self, i2c, addr=0x3C, w=128, h=64):
         self.i2c, self.addr, self.w, self.h = i2c, addr, w, h
         self.buf = bytearray(w * h // 8)
         super().__init__(self.buf, w, h, framebuf.MONO_VLSB)
-        for cmd in (
-            0xAE, 0x20, 0x00, 0x40, 0xA1, 0xA8, h - 1, 0xC8, 0xD3, 0x00,
-            0xDA, 0x12, 0xD5, 0x80, 0xD9, 0xF1, 0xDB, 0x30, 0x81, 0xFF,
-            0xA4, 0xA6, 0x8D, 0x14, 0xAF,
-        ):
-            self._cmd(cmd)
+        self.ok = False
+        self.retry_at = 0
+        self.init()
+
+    def init(self):
+        try:
+            for cmd in self.INIT:
+                self.i2c.writeto(self.addr, bytes((0x80, cmd)))
+            self.ok = True
+        except OSError:
+            self._fail()
+
+    def _fail(self):
+        self.ok = False
+        self.retry_at = time.ticks_add(time.ticks_ms(), 5000)
 
     def _cmd(self, c):
         self.i2c.writeto(self.addr, bytes((0x80, c)))
 
     def show(self):
-        for c in (0x21, 0, self.w - 1, 0x22, 0, self.h // 8 - 1):
-            self._cmd(c)
-        self.i2c.writeto(self.addr, b"\x40" + self.buf)
+        if not self.ok:
+            if time.ticks_diff(time.ticks_ms(), self.retry_at) > 0:
+                self.init()
+            if not self.ok:
+                return
+        try:
+            for c in (0x21, 0, self.w - 1, 0x22, 0, self.h // 8 - 1):
+                self._cmd(c)
+            self.i2c.writeto(self.addr, b"\x40" + self.buf)
+        except OSError:
+            self._fail()
 
 
 # ---- 云台舵机 ----
@@ -168,12 +192,17 @@ def say(name):
 
 
 def tick_voice():
-    global _voice
+    global _voice, audio
     if _voice is None:
         return
     chunk = _voice.read(2048)
     if chunk:
-        audio.write(chunk)
+        try:
+            audio.write(chunk)
+        except OSError:          # 功放/I2S 掉了:静音继续跑,别崩
+            _voice.close()
+            _voice = None
+            audio = None
     else:
         _voice.close()
         _voice = None
@@ -194,11 +223,11 @@ def tick_anim(now):
     name, t0 = anim
     t = time.ticks_diff(now, t0)
     if name == "celebrate":
+        # 庆祝 = 上面那根轴(俯仰)连续点头,不左右摇
         if t > 2600:
             anim = None
         else:
-            pan.goto(90 + int(35 * math.sin(t / 180)))
-            tilt.goto(90 + (8 if (t // 300) % 2 else -8))
+            tilt.goto(90 + (16 if (t // 260) % 2 else -6))
     elif name == "panic":
         if t > 3000:
             anim = None
@@ -301,6 +330,7 @@ def handle(line):
     elif cmd == "gimbal":
         pan.goto(int(d.get("pan", pan.angle)))
         tilt.goto(int(d.get("tilt", tilt.angle)))
+        send({"evt": "gimbal", "pan": pan.angle, "tilt": tilt.angle})   # ack:确认执行到 PWM 写入
     elif cmd == "text":
         draw_text(str(d.get("s", "")))
         text_until = time.ticks_ms() + 3000
@@ -313,7 +343,8 @@ def main():
     buf = ""
     last_face = None
     btn_was = 1
-    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.0"})
+    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.1",
+          "oled": oled.ok, "audio": audio is not None})
     while True:
         while poller.poll(0):
             ch = sys.stdin.read(1)
@@ -349,10 +380,12 @@ def main():
 
 try:
     main()
-except Exception as e:          # 崩溃可见:上报后落回 REPL,方便 mpremote 修复
+except Exception as e:          # 崩溃可见:上报后 1.5 s 自动复位(不再落回 REPL 变成"没在跑");mpremote 仍可 Ctrl-C 打断
     sys.print_exception(e)
     try:
         send({"evt": "err", "msg": "crash: " + repr(e)})
     except Exception:
         pass
-    raise
+    time.sleep_ms(1500)
+    import machine
+    machine.soft_reset()        # 软复位重跑 main.py;硬复位偶发让 USB 僵死

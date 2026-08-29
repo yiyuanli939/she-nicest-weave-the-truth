@@ -2,7 +2,7 @@ extends Node
 ## Autoload "Robot":实体小机器人链路(WebSocket → 本地桥接 → 串口 ESP32-S3)。
 ## 没跑桥接/没插机器人时静默降级:连接失败每 3 秒重试,cue 全部无害丢弃(sent_log 照记,测试与维护面板用)。
 ## 高层 cue(供 Game/对话 robot_cue 使用):greet celebrate confused hint think panic glitch calm sleep idle
-## 剧情态:broken = true(第三章)时任何 cue(sleep 除外)都变成故障演出。
+## 剧情态:broken = true(第三章)时任何 cue(sleep 除外)都变成故障演出:故障脸 + 乱动 + 随机一段「坏掉」音效,没有台词。
 ## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
@@ -24,13 +24,17 @@ const TILT_CENTER := 90
 const TURN_SEC := 0.6
 const SENT_LOG_MAX := 60
 const GUIDE_PHRASES: Array[String] = ["请指导我", "指导我", "请帮帮我", "帮帮我"]
-const SCRIPTS: Dictionary = {"run": "run_robot.sh", "stop": "stop_robot.sh", "flash": "flash_robot.sh", "voices": "make_voices.sh"}
+const SCRIPTS: Dictionary = {"run": "run_robot.sh", "stop": "stop_robot.sh", "flash": "flash_robot.sh", "voices": "make_voices.sh", "cam": "cam_check.sh"}
+const GLITCH_SFX_COUNT := 3            # sounds/glitch1..3.wav(hardware/make_sfx.py 合成的纯音效)
 
 var connected: bool = false        # ws 连上桥接
 var serial_open: bool = false      # 桥接报告串口(小机)在线
 var speech_online: bool = false    # 语音助手心跳在线
 var broken: bool = false           # 剧情故障态(Game.start_level 按章节设)
 var turn_dir: String = "right"     # 「请指导我」时回头方向
+var oled_ok: bool = true           # 固件 ready 上报的外设状态
+var audio_ok: bool = true
+var last_gimbal_ack: Dictionary = {}   # 固件回的 {"evt":"gimbal","pan","tilt"}(+ at_ms)
 var sent_log: Array[Dictionary] = []   # 最近发出的命令(无桥接也记)
 
 var _ws := WebSocketPeer.new()
@@ -95,6 +99,11 @@ func _on_event(d: Dictionary) -> void:
 			_speech_seen = Time.get_unix_time_from_system()
 		"serial":
 			serial_open = bool(d.get("open", false))
+		"ready":
+			oled_ok = bool(d.get("oled", true))
+			audio_ok = bool(d.get("audio", true))
+		"gimbal":
+			last_gimbal_ack = {pan = int(d.get("pan", -1)), tilt = int(d.get("tilt", -1)), at_ms = Time.get_ticks_msec()}
 	robot_event.emit(d)
 
 
@@ -110,10 +119,10 @@ static func matches_guide(text: String) -> bool:
 # ---- cue ----
 
 ## 每个 cue = 表情 + 云台动作 + 语音(引导定位:成功庆祝/失败鼓励);纯函数,测试盯着。
-## 故障态(broken)下除 sleep 外一律故障三连;未知 cue 原样当 emote 发,方便策划在 .tres 里扩展。
-static func commands_for(cue_name: String, is_broken: bool) -> Array[Dictionary]:
+## 故障态(broken)下除 sleep 外一律故障演出(variant 选哪段坏掉音效);未知 cue 原样当 emote 发,方便策划在 .tres 里扩展。
+static func commands_for(cue_name: String, is_broken: bool, variant: int = 0) -> Array[Dictionary]:
 	if is_broken and cue_name != "sleep":
-		return [{cmd = "emote", name = "glitch"}, {cmd = "anim", name = "panic"}, {cmd = "say", name = "panic"}]
+		return _glitch_show(variant)
 	match cue_name:
 		"greet":       # 进关引导
 			return [{cmd = "emote", name = "happy"}, {cmd = "anim", name = "nod"}, {cmd = "say", name = "greet"}]
@@ -123,13 +132,19 @@ static func commands_for(cue_name: String, is_broken: bool) -> Array[Dictionary]
 			return [{cmd = "emote", name = "confused"}, {cmd = "anim", name = "shake"}, {cmd = "say", name = "encourage"}]
 		"hint":        # 引导:装作看一眼电脑,转回来再开口提示
 			return [{cmd = "emote", name = "think"}, {cmd = "anim", name = "look_pc"}, {cmd = "say", name = "hint"}]
-		"panic":       # 故障演出(第三章开头坏掉那一刻)
-			return [{cmd = "emote", name = "glitch"}, {cmd = "anim", name = "panic"}, {cmd = "say", name = "panic"}]
+		"panic":       # 故障演出(第三章开头坏掉那一刻):没有台词,只放动画 + 坏掉音效
+			return _glitch_show(variant)
 		"calm":        # 归于平静(第四章开头修好)
 			return [{cmd = "emote", name = "happy"}, {cmd = "anim", name = "nod"}, {cmd = "say", name = "calm"}]
 		"think", "glitch", "sleep", "idle":
 			return [{cmd = "emote", name = cue_name}]
 	return [{cmd = "emote", name = cue_name}]
+
+
+## 故障脸 + 乱动 + 第 variant 段坏掉音效(glitch1..3 循环取);不说任何话
+static func _glitch_show(variant: int) -> Array[Dictionary]:
+	var n := posmod(variant, GLITCH_SFX_COUNT) + 1
+	return [{cmd = "emote", name = "glitch"}, {cmd = "anim", name = "panic"}, {cmd = "say", name = "glitch%d" % n}]
 
 
 func cue(cue_name: String) -> void:
@@ -141,7 +156,7 @@ func cue(cue_name: String) -> void:
 		if now - int(_last_at.get(key, -100000)) < int(THROTTLE_MS[key]):
 			return
 		_last_at[key] = now
-	for c in commands_for(cue_name, broken):
+	for c in commands_for(cue_name, broken, randi() % GLITCH_SFX_COUNT):
 		send(c)
 
 

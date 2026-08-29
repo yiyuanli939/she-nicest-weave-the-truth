@@ -81,7 +81,7 @@ func _run() -> void:
 		_check(bgm.slot == bgm.slot_for_chapter(game.current_chapter()), "%s BGM 槽位随章节" % lv.id)
 		var robot := root.get_node("/root/Robot")
 		if lv.id == &"l10":
-			_check(robot.broken and robot.sent("say", "panic"), "进 l10 小机故障(panic),第三章 broken")
+			_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic"), "进 l10 小机故障(乱动 + 音效,没有台词),第三章 broken")
 		elif lv.id == &"l13":
 			_check(not robot.broken and robot.sent("say", "calm"), "进 l13 小机修好(calm)")
 		var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]

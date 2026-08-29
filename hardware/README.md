@@ -9,7 +9,9 @@ speech/         语音助手 listen.py(Vosk 离线中文,只认「请指导我 /
 run_robot.sh    接入:拉起桥接 + 语音助手(幂等;pid/日志在 .run/)
 stop_robot.sh   停掉上面两个
 flash_robot.sh  刷固件与语音进小机(mpremote;会先停桥接)
-make_voice.sh   生成/更新一句语音(edge-tts XiaoyiNeural → 16k 单声道 → 归一化)
+make_voice.sh   生成/更新一句语音(edge-tts XiaoyiNeural → 16k 单声道 → 归一化);make_voices.sh 按 sounds/lines.json 整表重做
+make_sfx.py     合成三段「坏掉」音效(第三章故障,不说话)
+cam_check.sh    用 MacBook 摄像头验证云台两根轴真的在动(截图在 .run/cam/)
 backup/         原厂小智固件整片备份(16MB,esptool 可恢复)
 .venv/          esptool + mpremote + pyserial + vosk + sounddevice(不入库)
 ```

@@ -8,6 +8,17 @@ BOOT 键=GPIO0。**板上没有麦克风**,语音识别在电脑侧做(见下)�
 现固件:**MicroPython v1.29.0 + 本项目 `hardware/firmware/main.py`**(+ `paj7620.py`,语音 `sounds/*.wav`)。
 原厂小智固件整片备份在 `hardware/backup/xiaozhi_flash_backup.bin`(16MB,可随时恢复)。
 
+## 两个 USB-C 口(都接同一块 ESP32-S3,插哪个都能玩)
+
+| 口 | 电脑上的名字 | 板上走的是 | 怎么用 |
+|---|---|---|---|
+| 原生 USB(丝印 USB) | `/dev/cu.usbmodem2101` | S3 自带 USB(GPIO19/20)→ MicroPython USB-CDC | 桥接优先选它;刷写快。**TinyUSB 拉不了复位线,僵死只能按 RST** |
+| UART(丝印 COM/UART) | `/dev/cu.usbserial-A5069RR4`(FTDI) | USB 转串口 → S3 的 UART0(GPIO43/44) | MicroPython 的 stdio 同时挂在 USB-CDC 和 UART0,这一路同样通;桥接/刷写脚本都会回退到它。FTDI 的 DTR/RTS 接着自动复位线:mpremote 每次开关串口都可能把板子复位一下,所以刷语音改成逐个文件拷 + 失败重试 |
+
+云台和这两个口无关:两只舵机由主控直接 PWM 驱动 —— GPIO11 = 水平 pan(底座转向,50 左 ~ 130 右;回头 / look_pc / shake 用它),
+GPIO12 = 垂直 tilt(俯仰,70 抬头 ~ 110 低头;nod / celebrate 用它)。板上两个 3-pin 舵机插座插反的症状:发 `{"cmd":"gimbal","pan":130}` 时头抬/低而不是转。
+固件收到 `gimbal` 会回 ack `{"evt":"gimbal","pan":..,"tilt":..}`,证明命令执行到了 PWM 写入;舵机有没有真的转,用下面的摄像头验证。
+
 ## 链路
 
 ```
@@ -32,15 +43,33 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 - 「回头方向:右/左」:「请指导我」时底部云台往哪边转到极限(存 `user://save.json` 的 settings,「重置进度」不清);「试转一下」预览。
 - 小机声音:音色(微软中文神经语音,默认小艺 = 小智同款)/ 音量(wav 峰值 20–100%)/ 六句台词可直接改 →
   「保存并生成语音」写 `hardware/firmware/sounds/lines.json` 并跑 `make_voices.sh`(edge-tts,需联网)→ 「试听」本机播 → 「刷入固件与语音」送进小机。
+  故障(第三章)**没有台词、不显示任何报警文字**,只放 `hardware/make_sfx.py` 合成的三段坏掉音效(峰值 0.45,比台词的 0.9 轻;想换音效/音量改那个脚本重跑);刷入时会把板上已不用的旧文件删掉。
   **台词称呼女主一律用「诺拉」。**
 - 校准「看电脑方向」:自动(小机张望,正对屏幕时朝它挥手或按 BOOT)/ 手动微调 + 保存。结果存板上 `/look_cfg.json`。
+- 「摄像头验证云台」:`hardware/cam_check.sh`(下详),用 MacBook 摄像头判定两根轴是否真的转了。
+- 状态行还显示固件 `ready` 上报的屏幕 / 功放是否正常(OLED I2C 曾偶发 ENODEV)。
+
+## 摄像头验证云台(`hardware/cam_check.py`)
+
+```bash
+bash hardware/cam_check.sh                    # 默认两轴;日志 hardware/.run/cam.log,截图 hardware/.run/cam/
+hardware/.venv/bin/python hardware/cam_check.py --list        # 探测摄像头 0..3,存缩略图(iPhone 连续互通相机可能占 0)
+hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
+```
+流程:开摄像头暖机 → `cam_preview.png`(**先看这张,小机必须在画面里,而且画面里别有人在动**)→ 桥接 ping/pong 确认固件在跑 →
+云台归中抓 3 s 基线(学出 OLED 眨眼那块,判定时忽略)→ pan 130/50、tilt 70/110 各抓一帧比对。
+判定:变化像素占比 > max(2%, 5×基线噪声) 才算动了;方向用变化区域内的光流中位数(pan 期望横向、tilt 期望纵向,只警告)。
+结果:`cam_report.png`(2×2 带标注)、`cam_<axis>_A/B.png`、末行 `DONE` / `FAIL: …`。
+「ack 有 + 没动」= 固件写了 PWM 但舵机没跟 → 查舵机供电/插座;「没 pong」= 固件没在跑 → 按 RST。
+摄像头权限归拉起进程的应用(终端 / Godot),第一次弹窗要允许;venv 里的 OpenCV 若 `import cv2` 为空,
+`pip install --force-reinstall --no-deps opencv-contrib-python==5.0.0.93`。
 
 ## 剧情弧(按章节,`Game.robot_mode()`)
 
 | 章 | 模式 | 玩家说「请指导我 / 请帮帮我」 | 其它 cue |
 |---|---|---|---|
 | 一、二 | `guide` | 小机 think 脸、底部云台转到极限(方向可设)→ 0.8 s 后游戏**直接代解本关**(不庆祝不鼓励)→ 停 2.5 s 转回 | 照常 |
-| 三 | `broken` | 只故障(故障脸 + 乱动 + 故障声),不回头不代解 | **全部**变故障演出(sleep 除外);l10 进关 `panic` = 坏掉那一刻 |
+| 三 | `broken` | 只故障(故障脸 + 乱动 + 坏掉音效,没有台词),不回头不代解 | **全部**变故障演出(sleep 除外);l10 进关 `panic` = 坏掉那一刻 |
 | 四 | `look` | 只回头看你 1.5 s 再转回,不代解 | 照常;l13 进关 `calm` = 修好那一刻 |
 
 关内一二章显示提示「有困难可以对小机说:「请指导我」或「请帮帮我」」(`ui/level_scene.gd GUIDE_HINT`)。
@@ -54,7 +83,7 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 | `{"cmd":"ping"}` | 心跳,回 `{"evt":"pong"}` |
 | `{"cmd":"emote","name":N}` | 表情:`happy sad confused think glitch sleep idle` |
 | `{"cmd":"anim","name":N}` | 云台动画:`celebrate`(欢呼摇摆) `panic`(乱动+故障脸) `nod`(点头) `shake`(摇头) `look_pc`(扭头看电脑→轻点头→转回);动画结束会回到开始时的角度 |
-| `{"cmd":"say","name":N}` | 语音:播 `/sounds/N.wav`,播放中屏幕自动做**说话口型**。现有:`greet win encourage panic calm hint` |
+| `{"cmd":"say","name":N}` | 语音:播 `/sounds/N.wav`,播放中屏幕自动做**说话口型**。现有:`greet win encourage hint calm`(台词)+ `glitch1 glitch2 glitch3`(坏掉音效) |
 | `{"cmd":"gimbal","pan":P,"tilt":T}` | 云台直控(瞬时到位,无速度参数;省略的轴保持不动)。pan 50(左)~130(右),tilt 70(抬头)~110(低头),中心 90/90。空闲时固件不会自己回正 |
 | `{"cmd":"text","s":"..."}` | OLED 显示 ASCII 文本 3 秒(点阵字体不支持中文) |
 | `{"cmd":"cal_look"}` | **屏幕方向校准(自动)**:云台扫描,正对屏幕时朝它挥手(PAJ7620)或按 BOOT 锁定;30s 超时 |
@@ -62,7 +91,8 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 
 ### 上行(机器人/桥接/语音助手 → 游戏)
 
-`{"evt":"ready",...}` 开机 · `{"evt":"pong"}` · `{"evt":"button","name":"boot"}` ·
+`{"evt":"ready","fw":"she-nicest-bot 1.1","oled":bool,"audio":bool}` 开机(外设状态)· `{"evt":"pong"}` · `{"evt":"button","name":"boot"}` ·
+`{"evt":"gimbal","pan":..,"tilt":..}`(每条 `gimbal` 命令的 ack)·
 `{"evt":"cal_done","pan":..,"tilt":..}` · `{"evt":"cal_timeout"}` · `{"evt":"err","msg":...}` ·
 `{"evt":"serial","open":true|false}`(桥接:串口连上/断开,连入时先发一次)·
 `{"evt":"speech_ready"}` / `{"evt":"speech_alive"}`(语音助手启动 / 每 5 s 心跳,10 s 没心跳游戏判离线)·
@@ -75,10 +105,10 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 | cue | 触发点 | 行为 |
 |---|---|---|
 | `greet` | 进关 / 主菜单问候 | happy + 点头 + "欢迎回来,诺拉!" |
-| `celebrate` | 通关(`robot_cue_on_win`;小机代解时不发) | happy + 欢呼舞 + "太棒了!织成了!" |
+| `celebrate` | 通关(`robot_cue_on_win`;小机代解时不发) | happy + **俯仰轴连续点头**(不左右摇)+ "太棒了!织成了!" |
 | `confused` | 接出冲突线(节流 8s;代解期间不发) | 困惑脸 + 摇头 + **鼓励**"别灰心,换个口试试,你可以的!" |
 | `hint` | 发呆 45s(节流 15s) | 先 `look_pc` **装作看一眼电脑再转回来**,think 脸 + "要不要试试仪器架上的新机器?" |
-| `panic` | l10 进关(第三章开头坏掉);故障态下任何 cue 都是这套 | 故障脸 + 云台乱动 + "警告!推理核心过热!" |
+| `panic` | l10 进关(第三章开头坏掉);故障态下任何 cue 都是这套 | 故障脸 + 云台乱动 + 随机一段**坏掉音效**(`glitch1..3.wav`,`hardware/make_sfx.py` 合成;**没有台词**,屏幕上也不显示任何报警文字) |
 | `calm` | l13 进关(第四章开头修好) | happy + 点头 + "谢谢你,诺拉……" |
 | `glitch` `think` `sleep` `idle` | 对话行 robot_cue 任意挂 | 单表情 |
 
@@ -104,14 +134,18 @@ hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 erase-flash
 hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 write-flash 0x0 hardware/backup/xiaozhi_flash_backup.bin
 ```
 
-注意:MicroPython 走 TinyUSB CDC,**DTR/RTS 拉线不能复位芯片**;卡死时按板上 RST/拔插 USB。
-先停桥接再用 mpremote(串口独占;`flash_robot.sh` 已包含)。`fs mkdir` 目录已存在会报错,拷目录用 `fs cp -r sounds :`。
+注意:原生 USB 口走 TinyUSB CDC,**DTR/RTS 拉线不能复位芯片**;卡死时按板上 RST/拔插 USB(2026-08-29 硬复位后僵死过一次,
+flash 脚本与固件崩溃恢复都改成了软复位)。固件现在自愈:OLED/功放 I2C/I2S 出错只降级,崩溃 1.5 s 后软复位,不再落回 REPL。
+先停桥接再用 mpremote(串口独占;`flash_robot.sh` 已包含,连手动起的 `npm run bridge` 也会停)。
+`fs mkdir` 目录已存在会报错;语音逐个 `fs cp x.wav :sounds/x.wav`(别 `cp -r` 整个目录,会把 .import 也拷上去)。
 
 ## 实机验收清单
 
 1. 小机维护 → 接入小机 → 状态三行全部在线(语音助手第一次会弹麦克风权限)。
 2. 「试转一下」云台转到一侧再回正;「试听」六句本机能播。
 3. 刷入固件与语音 → 日志走到 DONE,小机重启后 `ready`。
-4. `godot --headless --path . --script res://tests/robot_smoke.gd` → 六个 cue + 回头/回正依次实机演出。
+4. `godot --headless --path . --script res://tests/robot_smoke.gd` → 六个 cue + 回头/回正依次实机演出;
+   `tests/robot_turn_smoke.gd` 只测回头:右极限 → 回正 → 左极限 → 回正,每步等固件 ack(退出码 = 失败数)。
+   `bash hardware/cam_check.sh` 用摄像头判定舵机真的转了(小机要在画面里)。
 5. 进第一纹对麦克风说「请指导我」→ 小机回头 → 关卡自动织成、小机不欢呼 → 转回;第三章进关小机故障、说话只故障;第四章进关平静、说话只回头。
 6. 拔掉 USB → 游戏无报错照常玩。

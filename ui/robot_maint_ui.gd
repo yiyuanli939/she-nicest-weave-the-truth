@@ -2,7 +2,7 @@ class_name RobotMaintUI
 extends CanvasLayer
 ## 小机维护面板(开发者信息页「小机维护」按钮 / 标题页 F9):
 ## 状态(桥接 / 串口 / 语音助手)· 接入小机(拉起桥接 + 语音助手)· 刷入固件与语音(mpremote,日志实时显示)·
-## 「请指导我」回头方向 · 小机声音(音色 / 音量 / 六句台词,保存并生成语音,可本机试听)·
+## 「请指导我」回头方向 · 小机声音(音色 / 音量 / 五句台词,保存并生成语音,可本机试听)·
 ## 「看电脑方向」校准(自动挥手锁定 / 手动微调 / 保存)。
 ## 全部走 Robot autoload(game/robot_link.gd);脚本在 hardware/*.sh;台词配置 hardware/firmware/sounds/lines.json。
 
@@ -15,9 +15,9 @@ const VOICES: Array = [
 	["zh-CN-XiaoyiNeural", "小艺(小智同款)"], ["zh-CN-XiaoxiaoNeural", "晓晓"], ["zh-CN-XiaoshuangNeural", "晓双(童声)"],
 	["zh-CN-YunxiNeural", "云希(男)"], ["zh-CN-YunyangNeural", "云扬(男)"],
 ]
-## 六句台词的触发点说明(顺序即面板顺序)
+## 五句台词的触发点说明(顺序即面板顺序);故障(第三章)没有台词,只放 make_sfx.py 合成的坏掉音效
 const LINE_HINTS: Dictionary = {
-	"greet": "进关问候", "win": "通关庆祝", "encourage": "接错线鼓励", "hint": "发呆提示", "panic": "故障(第三章)", "calm": "修好(第四章)",
+	"greet": "进关问候", "win": "通关庆祝", "encourage": "接错线鼓励", "hint": "发呆提示", "calm": "修好(第四章)",
 }
 
 var _robot: Node
@@ -25,6 +25,7 @@ var _status: Label
 var _log: RichTextLabel
 var _connect_btn: Button
 var _flash_btn: Button
+var _cam_btn: Button
 var _dir_btn: Button
 var _cal_status: Label
 var _voice_opt: OptionButton
@@ -72,6 +73,8 @@ func _init() -> void:
 	_dir_btn = _button("", _on_toggle_dir)
 	row1.add_child(_dir_btn)
 	row1.add_child(_button("试转一下", _on_try_turn))
+	_cam_btn = _button("摄像头验证云台", _on_cam_check)
+	row1.add_child(_cam_btn)
 	box.add_child(row1)
 
 	_log = RichTextLabel.new()
@@ -177,6 +180,8 @@ func _refresh() -> void:
 	lines.append("桥接:" + ("已连" if _robot.connected else "未连(点「接入小机」,或手动 bash hardware/run_robot.sh)"))
 	lines.append("串口 / 小机:" + ("在线" if _robot.serial_open else "离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)"))
 	lines.append("语音助手:" + ("在线,说「请指导我」或「请帮帮我」" if _robot.speech_online else "离线(需要 hardware/speech/model,第一次要允许麦克风)"))
+	if _robot.serial_open:
+		lines.append("固件外设:屏幕 %s / 功放 %s" % ["正常" if _robot.oled_ok else "故障(会自动重试)", "正常" if _robot.audio_ok else "故障(静音)"])
 	_status.text = "\n".join(lines)
 	_dir_btn.text = "回头方向:" + ("右" if _robot.turn_dir == "right" else "左") + "(点击切换)"
 
@@ -190,6 +195,11 @@ func _on_connect() -> void:
 
 func _on_flash() -> void:
 	_run_script("flash", _robot.flash_log_path(), "刷写中(会先停桥接,完成后自动重新接入)…")
+
+
+## 用电脑摄像头抓帧比对,判定两根轴是否真的转了(hardware/cam_check.py;截图在 hardware/.run/cam/)
+func _on_cam_check() -> void:
+	_run_script("cam", ProjectSettings.globalize_path("user://robot_cam.log"), "摄像头验证中:先确认小机在画面里(第一次要允许摄像头),然后转 pan / tilt 各两次…")
 
 
 ## 跑一个会写进度日志的脚本,面板跟踪日志直到 DONE / FAIL
@@ -211,6 +221,7 @@ func _set_busy(busy: bool) -> void:
 	_flash_btn.disabled = busy
 	_connect_btn.disabled = busy
 	_voices_btn.disabled = busy
+	_cam_btn.disabled = busy
 
 
 func _poll_log() -> void:
@@ -224,6 +235,8 @@ func _poll_log() -> void:
 	if last == "DONE" or last.begins_with("FAIL"):
 		if last == "DONE" and _busy_log == _robot.voices_log_path():
 			_log.text += "\n语音生成完毕:点「刷入固件与语音」送进小机。"
+		elif _busy_log.ends_with("robot_cam.log"):
+			_log.text += "\n截图在 hardware/.run/cam/cam_report.png"
 		_busy_log = ""
 		_set_busy(false)
 
@@ -285,7 +298,7 @@ func _on_make_voices() -> void:
 		return
 	f.store_string(JSON.stringify(_cfg, "\t", false))
 	f.close()
-	_run_script("voices", _robot.voices_log_path(), "已保存台词,正在用微软语音生成六句 wav(需联网,约十几秒)…")
+	_run_script("voices", _robot.voices_log_path(), "已保存台词,正在用微软语音生成五句 wav(需联网,约十几秒)…")
 
 
 ## 本机试听当前 wav(生成后才是新的;小机上的要刷入后才更新)

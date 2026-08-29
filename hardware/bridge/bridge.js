@@ -51,10 +51,13 @@ function broadcast(line) {
 async function pickPort() {
   if (process.env.SERIAL_PORT) return process.env.SERIAL_PORT;
   const ports = await SerialPort.list();
-  const hit = ports.find(
+  // 优先原生 USB(usbmodem / Espressif);没有就用板子 UART 口的 USB 转串口(usbserial,FTDI/CP210x),
+  // MicroPython 的控制台在两个口上都有
+  const native = ports.find(
     (p) => p.path.includes("usbmodem") || /Espressif/i.test(p.manufacturer ?? "")
   );
-  return hit?.path ?? null;
+  const uart = ports.find((p) => p.path.includes("usbserial"));   // serialport 列出的是 /dev/tty.*
+  return native?.path ?? uart?.path ?? null;
 }
 
 async function connectSerial() {
