@@ -49,8 +49,8 @@ func test_broken_cue_mapping() -> bool:
 
 func test_turn_targets() -> bool:
 	var rl := _rl()
-	return check(rl.turn_target("right") == 130 and rl.turn_target("left") == 50, "右=130 左=50(固件限位)") \
-		and check(rl.turn_target("乱填") == 130, "非法值当右")
+	return check(rl.turn_target("right") == 175 and rl.turn_target("left") == 5, "右=175 左=5(固件 1.2 限位,左右各到头)") \
+		and check(rl.turn_target("乱填") == 175, "非法值当右")
 
 
 func test_settings_survive_wipe() -> bool:

@@ -66,23 +66,25 @@ class SSD1306(framebuf.FrameBuffer):
 
 # ---- 云台舵机 ----
 class Servo:
-    def __init__(self, pin, lo, hi, center):
+    # us_min/us_max = 0°/180° 对应的脉宽。pan 那只实测 100–2900 µs 才是左右各 90°(标准 500–2500 只转一半)
+    def __init__(self, pin, lo, hi, center, us_min=500, us_max=2500):
         self.pwm = PWM(Pin(pin), freq=50)
         self.lo, self.hi = lo, hi
+        self.us_min, self.us_max = us_min, us_max
         self.angle = center
         self.goto(center)
 
     def goto(self, deg):
         deg = max(self.lo, min(self.hi, deg))
         self.angle = deg
-        us = 500 + (2500 - 500) * deg / 180
+        us = self.us_min + (self.us_max - self.us_min) * deg / 180
         self.pwm.duty_u16(int(us * 65535 // 20000))
 
 
 i2c = SoftI2C(sda=Pin(41), scl=Pin(42), freq=400000)
 oled = SSD1306(i2c)
-pan = Servo(11, 50, 130, 90)    # 水平:中心±40
-tilt = Servo(12, 70, 110, 90)   # 垂直:中心±20
+pan = Servo(11, 5, 175, 90, 100, 2900)   # 水平:左右各到头(实测 ±90°,壳/线都不卡),留 5° 余量
+tilt = Servo(12, 70, 110, 90)             # 垂直:中心±20
 boot_btn = Pin(0, Pin.IN, Pin.PULL_UP)
 # I2S 初始化容错:软复位后外设可能未释放,失败则静音运行(表情/云台不受影响)
 try:
@@ -227,7 +229,7 @@ def tick_anim(now):
         if t > 2600:
             anim = None
         else:
-            tilt.goto(90 + (16 if (t // 260) % 2 else -6))
+            tilt.goto(100 if (t // 260) % 2 else 72)   # 先仰后低,反复
     elif name == "panic":
         if t > 3000:
             anim = None
@@ -235,10 +237,11 @@ def tick_anim(now):
             pan.goto(50 + random.getrandbits(6))
             tilt.goto(70 + random.getrandbits(5))
     elif name == "nod":
+        # 先仰(72)再低(100):壳子让头本来就偏低,先抬起来才像点头
         if t > 1200:
             anim = None
         else:
-            tilt.goto(90 + (14 if (t // 300) % 2 else -6))
+            tilt.goto(100 if (t // 300) % 2 else 72)
     elif name == "shake":
         if t > 1400:
             anim = None
@@ -343,7 +346,7 @@ def main():
     buf = ""
     last_face = None
     btn_was = 1
-    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.1",
+    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.2",
           "oled": oled.ok, "audio": audio is not None})
     while True:
         while poller.poll(0):

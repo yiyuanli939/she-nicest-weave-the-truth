@@ -520,7 +520,7 @@ func _run() -> void:
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
 	await _wait(1.4)
 	_check(g1.session.is_solved() and game.save.is_solved(&"l01"), "说「请指导我」→ 小机代解通关并记档")
-	_check(robot.sent("gimbal", "", 130), "代解前底部云台回头到右极限(130)")
+	_check(robot.sent("gimbal", "", 175), "代解前底部云台回头到右极限(175)")
 	_check(not robot.sent("say", "win") and not robot.sent("anim", "celebrate") and not robot.sent("say", "encourage"), "代解不庆祝不鼓励")
 	await _wait(3.4)
 	_check(robot.sent("gimbal", "", 90), "代解后转回正中")
@@ -540,7 +540,7 @@ func _run() -> void:
 	robot.sent_log.clear()
 	robot._on_event({"evt": "speech", "text": "请 帮帮 我"})
 	await _wait(1.4)
-	_check(g2.session.is_solved() and robot.sent("gimbal", "", 50) and not robot.sent("gimbal", "", 130), "「请帮帮我」+ 方向设左 → 回头到左极限(50)后代解")
+	_check(g2.session.is_solved() and robot.sent("gimbal", "", 5) and not robot.sent("gimbal", "", 175), "「请帮帮我」+ 方向设左 → 回头到左极限(5)后代解")
 	robot.set_turn_dir("right")
 	# 第三章:进关当场故障;任何 cue(含「请指导我」)都是故障演出,不代解
 	game.start_level(game.catalog.find(&"l10"))
@@ -575,7 +575,7 @@ func _run() -> void:
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
 	await _wait(1.0)
-	_check(not g4.session.is_solved() and robot.sent("gimbal", "", 130), "第四章说「请指导我」只回头看你")
+	_check(not g4.session.is_solved() and robot.sent("gimbal", "", 175), "第四章说「请指导我」只回头看你")
 	await _wait(1.6)
 	_check(robot.sent("gimbal", "", 90) and not g4.session.is_solved(), "第四章看完转回,仍不代解")
 	game.save.wipe()

@@ -24,17 +24,19 @@ say "[2/5] 刷 main.py / paj7620.py → $PORT"
 "$MP" connect "$PORT" fs cp "$HW/firmware/main.py" :main.py >> "$LOG" 2>&1 \
 	&& "$MP" connect "$PORT" fs cp "$HW/firmware/paj7620.py" :paj7620.py >> "$LOG" 2>&1 \
 	|| { say "FAIL: 拷贝固件脚本失败(板子僵死请按 RST 或拔插 USB 再试)"; exit 1; }
-say "[3/5] 刷语音 sounds/*.wav(逐个拷,失败重试;并删掉板上已不用的旧文件)"
+say "[3/5] 刷语音 sounds/*.wav(一次会话拷完,少开关串口;失败整体重试;并删掉板上已不用的旧文件)"
 "$MP" connect "$PORT" fs mkdir :sounds >> "$LOG" 2>&1   # 已存在会报错,忽略
+CP_ARGS=()
 for f in "$HW"/firmware/sounds/*.wav; do
-	name="$(basename "$f")"
-	ok=0
-	for try in 1 2 3; do
-		if "$MP" connect "$PORT" fs cp "$f" ":sounds/$name" >> "$LOG" 2>&1; then ok=1; break; fi
-		say "    $name 第 $try 次失败,重试(UART 口的 DTR/RTS 偶尔会把板子复位)"; sleep 2
-	done
-	[ "$ok" = 1 ] || { say "FAIL: 拷贝语音 $name 失败(看日志)"; exit 1; }
+	[ ${#CP_ARGS[@]} -gt 0 ] && CP_ARGS+=("+")
+	CP_ARGS+=(fs cp "$f" ":sounds/$(basename "$f")")
 done
+ok=0
+for try in 1 2 3; do
+	if "$MP" connect "$PORT" "${CP_ARGS[@]}" >> "$LOG" 2>&1; then ok=1; break; fi
+	say "    语音拷贝第 $try 次失败,3 s 后重试"; sleep 3
+done
+[ "$ok" = 1 ] || { say "FAIL: 拷贝语音失败(看日志;原生 USB 口挂了就按 RST,或改插 UART 口)"; exit 1; }
 for f in $("$MP" connect "$PORT" fs ls :sounds 2>/dev/null | awk 'NF>=2 {print $2}'); do
 	case "$f" in *.wav) [ -f "$HW/firmware/sounds/$f" ] && continue ;; esac
 	"$MP" connect "$PORT" fs rm ":sounds/$f" >> "$LOG" 2>&1 && say "    删除板上旧文件 $f"
