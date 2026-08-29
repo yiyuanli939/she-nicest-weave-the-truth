@@ -4,7 +4,7 @@
 #        {"cmd":"anim","name":"celebrate(俯仰连点头)|panic|nod|shake|look_pc"}
 #        {"cmd":"say","name":"greet|win|encourage|hint|calm|glitch1..3"}   播 /sounds/<name>.wav
 #        {"cmd":"gimbal","pan":90,"tilt":90,"ms":300}
-#        {"cmd":"text","s":"..."}   {"cmd":"ping"}
+#        {"cmd":"text","s":"..."}   {"cmd":"ping"}   {"cmd":"probe"}  {"cmd":"pwm4","us":1500,"on":true}   侧口 GPIO4 测试
 #   上行 {"evt":"ready"...} {"evt":"pong"} {"evt":"button","name":"boot"}
 # 引脚来自 deskemoji 板配置:OLED I2C SDA=41 SCL=42;舵机 水平=11 垂直=12;
 # 功放 MAX98357A I2S BCLK=15 LRC=16 DIN=7(16kHz 16bit 单声道 WAV)。
@@ -14,7 +14,7 @@ import select
 import sys
 import time
 import random
-from machine import Pin, SoftI2C, PWM, I2S
+from machine import Pin, SoftI2C, PWM, I2S, time_pulse_us
 import framebuf
 from paj7620 import PAJ7620
 
@@ -93,6 +93,7 @@ try:
 except (OSError, ValueError):
     audio = None
 _voice = None                    # 正在播的 WAV 文件对象
+probe_pwm = None                 # 侧口 GPIO4 测试用 PWM(pwm4 命令)
 gest = PAJ7620(i2c)              # 手势传感器(共用 I2C;不在也能跑,校准退化为按键)
 
 # "看电脑"方向:给提示时先扭头望向屏幕再转回来。
@@ -337,6 +338,25 @@ def handle(line):
     elif cmd == "text":
         draw_text(str(d.get("s", "")))
         text_until = time.ticks_ms() + 3000
+    # ---- 侧口(3V3 / GND / GPIO4)测试工具 ----
+    elif cmd == "probe":       # 把 GPIO4 当示波器:量它收到的脉冲宽度(舵机排针 S 脚跳线到 4 → 验证底板走线有没有把 PWM 送到舵机座)
+        pin4 = Pin(4, Pin.IN, Pin.PULL_DOWN)
+        hi = time_pulse_us(pin4, 1, 40000)     # -2 = 等不到起始沿(没信号),-1 = 脉冲超时
+        lo = time_pulse_us(pin4, 0, 40000)
+        send({"evt": "probe", "pin": 4, "high_us": hi, "low_us": lo})
+    elif cmd == "pwm4":        # 用 GPIO4 输出舵机脉冲:舵机 S→4、红→3V3、棕→GND 可单独测一只舵机(3.3V 力弱但会动)
+        global probe_pwm
+        if d.get("on", True):
+            us_ = int(d.get("us", 1500))
+            if probe_pwm is None:
+                probe_pwm = PWM(Pin(4), freq=50)
+            probe_pwm.duty_u16(int(us_ * 65535 // 20000))
+            send({"evt": "pwm4", "us": us_})
+        else:
+            if probe_pwm is not None:
+                probe_pwm.deinit()
+                probe_pwm = None
+            send({"evt": "pwm4", "us": 0})
 
 
 def main():
@@ -346,7 +366,7 @@ def main():
     buf = ""
     last_face = None
     btn_was = 1
-    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.2",
+    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.3",
           "oled": oled.ok, "audio": audio is not None})
     while True:
         while poller.poll(0):

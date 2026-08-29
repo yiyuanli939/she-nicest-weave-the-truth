@@ -12,7 +12,7 @@ BOOT 键=GPIO0。**板上没有麦克风**,语音识别在电脑侧做(见下)�
 
 | 口 | 电脑上的名字 | 板上走的是 | 怎么用 |
 |---|---|---|---|
-| 原生 USB(丝印 USB) | `/dev/cu.usbmodem2101` | S3 自带 USB(GPIO19/20)→ MicroPython USB-CDC | 桥接优先选它;刷写快。**TinyUSB 拉不了复位线,僵死只能按 RST** |
+| 原生 USB(丝印 USB) | `/dev/cu.usbmodem2101`(序列号随芯片变,换板后名字不同,如 `usbmodem5CBC0272971`) | S3 自带 USB(GPIO19/20)→ MicroPython USB-CDC | 桥接优先选它;刷写快。**TinyUSB 拉不了复位线,僵死只能按 RST** |
 | UART(丝印 COM/UART) | `/dev/cu.usbserial-A5069RR4`(FTDI) | USB 转串口 → S3 的 UART0(GPIO43/44) | MicroPython 的 stdio 同时挂在 USB-CDC 和 UART0,这一路同样通;桥接/刷写脚本都会回退到它。FTDI 的 DTR/RTS 接着自动复位线:mpremote 每次开关串口都可能把板子复位一下,所以刷语音改成逐个文件拷 + 失败重试 |
 
 **舵机供电(2026-08-30 排障结论)**:底板左上角有一个圆形 DC 电源座(印 `5-30Vin`),**舵机的 5V 只从这个座经底板稳压来,USB 不给舵机供电**。
@@ -100,6 +100,9 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 | `{"cmd":"cal_look"}` | **屏幕方向校准(自动)**:云台扫描,正对屏幕时朝它挥手(PAJ7620)或按 BOOT 锁定;30s 超时 |
 | `{"cmd":"cal_set"}` | 以当前云台角保存为"屏幕方向" |
 
+| `{"cmd":"probe"}` | **侧口 GPIO4 当示波器**:回 `{"evt":"probe","high_us":H,"low_us":L}`。把舵机排针的 S 脚用跳线接到侧口 `4`,应读到 high ≈ 500–2900、low ≈ 17000–19500;`-2` = 没信号(底板走线没把 PWM 送到舵机座) |
+| `{"cmd":"pwm4","us":1500}` / `{"on":false}` | **侧口 GPIO4 输出舵机脉冲**:舵机 S→`4`、红→`3.3`、棕→`GND` 可单独测一只舵机(3.3V 力弱但会动;`us` 500–2500) |
+
 ### 上行(机器人/桥接/语音助手 → 游戏)
 
 `{"evt":"ready","fw":"she-nicest-bot 1.1","oled":bool,"audio":bool}` 开机(外设状态)· `{"evt":"pong"}` · `{"evt":"button","name":"boot"}` ·
@@ -154,6 +157,18 @@ flash 脚本与固件崩溃恢复都改成了软复位)。固件现在自愈:OLE
 另:`hardware/.run/bridge.log` 的时间戳是 **UTC**(本地 +8)。
 先停桥接再用 mpremote(串口独占;`flash_robot.sh` 已包含,连手动起的 `npm run bridge` 也会停)。
 `fs mkdir` 目录已存在会报错;语音逐个 `fs cp x.wav :sounds/x.wav`(别 `cp -r` 整个目录,会把 .import 也拷上去)。
+
+## 换板 / 重刷 MicroPython
+
+```bash
+bash hardware/stop_robot.sh
+PORT=$(ls /dev/cu.* | grep -E "usbmodem|usbserial" | head -1)
+hardware/.venv/bin/python -m esptool --chip esp32s3 --port $PORT read-flash 0 0x1000000 hardware/backup/xiaozhi_flash_backup_<板名>.bin   # 先备份原厂(默认波特;921600 会中断)
+hardware/.venv/bin/python -m esptool --chip esp32s3 --port $PORT erase-flash
+hardware/.venv/bin/python -m esptool --chip esp32s3 --port $PORT --baud 921600 write-flash -z 0x0 hardware/firmware/ESP32_GENERIC_S3-20260824-v1.29.0.bin
+bash hardware/flash_robot.sh      # 灌 main.py / paj7620.py / sounds,软复位,重起桥接
+```
+原厂固件走 USB-JTAG,esptool 能自动进下载模式;刷成 MicroPython(TinyUSB)后原生口不能自动复位,esptool 要按住 BOOT 点 RST,或走 UART 口。
 
 ## 实机验收清单
 
