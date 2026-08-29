@@ -1,2 +1,4 @@
 # Normalize EOL for all files that Git considers text files.
 * text=auto eol=lf
+# mp3 有 ID3 文本头,别让 git 当文本做换行归一化
+*.mp3 binary

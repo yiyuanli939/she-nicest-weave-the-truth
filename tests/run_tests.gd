@@ -20,10 +20,13 @@ const FILES: Array[String] = [
 	"res://tests/test_dialogue_import.gd",
 	"res://tests/test_theme.gd",
 	"res://tests/test_robot_logic.gd",
+	"res://tests/test_bgm.gd",
 ]
 
 
 func _initialize() -> void:
+	# --script 的 _initialize 跑在 root 进树之前:测试里 add_child 到 root 的节点不算在树里(播音频/建 Tween 会报错),先等一帧
+	await process_frame
 	var total := 0
 	var fails := 0
 	for path in FILES:

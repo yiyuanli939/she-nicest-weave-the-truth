@@ -22,6 +22,9 @@ var _game: Node
 
 func _ready() -> void:
 	_game = get_node("/root/Game")
+	var bgm := get_node_or_null("/root/Bgm")
+	if bgm != null:
+		bgm.play(&"title")
 	var bg := TextureRect.new()
 	bg.texture = load(BG_PATH)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)

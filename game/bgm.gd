@@ -1,0 +1,95 @@
+extends Node
+## Autoload "Bgm":背景音乐。槽位 -> 文件见 TRACKS(与 music/音乐bgm位置.md 一一对应)。
+## 场景在 _ready 里 play(槽位):同槽位不重启(标题/选关/开发者信息互切、故事界面进关内、同章下一关),
+## 换槽位用两个播放器交叉淡化;槽位没曲子就淡出到静音(关内先留白,补曲只改 TRACKS 一行)。
+## 美术文档没有音量 UI,音量是常量。
+
+const TRACKS: Dictionary = {
+	&"title": "res://music/title.mp3",   # 标题 / 选关 / 开发者信息
+	&"level_1": "",                       # 第一章 并纹:故事界面 + 关内
+	&"level_2": "",                       # 第二章 叠层纹
+	&"level_3": "",                       # 第三章 岔纹
+	&"level_4": "",                       # 第四章 焦纹
+}
+const VOLUME_LINEAR := 0.32   # 约 -10 dB:钢琴 BGM 压低,给实体小机的喇叭留空间
+const FADE_SEC := 1.2
+
+var slot: StringName = &""    # 当前请求的槽位(静音槽位也记着,同槽位再调才能免重启)
+
+var _players: Array[AudioStreamPlayer] = []
+var _active := 0
+var _tween: Tween
+var _streams: Dictionary = {}   # path -> AudioStream 缓存
+
+
+## 播放器在构造时建好(不是 _ready):测试 new() 后直接可用,进树前 _ready 不一定同步跑
+func _init() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	for i in 2:
+		var p := AudioStreamPlayer.new()
+		p.volume_linear = 0.0
+		add_child(p)
+		_players.append(p)
+
+
+## 章号(Game.current_chapter,0..3)对应关内槽位;-1(无 Game / 测试注入关)给空槽位 = 静音
+static func slot_for_chapter(ch: int) -> StringName:
+	if ch >= 0 and ch <= 3:
+		return StringName("level_%d" % (ch + 1))
+	return &""
+
+
+func play(new_slot: StringName) -> void:
+	if new_slot == slot:
+		return
+	slot = new_slot
+	if _tween != null and _tween.is_valid():
+		_tween.kill()
+	var outgoing := _players[_active]
+	_active = 1 - _active
+	var incoming := _players[_active]
+	# 淡化中途再切:去者从当前音量接着淡出;来者是上一轮的去者(尾音已很小),直接复用
+	incoming.stop()
+	incoming.stream = _stream_for(new_slot)
+	incoming.volume_linear = 0.0
+	if incoming.stream != null:
+		incoming.play()
+	# 只 tween volume_linear,别碰 volume_db(0 线性 = -inf dB)
+	_tween = create_tween().set_parallel(true)
+	_tween.tween_property(incoming, "volume_linear", VOLUME_LINEAR, FADE_SEC)
+	_tween.tween_property(outgoing, "volume_linear", 0.0, FADE_SEC)
+	_tween.chain().tween_callback(outgoing.stop)
+
+
+func stop() -> void:
+	play(&"")
+
+
+func is_playing() -> bool:
+	for p in _players:
+		if p.playing:
+			return true
+	return false
+
+
+func active_player() -> AudioStreamPlayer:
+	return _players[_active]
+
+
+## 按路径缓存加载;三种格式都设循环,音乐同学交 mp3 / ogg / wav 都行
+func _stream_for(s: StringName) -> AudioStream:
+	var path: String = TRACKS.get(s, "")
+	if path == "":
+		return null
+	if _streams.has(path):
+		return _streams[path]
+	var stream := load(path) as AudioStream
+	if stream == null:
+		push_warning("Bgm: 加载失败 %s(槽位 %s)" % [path, s])
+		return null
+	if stream is AudioStreamMP3 or stream is AudioStreamOggVorbis:
+		stream.loop = true
+	elif stream is AudioStreamWAV:
+		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
+	_streams[path] = stream
+	return stream

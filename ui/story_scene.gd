@@ -28,6 +28,9 @@ var _leaving := false
 func _ready() -> void:
 	var game := get_node_or_null("/root/Game")
 	var dlg: DialogueRes = game.current.intro_dialogue if game != null and game.current != null else null
+	var bgm := get_node_or_null("/root/Bgm")
+	if bgm != null:
+		bgm.play(bgm.slot_for_chapter(game.current_chapter() if game != null else -1))
 	_build_ui()
 	if dlg == null or dlg.lines.is_empty():
 		_go_board()

@@ -58,6 +58,9 @@ func _ready() -> void:
 		atoms = lv.atoms
 		atom_colors = lv.effective_colors()
 		allow_bot = lv.allow_bot
+	var bgm := get_node_or_null("/root/Bgm")
+	if bgm != null:
+		bgm.play(bgm.slot_for_chapter(_game.current_chapter() if _game != null else -1))
 	add_child(session)
 	_build_ui()
 	session.proof_completed.connect(_on_win)

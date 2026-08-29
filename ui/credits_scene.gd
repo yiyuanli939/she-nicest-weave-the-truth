@@ -18,6 +18,7 @@ const LINES: Array[String] = [
 	"[占位] 作者:She Nicest 团队",
 	"[占位] 美术:待补充",
 	"字体:站酷小薇体(ZCOOL XiaoWei,免费商用授权)",
+	"音乐:舒伯特 A 大调钢琴奏鸣曲 D.664 第二乐章 Andante,演奏 Paul Pitman,公有领域(CC PD)",
 	"引擎:Godot 4.7",
 	"参考作品:The Incredible Proof Machine(incredible.pm)",
 	"[占位] 感谢:待补充",
@@ -25,6 +26,9 @@ const LINES: Array[String] = [
 
 
 func _ready() -> void:
+	var bgm := get_node_or_null("/root/Bgm")
+	if bgm != null:
+		bgm.play(&"title")
 	var bg := TextureRect.new()
 	bg.texture = load(BG_PATH)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)

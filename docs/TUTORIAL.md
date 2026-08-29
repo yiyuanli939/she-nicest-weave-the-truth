@@ -18,7 +18,7 @@ board/       ProofBoard(GraphEdit)、MachineNode(GraphNode)、WireOverlay(错误
 pattern/     PatternEditor(挖孔画纹样的钉纹样窗口)
 narrative/   DialogueBox(对话框)、DialogueRes/Line(台词数据)、NotebookUI
 ui/          MainMenu / LevelSelect / StoryScene(进关前全屏对话)/ LevelScene(关卡)
-game/        Game autoload(流程/存档/机器人 cue 转发)、SaveManager、RobotLink
+game/        Game autoload(流程/存档/机器人 cue 转发)、SaveManager、RobotLink、Bgm(背景音乐槽位)
 levels/      LevelDef/ChapterDef/LevelCatalog + data/*.tres(生成器产物)
 tools/       gen_levels.gd(关卡/笔记本批量生成器)
 tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
@@ -98,6 +98,8 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;第三章 `broken` —— `Robot.broken = true`,任何 cue 都映射成故障三连(`RobotLink.commands_for`);
   第四章 `look` —— 只回头看你。l10/l13 的 `robot_cue_on_enter` = panic/calm 是坏掉/修好那一刻。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
+
+**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;故事界面与关内 = 该章 `level_N`)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音(关内目前留白)。没有音量 UI(美术文档没有),音量是常量。槽位表与补曲步骤见 `music/音乐bgm位置.md`。
 
 ## 3. 最近两轮改了什么(以及为什么)
 
@@ -181,6 +183,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
 | 改进关流程 | `game/game.gd start_level/enter_board` |
+| 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 第三章故障 / 第四章回头 | `ui/level_scene.gd` `_on_guide_requested/_run_guide/_run_look`、`game/game.gd robot_mode_for_chapter`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
 | 小机维护面板(接入 / 刷固件 / 校准 / 回头方向) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮、标题页 F9);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
@@ -191,7 +194,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 81 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 91 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)

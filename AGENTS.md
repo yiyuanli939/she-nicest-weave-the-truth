@@ -53,8 +53,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
 | `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、拉起 `hardware/*.sh` |
+| `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同槽位不重启、换槽位交叉淡化、空槽位静音;各场景 `_ready` 报槽位 |
 | `levels/level_solutions.gd` | 15 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
-| `tests/` | headless 测试,81 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描);`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,91 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -73,6 +74,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   (不是"含自由变量即可钉",否则封程机 P→Q 口会重复出按钮)。`match_into` 的
   判断顺序有讲究(模板侧可钉先于值侧刚性跳过,occurs check 不能省),动它前看
   `test_unifier.test_match_into_is_one_way`。环检测在传播之前,环上的边不参与传播。
+- **`--script` 的 `_initialize` 里 root 还没进树**:`SceneTree.initialize()` 先调脚本 `_initialize` 再 `root._set_tree`,
+  此时 `add_child` 到 root 的节点 `is_inside_tree()` 为假(AudioStreamPlayer.play / create_tween 直接报错)。
+  `run_tests.gd` 开头已 `await process_frame`;新写 SceneTree 脚本照做。
 - **存档里的钉是外部边界**:`from_dict` 只收"可钉口 + 全染色"的钉;含 `?` 的钉值
   会让 `Unifier.walk` 追自己死循环。
 
@@ -85,7 +89,8 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 (自由纹样一律由玩家钉)✅ → **美术包接入**(2026-08-29:站酷小薇体、3840×2160 逻辑视口 PNG 原尺寸、
 标题/选关/开发者信息/故事界面/仪器架/笔记抽屉全部换成美术图,节点内无公式文字;严格按
 `information/art_spec_20260829/游戏样式美化.md`)✅ → **小机剧情弧 + 语音求助**(玩家说「请指导我/请帮帮我」:一二章小机回头到极限后代解、
-第三章整章故障、第四章修好只回头;电脑麦克风离线识别 `hardware/speech/`;开发者信息页「小机维护」面板可接入/刷固件/校准/设回头方向)✅。
+第三章整章故障、第四章修好只回头;电脑麦克风离线识别 `hardware/speech/`;开发者信息页「小机维护」面板可接入/刷固件/校准/设回头方向)✅ → **背景音乐槽位系统 + 标题曲**(2026-08-29:autoload Bgm,
+标题/选关/开发者信息共用 `music/title.mp3`,关内暂静音;补曲只放文件 + 填 `TRACKS` 一行,见 `music/音乐bgm位置.md`)✅。
 剧情台词为**占位版**(正式台词等 Excel,`tools/import_dialogue.gd` 灌 CSV),更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
 机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。

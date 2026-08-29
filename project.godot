@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Game="*res://game/game.gd"
 Robot="*res://game/robot_link.gd"
+Bgm="*res://game/bgm.gd"
 
 [gui]
 

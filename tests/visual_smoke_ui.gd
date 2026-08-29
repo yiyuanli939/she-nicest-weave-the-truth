@@ -111,6 +111,8 @@ func _line(speaker: String, text: String, scene: String, left: String, nora_expr
 func _run() -> void:
 	await _settle()
 	var game := root.get_node("/root/Game")
+	AudioServer.set_bus_mute(0, true)   # 跑测试别真出声;playing 状态不受影响
+	var bgm := root.get_node("/root/Bgm")
 
 	# ---- A. 故事界面:底图 + 场景插图 + 左右立绘 + 遮罩;点击落点与任意键推进;不显示场景名 ----
 	var dlg := DialogueRes.new()
@@ -361,6 +363,8 @@ func _run() -> void:
 	await _settle()
 	var menu := current_scene as MainMenu
 	_check(menu != null, "标题页加载")
+	_check(bgm.slot == &"title" and bgm.is_playing(), "标题页 BGM = 标题曲在播")
+	var bgm_p0: AudioStreamPlayer = bgm.active_player()
 	if menu != null:
 		var names: Array[String] = []
 		for b in menu.find_children("*", "Button", true, false):
@@ -370,6 +374,7 @@ func _run() -> void:
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
+		_check(bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0, "标题到选关 BGM 不重启(同一播放器接着播)")
 		game.save.mark_solved(&"l01")
 		game.save.save()
 		game.goto_menu()
@@ -382,6 +387,7 @@ func _run() -> void:
 		_click(_center(_button_named(menu, "开发者信息")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is CreditsScene, "开发者信息页加载")
+		_check(bgm.active_player() == bgm_p0 and bgm_p0.playing, "开发者信息页 BGM 不重启")
 		var credit_btns := current_scene.find_children("*", "Button", true, false)
 		var visible_btns: Array[String] = []
 		for b in credit_btns:
@@ -441,10 +447,15 @@ func _run() -> void:
 			_click(_center(first), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(current_scene is StoryScene, "点第一纹 → 故事界面")
+			_check(bgm.slot == &"level_1", "进第一章故事界面 BGM 槽位 = level_1(故事与关内共用)")
 			if current_scene is StoryScene:
 				(current_scene as StoryScene).finish()
 				await _settle()
 				_check(current_scene is LevelScene and game.current.id == &"l01", "播完进 l01 棋盘")
+				_check(bgm.slot == &"level_1", "故事到关内同槽位不变")
+				if bgm.TRACKS[&"level_1"] == "":
+					await _wait(bgm.FADE_SEC + 0.2)
+					_check(not bgm.is_playing(), "第一章暂无曲:标题曲淡出到静音")
 
 	# ---- N. 测试用「示答」按钮:点了自动摆出本关答案并通关 ----
 	var l01 := current_scene as LevelScene
@@ -488,6 +499,7 @@ func _run() -> void:
 		(current_scene as StoryScene).finish()
 		await _settle()
 	var g2 := current_scene as LevelScene
+	_check(bgm.slot == &"level_1", "同章 l02 BGM 槽位不变")
 	robot.sent_log.clear()
 	robot._on_event({"evt": "speech", "text": "请 帮帮 我"})
 	await _wait(1.4)
@@ -499,6 +511,7 @@ func _run() -> void:
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
 		await _settle()
+	_check(bgm.slot == &"level_3", "进第三章 BGM 槽位 = level_3")
 	var g3 := current_scene as LevelScene
 	_check(robot.broken and robot.sent("say", "panic"), "进第三章小机故障(panic)")
 	_check(not g3._guide_hint.visible, "第三章不显示求助提示")
@@ -525,6 +538,11 @@ func _run() -> void:
 	await _wait(1.6)
 	_check(robot.sent("gimbal", "", 90) and not g4.session.is_solved(), "第四章看完转回,仍不代解")
 	game.save.wipe()
+
+	# ---- B. 回标题:BGM 淡入标题曲 ----
+	game.goto_menu()
+	await _settle()
+	_check(bgm.slot == &"title" and bgm.is_playing(), "回标题 BGM 淡入标题曲")
 
 	_finish()
 

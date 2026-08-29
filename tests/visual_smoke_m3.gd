@@ -58,12 +58,15 @@ func _run() -> void:
 	var game := _game()
 	_check(game != null, "Game autoload 存在")
 	game.save.wipe()
+	AudioServer.set_bus_mute(0, true)   # 跑测试别真出声
+	var bgm := root.get_node("/root/Bgm")
 
 	# 主菜单
 	change_scene_to_file("res://ui/main_menu.tscn")
 	await _settle()
 	_shot("m3_menu")
 	_check(current_scene is MainMenu, "主菜单加载")
+	_check(bgm.slot == &"title" and bgm.is_playing(), "主菜单 BGM = 标题曲")
 
 	# 逐关通关:第一关从菜单逻辑入口进,之后走「下一关」按钮
 	game.start_level(game.first_unsolved())
@@ -75,6 +78,7 @@ func _run() -> void:
 			_check(false, "第 %d 关场景未加载" % (i + 1))
 			break
 		var lv: LevelDef = game.current
+		_check(bgm.slot == bgm.slot_for_chapter(game.current_chapter()), "%s BGM 槽位随章节" % lv.id)
 		var robot := root.get_node("/root/Robot")
 		if lv.id == &"l10":
 			_check(robot.broken and robot.sent("say", "panic"), "进 l10 小机故障(panic),第三章 broken")
