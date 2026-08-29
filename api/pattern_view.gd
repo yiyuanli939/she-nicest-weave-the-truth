@@ -17,7 +17,7 @@ const LINEN := Color(0.91, 0.87, 0.78)      # 亚麻底
 const CHAR_BLACK := Color(0.12, 0.10, 0.09) # 焦黑
 const SPLIT_COLOR := Color(0.23, 0.18, 0.12)
 
-const GHOST_ALPHA := 0.4
+const GHOST_ALPHA := 0.5   # 原子色降饱和提亮后,0.4 的幽灵态在乳黄节点底上会糊
 
 ## 关卡注入的原子调色板 {StringName: Color};缺失回退 hash→HSV
 @export var atom_colors: Dictionary = {}
@@ -195,4 +195,4 @@ func atom_color(n: StringName) -> Color:
 	if atom_colors.has(n):
 		return atom_colors[n]
 	var h := fmod(absf(float(hash(String(n)))) * 0.618033, 1.0)
-	return Color.from_hsv(h, 0.55, 0.82)
+	return Color.from_hsv(h, 0.38, 0.86)   # 与 LevelDef.DEFAULT_COLORS 同档的低饱和高明度

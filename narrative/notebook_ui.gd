@@ -3,7 +3,7 @@ extends CanvasLayer
 ## 诺拉的笔记抽屉(美术参考图 information/art_spec_20260829/image 4.png 右缘、image 5.png 全页;
 ## 底图 assets/art/level/notebook_bg.png 原尺寸 3798×2065)。
 ## 平时收在屏幕右缘只露出黄铜夹子(「笔记」);点击向左划出(缓动),夹子文字变「继续工作」;再点向右收回。
-## 「翻页」循环切换条目(七台仪器说明,先仅文字,全量常驻)。
+## 「翻页」循环切换条目(只显示本关已上架仪器的说明,先仅文字)。
 ## 坐标为抽屉内 / 3840×2160 逻辑像素;美术调位置改下面常量。
 
 signal open_requested          # 玩家点了收起状态的「笔记」;宿主调 open()
@@ -119,10 +119,13 @@ func _snap() -> void:
 	_drawer.position.x = _target_x(_open)
 
 
-## unlocked 参数保留旧签名;笔记全量常驻,不看它
-func open(nb: NotebookCatalog, _unlocked: Array = []) -> void:
+## 只显示 unlocked(本关 allowed_rules,条目 id = rule_id)对应的条目;
+## 顺序 = 目录顺序 = 仪器架顺序。严格过滤:传空就一条不显示,没有"空=全量"兜底。
+func open(nb: NotebookCatalog, unlocked: Array = []) -> void:
 	_entries.clear()
-	_entries.assign(nb.entries)
+	for e in nb.entries:
+		if unlocked.has(e.id):
+			_entries.append(e)
 	_page = 0
 	_show_page()
 	_slide(true)

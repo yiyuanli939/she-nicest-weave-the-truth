@@ -98,7 +98,7 @@ func _make_swatch(a: StringName) -> Button:
 	var col := _preview.atom_color(a)
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var sb := StyleBoxFlat.new()
-		sb.bg_color = col.lightened(0.12) if state == "hover" else col
+		sb.bg_color = col.darkened(0.10) if state == "hover" else col   # 原子色已亮,悬停用变暗反馈
 		sb.set_corner_radius_all(10)
 		if state == "pressed":
 			sb.set_border_width_all(6)

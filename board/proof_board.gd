@@ -31,11 +31,42 @@ func _ready() -> void:
 	delete_nodes_request.connect(_on_delete_nodes_request)
 	end_node_move.connect(_on_end_node_move)
 	add_child(_overlay)
+	# 视区移动只留中键拖动(4.7 ViewPanner 内置):滚动条隐形且不吃鼠标。
+	# 引擎每次 _update_scroll 会自己 show()/hide(),改 visible 会被顶回,所以用 modulate;
+	# 不能 free —— scroll_offset 的值就存在这两条 ScrollBar 里。
+	for sb in scroll_bars():
+		sb.modulate.a = 0.0
+		sb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# 两个隐形角标把可平移画布撑到固定大小(GraphEdit 滚动范围 = 内容 AABB ± 一屏,无 API 可调)。
+	# 非 MachineNode:_machine_nodes()/_on_board_rebuilt 都不会碰它们,模型层不感知。
+	for corner in [Vector2(-800, -600), Vector2(4200, 2800)]:
+		var anchor := GraphElement.new()
+		anchor.position_offset = corner
+		anchor.modulate.a = 0.0
+		anchor.selectable = false
+		anchor.draggable = false
+		anchor.focus_mode = Control.FOCUS_NONE
+		anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(anchor)
 
 
 ## 关卡 HUD 没有单独一行(美术:不显示当前关),必需按钮挂在棋盘自带的工具条上(GraphEdit API 只在本文件)
 func add_toolbar_item(c: Control) -> void:
 	get_menu_hbox().add_child(c)
+
+
+## GraphEdit 的两条内部滚动条(GDScript 没有 get_h/v_scroll_bar;它们在内部容器里,递归找)
+func scroll_bars() -> Array[ScrollBar]:
+	var out: Array[ScrollBar] = []
+	var stack: Array[Node] = [self]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for c in n.get_children(true):
+			if c is ScrollBar:
+				out.append(c)
+			elif not (c is GraphElement):
+				stack.append(c)
+	return out
 
 
 func bind(s: ProofSession) -> void:

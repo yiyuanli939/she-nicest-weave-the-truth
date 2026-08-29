@@ -40,12 +40,12 @@
 - 新增关卡:复制一个 .tres 改字段 → 在 `levels/data/catalog.tres` 对应章节的 `levels` 数组里加进去。顺序即解锁顺序(全线性)。
 - 批量重生成(会覆盖!):改 `tools/gen_levels.gd` 的表后跑
   `godot --headless --path . --script res://tools/gen_levels.gd`
-- 仪器架固定显示 7 台(顺序按美术图),本关 `allowed_rules` 之外的置灰。
+- 仪器架只显示本关 `allowed_rules` 上架的仪器(顺序按美术图,紧凑排列),未上架的不显示。
 
 ## 诺拉的笔记(= 七台仪器的说明)
 
 `narrative/data/notebook.tres`:每台仪器一条(id = 仪器 rule_id,顺序同仪器架),标题 + 正文(BBCode),先仅文字。
-全量常驻、不解锁;关内点右缘「笔记」划出,「翻页」循环。
+目录仍 7 条全量;关内只显示本关上架仪器的条目(按 allowed_rules 过滤)。点右缘「笔记」划出,「翻页」循环。
 批量改走 `tools/gen_levels.gd` 的 `RULE_GUIDE` 表后重跑生成器;单条改直接在 Inspector 编辑 .tres。
 
 **文案守则**:只讲机器行为与操作,用纺织语汇(并纹/岔纹/迭层纹/焦纹/封单/借丝);

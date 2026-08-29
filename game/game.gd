@@ -1,7 +1,7 @@
 extends Node
 ## Autoload "Game":游戏流程唯一单例(逻辑层保持可 new,不进这里)。
 ## 场景切换、当前关卡、存档、机器人 cue 转发都从这里走。
-## 诺拉的笔记 = 七台仪器的说明(narrative/data/notebook.tres),全量常驻,不解锁。
+## 诺拉的笔记 = 七台仪器的说明(narrative/data/notebook.tres),关内按本关 allowed_rules 过滤显示。
 ## 小机剧情弧(按章节):第一二章 玩家说「请指导我」小机代解("guide");第三章小机故障("broken",所有 cue 变故障演出);
 ## 第四章修好、「请指导我」只回头看你("look");不在目录里的关(测试注入)不触发("off")。
 

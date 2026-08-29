@@ -68,7 +68,8 @@
 
 | 东西 | 文件与参数 |
 |---|---|
-| 命题纹样(节点口 / 编辑器 / 线轴 / 目标) | `api/pattern_view.gd`(LINEN / CHAR_BLACK / SPLIT_COLOR / BASE_LINE_W);原子配色在关卡 `atom_colors`,缺省表 `levels/level_def.gd DEFAULT_COLORS` |
+| 命题纹样(节点口 / 编辑器 / 线轴 / 目标) | `api/pattern_view.gd`(LINEN / CHAR_BLACK / SPLIT_COLOR / BASE_LINE_W);原子配色在关卡 `atom_colors`,缺省表 `levels/level_def.gd DEFAULT_COLORS`(低饱和高明度:藕粉红/灰蓝/豆青/紫藕) |
+| 选关/开发者页「返回主界面」 | `ui/back_button.gd`(RECT 左上角坐标 / FONT_SIZE) |
 | 连线错误徽章(纯文字:冲突 / 欠定 / 成环 / 逃逸) | `board/wire_overlay.gd` BADGE / BADGE_COLOR |
 | 纹样编辑器弹窗 | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE) |
 | 胜利绿光 | `ui/level_scene.gd _on_win()` |

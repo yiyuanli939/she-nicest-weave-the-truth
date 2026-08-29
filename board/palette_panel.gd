@@ -2,7 +2,7 @@ class_name PalettePanel
 extends Control
 ## 仪器架(美术参考图 information/art_spec_20260829/image 4.png 左栏):底图 + 固定 7 个仪器按钮,
 ## 顺序与按钮图的分配严格按图(合取类 = 并织/拆股,蕴含类 = 封程/引渡,析取类 = 岔纹/汇路,矛盾类 = 溃散)。
-## 本关未上架的仪器(不在 allowed_rules)置灰禁用;点击可用仪器请求放置。只发信号,不碰 GraphEdit。
+## 本关未上架的仪器(不在 allowed_rules)不显示,可见按钮按图顺序紧凑排列;点击请求放置。只发信号,不碰 GraphEdit。
 ## 坐标为架内 / 3840×2160 逻辑像素,图片原尺寸;美术调位置改下面常量。
 
 signal machine_requested(rule_id: StringName)
@@ -51,15 +51,22 @@ func _ready() -> void:
 				"disabled": sb.modulate_color = Color(0.62, 0.6, 0.58)
 			btn.add_theme_stylebox_override(state, sb)
 		btn.disabled = true
+		btn.visible = false   # set_rules 之前不闪 7 台
 		btn.pressed.connect(machine_requested.emit.bind(rule_id))
 		add_child(btn)
 		_buttons[rule_id] = btn
 
 
-## 本关可用的仪器亮起,其余置灰
+## 只显示本关上架的仪器,位置按可见顺序紧凑重排(未上架的不显示,不留空槽)
 func set_rules(ids: Array[StringName]) -> void:
-	for rule_id: StringName in _buttons:
-		(_buttons[rule_id] as Button).disabled = not ids.has(rule_id)
+	var k := 0
+	for rule_id in SLOT_ORDER:
+		var btn := _buttons[rule_id] as Button
+		btn.visible = ids.has(rule_id)
+		btn.disabled = not btn.visible
+		if btn.visible:
+			btn.position.y = SLOT_Y0 + k * SLOT_PITCH
+			k += 1
 
 
 func button_of(rule_id: StringName) -> Button:

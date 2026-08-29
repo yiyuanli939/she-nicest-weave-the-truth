@@ -43,7 +43,7 @@ var _suppress_win_cue := false        # 代解通关不庆祝
 var assumptions: Array[String] = ["A & B"]
 var goal_text := "B & A"
 var allowed_rules: Array[StringName] = [&"and_intro", &"and_elim"]
-var atom_colors: Dictionary = {&"A": Color(0.82, 0.35, 0.30), &"B": Color(0.27, 0.42, 0.70)}
+var atom_colors: Dictionary = {&"A": LevelDef.DEFAULT_COLORS[&"A"], &"B": LevelDef.DEFAULT_COLORS[&"B"]}
 var atoms: Array[StringName] = [&"A", &"B"]
 var allow_bot := false
 
@@ -162,7 +162,7 @@ func _make_tool_button(text: String, cb: Callable) -> Button:
 
 func _on_open_notebook() -> void:
 	var nb: NotebookCatalog = _game.notebook if _game != null else NotebookCatalog.load_default()
-	_notebook_ui.open(nb, [])
+	_notebook_ui.open(nb, allowed_rules)   # 只显示本关上架仪器的说明
 
 
 ## 线轴排左列、目标织机放右侧(棋盘画布坐标)

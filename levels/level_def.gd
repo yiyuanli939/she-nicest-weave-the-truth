@@ -15,11 +15,12 @@ extends Resource
 @export var robot_cue_on_enter: String = ""           # 进关机器人动作(如 "glitch";当前无关卡使用)
 @export var robot_cue_on_win: String = ""             # 通关机器人动作(默认 celebrate)
 
+# 低饱和高明度(S≈0.38-0.40, V≈0.74-0.88),与 UI 主色(藕粉/棕红/乳黄/黄铜)协调
 const DEFAULT_COLORS: Dictionary = {
-	&"A": Color(0.82, 0.35, 0.30),
-	&"B": Color(0.27, 0.42, 0.70),
-	&"C": Color(0.32, 0.62, 0.38),
-	&"D": Color(0.72, 0.55, 0.25),
+	&"A": Color(0.88, 0.57, 0.53),   # 藕粉陶土红
+	&"B": Color(0.52, 0.67, 0.84),   # 灰蓝
+	&"C": Color(0.46, 0.74, 0.55),   # 豆青
+	&"D": Color(0.78, 0.51, 0.78),   # 紫藕(原蜜金与亚麻底/黄铜撞色,换相;暂无关卡使用)
 }
 
 

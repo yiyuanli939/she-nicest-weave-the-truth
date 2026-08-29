@@ -2,7 +2,7 @@ class_name LevelSelect
 extends Control
 ## 选关页(美术参考图 information/art_spec_20260829/image 1.png):
 ## 底图 + 每章「第N章 X」标题 + 章内关卡按钮(已解锁 / 未解锁两张图 + 「第N纹」文字)。
-## 全部章节关卡初始可见,线性解锁(Game.is_unlocked)。参考图没有返回按钮:Esc 回标题。
+## 全部章节关卡初始可见,线性解锁(Game.is_unlocked)。左上角「返回主界面」按钮(BackButton),Esc 也回标题。
 ## 坐标为 3840×2160 逻辑像素;美术调间距改下面常量。
 
 const BG_PATH := "res://assets/art/select/bg.png"
@@ -57,6 +57,8 @@ func _ready() -> void:
 			idx += 1
 		block.add_child(row)
 		chapters.add_child(block)
+
+	add_child(BackButton.make(_game.goto_menu))
 
 
 ## 关卡按钮 = 美术的牌子图(原尺寸)+ 关名文字;未解锁换灰牌并禁用

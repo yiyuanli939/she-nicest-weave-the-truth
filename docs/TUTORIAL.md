@@ -91,7 +91,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   每行 `robot_cue` 转发给 `Game.robot_cue` → `RobotLink`(有实机才发)。
 - 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
   主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从 CSV 灌(`tools/import_dialogue.gd`)。
-- 诺拉的笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),全量常驻不解锁;
+- 诺拉的笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),关内按本关 allowed_rules 过滤显示;
   关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
 - 小机剧情弧(`Game.robot_mode()` 按章节):第一二章 `guide` —— 玩家对麦克风说「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 →
   `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限(`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后
@@ -141,7 +141,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 |---|---|---|
 | 逻辑视口 3840×2160,PNG 原尺寸 | `project.godot [display]`、`gui/theme/default_theme_scale=2` | 美术:不改图片大小与长宽比;窗口默认 1440×810 整体缩放。所有像素常量都是 4K 坐标 |
 | 站酷小薇体 + 纯文字按钮悬停变浅 | `theme/main_theme.tres`(FontVariation + 系统字体兜底;Button 四态 StyleBoxEmpty) | 字体没有 ☠📌▶✓∧∨→⊥ 等符号,UI 字面量全部去符号(`tests/test_theme.gd` 扫) |
-| 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页恰好四个选项、重置点击即清档;选关页无返回按钮(Esc);关名「第N纹」 |
+| 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页恰好四个选项、重置点击即清档;选关/开发者页左上角「返回主界面」(`ui/back_button.gd`),Esc 也回;关名「第N纹」 |
 | 故事界面换图 | `ui/story_scene.gd`、`narrative/story_art.gd`、`DialogueLine` 新字段、`tools/import_dialogue.gd` | 删地点铭牌与 `DialogueRes.location_title/background`、`DialogueLine.side_right/portrait` |
 | 关内界面 | `board/palette_panel.gd`(固定 7 格)、`ui/level_scene.gd`(绝对布局、工具条按钮)、`narrative/notebook_ui.gd`(图片抽屉) | 删 HUD 关名/目标文字、节点端口 Label、`MachineGuidePanel`/`RuleGuide*`、`LevelDef.notebook_unlocks`、`SaveManager.notebook` |
 | 测试 | `visual_smoke_ui.gd` 重写(`push_input(ev, true)`:视口≠窗口时坐标要按视口给)、新增 `test_story_art/test_dialogue_import/test_theme` | 81/81 + 三 smoke 全绿 |
@@ -174,9 +174,10 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
 | 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
-| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 签名保留(`unlocked` 忽略,全量常驻);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
+| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
 | 笔记条目(= 仪器说明) | `tools/gen_levels.gd` `RULE_GUIDE` 表(顺序同仪器架)→ 重跑生成器 → `narrative/data/notebook.tres` |
-| 仪器架按钮/顺序/置灰 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外置灰 |
+| 仪器架按钮/顺序/显隐 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外不显示,可见按钮紧凑重排 |
+| 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
 | 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR`(纯文字,不用符号) |
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |

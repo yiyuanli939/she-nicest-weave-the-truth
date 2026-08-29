@@ -148,11 +148,11 @@ func _run() -> void:
 	await _settle()
 	_check(l03.session.get_node_ids().size() == 4 and l03.session.is_solved(), "撤销后节点与通关态恢复")
 
-	# 关内诺拉的笔记抽屉:七台仪器说明,划出后截图
-	l03._notebook_ui.open(game.notebook, [])
+	# 关内诺拉的笔记抽屉:只显示本关上架仪器的说明(l03 第一章 = 2 台),划出后截图
+	l03._on_open_notebook()
 	await l03._notebook_ui.slide_finished
 	await _settle()
-	_check(l03._notebook_ui.is_open() and l03._notebook_ui._entries.size() == 7, "笔记抽屉划出,七台仪器说明")
+	_check(l03._notebook_ui.is_open() and l03._notebook_ui._entries.size() == 2, "笔记抽屉划出,第一章两台仪器说明")
 	_shot("m3_notebook")
 
 	print("M3_SMOKE_FAILS=", _fails)

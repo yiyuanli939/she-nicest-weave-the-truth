@@ -165,11 +165,17 @@ func test_legacy_save_entries_are_harmless() -> bool:
 	var sm2 := SaveManager.open()
 	var nb := NotebookCatalog.load_default()
 	var ui := NotebookUI.new()
-	ui.open(nb, [])
+	var all_ids: Array = []
+	for e in nb.entries:
+		all_ids.append(e.id)
+	ui.open(nb, all_ids)
 	var shown: int = ui._entries.size()
+	ui.open(nb, [])
+	var shown_none: int = ui._entries.size()
 	ui.free()
 	var ok := check(sm2.is_solved(&"l16"), "残留的通关记录读回来照旧") \
-		and check(shown == nb.entries.size(), "笔记全量常驻:显示 %d 条(得 %d)" % [nb.entries.size(), shown]) \
+		and check(shown == nb.entries.size(), "传全部 rule_id:显示 %d 条(得 %d)" % [nb.entries.size(), shown]) \
+		and check(shown_none == 0, "传空:一条不显示(严格过滤,无空=全量兜底)") \
 		and check(nb.entry(&"notebook_tnd") == null, "目录里不再有两仪条目")
 	sm2.wipe()
 	return ok

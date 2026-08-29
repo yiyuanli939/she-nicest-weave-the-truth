@@ -1,7 +1,8 @@
 class_name CreditsScene
 extends Control
 ## 开发者信息页(美术:「和选关界面采用相同底图,上面只放文字」):作者、免费素材、参考作品,先写占位。
-## 按用户要求底部加一个纯文字按钮「小机维护」(接入小机 / 刷固件 / 校准 / 回头方向);其余 Esc 或点击任意处回标题。
+## 底部纯文字按钮「小机维护」(接入小机 / 刷固件 / 校准 / 回头方向),左上角「返回主界面」(BackButton);
+## 其余 Esc 或点击任意处回标题。
 
 const BG_PATH := "res://assets/art/select/bg.png"
 const TITLE_FONT_SIZE := 80
@@ -12,6 +13,7 @@ const MAINT_FONT_SIZE := 48
 
 var _maint: RobotMaintUI
 var _maint_btn: Button
+var _back_btn: Button
 
 # 占位文案:改这里即可
 const LINES: Array[String] = [
@@ -63,15 +65,18 @@ func _ready() -> void:
 	box.add_child(_maint_btn)
 	_maint = RobotMaintUI.new()
 	add_child(_maint)
+	_back_btn = BackButton.make(get_node("/root/Game").goto_menu)
+	add_child(_back_btn)
 
 
 func _input(event: InputEvent) -> void:
 	if _maint != null and _maint.visible:
 		return   # 维护面板开着:交给面板
 	var mb := event as InputEventMouseButton
-	if mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT \
-			and _maint_btn.get_global_rect().has_point(mb.position):
-		return   # 点的是「小机维护」按钮
+	if mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+		for btn: Button in [_maint_btn, _back_btn]:
+			if btn != null and btn.get_global_rect().has_point(mb.position):
+				return   # 点的是页内按钮,交给按钮自己处理
 	if event.is_action_pressed("ui_cancel") or (mb != null and mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT):
 		get_viewport().set_input_as_handled()
 		get_node("/root/Game").goto_menu()

@@ -185,23 +185,32 @@ func _run() -> void:
 	_check(_button_named(scene, "示答") == null, "没有脚本化解法的关不显示示答按钮")
 	_check(_labels_with(scene, "第九纹") == 0 and _labels_with(scene, "目标纹样") == 0, "关内不显示当前关名/目标文字")
 
-	# ---- D. 仪器架:固定 7 格按图顺序;本关未上架的置灰禁用;点可用的放置 ----
+	# ---- D. 仪器架:只显示本关上架的仪器,按图顺序紧凑排列;未上架的不显示 ----
 	var board: ProofBoard = scene._board
 	var s := scene.session
 	var last_y := -1.0
 	var order_ok := true
+	var shown := 0
 	for rid in PalettePanel.SLOT_ORDER:
 		var b := scene._palette.button_of(rid)
-		order_ok = order_ok and b != null and b.position.y > last_y
-		if b != null:
-			last_y = b.position.y
-	_check(order_ok, "仪器架 7 个按钮按图顺序从上到下")
-	_check(scene._palette.button_of(&"imp_elim").disabled and scene._palette.button_of(&"or_elim").disabled
-			and scene._palette.button_of(&"false_elim").disabled and not scene._palette.button_of(&"or_intro").disabled,
-			"本关未上架的仪器置灰禁用")
+		if b == null or not b.visible:
+			continue
+		shown += 1
+		order_ok = order_ok and b.position.y > last_y
+		last_y = b.position.y
+	_check(shown == scene.allowed_rules.size() and order_ok,
+			"仪器架只显示本关 %d 台且从上到下紧凑排列(得 %d)" % [scene.allowed_rules.size(), shown])
+	_check(not scene._palette.button_of(&"imp_elim").visible and not scene._palette.button_of(&"or_elim").visible
+			and not scene._palette.button_of(&"false_elim").visible and scene._palette.button_of(&"or_intro").visible,
+			"本关未上架的仪器不显示")
+	var bars := board.scroll_bars()
+	var bars_hidden := bars.size() == 2
+	for bar in bars:
+		bars_hidden = bars_hidden and bar.modulate.a == 0.0 and bar.mouse_filter == Control.MOUSE_FILTER_IGNORE
+	_check(bars_hidden, "棋盘两条滚动条隐形且不吃鼠标(视区只靠中键拖动)")
 	_click(_center(scene._palette.button_of(&"false_elim")), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(s.get_node_ids().size() == 2, "点置灰的仪器不放置")
+	_check(s.get_node_ids().size() == 2, "点未上架仪器的空位不放置")
 	_click(_center(_button_named(scene._palette, "岔纹机")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	var ids := s.get_node_ids()
@@ -343,11 +352,12 @@ func _run() -> void:
 	await _settle()
 	_check(nbui.is_open() and is_equal_approx(nbui._drawer.position.x, NotebookUI.OPEN_X), "点「笔记」抽屉划出到位")
 	_check(nbui._handle.text.contains("继"), "划出后夹子变「继续工作」")
-	_check(nbui._entries.size() == 7 and nbui._page == 0 and nbui._title.text == "并织机", "七台仪器说明,从并织机开始")
+	_check(nbui._entries.size() == scene.allowed_rules.size() and nbui._page == 0 and nbui._title.text == "并织机",
+			"只显示本关 %d 台仪器的说明,从并织机开始(得 %d)" % [scene.allowed_rules.size(), nbui._entries.size()])
 	_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(nbui._page == 1 and nbui._title.text == "拆股机", "点「翻页」到第 2 条(拆股机)")
-	for i in 6:
+	for i in nbui._entries.size() - 1:
 		_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(nbui._page == 0, "翻到最后一条再翻回到第一条")
@@ -393,7 +403,8 @@ func _run() -> void:
 		for b in credit_btns:
 			if (b as Button).is_visible_in_tree():
 				visible_btns.append((b as Button).text)
-		_check(visible_btns == ["小机维护"], "开发者信息页只有文字 + 一个「小机维护」按钮(得 %s)" % str(visible_btns))
+		_check(visible_btns == ["小机维护", "返回主界面"],
+				"开发者信息页只有文字 + 「小机维护」「返回主界面」按钮(得 %s)" % str(visible_btns))
 		_click(_center(_button_named(current_scene, "小机维护")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		var maint: RobotMaintUI = (current_scene as CreditsScene)._maint
@@ -413,6 +424,11 @@ func _run() -> void:
 		_click(Vector2(1920, 1080), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is MainMenu, "开发者信息页点击任意处回标题")
+		game.goto_credits()
+		await _settle()
+		_click(_center(_button_named(current_scene, "返回主界面")), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(current_scene is MainMenu, "开发者信息页点「返回主界面」回标题")
 
 	# ---- K. 选关页:全部关卡可见,只有第一关可点;「第一纹」真实点击进关;Esc 回标题 ----
 	game.goto_select()
@@ -420,22 +436,31 @@ func _run() -> void:
 	var select := current_scene as LevelSelect
 	_check(select != null, "选关页加载")
 	if select != null:
-		var buttons := select.find_children("*", "Button", true, false)
+		var level_btns: Array[Button] = []
 		var enabled := 0
-		for b in buttons:
+		for b in select.find_children("*", "Button", true, false):
+			if (b as Button).text == "返回主界面":
+				continue
+			level_btns.append(b)
 			if not (b as Button).disabled:
 				enabled += 1
-		_check(buttons.size() == game.catalog.all_levels().size(), "全部 %d 关都显示" % game.catalog.all_levels().size())
+		_check(level_btns.size() == game.catalog.all_levels().size(), "全部 %d 关都显示" % game.catalog.all_levels().size())
 		_check(enabled == 1, "清档后只有第一关可点(得 %d)" % enabled)
+		_check(_button_named(select, "返回主界面") != null, "选关页左上角有「返回主界面」")
 		_check(_labels_with(select, "第一章 并纹") == 1 and _labels_with(select, "第二章 叠层纹") == 1, "章名按美术图")
 		var first: Button = null
-		for b in buttons:
+		for b in level_btns:
 			if (b as Button).text == "第一纹" and not (b as Button).disabled:
 				first = b
 		_check(first != null, "第一章「第一纹」可点")
 		_action("ui_cancel")
 		await _settle()
 		_check(current_scene is MainMenu, "选关页按 Esc 回标题")
+		game.goto_select()
+		await _settle()
+		_click(_center(_button_named(current_scene, "返回主界面")), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(current_scene is MainMenu, "选关页点「返回主界面」回标题")
 		game.goto_select()
 		await _settle()
 		select = current_scene as LevelSelect
