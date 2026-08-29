@@ -74,8 +74,11 @@ def main() -> int:
     xlsx = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_XLSX
     out = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_OUT
     rows = read_rows(xlsx)
-    text = "\r\n".join(",".join(csv_field(v) for v in row) for row in rows) + "\r\n"
-    Path(out).write_text(text, encoding="utf-8")
+    text = "\n".join(",".join(csv_field(v) for v in row) for row in rows) + "\n"
+    # newline="" 关掉平台换行翻译:Windows 文本模式会把 \n 写成 \r\n(若源串用 \r\n 更会翻成 \r\r\n)。
+    # 统一写 LF,git 也不再做 CRLF 归一化;importer 的 split_rows 对 \r\n / \n 都认。
+    with open(out, "w", encoding="utf-8", newline="") as f:
+        f.write(text)
     print(f"{xlsx} → {out}:{len(rows)} 行")
     return 0
 

@@ -39,9 +39,11 @@ ui_graph_delete={
 
 [display]
 
-; 逻辑视口 = 美术出图分辨率(3840×2160),所有 PNG 1:1 摆放不缩放;窗口本身默认开 1440×810,由 stretch 整体缩放
+; 逻辑视口 = 美术出图分辨率(3840×2160),所有 PNG 1:1 摆放不缩放,由 stretch 整体缩放;
+; 开局最大化(mode=2)铺满任意屏幕(用户屏 1920×1080),取消最大化后还原成 1440×810
 window/size/viewport_width=3840
 window/size/viewport_height=2160
+window/size/mode=2
 window/size/window_width_override=1440
 window/size/window_height_override=810
 window/stretch/mode="canvas_items"

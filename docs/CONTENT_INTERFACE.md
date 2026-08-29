@@ -9,6 +9,7 @@ python3 tools/xlsx_to_csv.py                                            # xlsx �
 "$GODOT" --headless --path . --script res://tools/import_dialogue.gd    # 校验并写进 levels/data/*.tres
 ```
 换别的表:`python3 tools/xlsx_to_csv.py 新表.xlsx`;导入命令后接 `-- 路径.csv` 可换 CSV。
+Windows 下第一条用 `py -3 tools/xlsx_to_csv.py`(转换器只用 Python 标准库,无需装任何包)。
 
 表头(列顺序随意,按名字识别,新旧写法都认;表头行之前的注意事项行自动跳过):
 `关卡|关卡id, 发言人, 场景, 左位人物|左侧人物, 左位人物表情|左侧表情, 主角表情|诺拉表情, 语句|台词, 小机动作(可省略)`

@@ -16,16 +16,16 @@ var _maint: RobotMaintUI
 var _maint_btn: Button
 var _back_btn: Button
 
-# 占位文案:改这里即可
+# 署名文案:改这里即可(文字须全部在站酷小薇体里,test_theme 会扫)
 const LINES: Array[String] = [
-	"[占位] 作者:She Nicest 团队",
-	"[占位] 美术:待补充",
+	"美术与策划:焰陶",
+	"音乐与硬件:lyy(李熠远)",
+	"程序:LLM 与 焰陶、lyy 合作完成",
 	"字体:站酷小薇体(ZCOOL XiaoWei,免费商用授权)",
 	"标题音乐:舒伯特 A 大调钢琴奏鸣曲 D.664 第二乐章 Andante,演奏 Paul Pitman,公有领域(CC PD)",
 	"关内音乐:李熠远 与 ChatGPT 共同生成",
 	"引擎:Godot 4.7",
-	"参考作品:The Incredible Proof Machine(incredible.pm)",
-	"[占位] 感谢:待补充",
+	"参考作品:The Incredible Proof Machine(incredible.pm)、陶哲轩 Q.E.D.",
 ]
 
 

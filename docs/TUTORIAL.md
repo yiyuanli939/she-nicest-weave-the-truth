@@ -143,7 +143,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 
 | 改动 | 落点 | 备注 |
 |---|---|---|
-| 逻辑视口 3840×2160,PNG 原尺寸 | `project.godot [display]`、`gui/theme/default_theme_scale=2` | 美术:不改图片大小与长宽比;窗口默认 1440×810 整体缩放。所有像素常量都是 4K 坐标 |
+| 逻辑视口 3840×2160,PNG 原尺寸 | `project.godot [display]`、`gui/theme/default_theme_scale=2` | 美术:不改图片大小与长宽比;窗口开局最大化(`size/mode=2`,适配 1920×1080 等任意屏),取消最大化还原 1440×810,整体等比缩放。所有像素常量都是 4K 坐标 |
 | 站酷小薇体 + 纯文字按钮悬停变浅 | `theme/main_theme.tres`(FontVariation + 系统字体兜底;Button 四态 StyleBoxEmpty) | 字体没有 ☠📌▶✓∧∨→⊥ 等符号,UI 字面量全部去符号(`tests/test_theme.gd` 扫) |
 | 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页恰好四个选项、重置点击即清档;选关/开发者页左上角「返回主界面」(`ui/back_button.gd`),Esc 也回;关名「第N纹」 |
 | 故事界面换图 | `ui/story_scene.gd`、`narrative/story_art.gd`、`DialogueLine` 新字段、`tools/import_dialogue.gd` | 删地点铭牌与 `DialogueRes.location_title/background`、`DialogueLine.side_right/portrait` |
@@ -199,7 +199,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 99 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 101 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
@@ -221,6 +221,8 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   幽灵态切换;欠定/冲突纯文字徽章与断线;重置;笔记抽屉划出/变「继续工作」/翻页循环/收回;
   标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
+- `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写
+  (mac/Windows 文件系统大小写不敏感,开发期写错不报错;导出 PCK 严格区分,一到导出版才炸)。
 - `tests/test_robot_logic.gd` — 语音命中、章节→模式、故障态 cue 映射、回头目标角、settings 过 wipe;
   `visual_smoke_ui.gd` R 段直接注入 `{"evt":"speech"}`:坏掉前代解且不庆祝、方向左右、3-1 通关瞬间坏掉(panic)、坏掉后不代解只故障(无真机也跑)。
   真机:`bash hardware/run_robot.sh` 后 `tests/robot_smoke.gd`;语音自测看 `hardware/.run/speech.log` 的「命中」行。

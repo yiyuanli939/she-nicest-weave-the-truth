@@ -264,6 +264,8 @@ static func hardware_dir() -> String:
 
 ## 跑 hardware/<脚本>(zsh),返回 pid(-1 = 失败);子进程不随游戏退出
 func launch(which: String, args: Array = []) -> int:
+	if not OS.has_feature("macos"):
+		return -1   # hardware/*.sh 是 macOS 的 zsh 脚本:其他平台直接降级(维护面板会提示手动跑)
 	var hw := hardware_dir()
 	if hw == "" or not SCRIPTS.has(which):
 		return -1
