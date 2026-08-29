@@ -6,15 +6,16 @@ extends Node
 
 const TRACKS: Dictionary = {
 	&"title": "res://music/title.mp3",   # 标题 / 选关 / 开发者信息
-	&"level_1": "",                       # 第一章 并纹:故事界面 + 关内
-	&"level_2": "",                       # 第二章 叠层纹
-	&"level_3": "",                       # 第三章 岔纹
-	&"level_4": "",                       # 第四章 焦纹
+	&"level_1": "res://music/level.wav",  # 第一章 并纹:故事界面 + 关内(四章暂共用一首)
+	&"level_2": "res://music/level.wav",  # 第二章 叠层纹
+	&"level_3": "res://music/level.wav",  # 第三章 岔纹
+	&"level_4": "res://music/level.wav",  # 第四章 焦纹
 }
 const VOLUME_LINEAR := 0.32   # 约 -10 dB:钢琴 BGM 压低,给实体小机的喇叭留空间
 const FADE_SEC := 1.2
 
 var slot: StringName = &""    # 当前请求的槽位(静音槽位也记着,同槽位再调才能免重启)
+var _path := ""               # 正在播的文件("" = 静音);几个槽位共用一首时换槽位不重启
 
 var _players: Array[AudioStreamPlayer] = []
 var _active := 0
@@ -43,6 +44,10 @@ func play(new_slot: StringName) -> void:
 	if new_slot == slot:
 		return
 	slot = new_slot
+	var path: String = TRACKS.get(new_slot, "")
+	if path == _path:
+		return   # 同一首(两章共用)或静音到静音:只记槽位,不重启
+	_path = path
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
 	var outgoing := _players[_active]

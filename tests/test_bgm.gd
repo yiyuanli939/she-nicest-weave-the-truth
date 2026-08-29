@@ -47,12 +47,32 @@ func test_play_same_slot_keeps_player_and_empty_slot_is_silent() -> bool:
 	ok = check(p0.stream != null and p0.stream.get("loop") == true, "标题曲已设循环") and ok
 	bgm.play(&"title")
 	ok = check(bgm.active_player() == p0 and p0.playing, "同槽位再 play 不重启、不换播放器") and ok
-	bgm.play(&"level_1")
-	ok = check(bgm.slot == &"level_1" and bgm.active_player() != p0 and bgm.active_player().stream == null, "空槽位:来者无曲,槽位仍记住") and ok
-	bgm.play(&"level_1")
-	ok = check(bgm.slot == &"level_1" and bgm.active_player().stream == null, "空槽位同槽位再 play 无事") and ok
+	bgm.play(&"")   # 章号 -1(无 Game / 测试注入关)= 空槽位
+	ok = check(bgm.slot == &"" and bgm.active_player() != p0 and bgm.active_player().stream == null, "空槽位:来者无曲(标题曲淡出到静音)") and ok
+	bgm.play(&"no_such_slot")
+	ok = check(bgm.slot == &"no_such_slot" and bgm.active_player().stream == null, "表里没有的槽位 = 静音;静音到静音只记槽位") and ok
 	bgm.stop()
 	ok = check(bgm.slot == &"", "stop = 空槽位") and ok
+	tree.root.remove_child(bgm)
+	bgm.free()
+	return ok
+
+
+func test_level_slots_share_one_looping_track() -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	var bgm: Node = (load(BGM_SCRIPT) as GDScript).new()
+	tree.root.add_child(bgm)
+	var ok := true
+	bgm.play(&"title")
+	var p0: AudioStreamPlayer = bgm.active_player()
+	bgm.play(&"level_1")
+	var p1: AudioStreamPlayer = bgm.active_player()
+	ok = check(p1 != p0 and p1.playing and p1.stream != null, "进关内换播放器播关内曲") and ok
+	ok = check(p1.stream is AudioStreamWAV and p1.stream.get("loop_mode") == AudioStreamWAV.LOOP_FORWARD, "关内曲 wav 已设循环") and ok
+	bgm.play(&"level_3")
+	ok = check(bgm.slot == &"level_3" and bgm.active_player() == p1 and p1.playing, "换章但同一首:不重启不换播放器") and ok
+	bgm.play(&"title")
+	ok = check(bgm.active_player() == p0 and p0.playing, "回标题换回标题曲") and ok
 	tree.root.remove_child(bgm)
 	bgm.free()
 	return ok
