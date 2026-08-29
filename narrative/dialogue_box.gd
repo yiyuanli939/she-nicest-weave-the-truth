@@ -1,56 +1,49 @@
 class_name DialogueBox
-extends CanvasLayer
-## 入场对话框:打字机 + 点击推进(打字中点击=全显,播完再点=下一句/关闭)。
-## 显示期间是模态的:左键在 _input 层截获(点面板、点台词、点任意处都推进),
+extends Control
+## 对话文字区:名字 + 台词打字机 + 推进(打字中 点击/按键 = 整句显示;显示完再点 = 下一句;最后一句后再点 = 关闭)。
+## 显示期间是模态的:左键与任意键在 _input 层截获(点面板、点台词、点任意处都推进),
 ## 不用全屏捕捉 Control —— 那样面板本身会先吃掉点击,点在台词上就不推进。
-## robot_cue 逐行转发(cue 信号)。视觉为占位级;美术换装走 theme(见 docs/ART_INTERFACE.md)。
+## 只管文字,没有自己的底(底图/立绘由 StoryScene 摆,底图右下角已印「按任意键继续」);
+## 位置由宿主调 layout()。robot_cue 逐行转发(cue 信号)。
 
 signal finished
 signal cue(cue_name: String)
 signal line_shown(line: DialogueLine)
 
 const CHARS_PER_SEC := 40.0
+const NAME_FONT_SIZE := 56
+const TEXT_FONT_SIZE := 48
+const NAME_COLOR := Color(0.627, 0.275, 0.227)   # 红棕(参考图里名字的颜色)
+const TEXT_COLOR := Color(0.29, 0.184, 0.165)    # 深棕
 
 var _lines: Array[DialogueLine] = []
 var _idx := -1
-var _panel: PanelContainer
 var _speaker: Label
 var _text: RichTextLabel
 var _tween: Tween
 
 
 func _init() -> void:
-	layer = 50
-	_panel = PanelContainer.new()
-	_panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	_panel.offset_top = -170
-	_panel.offset_left = 60
-	_panel.offset_right = -60
-	_panel.offset_bottom = -24
-	var box := VBoxContainer.new()
-	var top := HBoxContainer.new()
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_speaker = Label.new()
-	_speaker.add_theme_font_size_override("font_size", 18)
-	top.add_child(_speaker)
-	var sp := Control.new()
-	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	top.add_child(sp)
-	box.add_child(top)
+	_speaker.add_theme_font_size_override("font_size", NAME_FONT_SIZE)
+	_speaker.add_theme_color_override("font_color", NAME_COLOR)
+	_speaker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_speaker)
 	_text = RichTextLabel.new()
 	_text.bbcode_enabled = true
-	_text.fit_content = true
-	_text.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_text.add_theme_font_size_override("normal_font_size", TEXT_FONT_SIZE)
+	_text.add_theme_color_override("default_color", TEXT_COLOR)
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(_text)
-	var tip := Label.new()
-	tip.text = "点击继续"
-	tip.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	tip.add_theme_font_size_override("font_size", 11)
-	tip.modulate.a = 0.6
-	box.add_child(tip)
-	_panel.add_child(box)
-	add_child(_panel)
+	add_child(_text)
 	visible = false
+
+
+## 名字左上角与台词矩形(逻辑像素);宿主按自己的底图定
+func layout(name_pos: Vector2, text_rect: Rect2) -> void:
+	_speaker.position = name_pos
+	_text.position = text_rect.position
+	_text.size = text_rect.size
 
 
 func play(dlg: DialogueRes) -> void:
@@ -69,8 +62,7 @@ func _advance() -> void:
 		_finish()
 		return
 	var line := _lines[_idx]
-	_speaker.text = line.speaker
-	_speaker.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT if line.side_right else HORIZONTAL_ALIGNMENT_LEFT
+	_speaker.text = StoryArt.display_name(line.speaker)
 	_text.text = line.text
 	line_shown.emit(line)
 	if line.robot_cue != "":
@@ -83,21 +75,25 @@ func _advance() -> void:
 	_tween.tween_property(_text, "visible_characters", total, total / CHARS_PER_SEC)
 
 
+## 模态截获:左键(按下与抬起都不放给下层)与任意键(按下)都推进
 func _input(event: InputEvent) -> void:
 	if not visible:
 		return
 	var mb := event as InputEventMouseButton
-	if mb == null or mb.button_index != MOUSE_BUTTON_LEFT:
+	if mb != null:
+		if mb.button_index != MOUSE_BUTTON_LEFT:
+			return
+		get_viewport().set_input_as_handled()
+		if mb.pressed:
+			_step()
 		return
-	get_viewport().set_input_as_handled()   # 按下与抬起都不放给下层 UI(模态)
-	if mb.pressed:
-		_on_click(mb)
+	var key := event as InputEventKey
+	if key != null and key.pressed and not key.echo:
+		get_viewport().set_input_as_handled()
+		_step()
 
 
-func _on_click(event: InputEvent) -> void:
-	var mb := event as InputEventMouseButton
-	if mb == null or not mb.pressed or mb.button_index != MOUSE_BUTTON_LEFT or not visible:
-		return
+func _step() -> void:
 	if _text.visible_characters < _text.get_total_character_count():
 		if _tween != null:
 			_tween.kill()

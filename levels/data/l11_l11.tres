@@ -8,16 +8,16 @@
 script = ExtResource("1_fl7da")
 speaker = "档案员"
 text = "[占位] 不知道来的是哪股?汇路机让你两头都备好。"
+scene = "工坊"
 
 [sub_resource type="Resource" id="Resource_m3g0s"]
 script = ExtResource("2_p7gpl")
 lines = Array[ExtResource("1_fl7da")]([SubResource("Resource_m11vx")])
-location_title = "[占位] 档案室"
 
 [resource]
 script = ExtResource("3_adydy")
 id = &"l11"
-title = "殊途同归"
+title = "第二纹"
 assumptions = Array[String](["A | B"])
 goal = "B | A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim"])

@@ -8,17 +8,17 @@
 script = ExtResource("1_j62nj")
 speaker = "阿梭"
 text = "[占位] 欢迎来到织坊。把线轴上的纹样引到目标织机,轻点连线即可。"
+scene = "工坊"
 robot_cue = "greet"
 
 [sub_resource type="Resource" id="Resource_36a6t"]
 script = ExtResource("2_a3600")
 lines = Array[ExtResource("1_j62nj")]([SubResource("Resource_f6csw")])
-location_title = "[占位] 织坊"
 
 [resource]
 script = ExtResource("3_2xnmh")
 id = &"l01"
-title = "第一缕丝"
+title = "第一纹"
 assumptions = Array[String](["A"])
 goal = "A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])

@@ -1,11 +1,21 @@
 class_name LevelScene
 extends Control
-## 关卡场景:ProofSession + ProofBoard + 仪器架 + HUD + 关内对话框。
-## 开场对话已移到进关前的 StoryScene(见 game.start_level);_dialogue 留给关内剧情用。
+## 关卡场景(美术参考图 information/art_spec_20260829/image 4.png):
+## 乳黄底 + 左侧仪器架(图)+ 中间棋盘(GraphEdit,自带工具条挂必需按钮)+ 右缘织者笔记抽屉(图)。
+## 不显示当前关名/目标文字(美术要求);目标纹样只在棋盘的目标织机节点上看。
 ## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
 ## 否则用下面的默认字段(冒烟测试直接注入)。
+## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。
 
 var session := ProofSession.new()
+
+const BG_COLOR := Color(0.957, 0.925, 0.847)           # 乳黄
+const PALETTE_POS := Vector2(50, 22)                    # 仪器架左上角(图 687×2117)
+const BOARD_RECT := Rect2(884, 22, 2436, 2116)          # 棋盘区(右侧留出笔记夹子 NotebookUI.CLOSED_PEEK)
+const TOOLBAR_FONT_SIZE := 44
+# 测试用示答:动态加载而非 class_name 引用,导出正式版即使裁掉 tests/ 也不影响本脚本
+const SOLUTIONS_PATH := "res://tests/level_solutions.gd"
+const IDLE_HINT_SEC := 45.0
 
 var _game: Node = null
 var _board: ProofBoard
@@ -13,23 +23,14 @@ var _palette: PalettePanel
 var _status: Label
 var _win_flash: ColorRect
 var _editor: PatternEditor
-var _dialogue: DialogueBox
 var _notebook_ui: NotebookUI
-var _guide_panel: MachineGuidePanel
 var _next_btn: Button
-
-const NOTEBOOK_TAB_COLOR := Color(0.66, 0.53, 0.53)   # 藕粉竖条(与笔记页一致)
-# 测试用示答:动态加载而非 class_name 引用,导出正式版即使裁掉 tests/ 也不影响本脚本
-const SOLUTIONS_PATH := "res://tests/level_solutions.gd"
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
 var _restoring := false               # 载入旧棋盘触发的 proof_completed 不算新胜利
 
-const IDLE_HINT_SEC := 45.0
-
 # 默认配置(无 Game 时生效;冒烟测试注入)
-var level_title := ""
 var assumptions: Array[String] = ["A & B"]
 var goal_text := "B & A"
 var allowed_rules: Array[StringName] = [&"and_intro", &"and_elim"]
@@ -42,7 +43,6 @@ func _ready() -> void:
 	_game = get_node_or_null("/root/Game")
 	var lv: LevelDef = _game.current if _game != null else null
 	if lv != null:
-		level_title = lv.title
 		assumptions = lv.assumptions
 		goal_text = lv.goal
 		allowed_rules = lv.allowed_rules
@@ -74,69 +74,42 @@ func _ready() -> void:
 
 
 func _build_ui() -> void:
-	var root := VBoxContainer.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(root)
+	var bg := ColorRect.new()
+	bg.color = BG_COLOR
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
 
-	var hud := HBoxContainer.new()
-	var goal_lbl := Label.new()
-	var prefix := ("  %s · " % level_title) if level_title != "" else "  "
-	goal_lbl.text = "%s目标纹样:%s" % [prefix, goal_text]
-	hud.add_child(goal_lbl)
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	hud.add_child(spacer)
+	_palette = PalettePanel.new()
+	_palette.position = PALETTE_POS
+	add_child(_palette)
+
+	_board = ProofBoard.new()
+	_board.position = BOARD_RECT.position
+	_board.size = BOARD_RECT.size
+	_board.atom_colors = atom_colors
+	_board.bind(session)
+	add_child(_board)
+	_palette.machine_requested.connect(_board.place_machine_at_center)
+
+	# 必需按钮挂在棋盘工具条上(纯文字,悬停变浅走 theme)
 	_status = Label.new()
-	hud.add_child(_status)
-	var reset_btn := Button.new()
-	reset_btn.text = "重置"
-	reset_btn.pressed.connect(_on_reset)
-	hud.add_child(reset_btn)
+	_status.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
+	_board.add_toolbar_item(_status)
+	_board.add_toolbar_item(_make_tool_button("重置", _on_reset))
 	if _game != null:
 		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
 		if OS.is_debug_build() and _game.current != null and ResourceLoader.exists(SOLUTIONS_PATH):
 			var sols := load(SOLUTIONS_PATH)
 			if sols.DATA.has(_game.current.id):
-				var answer_btn := Button.new()
-				answer_btn.text = "示答"
+				var answer_btn := _make_tool_button("示答", _on_show_answer)
 				answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
 				answer_btn.modulate.a = 0.7
-				answer_btn.pressed.connect(_on_show_answer)
-				hud.add_child(answer_btn)
-		_next_btn = Button.new()
-		_next_btn.text = "下一关 ▶"
+				_board.add_toolbar_item(answer_btn)
+		_next_btn = _make_tool_button("下一关", _on_next)
 		_next_btn.visible = false
-		_next_btn.pressed.connect(_on_next)
-		hud.add_child(_next_btn)
-		var back := Button.new()
-		back.text = "选关"
-		back.pressed.connect(_on_back)
-		hud.add_child(back)
-	root.add_child(hud)
-
-	var body := HBoxContainer.new()
-	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	root.add_child(body)
-	_palette = PalettePanel.new()
-	body.add_child(_palette)
-	_board = ProofBoard.new()
-	_board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_board.atom_colors = atom_colors
-	_board.bind(session)
-	body.add_child(_board)
-	_palette.machine_requested.connect(_board.place_machine_at_center)
-
-	# 右缘竖排「笔记」标签:点开翻书式笔记(布局参考 information/ui_关卡界面_笔记入口.png)
-	var notebook_tab := Button.new()
-	notebook_tab.text = "笔\n记"
-	notebook_tab.custom_minimum_size.x = 48
-	notebook_tab.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var tab_sb := StyleBoxFlat.new()
-	tab_sb.bg_color = NOTEBOOK_TAB_COLOR
-	notebook_tab.add_theme_stylebox_override("normal", tab_sb)
-	notebook_tab.add_theme_color_override("font_color", Color.WHITE)
-	notebook_tab.pressed.connect(_on_open_notebook)
-	body.add_child(notebook_tab)
+		_board.add_toolbar_item(_next_btn)
+		_board.add_toolbar_item(_make_tool_button("选关", _on_back))
 
 	_win_flash = ColorRect.new()
 	_win_flash.color = Color(0.2, 0.85, 0.35, 0.0)
@@ -150,44 +123,32 @@ func _build_ui() -> void:
 	add_child(_editor)
 	_board.pin_requested.connect(_on_pin_requested)
 
-	_dialogue = DialogueBox.new()
-	if _game != null:
-		_dialogue.cue.connect(_game.robot_cue)
-	add_child(_dialogue)
-
+	# 右缘织者笔记抽屉(七台仪器说明),点夹子划出/收回
 	_notebook_ui = NotebookUI.new()
+	_notebook_ui.open_requested.connect(_on_open_notebook)
 	add_child(_notebook_ui)
 
-	# 点选某台仪器 → 左下角弹出它的介绍卡(数据来自 rule_guide.tres,和棋盘解耦)
-	_guide_panel = MachineGuidePanel.new()
-	_guide_panel.set_atom_colors(atom_colors)
-	_guide_panel.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_guide_panel.grow_horizontal = Control.GROW_DIRECTION_END
-	_guide_panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	_guide_panel.offset_left = 160
-	_guide_panel.offset_bottom = -16
-	add_child(_guide_panel)
-	_board.machine_selected.connect(_on_machine_selected)
-	_board.selection_cleared.connect(_guide_panel.clear)
 
-
-func _on_machine_selected(rule_id: StringName, _node_id: int) -> void:
-	var info := ProofSession.describe_rule(rule_id)
-	_guide_panel.show_for(rule_id, info.cn_name if info != null else String(rule_id))
+func _make_tool_button(text: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
+	b.pressed.connect(cb)
+	return b
 
 
 func _on_open_notebook() -> void:
-	if _game != null:
-		_notebook_ui.open(_game.notebook, _game.save.notebook)
+	var nb: NotebookCatalog = _game.notebook if _game != null else NotebookCatalog.load_default()
+	_notebook_ui.open(nb, [])
 
 
-## 线轴排左列、目标织机放右侧
+## 线轴排左列、目标织机放右侧(棋盘画布坐标)
 func _layout_endpoints() -> void:
-	var y := 80.0
+	var y := 160.0
 	for id in session.assumption_ids:
-		session.set_node_position(id, Vector2(60, y))
-		y += 130
-	session.set_node_position(session.goal_id, Vector2(760, 140))
+		session.set_node_position(id, Vector2(120, y))
+		y += 300
+	session.set_node_position(session.goal_id, Vector2(1800, 300))
 	_board.apply_positions()
 
 
@@ -248,7 +209,7 @@ func _on_conflict_check() -> void:
 # ---- 胜负与流程 ----
 
 func _on_win() -> void:
-	_status.text = "织成了!  "
+	_status.text = "织成了!"
 	if _next_btn != null and _game != null and _game.next_level() != null:
 		_next_btn.visible = true
 	if _restoring:

@@ -4,12 +4,17 @@ extends PopupPanel
 ## 内部是一棵带"孔"(META 叶,渲染成未染纱)的临时 Formula 树:
 ## 选笔刷 → 点纹样上的任意叶子区域 → 该处替换成 原子色/分割(裂成两孔)/孔。
 ## 全部孔填满(is_ground)才允许确认;确认发 pattern_committed。
+## 界面上不出现任何原子字母/逻辑符号:原子笔刷是色块,结构笔刷是纺织词。
 ## 几何与 PatternView.layout 同一套切分规则,core 函数无 UI 依赖,headless 可测。
 
 signal pattern_committed(f: Formula)
 signal pattern_cleared   # "清除钉住"(unpin)
 
 const HOLE_NAME := &"孔"
+const PREVIEW_SIZE := Vector2(720, 440)
+const SWATCH_SIZE := Vector2(110, 72)
+const FONT_SIZE := 40
+const STRUCT_BRUSHES: Array = [["并织", "and"], ["岔纹", "or"], ["迭层", "imp"], ["挖回孔", "erase"]]
 
 var tree: Formula = Formula.meta(HOLE_NAME)
 var brush: String = ""        # "atom:A" / "and" / "or" / "imp" / "bot" / "erase"
@@ -18,29 +23,30 @@ var _preview: PatternView
 var _brush_row: HFlowContainer
 var _confirm: Button
 var _clear_btn: Button
-var _brush_lbl: Label
+var _group := ButtonGroup.new()
 
 
 func _init() -> void:
 	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(320, 0)
+	box.custom_minimum_size = Vector2(PREVIEW_SIZE.x + 40, 0)
+	box.add_theme_constant_override("separation", 16)
 	add_child(box)
 	var hint := Label.new()
 	hint.text = "选笔刷,点纹样;斜纹处是未染的孔"
-	hint.add_theme_font_size_override("font_size", 12)
+	hint.add_theme_font_size_override("font_size", 36)
 	box.add_child(hint)
 	_preview = PatternView.new()
-	_preview.min_size = Vector2(300, 190)
+	_preview.min_size = PREVIEW_SIZE
 	_preview.gui_input.connect(_on_preview_input)
 	box.add_child(_preview)
-	_brush_lbl = Label.new()
-	_brush_lbl.add_theme_font_size_override("font_size", 12)
-	box.add_child(_brush_lbl)
 	_brush_row = HFlowContainer.new()
+	_brush_row.add_theme_constant_override("h_separation", 16)
+	_brush_row.add_theme_constant_override("v_separation", 12)
 	box.add_child(_brush_row)
 	var actions := HBoxContainer.new()
 	_clear_btn = Button.new()
 	_clear_btn.text = "清除钉住"
+	_clear_btn.add_theme_font_size_override("font_size", FONT_SIZE)
 	_clear_btn.pressed.connect(func() -> void:
 		pattern_cleared.emit()
 		hide())
@@ -50,10 +56,12 @@ func _init() -> void:
 	actions.add_child(sp)
 	var cancel := Button.new()
 	cancel.text = "取消"
+	cancel.add_theme_font_size_override("font_size", FONT_SIZE)
 	cancel.pressed.connect(hide)
 	actions.add_child(cancel)
 	_confirm = Button.new()
 	_confirm.text = "钉住"
+	_confirm.add_theme_font_size_override("font_size", FONT_SIZE)
 	_confirm.pressed.connect(func() -> void:
 		pattern_committed.emit(tree)
 		hide())
@@ -70,24 +78,44 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 	for c in _brush_row.get_children():
 		c.queue_free()
 	for a in atoms:
-		var b := Button.new()
-		b.text = String(a)
-		b.add_theme_color_override("font_color", _preview.atom_color(a))
-		b.pressed.connect(_set_brush.bind("atom:" + String(a)))
-		_brush_row.add_child(b)
-	for pair in [["并织 ∧", "and"], ["岔纹 ∨", "or"], ["迭层 →", "imp"], ["挖回孔", "erase"]]:
-		var b := Button.new()
-		b.text = pair[0]
-		b.pressed.connect(_set_brush.bind(pair[1]))
-		_brush_row.add_child(b)
+		_brush_row.add_child(_make_swatch(a))
+	for pair in STRUCT_BRUSHES:
+		_brush_row.add_child(_make_brush_button(pair[0], pair[1]))
 	if allow_bot:
-		var b := Button.new()
-		b.text = "焦纹 ⊥"
-		b.pressed.connect(_set_brush.bind("bot"))
-		_brush_row.add_child(b)
+		_brush_row.add_child(_make_brush_button("焦纹", "bot"))
 	brush = ""
 	_sync()
 	popup_centered()
+
+
+## 原子笔刷 = 该原子颜色的色块(不写字母);选中态描深边
+func _make_swatch(a: StringName) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = SWATCH_SIZE
+	b.toggle_mode = true
+	b.button_group = _group
+	b.tooltip_text = "染这一色"
+	var col := _preview.atom_color(a)
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = col.lightened(0.12) if state == "hover" else col
+		sb.set_corner_radius_all(10)
+		if state == "pressed":
+			sb.set_border_width_all(6)
+			sb.border_color = PatternView.SPLIT_COLOR
+		b.add_theme_stylebox_override(state, sb)
+	b.pressed.connect(_set_brush.bind("atom:" + String(a)))
+	return b
+
+
+func _make_brush_button(label: String, id: String) -> Button:
+	var b := Button.new()
+	b.text = label
+	b.toggle_mode = true
+	b.button_group = _group
+	b.add_theme_font_size_override("font_size", FONT_SIZE)
+	b.pressed.connect(_set_brush.bind(id))
+	return b
 
 
 # ---- core(无 UI 依赖,headless 可测) ----
@@ -167,7 +195,6 @@ func _set_brush(b: String) -> void:
 func _sync() -> void:
 	_preview.formula = tree
 	_confirm.disabled = not tree.is_ground()
-	_brush_lbl.text = "当前笔刷:" + (brush if brush != "" else "(未选)")
 
 
 func _on_preview_input(event: InputEvent) -> void:

@@ -4,7 +4,7 @@ extends SceneTree
 ## 通关三例且无脚本错误 → 退出码 0;截图在 tests/screenshots/。
 
 const OUT_DIR := "res://tests/screenshots"
-const EDITOR_RECT := Rect2(0, 0, 300, 190)
+const EDITOR_RECT := Rect2(0, 0, 720, 440)   # 与 PatternEditor.PREVIEW_SIZE 一致
 
 var _fails := 0
 
@@ -76,8 +76,8 @@ func _scenario_imp() -> void:
 	var ids := s.session.get_node_ids()
 	var outer: int = ids[-2]
 	var inner: int = ids[-1]
-	s.session.set_node_position(outer, Vector2(520, 120))
-	s.session.set_node_position(inner, Vector2(280, 130))
+	s.session.set_node_position(outer, Vector2(1040, 240))
+	s.session.set_node_position(inner, Vector2(1120, 520))
 	b.apply_positions()
 	_wire(b, inner, 0, outer, 0)                 # (B→A) 汇入外层散口
 	_wire(b, outer, 1, inner, 0)                 # 外层假设 A 流入内层子证明
@@ -98,8 +98,8 @@ func _scenario_or() -> void:
 	var elim: int = ids[-3]
 	var i1: int = ids[-2]
 	var i2: int = ids[-1]
-	s.session.set_node_position(elim, Vector2(300, 110))
-	s.session.set_node_position(i1, Vector2(560, 60))
+	s.session.set_node_position(elim, Vector2(600, 220))
+	s.session.set_node_position(i1, Vector2(1120, 120))
 	s.session.set_node_position(i2, Vector2(560, 260))
 	b.apply_positions()
 	var spool: int = s.session.assumption_ids[0]
@@ -120,7 +120,7 @@ func _scenario_bot() -> void:
 	var b := _board_of(s)
 	b.place_machine_at_center(&"false_elim")
 	var elim: int = s.session.get_node_ids()[-1]
-	s.session.set_node_position(elim, Vector2(360, 130))
+	s.session.set_node_position(elim, Vector2(720, 260))
 	b.apply_positions()
 	_wire(b, s.session.assumption_ids[0], 0, elim, 0)
 	_wire(b, elim, 0, s.session.goal_id, 0)

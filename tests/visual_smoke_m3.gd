@@ -1,6 +1,6 @@
 extends SceneTree
 ## M3 全流程验收:清档 → 主菜单 → 逐关(15)开场对话→解题→「下一关」推进 →
-## 选关页金印 → 笔记本 5 条 → 重进旧关棋盘恢复。
+## 选关页 → 重进旧关棋盘恢复 → 关内笔记抽屉。
 ##   godot --path . --script res://tests/visual_smoke_m3.gd
 ## 退出码 0 = 全部通过。截图在 tests/screenshots/。
 
@@ -43,7 +43,7 @@ func _click(at: Vector2, button: MouseButton) -> void:
 		ev.pressed = pressed
 		ev.position = at
 		ev.global_position = at
-		root.push_input(ev)
+		root.push_input(ev, true)   # 坐标是 3840×2160 逻辑视口坐标(窗口比它小)
 
 
 ## 进关前的全屏开场对话:一键播完并等切入棋盘
@@ -86,7 +86,6 @@ func _run() -> void:
 			await _settle()
 
 	_check(game.save.solved.size() == 15, "存档记录 15 关 (得 %d)" % game.save.solved.size())
-	_check(game.save.notebook.size() == 5, "笔记本解锁 5 条 (得 %d)" % game.save.notebook.size())
 
 	# 选关页金印
 	game.goto_select()
@@ -102,8 +101,8 @@ func _run() -> void:
 	_shot("m3_l15_dialogue")
 	if story != null:
 		_check(story._dialogue.visible, "l15 开场对话显示")
-		# 走真实输入管线,且点在对话面板正中(曾是死区:面板吃掉点击、捕捉层收不到)
-		var at: Vector2 = story._dialogue._panel.get_global_rect().get_center()
+		# 走真实输入管线,且点在台词正文正中(曾是死区:面板吃掉点击、捕捉层收不到)
+		var at: Vector2 = story._dialogue._text.get_global_rect().get_center()
 		for j in game.current.intro_dialogue.lines.size():
 			_click(at, MOUSE_BUTTON_LEFT)   # 打字中:点击全显
 			_click(at, MOUSE_BUTTON_LEFT)   # 已全显:点击下一句/关闭
@@ -140,12 +139,11 @@ func _run() -> void:
 	await _settle()
 	_check(l03.session.get_node_ids().size() == 4 and l03.session.is_solved(), "撤销后节点与通关态恢复")
 
-	# 主菜单笔记本
-	game.goto_menu()
+	# 关内织者笔记抽屉:七台仪器说明,划出后截图
+	l03._notebook_ui.open(game.notebook, [])
+	await l03._notebook_ui.slide_finished
 	await _settle()
-	var menu := current_scene as MainMenu
-	menu._notebook_ui.open(game.notebook, game.save.notebook)
-	await _settle()
+	_check(l03._notebook_ui.is_open() and l03._notebook_ui._entries.size() == 7, "笔记抽屉划出,七台仪器说明")
 	_shot("m3_notebook")
 
 	print("M3_SMOKE_FAILS=", _fails)

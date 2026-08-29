@@ -12,7 +12,7 @@ extends Control
 ## 美术接口:atom_colors 由关卡注入;缺失原子回退 hash→HSV。
 
 const MAX_DEPTH := 6
-const BASE_LINE_W := 4.0
+const BASE_LINE_W := 8.0
 const LINEN := Color(0.91, 0.87, 0.78)      # 亚麻底
 const CHAR_BLACK := Color(0.12, 0.10, 0.09) # 焦黑
 const SPLIT_COLOR := Color(0.23, 0.18, 0.12)
@@ -21,7 +21,7 @@ const GHOST_ALPHA := 0.4
 
 ## 关卡注入的原子调色板 {StringName: Color};缺失回退 hash→HSV
 @export var atom_colors: Dictionary = {}
-@export var min_size := Vector2(24, 24)
+@export var min_size := Vector2(48, 48)
 
 ## 幽灵态:半透明画"推导出的期望值"(未连线端口),与实际连入的实纹样区分
 @export var ghost := false:
@@ -116,7 +116,7 @@ static func _layout_or_child(f: Formula, tri: PackedVector2Array, inner: Rect2, 
 
 
 static func split_width(depth: int) -> float:
-	return maxf(1.0, BASE_LINE_W * pow(0.62, depth))
+	return maxf(2.0, BASE_LINE_W * pow(0.62, depth))
 
 
 func _draw() -> void:
@@ -138,8 +138,8 @@ func _draw() -> void:
 				draw_rect(e.rect, LINEN.darkened(0.15))
 				var c: Vector2 = e.rect.get_center()
 				for i in 3:
-					draw_circle(c + Vector2((i - 1) * 5.0, 0), 1.5, SPLIT_COLOR)
-	draw_rect(rect, SPLIT_COLOR, false, 1.0)
+					draw_circle(c + Vector2((i - 1) * 10.0, 0), 3.0, SPLIT_COLOR)
+	draw_rect(rect, SPLIT_COLOR, false, 2.0)
 
 
 func _fill_rect_leaf(e: Dictionary) -> void:
@@ -172,14 +172,14 @@ func _fill_tri_leaf(e: Dictionary) -> void:
 
 ## 未染纱斜纹:左上→右下平行织线
 func _draw_hatch(r: Rect2) -> void:
-	var step := 6.0
+	var step := 12.0
 	var hatch := LINEN.darkened(0.25)
 	var d := r.size.x + r.size.y
 	var t := step
 	while t < d:
 		var a := Vector2(r.position.x + minf(t, r.size.x), r.position.y + maxf(0.0, t - r.size.x))
 		var b := Vector2(r.position.x + maxf(0.0, t - r.size.y), r.position.y + minf(t, r.size.y))
-		draw_line(a, b, hatch, 1.0)
+		draw_line(a, b, hatch, 2.0)
 		t += step
 
 
@@ -188,7 +188,7 @@ func _draw_holes(r: Rect2) -> void:
 	const SPOTS: Array[Vector2] = [Vector2(0.3, 0.25), Vector2(0.7, 0.6), Vector2(0.45, 0.8), Vector2(0.8, 0.2)]
 	for s in SPOTS:
 		var p := r.position + s * r.size
-		draw_circle(p, maxf(1.5, minf(r.size.x, r.size.y) * 0.07), LINEN.darkened(0.45))
+		draw_circle(p, maxf(3.0, minf(r.size.x, r.size.y) * 0.07), LINEN.darkened(0.45))
 
 
 func atom_color(n: StringName) -> Color:

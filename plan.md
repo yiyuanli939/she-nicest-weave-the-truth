@@ -439,6 +439,9 @@ class_name LevelDef extends Resource
 
 ## 7. M4 — 美术与素材制作方案(程序化 + SVG 手绘)
 
+> **2026-08-29 更新**:美术已交付 PNG 美术包(站酷小薇体 + 标题/选关/故事/仪器架/笔记底图),
+> 本节的 SVG 手绘方案作废;现行接口见 `docs/ART_INTERFACE.md`,逻辑视口改为 3840×2160、图片原尺寸使用。
+
 > 🔧 **Godot 指引**:
 > - **SVG 导入**:把 `.svg` 拖进 `assets/svg/`,Godot 自动导入为 Texture2D;选中文件 → Import 面板把 `svg/scale` 设 2.0(高分屏清晰)+ 开 mipmaps → Reimport。
 > - **九宫格**:新建 `StyleBoxTexture`,指定贴图并把四边 margin 设 24px → 面板任意拉伸不糊角;GraphNode 的机身就是在 Theme 里覆写它的 `panel`/`titlebar` StyleBox。

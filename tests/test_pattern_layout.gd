@@ -53,7 +53,7 @@ func test_line_width_decreases_with_depth() -> bool:
 	widths.sort()
 	return check(widths.size() == 2, "两条分割线") \
 		and check(widths[0] < widths[1], "内层线更细 (得 %s)" % str(widths)) \
-		and check(is_equal_approx(widths[1], 4.0), "外层线 = 基准宽")
+		and check(is_equal_approx(widths[1], PatternView.BASE_LINE_W), "外层线 = 基准宽")
 
 
 func test_meta_bot_null_leaves() -> bool:

@@ -71,7 +71,7 @@ static func apply(scene: LevelScene, board: ProofBoard, level_id: StringName) ->
 		board.place_machine_at_center(sol.m[i])
 		var id: int = session.get_node_ids()[-1]
 		machines.append(id)
-		session.set_node_position(id, Vector2(240 + 170 * i, 90 + 140 * (i % 3)))
+		session.set_node_position(id, Vector2(600 + 400 * i, 180 + 320 * (i % 3)))   # 4K 逻辑坐标,避开左列线轴
 	board.apply_positions()
 	for pin: Array in sol.p:
 		var target: int = machines[int(String(pin[0]).substr(1))]

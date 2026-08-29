@@ -1,59 +1,89 @@
 class_name MainMenu
 extends Control
-## 主菜单(占位级 UI,换装走 theme)。
+## 标题页(美术参考图 information/art_spec_20260829/image.png):
+## 整张背景图 + 标题图(表面流光 shader)+ 右侧四个纯文字选项(悬停变浅走 theme)。
+## 「开始游戏 / 继续游戏」都进选关页,不直接进关;「重置进度」点击即清档。
+## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。小机校准不占界面:调试版按 F9。
 
-var _notebook_ui: NotebookUI
+const BG_PATH := "res://assets/art/title/bg.png"
+const TITLE_PATH := "res://assets/art/title/title.png"
+const SHEEN_PATH := "res://assets/shaders/title_sheen.gdshader"
+const TITLE_POS := Vector2(619, 1560)     # 标题图左上角
+const MENU_CENTER_X := 3575.0             # 四个选项的水平中心
+const MENU_Y0 := 948.0                    # 第一个选项的垂直中心
+const MENU_PITCH := 194.0                 # 选项间距
+const MENU_FONT_SIZE := 64
+const MENU_GLYPH_SPACING := 12            # 参考图的选项文字是疏排的
+
 var _cal_ui: RobotCalUI
+var _start_btn: Button
+var _game: Node
 
 
 func _ready() -> void:
-	var game := get_node("/root/Game")
-	var center := CenterContainer.new()
-	center.set_anchors_preset(Control.PRESET_FULL_RECT)
-	add_child(center)
-	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", 14)
-	center.add_child(box)
+	_game = get_node("/root/Game")
+	var bg := TextureRect.new()
+	bg.texture = load(BG_PATH)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
 
-	var title := Label.new()
-	title.text = "She Nicest · 织机证明"
-	title.add_theme_font_size_override("font_size", 40)
-	box.add_child(title)
-	var sub := Label.new()
-	sub.text = "[占位] 用丝线织出无可辩驳的纹样"
-	sub.modulate.a = 0.7
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(sub)
-	box.add_child(Control.new())
+	var title := TextureRect.new()
+	title.texture = load(TITLE_PATH)
+	title.position = TITLE_POS
+	title.size = title.texture.get_size()
+	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var mat := ShaderMaterial.new()
+	mat.shader = load(SHEEN_PATH)
+	title.material = mat
+	add_child(title)
 
-	var progressed: bool = not game.save.solved.is_empty()
-	_add_btn(box, "继续织造" if progressed else "开始织造", func() -> void:
-		game.start_level(game.first_unsolved()))
-	_add_btn(box, "选关", game.goto_select)
-	_add_btn(box, "织者笔记", func() -> void:
-		_notebook_ui.open(game.notebook, game.save.notebook))
-	_add_btn(box, "校准小机", func() -> void:
-		_cal_ui.open(get_node("/root/Robot")))
-	_add_btn(box, "退出", func() -> void:
+	var progressed: bool = not _game.save.solved.is_empty()
+	_start_btn = _add_option(0, "继续游戏" if progressed else "开始游戏", _game.goto_select)
+	_add_option(1, "重置进度", _on_reset)
+	_add_option(2, "开发者信息", _game.goto_credits)
+	_add_option(3, "退出游戏", func() -> void:
 		get_node("/root/Robot").cue("sleep")   # 小机道晚安
 		await get_tree().create_timer(0.2).timeout
 		get_tree().quit())
 
-	_notebook_ui = NotebookUI.new()
-	add_child(_notebook_ui)
 	_cal_ui = RobotCalUI.new()
 	add_child(_cal_ui)
 
-	if not game.menu_greeted:
-		game.menu_greeted = true
+	if not _game.menu_greeted:
+		_game.menu_greeted = true
 		# 稍等 WebSocket 连上桥接再问候(连不上则静默)
 		get_tree().create_timer(1.2).timeout.connect(func() -> void:
-			game.robot_cue("greet"))
+			_game.robot_cue("greet"))
 
 
-func _add_btn(box: VBoxContainer, label: String, cb: Callable) -> void:
+## 纯文字选项:无底、悬停变浅(theme),以 (MENU_CENTER_X, MENU_Y0 + i*PITCH) 为中心摆放
+func _add_option(i: int, label: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
-	b.custom_minimum_size = Vector2(240, 42)
+	b.add_theme_font_size_override("font_size", MENU_FONT_SIZE)
+	var fv := FontVariation.new()
+	fv.base_font = get_theme_default_font()
+	fv.spacing_glyph = MENU_GLYPH_SPACING
+	b.add_theme_font_override("font", fv)
 	b.pressed.connect(cb)
-	box.add_child(b)
+	add_child(b)
+	b.reset_size()
+	b.position = Vector2(MENU_CENTER_X, MENU_Y0 + i * MENU_PITCH) - b.size * 0.5
+	return b
+
+
+## 美术:「重置进度:点击后重置玩家进度」—— 点击即清档,第一项随之变回「开始游戏」
+func _on_reset() -> void:
+	_game.save.wipe()
+	_game.current = null
+	_start_btn.text = "开始游戏"
+	_start_btn.reset_size()
+	_start_btn.position = Vector2(MENU_CENTER_X, MENU_Y0) - _start_btn.size * 0.5
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	var k := event as InputEventKey
+	if k != null and k.pressed and not k.echo and k.keycode == KEY_F9 and OS.is_debug_build():
+		_cal_ui.open(get_node("/root/Robot"))
+		get_viewport().set_input_as_handled()

@@ -8,16 +8,16 @@
 script = ExtResource("1_vrjea")
 speaker = "阿梭"
 text = "[占位] 两股丝可以并成一幅纹样——试试并织机。"
+scene = "工坊"
 
 [sub_resource type="Resource" id="Resource_y4vb5"]
 script = ExtResource("2_qrgu5")
 lines = Array[ExtResource("1_vrjea")]([SubResource("Resource_nqpor")])
-location_title = "[占位] 织坊"
 
 [resource]
 script = ExtResource("3_5gm61")
 id = &"l02"
-title = "并织初试"
+title = "第二纹"
 assumptions = Array[String](["A", "B"])
 goal = "A & B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])

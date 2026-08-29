@@ -8,8 +8,6 @@ extends GraphEdit
 ##   * 正常放置由发起方(place 函数)用返回的 id 自己建节点。
 
 signal pin_requested(node_id: int, out_port: int)
-signal machine_selected(rule_id: StringName, node_id: int)   # 点选一台仪器(线轴/目标不发)
-signal selection_cleared                                     # 没有仪器被选中了
 
 var session: ProofSession
 var atom_colors: Dictionary = {}
@@ -25,14 +23,19 @@ func _init() -> void:
 func _ready() -> void:
 	right_disconnects = true
 	minimap_enabled = true
+	minimap_size = Vector2(480, 320)
 	show_arrange_button = false
+	connection_lines_thickness = 8.0
 	connection_request.connect(_on_connection_request)
 	disconnection_request.connect(_on_disconnection_request)
 	delete_nodes_request.connect(_on_delete_nodes_request)
 	end_node_move.connect(_on_end_node_move)
-	node_selected.connect(_on_node_selected)
-	node_deselected.connect(_on_node_deselected)
 	add_child(_overlay)
+
+
+## 关卡 HUD 没有单独一行(美术:不显示当前关),必需按钮挂在棋盘自带的工具条上(GraphEdit API 只在本文件)
+func add_toolbar_item(c: Control) -> void:
+	get_menu_hbox().add_child(c)
 
 
 func bind(s: ProofSession) -> void:
@@ -44,7 +47,7 @@ func bind(s: ProofSession) -> void:
 
 ## palette 请求放一台仪器:落点取当前视野中心
 func place_machine_at_center(rule_id: StringName) -> void:
-	var canvas_pos := (scroll_offset + size * 0.5) / zoom - Vector2(90, 60)
+	var canvas_pos := (scroll_offset + size * 0.5) / zoom - Vector2(180, 120)
 	var id := session.place_machine(rule_id, canvas_pos)
 	if id >= 0:
 		_spawn_node(id)
@@ -128,29 +131,6 @@ func _remove_machine(id: int) -> void:
 func _on_end_node_move() -> void:
 	for mn in _machine_nodes():
 		session.set_node_position(mn.node_id, mn.position_offset)
-
-
-# ---- 选中 → 仪器介绍(视图侧消费,见 ui/machine_guide_panel.gd) ----
-
-func _on_node_selected(node: Node) -> void:
-	var mn := node as MachineNode
-	if mn == null or mn.node_type != ProofSession.NodeType.MACHINE:
-		return
-	var info := session.describe_node(mn.node_id)
-	if info != null:
-		machine_selected.emit(info.rule_id, mn.node_id)
-
-
-func _on_node_deselected(_node: Node) -> void:
-	# 切换选中会先 deselect 旧的再 select 新的,推到帧末再判断有没有仪器仍选中,避免闪
-	_check_selection_cleared.call_deferred()
-
-
-func _check_selection_cleared() -> void:
-	for mn in _machine_nodes():
-		if mn.selected and mn.node_type == ProofSession.NodeType.MACHINE:
-			return
-	selection_cleared.emit()
 
 
 static func _id_of(node_name: StringName) -> int:

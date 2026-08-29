@@ -8,20 +8,19 @@
 script = ExtResource("1_sk1ha")
 speaker = "阿梭"
 text = "[占位] 括号只是记法,布面自会说话。"
+scene = "工坊"
 
 [sub_resource type="Resource" id="Resource_vltgm"]
 script = ExtResource("2_nkml8")
 lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_0wxft")])
-location_title = "[占位] 织坊"
 
 [resource]
 script = ExtResource("3_lp67d")
 id = &"l04"
-title = "结绳记事"
+title = "第四纹"
 assumptions = Array[String](["A & (B & C)"])
 goal = "(A & B) & C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
 intro_dialogue = SubResource("Resource_vltgm")
-notebook_unlocks = Array[StringName]([&"notebook_and"])
 robot_cue_on_win = "celebrate"

@@ -2,13 +2,13 @@ class_name WireOverlay
 extends Control
 ## 连线视觉叠加层:出错的线在中点挂一枚错误徽章(正常线无浮层)。
 ## GraphEdit 的普通 Control 子节点,不吃鼠标;位置每帧重排(棋盘很小,便宜)。
-## 徽章目前是文字占位;美术接口:换成 assets/svg/badges/*.svg(见 docs/ART_INTERFACE.md)。
+## 徽章是纯文字(只用美术指定字体,不带符号);颜色在 BADGE_COLOR。
 
 const BADGE: Dictionary = {
-	ProofSession.WireState.CONFLICT: "☠ 冲突",
-	ProofSession.WireState.UNDERSPEC: "? 欠定",
-	ProofSession.WireState.CYCLE: "◌ 成环",
-	ProofSession.WireState.ESCAPED_HYP: "✂ 逃逸",
+	ProofSession.WireState.CONFLICT: "冲突",
+	ProofSession.WireState.UNDERSPEC: "欠定",
+	ProofSession.WireState.CYCLE: "成环",
+	ProofSession.WireState.ESCAPED_HYP: "逃逸",
 }
 const BADGE_COLOR: Dictionary = {
 	ProofSession.WireState.CONFLICT: Color(0.85, 0.2, 0.2),
@@ -48,7 +48,7 @@ func _make_chip(w: ProofSession.WireInfo) -> Control:
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var b := Label.new()
 	b.text = BADGE[w.state]
-	b.add_theme_font_size_override("font_size", 12)
+	b.add_theme_font_size_override("font_size", 32)
 	b.add_theme_color_override("font_color", BADGE_COLOR[w.state])
 	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(b)

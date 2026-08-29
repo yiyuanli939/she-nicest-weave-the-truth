@@ -70,24 +70,30 @@ tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
   UI 只用它的查询 getter(`get_input_pattern`/`is_input_connected`/`get_wires`/`describe_node`…),**从不直接碰 SolveResult**。
 - `ProofBoard`(GraphEdit)与 `MachineNode`(GraphNode)是全项目**唯一**允许出现 GraphEdit API 的两个文件。
   `board_updated` 后:清空连线 → 按 `get_wires()` 重挂 → 每个节点 `refresh()` → `WireOverlay.rebuild()`(只给出错的线挂徽章)。
-- `MachineNode`:每行一对(输入口,输出口)单元格;可钉口在标题栏出按钮(单口"钉纹样",岔纹机"钉上口/钉下口");
+- `MachineNode`:每行一对(输入口,输出口)单元格,**只画纹样不写公式文字**(美术要求);可钉口在标题栏出按钮
+  (单口"钉纹样",岔纹机"钉上口/钉下口"),钉住后口下出「已钉」小字;
   右键节点体 → `delete_requested` → 板转 `session.remove_machine`(线轴/目标模型层拒删)。
+  关卡必需按钮(重置/示答/下一关/选关)挂在 GraphEdit 自带工具条上(`ProofBoard.add_toolbar_item`)。
 - `PatternView`:哑控件,给 Formula 画纹样(AND 竖分 / IMP 横分 / OR 对角 / META 斜纹 / BOT 焦纹),`ghost` 用 `self_modulate` 调透明度。
 
 ### 2.5 流程与剧情
 
 ```
-MainMenu → LevelSelect → Game.start_level(lv)
-                            ├─ 有 intro_dialogue → StoryScene(全屏:底图+插图+地点铭牌+立绘+对话框)
+MainMenu(标题页:开始/继续游戏 · 重置进度 · 开发者信息 · 退出)→ LevelSelect → Game.start_level(lv)
+                            ├─ 有 intro_dialogue → StoryScene(固定底图 + 场景插图 + 左右立绘 + 遮罩 + 对话区)
                             │                         播完 → Game.enter_board()
-                            └─ 无 → enter_board() → LevelScene(棋盘 + HUD + 关内 DialogueBox)
-LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、robot_cue 庆祝)→ "下一关"
+                            └─ 无 → enter_board() → LevelScene(仪器架 + 棋盘 + 右缘笔记抽屉)
+LevelScene.proof_completed → Game.notify_solved(记档、robot_cue 庆祝)→ 工具条「下一关」
+CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```
 
-- `DialogueBox`:打字机 + 点击推进(打字中点=整句显示,显示完点=下一句,最后一句后再点=关闭),没有跳过键;
+- `DialogueBox`(Control,只管文字):打字机 + 点击/任意键推进(打字中=整句显示,显示完=下一句,最后一句后=关闭),没有跳过键;
   每行 `robot_cue` 转发给 `Game.robot_cue` → `RobotLink`(有实机才发)。
-- 对话/立绘/背景/地点都是 `LevelDef.intro_dialogue`(`DialogueRes`)里的数据,美术空槽位走程序化占位。
-- 关卡与笔记本 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
+- 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
+  主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从 CSV 灌(`tools/import_dialogue.gd`)。
+- 织者笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),全量常驻不解锁;
+  关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
+- 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
 
 ## 3. 最近两轮改了什么(以及为什么)
 
@@ -123,7 +129,18 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 旧语义下能"白拿"的东西现在必须钉:封程机的假设 P(原本可靠连目标反推)、岔纹机的另一支、溃散机织出的纹样。
 没钉时连线显示"? 欠定"徽章、端口是未染纱幽灵——这正是引导玩家去点钉按钮的提示。
 
-### 3.3 审查后修掉的 bug(值得记住的坑)
+### 3.3 美术包接入(2026-08-29,严格按 `information/art_spec_20260829/游戏样式美化.md`)
+
+| 改动 | 落点 | 备注 |
+|---|---|---|
+| 逻辑视口 3840×2160,PNG 原尺寸 | `project.godot [display]`、`gui/theme/default_theme_scale=2` | 美术:不改图片大小与长宽比;窗口默认 1440×810 整体缩放。所有像素常量都是 4K 坐标 |
+| 站酷小薇体 + 纯文字按钮悬停变浅 | `theme/main_theme.tres`(FontVariation + 系统字体兜底;Button 四态 StyleBoxEmpty) | 字体没有 ☠📌▶✓∧∨→⊥ 等符号,UI 字面量全部去符号(`tests/test_theme.gd` 扫) |
+| 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页恰好四个选项、重置点击即清档;选关页无返回按钮(Esc);关名「第N纹」 |
+| 故事界面换图 | `ui/story_scene.gd`、`narrative/story_art.gd`、`DialogueLine` 新字段、`tools/import_dialogue.gd` | 删地点铭牌与 `DialogueRes.location_title/background`、`DialogueLine.side_right/portrait` |
+| 关内界面 | `board/palette_panel.gd`(固定 7 格)、`ui/level_scene.gd`(绝对布局、工具条按钮)、`narrative/notebook_ui.gd`(图片抽屉) | 删 HUD 关名/目标文字、节点端口 Label、`MachineGuidePanel`/`RuleGuide*`、`LevelDef.notebook_unlocks`、`SaveManager.notebook` |
+| 测试 | `visual_smoke_ui.gd` 重写(`push_input(ev, true)`:视口≠窗口时坐标要按视口给)、新增 `test_story_art/test_dialogue_import/test_theme` | 81/81 + 三 smoke 全绿 |
+
+### 3.4 审查后修掉的 bug(值得记住的坑)
 
 | 问题 | 根因 | 修法 |
 |---|---|---|
@@ -141,8 +158,9 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 
 | 想做的事 | 去哪 |
 |---|---|
-| 改台词/立绘/背景/地点 | 关卡 .tres 的 `intro_dialogue`(Inspector),字段见 `docs/CONTENT_INTERFACE.md`;批量改走 `tools/gen_levels.gd` 的 `LEVELS` 表 |
-| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*`/`NOTEBOOK` 表)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `tests/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
+| 改台词/场景/立绘/表情 | Excel 另存 CSV → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue`(Inspector);占位批量改走 `tools/gen_levels.gd` 的 `LEVELS` 表 |
+| 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
+| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*` 表;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `tests/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
 | 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
 | 加一台仪器 | `logic/rules.gd` 一行链式定义(自由变量所在口标 `pinnable`)→ `CH_RULES` 放进某章 → 测试 `test_describe_rule_metadata` 的台数 → 解法 |
 | 改"钉"的规则(哪些口可钉) | 只改 `rules.gd` 的 `pinnable` 标记;`_port_free_meta` 要求可钉口恰有一个自由变量 |
@@ -150,14 +168,14 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
 | 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
-| 织者笔记(整页翻书) | `narrative/notebook_ui.gd`(左「继续工作」关闭 / 右「翻页」翻条目 / 中间书页);`open(nb, unlocked)` 签名不可改(主菜单/关卡右缘笔记标签/测试都用)。竖排 CJK 用逐字换行 |
-| 关卡右缘「笔记」标签 | `ui/level_scene.gd` `_build_ui` 里 body 最后一个子节点 + `_on_open_notebook` |
-| 笔记条目/封程机教学页 | `tools/gen_levels.gd` `NOTEBOOK` 表(BBCode 正文 + demo_formula)+ 关卡 `notebook_unlocks` 挂接 → 重跑生成器 |
-| 仪器介绍卡(点选机器弹出) | 内容:`tools/gen_levels.gd` `RULE_GUIDE` 表 → `narrative/data/rule_guide.tres`(`RuleGuideCatalog`,按 rule_id 查);视图:`ui/machine_guide_panel.gd`(独立卡,`show_for/clear`);接线:`board/proof_board.gd` 的 `machine_selected`/`selection_cleared` 信号(GraphEdit `node_selected` 转发,只对 MACHINE)→ `ui/level_scene.gd`。三层解耦,换皮/挪位置只动 machine_guide_panel |
-| 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR` |
-| 改全屏对话场景布局/占位色 | `ui/story_scene.gd` 顶部常量与 `_build_ui/_fill_portrait` |
-| 改关卡 HUD/快捷键/发呆提示 | `ui/level_scene.gd` |
-| 测试开答案 | HUD「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `tests/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
+| 织者笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 签名保留(`unlocked` 忽略,全量常驻);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
+| 笔记条目(= 仪器说明) | `tools/gen_levels.gd` `RULE_GUIDE` 表(顺序同仪器架)→ 重跑生成器 → `narrative/data/notebook.tres` |
+| 仪器架按钮/顺序/置灰 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外置灰 |
+| 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR`(纯文字,不用符号) |
+| 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
+| 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
+| 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
+| 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `tests/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
 | 改进关流程 | `game/game.gd start_level/enter_board` |
 | 机器人动作/语音 | `game/robot_link.gd` + `docs/ROBOT_API.md` |
 
@@ -166,7 +184,7 @@ LevelScene.proof_completed → Game.notify_solved(记档、解锁笔记本、rob
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 72 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 81 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
@@ -181,8 +199,11 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   钉值不被改写、**摘掉下游普通线上游出口不变(禁反推)**、重解确定、JSON 往返不变、接线乱序胜负一致);
   每关解法"完整通关 / 少任一钉不通关 / 少任一线不通关 / 4 种接线顺序仍通关 / 要钉的原子本关可用";
   存档残留 l16/l17/notebook_tnd 无害;ProofSession 随机操作序列 undo 全回初态、redo 全回终态。
-- `tests/visual_smoke_ui.gd` — 真实输入:对话在名牌/正文/面板角/面板外/立绘/插图六个落点都能推进,
-  立绘与背景贴图槽位,无对话关直进棋盘;右键在标题/纹样/标签/spacer/几何中心六个落点都能删,
-  拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→编辑器→钉住→📌;
-  幽灵态切换;欠定/冲突徽章与断线;重置按钮;选关页点按钮进关。
+- `tests/visual_smoke_ui.gd` — 真实输入(`push_input(ev, true)`,坐标按 3840×2160 视口给):故事界面的场景/立绘/遮罩切换,
+  名字/正文/屏幕角/立绘/插图六个落点点击与任意键推进,不显示场景名;无对话关直进棋盘;工具条无撤销/重做、不显示关名;
+  仪器架 7 格顺序与置灰、点置灰不放置;节点内无公式字母;右键在标题/纹样/spacer/「已钉」/几何中心都能删,
+  拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→色块编辑器→钉住→「已钉」;
+  幽灵态切换;欠定/冲突纯文字徽章与断线;重置;笔记抽屉划出/变「继续工作」/翻页循环/收回;
+  标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
+- `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/visual_smoke_m3.gd` / `m2.gd` — 端到端流程与三个代表性证明。

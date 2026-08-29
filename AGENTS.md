@@ -37,6 +37,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
    `board/proof_board.gd` 与 `board/machine_node.gd`;连线合法性由 ProofGraph 裁决。
 5. 信号用代码连(`sig.connect(_on_x)`),不用编辑器连线。
 6. 缩进 Tab;文件 snake_case、类 PascalCase;一个文件一个 `class_name`。
+7. **美术/策划文档严格照做**:文档没写的 UI 元素、确认步骤、规则一律不加;图片原尺寸用
+   (逻辑视口 = 出图分辨率 3840×2160);所有文字用站酷小薇体,UI 字面量不得含该字体没有的符号。
 
 ## 代码地图(M0 已完成 ✅)
 
@@ -49,7 +51,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/unifier.gd` | 一阶合一(occurs check;union-find 式 walk/resolve) |
 | `logic/proof_graph.gd` | 棋盘模型 + solve 五步管线(方程→合一→环→辖域→胜负) |
 | `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
-| `tests/` | headless 测试,72 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量);`test_base.gd` 提供 `check`/`f("A & B")` |
+| `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
+| `tests/` | headless 测试,81 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -77,8 +80,10 @@ M0 引擎 ✅ → API(ProofSession/PatternView)✅ → M1 灰盒板 ✅ → M2 �
 M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件/桥接/语音/校准)✅ →
 交互改版(进关前全屏开场对话 StoryScene、右键删节点、无跳过键点击推进、
 连线只留错误徽章、未连线口幽灵纹样)✅ → 删第五章(4 章 15 关)+ 严格正向求解
-(自由纹样一律由玩家钉)✅。
-剧情台词与 UI 为**占位版**,更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
+(自由纹样一律由玩家钉)✅ → **美术包接入**(2026-08-29:站酷小薇体、3840×2160 逻辑视口 PNG 原尺寸、
+标题/选关/开发者信息/故事界面/仪器架/笔记抽屉全部换成美术图,节点内无公式文字;严格按
+`information/art_spec_20260829/游戏样式美化.md`)✅。
+剧情台词为**占位版**(正式台词等 Excel,`tools/import_dialogue.gd` 灌 CSV),更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;
 机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

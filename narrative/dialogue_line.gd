@@ -1,10 +1,13 @@
 class_name DialogueLine
 extends Resource
-## 一句台词。策划在 Inspector 里直接编辑;robot_cue 是机器人联动接口:
-## 播到该行时触发实体小机器人动作(见 docs/CONTENT_INTERFACE.md 的 cue 一览)。
+## 一句台词。策划在 Inspector 里改,或用 tools/import_dialogue.gd 从 Excel 另存的 CSV 整表灌入。
+## 角色 / 表情 / 场景一律写美术给的中文名(登记表与可用值见 narrative/story_art.gd);
+## 主角诺拉恒在右侧立绘位,发言人是否诺拉由 StoryArt.is_nora(speaker) 判定。
 
-@export var speaker: String = ""
-@export_multiline var text: String = ""      # 支持 BBCode
-@export var side_right: bool = false         # 立绘/名牌靠右
-@export var robot_cue: String = ""           # ""=无;如 "happy"/"panic"/"nod"
-@export var portrait: Texture2D = null       # 立绘;null = 按 speaker 着色的剪影占位
+@export var speaker: String = ""            # 发言人显示名,如 "诺拉·拉弗蒂" / "莉娅"
+@export_multiline var text: String = ""     # 台词,支持 BBCode
+@export var scene: String = ""              # 场景插图:工坊 / 宿舍 / 街景;"" = 沿用上一句
+@export var left_char: String = ""          # 左侧人物:莉娅 / 亚瑟;"" = 左侧无人
+@export var left_expr: String = "默认"      # 左侧人物表情
+@export var nora_expr: String = "默认"      # 诺拉表情:默认 / 苦恼 / 严肃 / 惊讶
+@export var robot_cue: String = ""          # 播到本句触发的实体小机动作(见 docs/CONTENT_INTERFACE.md);"" = 无

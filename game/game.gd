@@ -1,8 +1,7 @@
 extends Node
 ## Autoload "Game":游戏流程唯一单例(逻辑层保持可 new,不进这里)。
-## 场景切换、当前关卡、存档、笔记本解锁、机器人 cue 转发都从这里走。
-
-signal notebook_unlocked(entry_id: StringName)
+## 场景切换、当前关卡、存档、机器人 cue 转发都从这里走。
+## 织者笔记 = 七台仪器的说明(narrative/data/notebook.tres),全量常驻,不解锁。
 
 var catalog: LevelCatalog
 var notebook: NotebookCatalog
@@ -68,6 +67,10 @@ func goto_select() -> void:
 	get_tree().change_scene_to_file("res://ui/level_select.tscn")
 
 
+func goto_credits() -> void:
+	get_tree().change_scene_to_file("res://ui/credits_scene.tscn")
+
+
 # ---- 关卡回报 ----
 
 func notify_solved(board_state: Dictionary) -> void:
@@ -75,9 +78,6 @@ func notify_solved(board_state: Dictionary) -> void:
 		return
 	save.mark_solved(current.id)
 	save.set_board_state(current.id, board_state)
-	for entry_id in current.notebook_unlocks:
-		if save.unlock_notebook(entry_id):
-			notebook_unlocked.emit(entry_id)
 	save.save()
 	robot_cue(current.robot_cue_on_win)
 

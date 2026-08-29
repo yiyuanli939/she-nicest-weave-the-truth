@@ -16,6 +16,9 @@ const FILES: Array[String] = [
 	"res://tests/test_pattern_editor.gd",
 	"res://tests/test_levels.gd",
 	"res://tests/test_solver_exhaustive.gd",
+	"res://tests/test_story_art.gd",
+	"res://tests/test_dialogue_import.gd",
+	"res://tests/test_theme.gd",
 ]
 
 

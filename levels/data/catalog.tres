@@ -21,22 +21,22 @@
 
 [sub_resource type="Resource" id="Resource_r13jp"]
 script = ExtResource("1_ljj35")
-title = "第一章·并织"
+title = "第一章 并纹"
 levels = Array[ExtResource("2_0sxbx")]([ExtResource("3_echqs"), ExtResource("4_urugv"), ExtResource("5_33pqu"), ExtResource("6_fg67j")])
 
 [sub_resource type="Resource" id="Resource_1t2kf"]
 script = ExtResource("1_ljj35")
-title = "第二章·封程"
+title = "第二章 叠层纹"
 levels = Array[ExtResource("2_0sxbx")]([ExtResource("7_wlkb3"), ExtResource("8_5dnp8"), ExtResource("9_hyw4g"), ExtResource("10_2qrau"), ExtResource("11_a4wpr")])
 
 [sub_resource type="Resource" id="Resource_arxw0"]
 script = ExtResource("1_ljj35")
-title = "第三章·岔纹"
+title = "第三章 岔纹"
 levels = Array[ExtResource("2_0sxbx")]([ExtResource("12_wckoa"), ExtResource("13_cohgv"), ExtResource("14_tcwnj")])
 
 [sub_resource type="Resource" id="Resource_mm40q"]
 script = ExtResource("1_ljj35")
-title = "第四章·焦纹"
+title = "第四章 焦纹"
 levels = Array[ExtResource("2_0sxbx")]([ExtResource("15_jn1rt"), ExtResource("16_6myto"), ExtResource("17_g7qwh")])
 
 [resource]

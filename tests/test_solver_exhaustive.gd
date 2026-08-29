@@ -150,23 +150,26 @@ func test_level_solutions_complete_minimal_and_order_free() -> bool:
 	return ok
 
 
-# ---- 4. 存档残留:删掉的关卡/笔记本 id 留在档里不该出事 ----
+# ---- 4. 存档残留:删掉的关卡 id / 旧版 notebook 字段留在档里不该出事 ----
 
 func test_legacy_save_entries_are_harmless() -> bool:
 	var sm := SaveManager.new()
 	sm.mark_solved(&"l16")
 	sm.mark_solved(&"l17")
-	sm.unlock_notebook(&"notebook_tnd")
 	sm.set_board_state(&"l16", {"graph": {"next_meta": 2, "nodes": [], "edges": []}, "positions": {}})
 	sm.save()
+	# 旧版存档带 notebook 数组:读档应静默忽略
+	var f := FileAccess.open(SaveManager.PATH, FileAccess.WRITE)
+	f.store_string(JSON.stringify({solved = {"l16": true, "l17": true}, boards = {}, notebook = ["notebook_tnd", "notebook_and"]}))
+	f.close()
 	var sm2 := SaveManager.open()
 	var nb := NotebookCatalog.load_default()
 	var ui := NotebookUI.new()
-	ui.open(nb, sm2.notebook)
+	ui.open(nb, [])
 	var shown: int = ui._entries.size()
 	ui.free()
 	var ok := check(sm2.is_solved(&"l16"), "残留的通关记录读回来照旧") \
-		and check(shown == 0, "笔记本只显示目录里存在的条目(得 %d)" % shown) \
+		and check(shown == nb.entries.size(), "笔记全量常驻:显示 %d 条(得 %d)" % [nb.entries.size(), shown]) \
 		and check(nb.entry(&"notebook_tnd") == null, "目录里不再有两仪条目")
 	sm2.wipe()
 	return ok
