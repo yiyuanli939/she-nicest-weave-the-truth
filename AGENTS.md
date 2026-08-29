@@ -95,7 +95,9 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 `tools/xlsx_to_csv.py` + `tools/import_dialogue.gd` 灌入 15 段正式台词(别名表头/「章-节」关卡号/左位「无」与全名/注意事项行自动跳过);
 **4-3 = l15 通关后剧情**(`LevelDef.outro_dialogue`):l15 通关点「继续」→ 全屏 4-3 → 「感谢游玩」黑屏 → 开发者信息页从黑淡入;
 小机 **3-1(l10)通关瞬间坏掉**(win cue = panic,代解通关也演)、3-2 起整段故障、**结局黑屏才修好**(calm),「look 模式」删除;
-新增莉娅严肃立绘 `char_lia_serious.png`、场景别名 伦敦街上/诺拉房间)✅。
+新增莉娅严肃立绘 `char_lia_serious.png`、场景别名 伦敦街上/诺拉房间)✅ →
+**笔记条目换整页图**(2026-08-30:七台仪器 `assets/art/level/notebook/<rule_id>.png`,3840×2160 全屏导出透明底、
+与打开的抽屉对齐原尺寸摆放;引擎不再渲染笔记文字,NotebookEntry 只剩 id+image;源图存档 `笔记本页面补充/`)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

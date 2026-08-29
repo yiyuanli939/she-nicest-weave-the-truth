@@ -364,11 +364,15 @@ func _run() -> void:
 	await _settle()
 	_check(nbui.is_open() and is_equal_approx(nbui._drawer.position.x, NotebookUI.OPEN_X), "点「笔记」抽屉划出到位")
 	_check(nbui._handle.text.contains("继"), "划出后夹子变「继续工作」")
-	_check(nbui._entries.size() == scene.allowed_rules.size() and nbui._page == 0 and nbui._title.text == "并织机",
-			"只显示本关 %d 台仪器的说明,从并织机开始(得 %d)" % [scene.allowed_rules.size(), nbui._entries.size()])
+	_check(nbui._entries.size() == scene.allowed_rules.size() and nbui._page == 0 and nbui._page_pic.visible
+			and nbui._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
+			"只显示本关 %d 台仪器的页,从并织机整页图开始(得 %d)" % [scene.allowed_rules.size(), nbui._entries.size()])
+	_check(nbui._page_pic.position == NotebookUI.PAGE_OFFSET and nbui._page_pic.stretch_mode == TextureRect.STRETCH_KEEP
+			and nbui._page_pic.texture.get_size() == Vector2(3840, 2160),
+			"整页图全屏尺寸原样摆放(抽屉开位时与屏幕对齐,不缩放不改长宽比)")
 	_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(nbui._page == 1 and nbui._title.text == "拆股机", "点「翻页」到第 2 条(拆股机)")
+	_check(nbui._page == 1 and nbui._page_pic.texture.resource_path.ends_with("notebook/and_elim.png"), "点「翻页」到第 2 页(拆股机整页图)")
 	for i in nbui._entries.size() - 1:
 		_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()

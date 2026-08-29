@@ -1,9 +1,11 @@
 class_name NotebookUI
 extends CanvasLayer
-## 诺拉的笔记抽屉(美术参考图 information/art_spec_20260829/image 4.png 右缘、image 5.png 全页;
+## 诺拉的笔记抽屉(美术参考图 笔记本页面补充/位置参考.png 全页、information/art_spec_20260829/image 4.png 右缘;
 ## 底图 assets/art/level/notebook_bg.png 原尺寸 3798×2065)。
 ## 平时收在屏幕右缘只露出黄铜夹子(「笔记」);点击向左划出(缓动),夹子文字变「继续工作」;再点向右收回。
-## 「翻页」循环切换条目(只显示本关已上架仪器的说明,先仅文字)。
+## 「翻页」循环切换条目(只显示本关已上架仪器的页)。
+## 条目内容 = 整页 PNG(NotebookEntry.image,3840×2160 全屏导出、透明底,标题/正文全画在图里):
+## 抽屉划出到位时图与屏幕对齐 → 在抽屉内摆在 PAGE_OFFSET(负的抽屉开位)、原尺寸不缩放;引擎不再渲染条目文字。
 ## 坐标为抽屉内 / 3840×2160 逻辑像素;美术调位置改下面常量。
 
 signal open_requested          # 玩家点了收起状态的「笔记」;宿主调 open()
@@ -16,20 +18,15 @@ const CLOSED_PEEK := 480.0                              # 收起时露出的宽�
 const SLIDE_SEC := 0.35
 const HANDLE_RECT := Rect2(200, 820, 300, 440)          # 夹子上「笔记 / 继续工作」按钮(抽屉内坐标)
 const FLIP_RECT := Rect2(3190, 1480, 240, 140)          # 右下角折角「翻页」
-const CONTENT_RECT := Rect2(397, 237, 3040, 1500)       # 纸面
-const CONTENT_MARGIN := 120
+const CONTENT_RECT := Rect2(397, 237, 3040, 1500)       # 纸面(整页图内容实测都落在此内,仅作参考)
+const PAGE_OFFSET := Vector2(-OPEN_X, -DRAWER_Y)        # 整页图按全屏导出:抽屉开位时正好与屏幕对齐
 const HANDLE_FONT_SIZE := 52
 const FLIP_FONT_SIZE := 52
-const TITLE_FONT_SIZE := 64
-const BODY_FONT_SIZE := 52
-const TITLE_COLOR := Color(0.29, 0.184, 0.165)          # 深棕
-const BODY_COLOR := Color(0.627, 0.275, 0.227)          # 红棕(参考图正文色)
 
 var _drawer: Control
 var _handle: Button
 var _flip: Button
-var _title: Label
-var _body: RichTextLabel
+var _page_pic: TextureRect
 var _entries: Array[NotebookEntry] = []
 var _page := 0
 var _open := false
@@ -56,30 +53,11 @@ func _init() -> void:
 	_flip.pressed.connect(_next_page)
 	_drawer.add_child(_flip)
 
-	var content := MarginContainer.new()
-	content.position = CONTENT_RECT.position
-	content.size = CONTENT_RECT.size
-	content.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for side in ["left", "right", "top", "bottom"]:
-		content.add_theme_constant_override("margin_" + side, CONTENT_MARGIN)
-	_drawer.add_child(content)
-	var box := VBoxContainer.new()
-	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_theme_constant_override("separation", 40)
-	content.add_child(box)
-	_title = Label.new()
-	_title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
-	_title.add_theme_color_override("font_color", TITLE_COLOR)
-	_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(_title)
-	_body = RichTextLabel.new()
-	_body.bbcode_enabled = true
-	_body.fit_content = true
-	_body.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_body.add_theme_font_size_override("normal_font_size", BODY_FONT_SIZE)
-	_body.add_theme_color_override("default_color", BODY_COLOR)
-	_body.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.add_child(_body)
+	_page_pic = TextureRect.new()
+	_page_pic.position = PAGE_OFFSET
+	_page_pic.stretch_mode = TextureRect.STRETCH_KEEP   # 原尺寸:不缩放、不改长宽比(美术要求)
+	_page_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_drawer.add_child(_page_pic)
 	_set_handle_text(false)
 
 
@@ -163,14 +141,16 @@ func _slide(opened: bool) -> void:
 
 func _show_page() -> void:
 	if _entries.is_empty():
-		_title.text = "(还没有记下什么)"
-		_body.text = ""
+		_page_pic.visible = false   # 空 = 白纸(占位文字已按要求全部删除)
 		_flip.visible = false
 		return
 	_flip.visible = _entries.size() > 1
 	var e := _entries[_page]
-	_title.text = e.title
-	_body.text = e.body
+	var tex: Texture2D = load(e.image) if e.image != "" and ResourceLoader.exists(e.image) else null
+	if tex == null:
+		push_warning("NotebookUI: 缺整页图 " + e.image)
+	_page_pic.texture = tex
+	_page_pic.visible = tex != null
 
 
 ## 翻到下一条,最后一条回到第一条(美术要求)

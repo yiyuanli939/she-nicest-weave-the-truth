@@ -1,5 +1,5 @@
 extends SceneTree
-## 一次性生成 15 关 .tres + catalog + 诺拉的笔记(七台仪器说明;占位文案标 [占位])。
+## 一次性生成 15 关 .tres + catalog + 诺拉的笔记(七台仪器各一张整页图)。
 ##   godot --headless --path . --script res://tools/gen_levels.gd
 ## 生成后策划直接在 Inspector 改 .tres;本脚本仅在想整表重生成时再跑
 ## (会覆盖 levels/data/ 与 narrative/data/ 下的同名文件)。
@@ -38,25 +38,10 @@ const CH_TITLES: Array[String] = ["第一章 并纹", "第二章 叠层纹", "�
 const CN_NUM: Array[String] = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 const CH_OF_LEVEL: Array[int] = [0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3]
 
-# 诺拉的笔记 = 七台仪器说明:[rule_id, 展示名, 一句话, 详解(BBCode), 示例公式(先仅文字,留空)]
-# 顺序 = 仪器架顺序(美术图)。文案守则:只讲机器行为与操作,用纺织语汇;
-# 不出现逻辑符号/逻辑术语/规则陈述/解法提示,也不出现字体没有的符号。
-const RULE_GUIDE: Array = [
-	["and_intro", "并织机", "[占位] 两股丝,并作一幅。",
-		"[占位] 左右两口各收一幅纹样,织成一幅左右并排的并纹。少了任何一股,机器都不开工。", ""],
-	["and_elim", "拆股机", "[占位] 并纹拆回两股。",
-		"[占位] 收一幅并纹,上口吐出它的左半,下口吐出右半。想用哪股接哪股。", ""],
-	["imp_intro", "封程机", "[占位] 空手立一张「若…则…」的封单。",
-		"[占位] 全场最讲究的一台。线轴口凭空吐出一幅你钉住的纹样,当作暂借的丝;拿去织出成品、汇回散口,机器便把整段织程封成一张迭层纹封单,借来的丝就此还清。", ""],
-	["imp_elim", "引渡机", "[占位] 凭单取货。",
-		"[占位] 一口收一张迭层纹封单,另一口收它上层的纹样,机器兑出下层的货。", ""],
-	["or_intro", "岔纹机", "[占位] 一股丝,岔出两可。",
-		"[占位] 收一幅纹样,织成对角分岔的岔纹:上口把它排在岔口一侧、下口排在另一侧。岔纹的另一支机器自己不知道该织什么——点标题栏的「钉上口/钉下口」,由你来定。", ""],
-	["or_elim", "汇路机", "[占位] 岔路汇流,殊途同归。",
-		"[占位] 0 号口收一幅岔纹,两个线轴口各吐出岔纹的一支,交给两条支路分头去织;两条支路织回同样的成品,机器才把它吐出来。线轴口的纹样随 0 号口自动定,不用钉。", ""],
-	["false_elim", "溃散机", "[占位] 焦纹入机,百无禁忌。",
-		"[占位] 收进一幅烧穿的焦纹后,这台机器什么都肯织——织什么由你钉。工坊严令:慎用。", ""],
-]
+# 诺拉的笔记 = 七台仪器各一张整页图(assets/art/level/notebook/<rule_id>.png,3840×2160 全屏导出、
+# 透明底,标题/正文全画在图里,引擎不渲染文字;源中文命名图存档在 笔记本页面补充/)。
+# 顺序 = 仪器架顺序(美术图)。文案守则(由美术在图里执行):只讲机器行为与操作,用纺织语汇,不出现直接逻辑提示。
+const NOTEBOOK_IDS: Array = ["and_intro", "and_elim", "imp_intro", "imp_elim", "or_intro", "or_elim", "false_elim"]
 
 
 func _initialize() -> void:
@@ -81,16 +66,14 @@ func _initialize() -> void:
 	_save(catalog, "res://levels/data/catalog.tres")
 
 	var nb := NotebookCatalog.new()
-	for row in RULE_GUIDE:
+	for id: String in NOTEBOOK_IDS:
 		var e := NotebookEntry.new()
-		e.id = StringName(row[0])
-		e.title = row[1]
-		e.body = row[2] + "\n\n" + row[3]
-		e.demo_formula = row[4]
+		e.id = StringName(id)
+		e.image = "res://assets/art/level/notebook/%s.png" % id
 		nb.entries.append(e)
 	_save(nb, "res://narrative/data/notebook.tres")
 
-	print("生成完毕: %d 关 + catalog + 诺拉的笔记 %d 条" % [LEVELS.size(), RULE_GUIDE.size()])
+	print("生成完毕: %d 关 + catalog + 诺拉的笔记 %d 条" % [LEVELS.size(), NOTEBOOK_IDS.size()])
 	quit(0)
 
 

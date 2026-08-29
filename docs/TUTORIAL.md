@@ -179,7 +179,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
 | 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
-| 笔记条目(= 仪器说明) | `tools/gen_levels.gd` `RULE_GUIDE` 表(顺序同仪器架)→ 重跑生成器 → `narrative/data/notebook.tres` |
+| 笔记条目(= 仪器整页图) | 覆盖 `assets/art/level/notebook/<rule_id>.png`(3840×2160 全屏导出、透明底,标题/正文画在图里);新增仪器页改 `tools/gen_levels.gd` `NOTEBOOK_IDS` → 重跑生成器 |
 | 仪器架按钮/顺序/显隐 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外不显示,可见按钮紧凑重排 |
 | 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
 | 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR`(纯文字,不用符号) |

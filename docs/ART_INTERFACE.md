@@ -22,6 +22,7 @@
 | 关卡与笔记/仪器架底图.png(687×2117) | `assets/art/level/palette_bg.png` | 关内左侧仪器架 |
 | 关卡与笔记/仪器按钮(合取/蕴含/析取/矛盾类).png(526×182) | `assets/art/level/machine_{and,imp,or,bot}.png` | 并织/拆股 · 封程/引渡 · 岔纹/汇路 · 溃散 |
 | 关卡与笔记/笔记底图.png(3798×2065) | `assets/art/level/notebook_bg.png` | 右缘笔记抽屉 |
+| 笔记本页面补充/<机名>.png(3840×2160,透明底) | `assets/art/level/notebook/<rule_id>.png` | 笔记条目整页图(标题/正文画在图里);**按全屏导出**,抽屉划出到位时与屏幕对齐,引擎原尺寸摆放 |
 | 对话界面/对话界面底图.png(3835×2123) | `assets/art/story/base.png` | 故事界面固定底图 |
 | 对话界面/场景(工坊/宿舍/街景).png(1942×1251) | `assets/art/story/scene_{workshop,dorm,street}.png` | 场景插图 |
 | 对话界面/诺拉(默认/苦恼/严肃/惊讶).png(761×1721) | `assets/art/story/char_nora_{default,worried,serious,surprised}.png` | 主角立绘(恒右) |
@@ -52,7 +53,7 @@
 | 关内:仪器架左上角 / 棋盘矩形 / 底色 | `ui/level_scene.gd` → `PALETTE_POS` `BOARD_RECT` `BG_COLOR` |
 | 关内:仪器架 7 个按钮的 x / 首个 y / 间距 / 机名字号 | `board/palette_panel.gd` → `SLOT_X` `SLOT_Y0` `SLOT_PITCH` `NAME_FONT_SIZE` |
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
-| 关内:夹子「笔记/继续工作」按钮矩形 / 「翻页」矩形 / 纸面矩形与内边距 / 字号颜色 | `narrative/notebook_ui.gd` → `HANDLE_RECT` `FLIP_RECT` `CONTENT_RECT` `CONTENT_MARGIN` `*_FONT_SIZE` `*_COLOR` |
+| 关内:夹子「笔记/继续工作」按钮矩形 / 「翻页」矩形 / 整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_RECT` `FLIP_RECT` `PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
 | 节点区:端口颜色 / 纹样口尺寸 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` |

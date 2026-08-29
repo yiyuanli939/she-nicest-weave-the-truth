@@ -1,8 +1,7 @@
 class_name NotebookEntry
 extends Resource
-## 笔记本条目(同构揭示等)。demo_formula 用 PatternView 现场渲染。
+## 笔记本条目 = 一张整页图(标题/正文全画在图里,引擎不渲染文字)。
+## image = assets/art/level/notebook/<rule_id>.png,3840×2160 全屏导出、透明底,与打开的抽屉对齐。
 
 @export var id: StringName
-@export var title: String = ""
-@export_multiline var body: String = ""      # BBCode
-@export var demo_formula: String = ""        # 公式文本,空则不画
+@export var image: String = ""      # 整页图 res:// 路径(NotebookUI 原尺寸摆放)

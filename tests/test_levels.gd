@@ -52,6 +52,7 @@ func test_titles_follow_art_spec() -> bool:
 
 
 ## 诺拉的笔记 = 七台仪器各一条说明,顺序同仪器架,全量常驻(不解锁)
+## 诺拉的笔记 = 七台仪器各一张整页图(标题/正文全画在图里,引擎侧无文案)
 func test_notebook_is_machine_manual() -> bool:
 	var nb := NotebookCatalog.load_default()
 	var ok := check(nb != null and nb.entries.size() == Rules.all_ids().size(), "笔记条数 = 仪器数")
@@ -61,9 +62,7 @@ func test_notebook_is_machine_manual() -> bool:
 		ok = check(e != null, "仪器 %s 应有笔记条目" % expected[i]) and ok
 		if e != null:
 			ok = check(e.id == nb.entries[i].id, "条目顺序应同仪器架:%s" % expected[i]) and ok
-			ok = check(e.title != "" and e.body != "", "%s 标题/正文不为空" % expected[i]) and ok
-			for sym in ["∧", "∨", "→", "⊥", "?P", "?Q"]:
-				ok = check(not e.body.contains(sym), "%s 正文不得含逻辑符号 %s" % [expected[i], sym]) and ok
+			ok = check(e.image != "" and ResourceLoader.exists(e.image), "%s 整页图存在:%s" % [expected[i], e.image]) and ok
 	return ok
 
 

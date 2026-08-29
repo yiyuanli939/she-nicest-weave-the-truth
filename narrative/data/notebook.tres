@@ -6,58 +6,37 @@
 [sub_resource type="Resource" id="Resource_ajpst"]
 script = ExtResource("1_v15ww")
 id = &"and_intro"
-title = "并织机"
-body = "[占位] 两股丝,并作一幅。
-
-[占位] 左右两口各收一幅纹样,织成一幅左右并排的并纹。少了任何一股,机器都不开工。"
+image = "res://assets/art/level/notebook/and_intro.png"
 
 [sub_resource type="Resource" id="Resource_g45pq"]
 script = ExtResource("1_v15ww")
 id = &"and_elim"
-title = "拆股机"
-body = "[占位] 并纹拆回两股。
-
-[占位] 收一幅并纹,上口吐出它的左半,下口吐出右半。想用哪股接哪股。"
+image = "res://assets/art/level/notebook/and_elim.png"
 
 [sub_resource type="Resource" id="Resource_33mp1"]
 script = ExtResource("1_v15ww")
 id = &"imp_intro"
-title = "封程机"
-body = "[占位] 空手立一张「若…则…」的封单。
-
-[占位] 全场最讲究的一台。线轴口凭空吐出一幅你钉住的纹样,当作暂借的丝;拿去织出成品、汇回散口,机器便把整段织程封成一张迭层纹封单,借来的丝就此还清。"
+image = "res://assets/art/level/notebook/imp_intro.png"
 
 [sub_resource type="Resource" id="Resource_n1i1x"]
 script = ExtResource("1_v15ww")
 id = &"imp_elim"
-title = "引渡机"
-body = "[占位] 凭单取货。
-
-[占位] 一口收一张迭层纹封单,另一口收它上层的纹样,机器兑出下层的货。"
+image = "res://assets/art/level/notebook/imp_elim.png"
 
 [sub_resource type="Resource" id="Resource_fwrau"]
 script = ExtResource("1_v15ww")
 id = &"or_intro"
-title = "岔纹机"
-body = "[占位] 一股丝,岔出两可。
-
-[占位] 收一幅纹样,织成对角分岔的岔纹:上口把它排在岔口一侧、下口排在另一侧。岔纹的另一支机器自己不知道该织什么——点标题栏的「钉上口/钉下口」,由你来定。"
+image = "res://assets/art/level/notebook/or_intro.png"
 
 [sub_resource type="Resource" id="Resource_0gsv6"]
 script = ExtResource("1_v15ww")
 id = &"or_elim"
-title = "汇路机"
-body = "[占位] 岔路汇流,殊途同归。
-
-[占位] 0 号口收一幅岔纹,两个线轴口各吐出岔纹的一支,交给两条支路分头去织;两条支路织回同样的成品,机器才把它吐出来。线轴口的纹样随 0 号口自动定,不用钉。"
+image = "res://assets/art/level/notebook/or_elim.png"
 
 [sub_resource type="Resource" id="Resource_n6kct"]
 script = ExtResource("1_v15ww")
 id = &"false_elim"
-title = "溃散机"
-body = "[占位] 焦纹入机,百无禁忌。
-
-[占位] 收进一幅烧穿的焦纹后,这台机器什么都肯织——织什么由你钉。工坊严令:慎用。"
+image = "res://assets/art/level/notebook/false_elim.png"
 
 [resource]
 script = ExtResource("2_4mggw")
