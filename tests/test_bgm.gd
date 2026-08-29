@@ -21,6 +21,17 @@ func test_tracks_table_matches_doc() -> bool:
 	return ok
 
 
+func test_gain_table_levels_loudness() -> bool:
+	var B: GDScript = load(BGM_SCRIPT)
+	var ok := true
+	var paths: Array = B.TRACKS.values()
+	for p in B.GAIN_DB:
+		ok = check(paths.has(p), "GAIN_DB 里的文件 %s 也在 TRACKS 里(别留死条目)" % p) and ok
+	ok = check(is_equal_approx(B.target_volume("res://music/title.mp3"), B.VOLUME_LINEAR), "标题曲 = 基准音量") and ok
+	ok = check(is_equal_approx(B.target_volume("res://music/level.wav"), B.VOLUME_LINEAR * db_to_linear(-5.5)), "关内曲压低 5.5 dB") and ok
+	return ok
+
+
 func test_slot_for_chapter() -> bool:
 	var B: GDScript = load(BGM_SCRIPT)
 	var seen := {}

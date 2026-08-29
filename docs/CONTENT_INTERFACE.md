@@ -66,7 +66,7 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 ## 换 / 加背景音乐
 
 槽位表与做法见 `music/音乐bgm位置.md`:换曲 = 覆盖 `music/<槽位>.mp3`;新槽位第一次填曲改 `game/bgm.gd` `TRACKS` 一行;
-`--import` 后把 `.import` 一起提交。开发者信息页署名改 `ui/credits_scene.gd` `LINES`。关内暂无曲(静音),补曲后自动接上。
+`--import` 后把 `.import` 一起提交。开发者信息页署名改 `ui/credits_scene.gd` `LINES`。关内四章暂共用 `music/level.wav`;新曲响度和现有曲不一致时在 `game/bgm.gd` `GAIN_DB` 按文件填 dB 修正。
 
 ## 验证改动
 

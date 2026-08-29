@@ -6,7 +6,7 @@
 | 槽位 | 用在哪 | 文件 | 曲目 / 演奏 / 授权 |
 |---|---|---|---|
 | title | 进入游戏:标题页、选关页、开发者信息页(三页共用,切页不重启) | `music/title.mp3` | Schubert Piano Sonata in A Major, D.664 - II. Andante;演奏 Paul Pitman;License: CCPD(公有领域) |
-| level_1 | 第一章 并纹:进关前故事界面 + 关内 | `music/level.wav` | 原 guanka.wav(37 秒循环);曲目 / 作者 / 授权待填 |
+| level_1 | 第一章 并纹:进关前故事界面 + 关内 | `music/level.wav` | 原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
 | level_2 | 第二章 叠层纹:故事界面 + 关内 | `music/level.wav`(同上,四章暂共用) | |
 | level_3 | 第三章 岔纹:故事界面 + 关内 | `music/level.wav`(同上) | |
 | level_4 | 第四章 焦纹:故事界面 + 关内 | `music/level.wav`(同上) | |
@@ -20,3 +20,9 @@
 4. 在这张表里补上曲目 / 演奏 / 授权;开发者信息页的署名在 `ui/credits_scene.gd` `LINES`。
 
 循环接缝:MP3 从头循环会有编码填充的小空隙,想无缝循环交剪好首尾的 OGG。
+
+## 响度
+
+各曲响度不一时在 `game/bgm.gd` `GAIN_DB` 按文件填 dB 修正,基准是标题曲(0)。量法(macOS):
+`afconvert -f WAVE -d LEI16 x.mp3 x.wav` 后算 16-bit 样本的 RMS(dBFS)。
+现值:`title.mp3` −24.0 dBFS(基准)、`level.wav` −18.5 dBFS → 修正 −5.5 dB。

@@ -13,6 +13,10 @@ const TRACKS: Dictionary = {
 }
 const VOLUME_LINEAR := 0.32   # 约 -10 dB:钢琴 BGM 压低,给实体小机的喇叭留空间
 const FADE_SEC := 1.2
+## 按文件的响度修正(dB):不同来源响度不一,压平到标题曲(基准 0);RMS 量法见 music/音乐bgm位置.md
+const GAIN_DB: Dictionary = {
+	"res://music/level.wav": -5.5,   # RMS -18.5 dBFS,标题曲 -24.0
+}
 
 var slot: StringName = &""    # 当前请求的槽位(静音槽位也记着,同槽位再调才能免重启)
 var _path := ""               # 正在播的文件("" = 静音);几个槽位共用一首时换槽位不重启
@@ -40,6 +44,11 @@ static func slot_for_chapter(ch: int) -> StringName:
 	return &""
 
 
+## 某文件的目标音量(线性)= 基准音量 x 响度修正
+static func target_volume(path: String) -> float:
+	return VOLUME_LINEAR * db_to_linear(float(GAIN_DB.get(path, 0.0)))
+
+
 func play(new_slot: StringName) -> void:
 	if new_slot == slot:
 		return
@@ -61,7 +70,7 @@ func play(new_slot: StringName) -> void:
 		incoming.play()
 	# 只 tween volume_linear,别碰 volume_db(0 线性 = -inf dB)
 	_tween = create_tween().set_parallel(true)
-	_tween.tween_property(incoming, "volume_linear", VOLUME_LINEAR, FADE_SEC)
+	_tween.tween_property(incoming, "volume_linear", target_volume(path), FADE_SEC)
 	_tween.tween_property(outgoing, "volume_linear", 0.0, FADE_SEC)
 	_tween.chain().tween_callback(outgoing.stop)
 

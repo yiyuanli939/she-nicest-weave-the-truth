@@ -99,7 +99,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   第四章 `look` —— 只回头看你。l10/l13 的 `robot_cue_on_enter` = panic/calm 是坏掉/修好那一刻。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
 
-**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;故事界面与关内 = 该章 `level_N`)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音(关内目前留白)。没有音量 UI(美术文档没有),音量是常量。槽位表与补曲步骤见 `music/音乐bgm位置.md`。
+**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;故事界面与关内 = 该章 `level_N`)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。
 
 ## 3. 最近两轮改了什么(以及为什么)
 
