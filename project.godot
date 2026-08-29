@@ -23,6 +23,7 @@ Robot="*res://game/robot_link.gd"
 [gui]
 
 theme/custom="res://theme/main_theme.tres"
+theme/default_theme_scale=2.0
 
 [input]
 
@@ -37,8 +38,13 @@ ui_graph_delete={
 
 [display]
 
+; 逻辑视口 = 美术出图分辨率(3840×2160),所有 PNG 1:1 摆放不缩放;窗口本身默认开 1440×810,由 stretch 整体缩放
+window/size/viewport_width=3840
+window/size/viewport_height=2160
+window/size/window_width_override=1440
+window/size/window_height_override=810
 window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/stretch/aspect="keep"
 
 [physics]
 
@@ -47,3 +53,4 @@ window/stretch/aspect="expand"
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+textures/canvas_textures/default_texture_filter=2

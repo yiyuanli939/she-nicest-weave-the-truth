@@ -1,88 +1,197 @@
-[gd_resource type="Theme" load_steps=6 format=3]
+[gd_resource type="Theme" load_steps=18 format=3]
 
-[sub_resource type="StyleBoxFlat" id="btn_normal"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.549, 0.435, 0.271, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.361, 0.29, 0.18, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+; 全局主题:字体 = 美术指定的站酷小薇体(assets/fonts),系统字体只做缺字兜底(UI 文案已去掉字体没有的符号)。
+; 配色取自美术参考图:棕红描边 #6B3B33 / 深棕文字 #4A2F2A / 红棕强调 #A0463A / 乳黄 #F4ECD8 / 黄铜 #C9A24E。
+; 纯文字按钮:无底,悬停文字变浅(美术要求);带图按钮在各自脚本里用 StyleBoxTexture 覆盖。
+; 坐标/字号全部按 3840×2160 逻辑视口。
 
-[sub_resource type="StyleBoxFlat" id="btn_hover"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.69, 0.553, 0.341, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.361, 0.29, 0.18, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[ext_resource type="FontFile" path="res://assets/fonts/ZCOOLXiaoWei-Regular.ttf" id="1_zcool"]
 
-[sub_resource type="StyleBoxFlat" id="btn_pressed"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.361, 0.29, 0.18, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.239, 0.192, 0.121, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="SystemFont" id="sys_fallback"]
+font_names = PackedStringArray("PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC")
 
-[sub_resource type="StyleBoxFlat" id="btn_disabled"]
-content_margin_left = 12.0
-content_margin_top = 6.0
-content_margin_right = 12.0
-content_margin_bottom = 6.0
-bg_color = Color(0.35, 0.33, 0.3, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.25, 0.24, 0.22, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+[sub_resource type="FontVariation" id="font_main"]
+base_font = ExtResource("1_zcool")
+fallbacks = Array[Font]([SubResource("sys_fallback")])
 
-[sub_resource type="StyleBoxFlat" id="panel_parchment"]
-content_margin_left = 14.0
+[sub_resource type="StyleBoxEmpty" id="btn_empty"]
+content_margin_left = 24.0
 content_margin_top = 12.0
-content_margin_right = 14.0
+content_margin_right = 24.0
 content_margin_bottom = 12.0
-bg_color = Color(0.176, 0.157, 0.129, 1)
+
+[sub_resource type="StyleBoxEmpty" id="empty"]
+
+[sub_resource type="StyleBoxFlat" id="panel_cream"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.957, 0.925, 0.847, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.42, 0.23, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="graph_panel"]
+bg_color = Color(0.973, 0.949, 0.894, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.42, 0.23, 0.2, 0.55)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="graph_menu"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.957, 0.925, 0.847, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.42, 0.23, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="node_panel"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.98, 0.94, 1)
+border_width_left = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.42, 0.23, 0.2, 1)
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="node_panel_selected"]
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(1, 0.98, 0.94, 1)
+border_width_left = 6
+border_width_right = 6
+border_width_bottom = 6
+border_color = Color(0.788, 0.635, 0.306, 1)
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+
+[sub_resource type="StyleBoxFlat" id="node_titlebar"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.941, 0.894, 0.784, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_color = Color(0.42, 0.23, 0.2, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+
+[sub_resource type="StyleBoxFlat" id="node_titlebar_selected"]
+content_margin_left = 20.0
+content_margin_top = 8.0
+content_margin_right = 20.0
+content_margin_bottom = 8.0
+bg_color = Color(0.941, 0.894, 0.784, 1)
+border_width_left = 6
+border_width_top = 6
+border_width_right = 6
+border_color = Color(0.788, 0.635, 0.306, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+
+[sub_resource type="StyleBoxFlat" id="minimap_panel"]
+bg_color = Color(0.957, 0.925, 0.847, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.23, 0.2, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="minimap_node"]
+bg_color = Color(0.54, 0.35, 0.27, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="minimap_camera"]
+bg_color = Color(0.788, 0.635, 0.306, 0.25)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.549, 0.435, 0.271, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+border_color = Color(0.788, 0.635, 0.306, 1)
+
+[sub_resource type="StyleBoxFlat" id="tooltip_panel"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.957, 0.925, 0.847, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.42, 0.23, 0.2, 1)
 
 [resource]
-Button/styles/disabled = SubResource("btn_disabled")
-Button/styles/hover = SubResource("btn_hover")
-Button/styles/normal = SubResource("btn_normal")
-Button/styles/pressed = SubResource("btn_pressed")
-PanelContainer/styles/panel = SubResource("panel_parchment")
+default_font = SubResource("font_main")
+default_font_size = 48
+Button/colors/font_color = Color(0.29, 0.184, 0.165, 1)
+Button/colors/font_hover_color = Color(0.66, 0.52, 0.48, 1)
+Button/colors/font_hover_pressed_color = Color(0.66, 0.52, 0.48, 1)
+Button/colors/font_pressed_color = Color(0.545, 0.416, 0.376, 1)
+Button/colors/font_focus_color = Color(0.29, 0.184, 0.165, 1)
+Button/colors/font_disabled_color = Color(0.29, 0.184, 0.165, 0.35)
+Button/styles/normal = SubResource("btn_empty")
+Button/styles/hover = SubResource("btn_empty")
+Button/styles/pressed = SubResource("btn_empty")
+Button/styles/disabled = SubResource("btn_empty")
+Button/styles/focus = SubResource("empty")
+DialoguePanel/base_type = &"PanelContainer"
+DialoguePanel/styles/panel = SubResource("empty")
+GraphEdit/colors/connection_rim_color = Color(0.42, 0.23, 0.2, 1)
+GraphEdit/colors/grid_major = Color(0.42, 0.23, 0.2, 0.18)
+GraphEdit/colors/grid_minor = Color(0.42, 0.23, 0.2, 0.08)
+GraphEdit/constants/port_hotzone_inner_extent = 44
+GraphEdit/constants/port_hotzone_outer_extent = 52
+GraphEdit/styles/menu_panel = SubResource("graph_menu")
+GraphEdit/styles/panel = SubResource("graph_panel")
+GraphEditMinimap/styles/camera = SubResource("minimap_camera")
+GraphEditMinimap/styles/node = SubResource("minimap_node")
+GraphEditMinimap/styles/panel = SubResource("minimap_panel")
+GraphNode/styles/panel = SubResource("node_panel")
+GraphNode/styles/panel_selected = SubResource("node_panel_selected")
+GraphNode/styles/titlebar = SubResource("node_titlebar")
+GraphNode/styles/titlebar_selected = SubResource("node_titlebar_selected")
+GraphNodeTitleLabel/colors/font_color = Color(0.29, 0.184, 0.165, 1)
+GraphNodeTitleLabel/font_sizes/font_size = 48
+Label/colors/font_color = Color(0.29, 0.184, 0.165, 1)
+PanelContainer/styles/panel = SubResource("panel_cream")
+PopupPanel/styles/panel = SubResource("panel_cream")
+RichTextLabel/colors/default_color = Color(0.29, 0.184, 0.165, 1)
+TooltipPanel/styles/panel = SubResource("tooltip_panel")
+TooltipLabel/colors/font_color = Color(0.29, 0.184, 0.165, 1)
