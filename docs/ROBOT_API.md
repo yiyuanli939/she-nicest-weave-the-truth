@@ -136,6 +136,10 @@ hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 write-flash 0x0
 
 注意:原生 USB 口走 TinyUSB CDC,**DTR/RTS 拉线不能复位芯片**;卡死时按板上 RST/拔插 USB(2026-08-29 硬复位后僵死过一次,
 flash 脚本与固件崩溃恢复都改成了软复位)。固件现在自愈:OLED/功放 I2C/I2S 出错只降级,崩溃 1.5 s 后软复位,不再落回 REPL。
+**桥接也自愈**(`bridge.js`):板子若仍掉进 REPL(Ctrl-C、mpremote 拷完没复位、旧固件崩溃),我们发的 JSON 会被 REPL 当表达式吃掉并回显
+`>>> {...}`;桥接一看到 `>>>` 就发 Ctrl-B + Ctrl-D 软复位重跑 main.py(广播 `{"evt":"repl_kick"}`),并且板子空闲 5 s 没输出就 ping 一次当看门狗,
+让 REPL 状态一定暴露出来。不插真机也能回归:`bash hardware/bridge/selfheal_test.sh`(pty 模拟停在 REPL 的小机)。
+另:`hardware/.run/bridge.log` 的时间戳是 **UTC**(本地 +8)。
 先停桥接再用 mpremote(串口独占;`flash_robot.sh` 已包含,连手动起的 `npm run bridge` 也会停)。
 `fs mkdir` 目录已存在会报错;语音逐个 `fs cp x.wav :sounds/x.wav`(别 `cp -r` 整个目录,会把 .import 也拷上去)。
 
