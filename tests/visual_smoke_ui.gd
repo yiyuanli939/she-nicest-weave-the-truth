@@ -522,7 +522,7 @@ func _run() -> void:
 	robot.set_turn_dir("right")
 	robot.sent_log.clear()
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
-	await _wait(1.4)
+	await _wait_until(func() -> bool: return g1.session.is_solved())
 	_check(g1.session.is_solved() and game.save.is_solved(&"l01"), "说「请指导我」→ 小机代解通关并记档")
 	_check(robot.sent("gimbal", "", 175), "代解前底部云台回头到右极限(175)")
 	_check(not robot.sent("say", "win") and not robot.sent("anim", "celebrate") and not robot.sent("say", "encourage"), "代解不庆祝不鼓励")
@@ -543,7 +543,7 @@ func _run() -> void:
 	_check(bgm.slot == &"level_1", "同章 l02 BGM 槽位不变")
 	robot.sent_log.clear()
 	robot._on_event({"evt": "speech", "text": "请 帮帮 我"})
-	await _wait(1.4)
+	await _wait_until(func() -> bool: return g2.session.is_solved())
 	_check(g2.session.is_solved() and robot.sent("gimbal", "", 5) and not robot.sent("gimbal", "", 175), "「请帮帮我」+ 方向设左 → 回头到左极限(5)后代解")
 	robot.set_turn_dir("right")
 	# 3-1(l10):小机还没坏 —— 进关不故障、提示照显、说「请指导我」仍回头代解;通关瞬间坏掉(panic 演出)
@@ -562,7 +562,7 @@ func _run() -> void:
 	robot.sent_log.clear()
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
-	await _wait(1.4)
+	await _wait_until(func() -> bool: return g3.session.is_solved())
 	_check(g3.session.is_solved() and robot.sent("gimbal", "", 175), "3-1 说「请指导我」仍回头代解")
 	_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic")
 			and (robot.sent("say", "glitch1") or robot.sent("say", "glitch2") or robot.sent("say", "glitch3")),
@@ -611,7 +611,7 @@ func _run() -> void:
 	robot.sent_log.clear()
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
-	await _wait(1.4)
+	await _wait_until(func() -> bool: return g5.session.is_solved())
 	_check(g5.session.is_solved() and robot.sent("emote", "think") and not robot.sent("gimbal") and not robot.sent("anim"),
 			"不动模式:代解与表情照常,云台/动画一条不发")
 	robot.set_stationary(false)
@@ -629,3 +629,12 @@ func _run() -> void:
 func _finish() -> void:
 	print("UI_SMOKE_FAILS=", _fails)
 	quit(_fails)
+
+
+## 轮询等待条件成立(带超时):代解等流程走定时器,冷启动首个窗口运行会有导入/着色器卡顿,
+## 固定秒数等待会在慢机器上偶发竞态 —— 一律等到条件真了再断言。
+func _wait_until(pred: Callable, timeout := 6.0) -> void:
+	var t := 0.0
+	while t < timeout and not pred.call():
+		await _wait(0.1)
+		t += 0.1
