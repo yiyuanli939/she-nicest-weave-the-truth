@@ -83,7 +83,7 @@ class Servo:
 
 i2c = SoftI2C(sda=Pin(41), scl=Pin(42), freq=400000)
 oled = SSD1306(i2c)
-pan = Servo(11, 5, 175, 90, 100, 2900)   # 水平:左右各到头(实测 ±90°,壳/线都不卡),留 5° 余量
+pan = Servo(11, 5, 175, 90)              # 水平:标准 SG90/MG90S(500–2500 µs ↔ 180°),两端留 5° 余量;换 270° 舵机时改此行
 tilt = Servo(12, 70, 110, 90)             # 垂直:中心±20
 boot_btn = Pin(0, Pin.IN, Pin.PULL_UP)
 # I2S 初始化容错:软复位后外设可能未释放,失败则静音运行(表情/云台不受影响)
@@ -366,7 +366,7 @@ def main():
     buf = ""
     last_face = None
     btn_was = 1
-    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.3",
+    send({"evt": "ready", "board": "esp32-s3n16r8-emoji", "fw": "she-nicest-bot 1.4",
           "oled": oled.ok, "audio": audio is not None})
     while True:
         while poller.poll(0):

@@ -98,7 +98,7 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 | `{"cmd":"emote","name":N}` | 表情:`happy sad confused think glitch sleep idle` |
 | `{"cmd":"anim","name":N}` | 云台动画:`celebrate`(欢呼摇摆) `panic`(乱动+故障脸) `nod`(点头) `shake`(摇头) `look_pc`(扭头看电脑→轻点头→转回);动画结束会回到开始时的角度 |
 | `{"cmd":"say","name":N}` | 语音:播 `/sounds/N.wav`,播放中屏幕自动做**说话口型**。现有:`greet win encourage hint calm`(台词)+ `glitch1 glitch2 glitch3`(坏掉音效) |
-| `{"cmd":"gimbal","pan":P,"tilt":T}` | 云台直控(瞬时到位,无速度参数;省略的轴保持不动)。pan **5(左)~175(右)**(固件 1.2 实测:这只舵机 100–2900 µs 才是 180°,左右各 90° 壳/线都不卡,留 5° 余量),tilt 70(抬头)~110(低头),中心 90/90。空闲时固件不会自己回正 |
+| `{"cmd":"gimbal","pan":P,"tilt":T}` | 云台直控(瞬时到位,无速度参数;省略的轴保持不动)。pan **5(左)~175(右)**(2026-08-30 起换标准 SG90:500–2500 µs ↔ 180°,两端留 5° 余量;原装那只怪舵机是 100–2900 µs,已烧报废),tilt 70(抬头)~110(低头),中心 90/90。空闲时固件不会自己回正 |
 | `{"cmd":"text","s":"..."}` | OLED 显示 ASCII 文本 3 秒(点阵字体不支持中文) |
 | `{"cmd":"cal_look"}` | **屏幕方向校准(自动)**:云台扫描,正对屏幕时朝它挥手(PAJ7620)或按 BOOT 锁定;30s 超时 |
 | `{"cmd":"cal_set"}` | 以当前云台角保存为"屏幕方向" |
