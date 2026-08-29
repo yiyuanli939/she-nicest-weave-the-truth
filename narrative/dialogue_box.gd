@@ -89,6 +89,11 @@ func _input(event: InputEvent) -> void:
 		return
 	var key := event as InputEventKey
 	if key != null and key.pressed and not key.echo:
+		# 纯修饰键(切输入法/截屏/Cmd+Tab 都会先按下修饰键)不算"任意键";
+		# Esc 留给将来的退出/暂停(否则想退出的玩家反而被推进关),功能键留给调试(F9)。
+		if key.keycode in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK, KEY_ESCAPE] \
+				or (key.keycode >= KEY_F1 and key.keycode <= KEY_F12):
+			return
 		get_viewport().set_input_as_handled()
 		_step()
 

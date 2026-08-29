@@ -22,9 +22,13 @@ func _init() -> void:
 
 func _ready() -> void:
 	right_disconnects = true
-	minimap_enabled = true
-	minimap_size = Vector2(480, 320)
+	# 引擎默认工具条控件与美术风格冲突(灰 SpinBox/淡图标):只留缩放按钮;
+	# minimap 被撑画布的角标稀释得没有信息量,关掉(画布固定大小 + 中键平移,不迷路)
+	minimap_enabled = false
 	show_arrange_button = false
+	show_grid_buttons = false
+	show_zoom_label = false
+	show_minimap_button = false
 	connection_lines_thickness = 8.0
 	connection_request.connect(_on_connection_request)
 	disconnection_request.connect(_on_disconnection_request)

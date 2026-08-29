@@ -94,14 +94,16 @@ func _build_ui() -> void:
 func _on_line_shown(line: DialogueLine) -> void:
 	if line.scene != "":
 		var tex := StoryArt.scene(line.scene)
-		_scene_pic.texture = tex
-		_scene_pic.visible = tex != null
+		if tex != null:   # 无效场景名/缺图:保持上一张,别把插图弄消失
+			_scene_pic.texture = tex
+			_scene_pic.visible = true
 	_set_portrait(1, StoryArt.NORA, line.nora_expr)
 	_set_portrait(0, line.left_char, line.left_expr)
+	# 遮罩规则:发言人不是这幅立绘的人 → 压暗。第三方(画外音,如占位的阿梭/档案员)说话时两侧都压。
 	var both := _slots[0].visible and _slots[1].visible
-	var nora_speaking := StoryArt.is_nora(line.speaker)
-	_masks[0].visible = both and nora_speaking
-	_masks[1].visible = both and not nora_speaking
+	var speaking := StoryArt.character_of(line.speaker)
+	_masks[0].visible = both and speaking != line.left_char
+	_masks[1].visible = both and not StoryArt.is_nora(line.speaker)
 
 
 ## 立绘原尺寸,框内水平居中、底边对齐框底,再加逐角色微调;遮罩与立绘同位同尺寸

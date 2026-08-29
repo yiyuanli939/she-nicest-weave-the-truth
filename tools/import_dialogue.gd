@@ -6,6 +6,7 @@ extends SceneTree
 ## 关卡id = l01…l15;场景/人物/表情写中文名(合法值见 narrative/story_art.gd);
 ## 左侧人物可空;左侧表情/诺拉表情空 = 默认;小机动作可空。台词里可含逗号、换行(用引号包住,Excel 另存 CSV 会自动做)。
 ## 同一关的行按出现顺序成为该关对话;表里没出现的关卡不动。
+## 导入是原子的:只要有任何错误(坏行/找不到关卡/某关首句没场景),一关都不写,改完重跑。
 ## parse_csv() 是纯函数(不碰文件),tests/test_dialogue_import.gd 直接测它。
 
 const DEFAULT_PATH := "res://information/dialogue.csv"
@@ -20,21 +21,25 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var result := parse_csv(FileAccess.get_file_as_string(path))
-	for e: String in result.errors:
-		push_error(e)
+	for level_id: String in result.levels:
+		if _level_path(level_id) == "":
+			result.errors.append("找不到关卡 %s 的 .tres" % level_id)
+	if not result.errors.is_empty():
+		for e: String in result.errors:
+			push_error(e)
+		print("导入中止:%d 条错误,一关都没写(改完 CSV 重跑即可)" % result.errors.size())
+		quit(1)
+		return
 	var n := 0
 	for level_id: String in result.levels:
 		var lv_path := _level_path(level_id)
-		if lv_path == "":
-			push_error("找不到关卡 %s 的 .tres" % level_id)
-			continue
 		var lv: LevelDef = load(lv_path)
 		lv.intro_dialogue = result.levels[level_id]
 		var err := ResourceSaver.save(lv, lv_path)
 		assert(err == OK, "保存失败 %s: %d" % [lv_path, err])
 		n += 1
-	print("导入完毕:%d 关的对话已更新,%d 条错误" % [n, result.errors.size()])
-	quit(0 if result.errors.is_empty() else 1)
+	print("导入完毕:%d 关的对话已更新,0 条错误" % n)
+	quit(0)
 
 
 static func _level_path(level_id: String) -> String:
@@ -86,6 +91,12 @@ static func parse_csv(text: String) -> Dictionary:
 		if not out.levels.has(level_id):
 			out.levels[level_id] = DialogueRes.new()
 		(out.levels[level_id] as DialogueRes).lines.append(line)
+	# 「场景空 = 沿用上一句」只在一关之内成立(每关独立 DialogueRes):首句必须给场景,
+	# 否则该关插图整段空白;策划在 Excel 里只写全表第一行场景是常见笔误,这里直接报错。
+	for level_id: String in out.levels:
+		var lines := (out.levels[level_id] as DialogueRes).lines
+		if not lines.is_empty() and lines[0].scene == "":
+			out.errors.append("关卡 %s 的第一句没有场景(「空=沿用上一句」不跨关)" % level_id)
 	return out
 
 

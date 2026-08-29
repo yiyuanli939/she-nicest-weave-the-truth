@@ -143,6 +143,10 @@ func _run() -> void:
 			["场景插图", _center(story._scene_pic)],
 			["右侧立绘", _center(story._slots[1])],
 		]
+		# Esc 不当推进键(留给将来的退出/暂停;修饰键/功能键同理)
+		_key(KEY_ESCAPE)
+		_check(box._idx == 0 and box._text.visible_characters < box._text.get_total_character_count(),
+				"Esc 不推进也不全显(想退出的玩家不该被推进关)")
 		var expected_idx := 0
 		for n in 3:
 			_check(box._idx == expected_idx, "第 %d 句正在显示(idx=%d)" % [n, box._idx])
@@ -184,6 +188,14 @@ func _run() -> void:
 	_check(_button_named(scene, "重置") != null, "有重置按钮")
 	_check(_button_named(scene, "示答") == null, "没有脚本化解法的关不显示示答按钮")
 	_check(_labels_with(scene, "第九纹") == 0 and _labels_with(scene, "目标纹样") == 0, "关内不显示当前关名/目标文字")
+	# 状态文字在按钮之后:文字变长不再把按钮推着跑(通关瞬间「下一关」曾从鼠标下溜走)
+	var back_tool := _button_named(scene, "选关")
+	var back_x0: float = back_tool.get_global_rect().position.x
+	scene._status.text = "一段相当长的状态文字用来验证工具条按钮不再被文字推着跑一二三四五六七八"
+	await _settle()
+	_check(back_tool.get_global_rect().position.x == back_x0, "状态文字变化不推挤工具条按钮")
+	scene._status.text = ""
+	await _settle()
 
 	# ---- D. 仪器架:只显示本关上架的仪器,按图顺序紧凑排列;未上架的不显示 ----
 	var board: ProofBoard = scene._board
@@ -409,7 +421,7 @@ func _run() -> void:
 		await _settle()
 		var maint: RobotMaintUI = (current_scene as CreditsScene)._maint
 		_check(current_scene is CreditsScene and maint.visible, "点「小机维护」打开面板(不退回标题)")
-		_check(maint._line_edits.size() == 6 and (maint._line_edits["greet"] as LineEdit).text.contains("诺拉"), "面板读到六句台词(greet 称呼诺拉)")
+		_check(maint._line_edits.size() == 5 and (maint._line_edits["greet"] as LineEdit).text.contains("诺拉"), "面板读到五句台词(greet 称呼诺拉;故障没有台词)")
 		_check(_button_named(maint, "保存并生成语音") != null and _button_named(maint, "刷入固件与语音") != null
 				and _button_named(maint, "接入小机(拉起桥接与语音助手)") != null, "面板有 接入 / 刷入 / 生成语音 按钮")
 		_check(maint._dir_btn.text.contains("右") and maint._voice_opt.item_count == RobotMaintUI.VOICES.size(), "回头方向与音色控件就绪")
@@ -538,8 +550,12 @@ func _run() -> void:
 		await _settle()
 	_check(bgm.slot == &"level_3", "进第三章 BGM 槽位 = level_3")
 	var g3 := current_scene as LevelScene
-	_check(robot.broken and robot.sent("say", "panic"), "进第三章小机故障(panic)")
+	_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic")
+			and (robot.sent("say", "glitch1") or robot.sent("say", "glitch2") or robot.sent("say", "glitch3")), "进第三章小机故障:乱动 + 坏掉音效,没有台词")
 	_check(not g3._guide_hint.visible, "第三章不显示求助提示")
+	# 离开 l02 时演出还在 hold,LevelScene._exit_tree 兜底启动了缓步回正(gimbal 逐帧回 90,
+	# 由 Robot autoload 跨场景继续走)——等它走完再清日志,别污染下面"不回头"的断言
+	await _wait(1.6)
 	robot.sent_log.clear()
 	robot._last_at.clear()          # 模拟故障演出 6 s 节流已过
 	robot._last_guide_ms = -100000

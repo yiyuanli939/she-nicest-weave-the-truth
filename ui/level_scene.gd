@@ -108,9 +108,6 @@ func _build_ui() -> void:
 	_palette.machine_requested.connect(_board.place_machine_at_center)
 
 	# 必需按钮挂在棋盘工具条上(纯文字,悬停变浅走 theme)
-	_status = Label.new()
-	_status.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
-	_board.add_toolbar_item(_status)
 	_board.add_toolbar_item(_make_tool_button("重置", _on_reset))
 	if _game != null:
 		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
@@ -123,6 +120,10 @@ func _build_ui() -> void:
 		_next_btn.visible = false
 		_board.add_toolbar_item(_next_btn)
 		_board.add_toolbar_item(_make_tool_button("选关", _on_back))
+	# 状态文字放在按钮之后:文字长短变化不会把按钮推来推去(通关瞬间按钮从鼠标下溜走)
+	_status = Label.new()
+	_status.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
+	_board.add_toolbar_item(_status)
 
 	_win_flash = ColorRect.new()
 	_win_flash.color = Color(0.2, 0.85, 0.35, 0.0)
@@ -270,11 +271,14 @@ func _run_guide(robot: Node) -> void:
 	if not is_inside_tree():
 		return
 	_idle_sec = 0.0
-	_suppress_win_cue = true
-	_on_reset()
-	LevelSolutions.apply(self, _board, _game.current.id)
-	_suppress_win_cue = false
+	if not session.is_solved():   # 等待窗口里玩家自己解出来了:不重摆、不覆盖玩家的解,只完成回头演出
+		_suppress_win_cue = true
+		_reset_board()
+		LevelSolutions.apply(self, _board, _game.current.id)
+		_suppress_win_cue = false
 	await get_tree().create_timer(GUIDE_HOLD_SEC).timeout
+	if not is_inside_tree():
+		return   # 场景已销毁:回正由 _exit_tree 兜底
 	robot.return_center()
 	robot.cue("idle")
 	_guiding = false
@@ -286,9 +290,23 @@ func _run_look(robot: Node) -> void:
 	robot.cue("think")
 	robot.turn_to_limit()
 	await get_tree().create_timer(LOOK_HOLD_SEC).timeout
+	if not is_inside_tree():
+		return   # 场景已销毁:回正由 _exit_tree 兜底
 	robot.return_center()
 	robot.cue("idle")
 	_guiding = false
+
+
+## 演出/代解期间点「下一关/选关」离开:协程随场景销毁,await 之后的回正永不执行 ——
+## 否则实体小机会永远停在极限角 + think 脸。这里兜底转回正面。
+func _exit_tree() -> void:
+	if not _guiding:
+		return
+	_guiding = false
+	var robot := get_node_or_null("/root/Robot")
+	if robot != null:
+		robot.return_center()
+		robot.cue("idle")
 
 
 func _on_next() -> void:
@@ -302,6 +320,12 @@ func _on_back() -> void:
 
 
 func _on_reset() -> void:
+	if _guiding:
+		return   # 小机代解/回头演出中,别和它抢棋盘
+	_reset_board()
+
+
+func _reset_board() -> void:
 	session.load_state(_fresh_state)
 	_layout_endpoints()
 	_status.text = ""
@@ -309,5 +333,7 @@ func _on_reset() -> void:
 
 ## 测试用:重置后按 levels/level_solutions.gd 的脚本化解法自动通关(仅调试版有入口)
 func _on_show_answer() -> void:
-	_on_reset()
+	if _guiding:
+		return   # 代解 0.8s 窗口内点示答会双重摆盘、庆祝 cue 和演出打架
+	_reset_board()
 	LevelSolutions.apply(self, _board, _game.current.id)

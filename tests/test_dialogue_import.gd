@@ -44,3 +44,17 @@ func test_invalid_rows_are_reported_and_skipped() -> bool:
 func test_missing_required_header() -> bool:
 	var r: Dictionary = _importer().parse_csv("关卡id,发言人\nl01,莉娅\n")
 	return check(not r.errors.is_empty() and r.levels.is_empty(), "缺台词列应报错且不导入")
+
+
+func test_first_line_of_each_level_needs_scene() -> bool:
+	# 「场景空=沿用上一句」不跨关:某关首句没场景必须报错(策划只在全表第一行写场景是常见笔误)
+	var csv := "关卡id,发言人,场景,台词\n" \
+			+ "l01,莉娅,街景,首句有场景\n" \
+			+ "l01,莉娅,,第二句沿用\n" \
+			+ "l02,莉娅,,首句没场景\n" \
+			+ "l02,莉娅,工坊,第二句才给\n"
+	var r: Dictionary = _importer().parse_csv(csv)
+	var ok := check(r.errors.size() == 1 and (r.errors[0] as String).contains("l02"),
+			"只有 l02 报「首句没有场景」(得 %s)" % str(r.errors))
+	ok = check((r.levels["l01"] as DialogueRes).lines.size() == 2, "l01 两句都解析成功") and ok
+	return ok

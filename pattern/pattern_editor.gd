@@ -76,6 +76,7 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 	_preview.atom_colors = atom_colors
 	_clear_btn.visible = can_clear
 	for c in _brush_row.get_children():
+		_brush_row.remove_child(c)   # 先摘下来:queue_free 帧末才生效,旧笔刷会把窗口最小尺寸撑大
 		c.queue_free()
 	for a in atoms:
 		_brush_row.add_child(_make_swatch(a))
@@ -85,7 +86,11 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 		_brush_row.add_child(_make_brush_button("焦纹", "bot"))
 	brush = ""
 	_sync()
+	# 旧笔刷已 remove_child,最小尺寸立即正确;reset_size 让 Window 收缩(它只涨不缩),
+	# 随后同步居中。不能 call_deferred:提交流程"打开→钉住→hide"会被迟到的弹出又顶开。
+	reset_size()
 	popup_centered()
+
 
 
 ## 原子笔刷 = 该原子颜色的色块(不写字母);选中态描深边
