@@ -29,16 +29,20 @@
 
 - 关卡字段见 `levels/level_def.gd` 注释。公式格式:`&`=∧ `|`=∨ `>`=→(右结合) `false`=⊥,如 `"A & B > C"`。
 - **关名不要自己取**:美术规定按章内序号叫「第一纹」「第二纹」…;章名 `第一章 并纹 / 第二章 叠层纹 / 第三章 岔纹 / 第四章 焦纹`。
-- `robot_cue_on_enter` / `robot_cue_on_win`:进关/通关的小机演出。`allow_bot`:纹样编辑器是否解锁焦纹笔刷(第四章起 on)。
+- `robot_cue_on_enter` / `robot_cue_on_win`:进关/通关的小机演出。现在 l10 进关 `panic`(第三章开头小机当场坏掉)、l13 进关 `calm`(第四章开头修好),
+  其余进关为空、通关一律 `celebrate`。**第三章整章是故障态**:这三关里策划挂的任何 cue(含对话行 robot_cue、通关 celebrate)都会变成故障演出(故障脸 + 乱动 + 故障声)。
+  `allow_bot`:纹样编辑器是否解锁焦纹笔刷(第四章起 on)。
+- 小机「请指导我 / 请帮帮我」(玩家对麦克风说):第一二章小机回头到极限后**直接代解本关**(不庆祝不鼓励),第三章只故障,第四章只回头看你。
+  关内提示文案在 `ui/level_scene.gd` `GUIDE_HINT`(只在一二章显示);语音识别与小机维护见 docs/ROBOT_API.md。
 - **设计关卡时注意求解是严格正向的**:仪器输出只由输入 + 玩家钉的纹样决定,不会从目标反推。
   用到封程机(假设 P)、岔纹机(另一支)、溃散机(织出什么)的关,玩家必须点标题栏"钉纹样/钉上口/钉下口"
-  给自由纹样赋值;关卡 `atoms` 要包含玩家需要钉的原子。脚本化解法在 `tests/level_solutions.gd` 的 `p` 数组。
+  给自由纹样赋值;关卡 `atoms` 要包含玩家需要钉的原子。脚本化解法在 `levels/level_solutions.gd` 的 `p` 数组。
 - 新增关卡:复制一个 .tres 改字段 → 在 `levels/data/catalog.tres` 对应章节的 `levels` 数组里加进去。顺序即解锁顺序(全线性)。
 - 批量重生成(会覆盖!):改 `tools/gen_levels.gd` 的表后跑
   `godot --headless --path . --script res://tools/gen_levels.gd`
 - 仪器架固定显示 7 台(顺序按美术图),本关 `allowed_rules` 之外的置灰。
 
-## 织者笔记(= 七台仪器的说明)
+## 诺拉的笔记(= 七台仪器的说明)
 
 `narrative/data/notebook.tres`:每台仪器一条(id = 仪器 rule_id,顺序同仪器架),标题 + 正文(BBCode),先仅文字。
 全量常驻、不解锁;关内点右缘「笔记」划出,「翻页」循环。

@@ -1,6 +1,6 @@
 class_name NotebookUI
 extends CanvasLayer
-## 织者笔记抽屉(美术参考图 information/art_spec_20260829/image 4.png 右缘、image 5.png 全页;
+## 诺拉的笔记抽屉(美术参考图 information/art_spec_20260829/image 4.png 右缘、image 5.png 全页;
 ## 底图 assets/art/level/notebook_bg.png 原尺寸 3798×2065)。
 ## 平时收在屏幕右缘只露出黄铜夹子(「笔记」);点击向左划出(缓动),夹子文字变「继续工作」;再点向右收回。
 ## 「翻页」循环切换条目(七台仪器说明,先仅文字,全量常驻)。

@@ -3,7 +3,7 @@
 > 2026-08-29:按美术要求关名已统一为章内序号「第N纹」(l01–l04 = 第一章 第一至四纹,以此类推),章名为 并纹/叠层纹/岔纹/焦纹;下文的旧关名(第一缕丝、自证…)仅作设计讨论用的别名。
 
 > 对象:`levels/data/l01–l15`(由 `tools/gen_levels.gd` 的 `LEVELS` 表生成)。
-> 数据来源:每关"最短解"取 `tests/level_solutions.gd`;提案关卡全部用纯 `ProofSession` API
+> 数据来源:每关"最短解"取 `levels/level_solutions.gd`;提案关卡全部用纯 `ProofSession` API
 > 在当前引擎(严格正向求解)上跑通,解法见附录 A。
 > 原版对照:incredible.pm `sessions.yaml`(Session 1–4,本作无 TND)。
 
@@ -323,7 +323,7 @@ l15 █████████         9   ← 终章反而回落
 
 1. `tools/gen_levels.gd`:`LEVELS` 表 25 行、`CH_OF_LEVEL`、`CH_RULES` 改按关上架(§4.3)、`NOTEBOOK` 加汇路机教学页(可选)。
    新增 10 关的占位台词方向见 §4 表"备注"列。重跑生成器后删孤儿 .tres。
-2. `tests/level_solutions.gd`:`DATA` 25 条——现有 15 条按"原"列改 id,新 10 条抄附录 A。
+2. `levels/level_solutions.gd`:`DATA` 25 条——现有 15 条按"原"列改 id,新 10 条抄附录 A。
 3. `tests/test_levels.gd`:15 → 25;笔记本 5 → 6(若加汇路教学页)。
 4. `tests/visual_smoke_m3.gd`:`for i in 15`、`solved.size() == 15`、`notebook.size() == 5`、`all_levels()[14]`(glitch 台词关)、`all_levels()[2]`(棋盘恢复关,l03 → 新 04)。
 5. `tests/visual_smoke_ui.gd`:grep 具体关卡 id(l07 钉按钮等)对应改。
@@ -334,7 +334,7 @@ l15 █████████         9   ← 终章反而回落
 
 ## 附录 A · 新增关卡与备选题的脚本化解法
 
-格式同 `tests/level_solutions.gd`:`m` 机器表、`w` 连线 `[from, port, to, port]`、`p` 钉 `[机器, 输出口, 公式]`;
+格式同 `levels/level_solutions.gd`:`m` 机器表、`w` 连线 `[from, port, to, port]`、`p` 钉 `[机器, 输出口, 公式]`;
 `s0..sN` 第 N 条线轴、`g` 目标、`mN` 第 N 台机器。端口约定:并织 in(P,Q)/out(P&Q);拆股 in(P&Q)/out(P,Q);
 岔纹 in(P)/out0 `P|Q`(钉 Q)/out1 `R|P`(钉 R);汇路 in0 `P|Q`、in1 R、in2 R / out0 R、out1 假设 P、out2 假设 Q;
 封程 in0 Q / out0 `P>Q`、out1 假设 P(钉);引渡 in0 `P>Q`、in1 P / out0 Q;溃散 in ⊥ / out0 P(钉)。

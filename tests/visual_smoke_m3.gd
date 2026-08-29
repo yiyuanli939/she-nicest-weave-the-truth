@@ -75,6 +75,11 @@ func _run() -> void:
 			_check(false, "第 %d 关场景未加载" % (i + 1))
 			break
 		var lv: LevelDef = game.current
+		var robot := root.get_node("/root/Robot")
+		if lv.id == &"l10":
+			_check(robot.broken and robot.sent("say", "panic"), "进 l10 小机故障(panic),第三章 broken")
+		elif lv.id == &"l13":
+			_check(not robot.broken and robot.sent("say", "calm"), "进 l13 小机修好(calm)")
 		var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 		LevelSolutions.apply(scene, board, lv.id)
 		await _settle()
@@ -139,7 +144,7 @@ func _run() -> void:
 	await _settle()
 	_check(l03.session.get_node_ids().size() == 4 and l03.session.is_solved(), "撤销后节点与通关态恢复")
 
-	# 关内织者笔记抽屉:七台仪器说明,划出后截图
+	# 关内诺拉的笔记抽屉:七台仪器说明,划出后截图
 	l03._notebook_ui.open(game.notebook, [])
 	await l03._notebook_ui.slide_finished
 	await _settle()

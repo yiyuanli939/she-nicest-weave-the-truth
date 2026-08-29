@@ -91,8 +91,12 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   每行 `robot_cue` 转发给 `Game.robot_cue` → `RobotLink`(有实机才发)。
 - 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
   主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从 CSV 灌(`tools/import_dialogue.gd`)。
-- 织者笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),全量常驻不解锁;
+- 诺拉的笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),全量常驻不解锁;
   关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
+- 小机剧情弧(`Game.robot_mode()` 按章节):第一二章 `guide` —— 玩家对麦克风说「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 →
+  `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限(`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后
+  `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;第三章 `broken` —— `Robot.broken = true`,任何 cue 都映射成故障三连(`RobotLink.commands_for`);
+  第四章 `look` —— 只回头看你。l10/l13 的 `robot_cue_on_enter` = panic/calm 是坏掉/修好那一刻。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖。
 
 ## 3. 最近两轮改了什么(以及为什么)
@@ -160,7 +164,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 |---|---|
 | 改台词/场景/立绘/表情 | Excel 另存 CSV → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue`(Inspector);占位批量改走 `tools/gen_levels.gd` 的 `LEVELS` 表 |
 | 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
-| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*` 表;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `tests/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
+| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*` 表;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
 | 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
 | 加一台仪器 | `logic/rules.gd` 一行链式定义(自由变量所在口标 `pinnable`)→ `CH_RULES` 放进某章 → 测试 `test_describe_rule_metadata` 的台数 → 解法 |
 | 改"钉"的规则(哪些口可钉) | 只改 `rules.gd` 的 `pinnable` 标记;`_port_free_meta` 要求可钉口恰有一个自由变量 |
@@ -168,16 +172,19 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
 | 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
-| 织者笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 签名保留(`unlocked` 忽略,全量常驻);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
+| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 签名保留(`unlocked` 忽略,全量常驻);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
 | 笔记条目(= 仪器说明) | `tools/gen_levels.gd` `RULE_GUIDE` 表(顺序同仪器架)→ 重跑生成器 → `narrative/data/notebook.tres` |
 | 仪器架按钮/顺序/置灰 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外置灰 |
 | 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR`(纯文字,不用符号) |
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
-| 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `tests/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
+| 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现;tests/ 走动态 load,导出裁掉也不炸 |
 | 改进关流程 | `game/game.gd start_level/enter_board` |
-| 机器人动作/语音 | `game/robot_link.gd` + `docs/ROBOT_API.md` |
+| 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
+| 「请指导我」代解 / 第三章故障 / 第四章回头 | `ui/level_scene.gd` `_on_guide_requested/_run_guide/_run_look`、`game/game.gd robot_mode_for_chapter`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
+| 小机维护面板(接入 / 刷固件 / 校准 / 回头方向) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮、标题页 F9);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
+| 语音识别 | `hardware/speech/listen.py`(Vosk 离线,语法只认两句;`get_model.sh` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
 
 ## 5. 改完怎么验证
 
@@ -206,4 +213,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   幽灵态切换;欠定/冲突纯文字徽章与断线;重置;笔记抽屉划出/变「继续工作」/翻页循环/收回;
   标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
+- `tests/test_robot_logic.gd` — 语音命中、章节→模式、故障态 cue 映射、回头目标角、settings 过 wipe;
+  `visual_smoke_ui.gd` R 段直接注入 `{"evt":"speech"}`:一二章代解且不庆祝、方向左右、第三章故障不代解、第四章只回头(无真机也跑)。
+  真机:`bash hardware/run_robot.sh` 后 `tests/robot_smoke.gd`;语音自测看 `hardware/.run/speech.log` 的「命中」行。
 - `tests/visual_smoke_m3.gd` / `m2.gd` — 端到端流程与三个代表性证明。

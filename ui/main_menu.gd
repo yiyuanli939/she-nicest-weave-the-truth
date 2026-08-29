@@ -3,7 +3,7 @@ extends Control
 ## 标题页(美术参考图 information/art_spec_20260829/image.png):
 ## 整张背景图 + 标题图(表面流光 shader)+ 右侧四个纯文字选项(悬停变浅走 theme)。
 ## 「开始游戏 / 继续游戏」都进选关页,不直接进关;「重置进度」点击即清档。
-## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。小机校准不占界面:调试版按 F9。
+## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。小机维护不占界面:调试版按 F9(开发者信息页也有入口)。
 
 const BG_PATH := "res://assets/art/title/bg.png"
 const TITLE_PATH := "res://assets/art/title/title.png"
@@ -15,7 +15,7 @@ const MENU_PITCH := 194.0                 # 选项间距
 const MENU_FONT_SIZE := 64
 const MENU_GLYPH_SPACING := 12            # 参考图的选项文字是疏排的
 
-var _cal_ui: RobotCalUI
+var _cal_ui: RobotMaintUI
 var _start_btn: Button
 var _game: Node
 
@@ -47,7 +47,7 @@ func _ready() -> void:
 		await get_tree().create_timer(0.2).timeout
 		get_tree().quit())
 
-	_cal_ui = RobotCalUI.new()
+	_cal_ui = RobotMaintUI.new()
 	add_child(_cal_ui)
 
 	if not _game.menu_greeted:

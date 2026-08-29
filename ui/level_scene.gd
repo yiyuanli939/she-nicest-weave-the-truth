@@ -1,8 +1,10 @@
 class_name LevelScene
 extends Control
 ## 关卡场景(美术参考图 information/art_spec_20260829/image 4.png):
-## 乳黄底 + 左侧仪器架(图)+ 中间棋盘(GraphEdit,自带工具条挂必需按钮)+ 右缘织者笔记抽屉(图)。
+## 乳黄底 + 左侧仪器架(图)+ 中间棋盘(GraphEdit,自带工具条挂必需按钮)+ 右缘诺拉的笔记抽屉(图)。
 ## 不显示当前关名/目标文字(美术要求);目标纹样只在棋盘的目标织机节点上看。
+## 小机「请指导我」(Robot.guide_requested):第一二章 小机回头到极限后直接代解(无鼓励无庆祝),
+## 第三章 小机故障只会乱动,第四章 小机只回头看你不代解(章节判定在 Game.robot_mode)。
 ## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
 ## 否则用下面的默认字段(冒烟测试直接注入)。
 ## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。
@@ -13,9 +15,13 @@ const BG_COLOR := Color(0.957, 0.925, 0.847)           # 乳黄
 const PALETTE_POS := Vector2(50, 22)                    # 仪器架左上角(图 687×2117)
 const BOARD_RECT := Rect2(884, 22, 2436, 2116)          # 棋盘区(右侧留出笔记夹子 NotebookUI.CLOSED_PEEK)
 const TOOLBAR_FONT_SIZE := 44
-# 测试用示答:动态加载而非 class_name 引用,导出正式版即使裁掉 tests/ 也不影响本脚本
-const SOLUTIONS_PATH := "res://tests/level_solutions.gd"
 const IDLE_HINT_SEC := 45.0
+const GUIDE_TURN_SEC := 0.8    # 小机回头到位后再代解
+const GUIDE_HOLD_SEC := 2.5    # 代解后小机保持回头的时间,再转回来
+const LOOK_HOLD_SEC := 1.5     # 第四章:只回头看你
+const GUIDE_HINT := "有困难可以对小机说:「请指导我」或「请帮帮我」"   # 只在小机会代解的章节(一二章)显示
+const GUIDE_HINT_FONT_SIZE := 40
+const GUIDE_HINT_POS := Vector2(920, 2090)   # 棋盘左下角外侧
 
 var _game: Node = null
 var _board: ProofBoard
@@ -25,10 +31,13 @@ var _win_flash: ColorRect
 var _editor: PatternEditor
 var _notebook_ui: NotebookUI
 var _next_btn: Button
+var _guide_hint: Label
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
 var _restoring := false               # 载入旧棋盘触发的 proof_completed 不算新胜利
+var _guiding := false                 # 小机代解/回头演出进行中(防重入、免鼓励)
+var _suppress_win_cue := false        # 代解通关不庆祝
 
 # 默认配置(无 Game 时生效;冒烟测试注入)
 var assumptions: Array[String] = ["A & B"]
@@ -54,6 +63,9 @@ func _ready() -> void:
 	session.proof_completed.connect(_on_win)
 	session.board_updated.connect(_on_conflict_check)
 	session.board_updated.connect(func() -> void: _idle_sec = 0.0)
+	var robot := get_node_or_null("/root/Robot")
+	if robot != null:
+		robot.guide_requested.connect(_on_guide_requested)
 	var err := session.setup(assumptions, goal_text)
 	assert(err == "", err)
 	_layout_endpoints()
@@ -99,13 +111,11 @@ func _build_ui() -> void:
 	_board.add_toolbar_item(_make_tool_button("重置", _on_reset))
 	if _game != null:
 		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
-		if OS.is_debug_build() and _game.current != null and ResourceLoader.exists(SOLUTIONS_PATH):
-			var sols := load(SOLUTIONS_PATH)
-			if sols.DATA.has(_game.current.id):
-				var answer_btn := _make_tool_button("示答", _on_show_answer)
-				answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
-				answer_btn.modulate.a = 0.7
-				_board.add_toolbar_item(answer_btn)
+		if OS.is_debug_build() and _game.current != null and LevelSolutions.DATA.has(_game.current.id):
+			var answer_btn := _make_tool_button("示答", _on_show_answer)
+			answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
+			answer_btn.modulate.a = 0.7
+			_board.add_toolbar_item(answer_btn)
 		_next_btn = _make_tool_button("下一关", _on_next)
 		_next_btn.visible = false
 		_board.add_toolbar_item(_next_btn)
@@ -117,13 +127,23 @@ func _build_ui() -> void:
 	_win_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_win_flash)
 
+	# 「请指导我 / 请帮帮我」提示(用户要求要提示出来);第三四章不代解就不显示
+	_guide_hint = Label.new()
+	_guide_hint.text = GUIDE_HINT
+	_guide_hint.position = GUIDE_HINT_POS
+	_guide_hint.add_theme_font_size_override("font_size", GUIDE_HINT_FONT_SIZE)
+	_guide_hint.modulate.a = 0.85
+	_guide_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_guide_hint.visible = _game != null and _game.robot_mode() == "guide"
+	add_child(_guide_hint)
+
 	_editor = PatternEditor.new()
 	_editor.pattern_committed.connect(_on_pattern_committed)
 	_editor.pattern_cleared.connect(_on_pattern_cleared)
 	add_child(_editor)
 	_board.pin_requested.connect(_on_pin_requested)
 
-	# 右缘织者笔记抽屉(七台仪器说明),点夹子划出/收回
+	# 右缘诺拉的笔记抽屉(七台仪器说明),点夹子划出/收回
 	_notebook_ui = NotebookUI.new()
 	_notebook_ui.open_requested.connect(_on_open_notebook)
 	add_child(_notebook_ui)
@@ -196,9 +216,9 @@ func _process(delta: float) -> void:
 		_game.robot_cue("hint")
 
 
-## 接出冲突线 → 小机困惑(Robot 侧自带节流,这里只管报)
+## 接出冲突线 → 小机困惑(Robot 侧自带节流,这里只管报);代解期间不鼓励
 func _on_conflict_check() -> void:
-	if _game == null:
+	if _game == null or _guiding:
 		return
 	for w in session.get_wires():
 		if w.state == ProofSession.WireState.CONFLICT:
@@ -218,7 +238,54 @@ func _on_win() -> void:
 	tw.tween_property(_win_flash, "color:a", 0.35, 0.25)
 	tw.tween_property(_win_flash, "color:a", 0.0, 0.9)
 	if _game != null:
-		_game.notify_solved(session.save_state())
+		_game.notify_solved(session.save_state(), not _suppress_win_cue)
+
+
+# ---- 小机「请指导我」 ----
+
+func _on_guide_requested() -> void:
+	if _game == null or _guiding or session.is_solved():
+		return
+	var robot := get_node_or_null("/root/Robot")
+	if robot == null:
+		return
+	match _game.robot_mode():
+		"guide":
+			_run_guide(robot)
+		"broken":
+			_game.robot_cue("glitch")   # 故障态:任何 cue 都是故障演出
+		"look":
+			_run_look(robot)
+
+
+## 第一二章:回头到极限 → 代解(无鼓励无庆祝)→ 停一会儿 → 转回来
+func _run_guide(robot: Node) -> void:
+	_guiding = true
+	robot.cue("think")
+	robot.turn_to_limit()
+	await get_tree().create_timer(GUIDE_TURN_SEC).timeout
+	if not is_inside_tree():
+		return
+	_idle_sec = 0.0
+	_suppress_win_cue = true
+	_on_reset()
+	LevelSolutions.apply(self, _board, _game.current.id)
+	_suppress_win_cue = false
+	await get_tree().create_timer(GUIDE_HOLD_SEC).timeout
+	robot.return_center()
+	robot.cue("idle")
+	_guiding = false
+
+
+## 第四章(已修好):只回头看你,不代解
+func _run_look(robot: Node) -> void:
+	_guiding = true
+	robot.cue("think")
+	robot.turn_to_limit()
+	await get_tree().create_timer(LOOK_HOLD_SEC).timeout
+	robot.return_center()
+	robot.cue("idle")
+	_guiding = false
 
 
 func _on_next() -> void:
@@ -237,8 +304,7 @@ func _on_reset() -> void:
 	_status.text = ""
 
 
-## 测试用:重置后按 tests/level_solutions.gd 的脚本化解法自动通关(仅调试版有入口)
+## 测试用:重置后按 levels/level_solutions.gd 的脚本化解法自动通关(仅调试版有入口)
 func _on_show_answer() -> void:
 	_on_reset()
-	var sols := load(SOLUTIONS_PATH)
-	sols.apply(self, _board, _game.current.id)
+	LevelSolutions.apply(self, _board, _game.current.id)

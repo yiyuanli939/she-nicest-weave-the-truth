@@ -1,5 +1,7 @@
 // 串口 ↔ WebSocket 桥接:游戏(Godot Robot autoload)连 ws://127.0.0.1:9800,
 // 本进程把 JSON 行双向透传给 /dev/cu.usbmodem*(ESP32-S3 小机)。
+// 客户端发来的消息若本身带 "evt" 键(如语音助手的 {"evt":"speech"}),视为上行事件,
+// 只转发给其它客户端、不下串口;串口打开/断开也广播 {"evt":"serial","open":bool}。
 // 用法: npm run bridge   (可选环境变量 SERIAL_PORT / BRIDGE_PORT)
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
@@ -14,17 +16,32 @@ const wss = new WebSocketServer({ host: "127.0.0.1", port: WS_PORT });
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 wss.on("listening", () => log(`WebSocket 就绪 ws://127.0.0.1:${WS_PORT}`));
+function isEvt(line) {
+  try {
+    const o = JSON.parse(line);
+    return !!o && typeof o === "object" && "evt" in o;
+  } catch {
+    return false;
+  }
+}
+
 wss.on("connection", (ws) => {
-  log("游戏已连入");
+  log("客户端连入");
+  ws.send(JSON.stringify({ evt: "serial", open: !!serial?.isOpen }));
   ws.on("message", (data) => {
     const line = data.toString().trim();
     if (!line) return;
+    if (isEvt(line)) {   // 客户端注入的上行事件(语音助手)→ 只给其它客户端
+      for (const c of wss.clients) if (c !== ws && c.readyState === 1) c.send(line);
+      log("↔ ", line);
+      return;
+    }
     if (serial?.isOpen) {
       serial.write(line + "\n");
       log("» ", line);
     } else log("丢弃(串口未连):", line);
   });
-  ws.on("close", () => log("游戏断开"));
+  ws.on("close", () => log("客户端断开"));
 });
 
 function broadcast(line) {
@@ -53,6 +70,7 @@ async function connectSerial() {
       return;
     }
     log("串口已连:", path);
+    broadcast(JSON.stringify({ evt: "serial", open: true }));
     serial.write('{"cmd":"ping"}\n');
   });
   const parser = serial.pipe(new ReadlineParser({ delimiter: "\n" }));
@@ -65,6 +83,7 @@ async function connectSerial() {
   serial.on("close", () => {
     log("串口断开,重试中…");
     serial = null;
+    broadcast(JSON.stringify({ evt: "serial", open: false }));
     setTimeout(connectSerial, RETRY_MS);
   });
   serial.on("error", (e) => log("串口错误:", e.message));

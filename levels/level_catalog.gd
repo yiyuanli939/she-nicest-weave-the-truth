@@ -21,3 +21,11 @@ func find(level_id: StringName) -> LevelDef:
 		if l.id == level_id:
 			return l
 	return null
+
+
+## lv 属于第几章(0 起);不在目录里(如测试注入的关)返回 -1
+func chapter_of(lv: LevelDef) -> int:
+	for i in chapters.size():
+		if chapters[i].levels.has(lv):
+			return i
+	return -1

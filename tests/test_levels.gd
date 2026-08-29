@@ -51,7 +51,7 @@ func test_titles_follow_art_spec() -> bool:
 	return ok
 
 
-## 织者笔记 = 七台仪器各一条说明,顺序同仪器架,全量常驻(不解锁)
+## 诺拉的笔记 = 七台仪器各一条说明,顺序同仪器架,全量常驻(不解锁)
 func test_notebook_is_machine_manual() -> bool:
 	var nb := NotebookCatalog.load_default()
 	var ok := check(nb != null and nb.entries.size() == Rules.all_ids().size(), "笔记条数 = 仪器数")

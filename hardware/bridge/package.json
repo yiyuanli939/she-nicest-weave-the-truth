@@ -9,6 +9,7 @@
     "send": "node send.js"
   },
   "dependencies": {
+    "@serialport/parser-readline": "^12.0.0",
     "serialport": "^12.0.0",
     "ws": "^8.18.0"
   }

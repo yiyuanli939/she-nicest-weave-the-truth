@@ -23,4 +23,5 @@ goal = "A | B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim"])
 atoms = Array[StringName]([&"A", &"B"])
 intro_dialogue = SubResource("Resource_dwgyv")
+robot_cue_on_enter = "panic"
 robot_cue_on_win = "celebrate"

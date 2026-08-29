@@ -25,4 +25,5 @@ allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"im
 atoms = Array[StringName]([&"A"])
 allow_bot = true
 intro_dialogue = SubResource("Resource_7lqpg")
+robot_cue_on_enter = "calm"
 robot_cue_on_win = "celebrate"

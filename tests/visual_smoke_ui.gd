@@ -82,6 +82,10 @@ func _center(c: Control) -> Vector2:
 	return c.get_global_rect().get_center()
 
 
+func _wait(sec: float) -> void:
+	await create_timer(sec).timeout
+
+
 func _make_level(id: String, dlg: DialogueRes) -> LevelDef:
 	var lv := LevelDef.new()
 	lv.id = StringName(id)
@@ -110,9 +114,11 @@ func _run() -> void:
 
 	# ---- A. 故事界面:底图 + 场景插图 + 左右立绘 + 遮罩;点击落点与任意键推进;不显示场景名 ----
 	var dlg := DialogueRes.new()
-	dlg.lines.append(_line("莉娅", "第 0 句台词", "街景", "莉娅", "默认"))
-	dlg.lines.append(_line("诺拉·拉弗蒂", "第 1 句台词", "", "莉娅", "惊讶"))
-	dlg.lines.append(_line("莉娅", "第 2 句台词", "工坊", "莉娅", "默认"))
+	# 台词要够长:打字机 40 字/秒,太短的话两帧一过就已显示完,"打字中点击"就测不到
+	var filler := "这是一句足够长的测试台词,用来保证打字机还在逐字显示的时候我们就点了下去。"
+	dlg.lines.append(_line("莉娅", "第 0 句台词。" + filler, "街景", "莉娅", "默认"))
+	dlg.lines.append(_line("诺拉·拉弗蒂", "第 1 句台词。" + filler, "", "莉娅", "惊讶"))
+	dlg.lines.append(_line("莉娅", "第 2 句台词。" + filler, "工坊", "莉娅", "默认"))
 	game.start_level(_make_level("ui_dlg", dlg))
 	await _settle()
 	var story := current_scene as StoryScene
@@ -376,7 +382,23 @@ func _run() -> void:
 		_click(_center(_button_named(menu, "开发者信息")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is CreditsScene, "开发者信息页加载")
-		_check(current_scene.find_children("*", "Button", true, false).is_empty(), "开发者信息页只有文字没有按钮")
+		var credit_btns := current_scene.find_children("*", "Button", true, false)
+		var visible_btns: Array[String] = []
+		for b in credit_btns:
+			if (b as Button).is_visible_in_tree():
+				visible_btns.append((b as Button).text)
+		_check(visible_btns == ["小机维护"], "开发者信息页只有文字 + 一个「小机维护」按钮(得 %s)" % str(visible_btns))
+		_click(_center(_button_named(current_scene, "小机维护")), MOUSE_BUTTON_LEFT)
+		await _settle()
+		var maint: RobotMaintUI = (current_scene as CreditsScene)._maint
+		_check(current_scene is CreditsScene and maint.visible, "点「小机维护」打开面板(不退回标题)")
+		_check(maint._line_edits.size() == 6 and (maint._line_edits["greet"] as LineEdit).text.contains("诺拉"), "面板读到六句台词(greet 称呼诺拉)")
+		_check(_button_named(maint, "保存并生成语音") != null and _button_named(maint, "刷入固件与语音") != null
+				and _button_named(maint, "接入小机(拉起桥接与语音助手)") != null, "面板有 接入 / 刷入 / 生成语音 按钮")
+		_check(maint._dir_btn.text.contains("右") and maint._voice_opt.item_count == RobotMaintUI.VOICES.size(), "回头方向与音色控件就绪")
+		_click(_center(_button_named(maint, "关闭")), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(not maint.visible and current_scene is CreditsScene, "关闭面板仍在开发者信息页")
 		_action("ui_cancel")
 		await _settle()
 		_check(current_scene is MainMenu, "开发者信息页按 Esc 回标题")
@@ -433,6 +455,76 @@ func _run() -> void:
 			_click(_center(answer_btn), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(l01.session.is_solved(), "点「示答」自动摆出答案并通关")
+
+	# ---- R. 小机「请指导我」:第一二章回头到极限后代解(无庆祝)/ 方向设置 / 第三章故障 / 第四章只回头 ----
+	var robot := root.get_node("/root/Robot")
+	game.save.wipe()
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g1 := current_scene as LevelScene
+	_check(g1 != null and g1._guide_hint.visible and g1._guide_hint.text.contains("请指导我") and g1._guide_hint.text.contains("请帮帮我"),
+			"第一二章关内提示可以说「请指导我」或「请帮帮我」")
+	robot.set_turn_dir("right")
+	robot.sent_log.clear()
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.4)
+	_check(g1.session.is_solved() and game.save.is_solved(&"l01"), "说「请指导我」→ 小机代解通关并记档")
+	_check(robot.sent("gimbal", "", 130), "代解前底部云台回头到右极限(130)")
+	_check(not robot.sent("say", "win") and not robot.sent("anim", "celebrate") and not robot.sent("say", "encourage"), "代解不庆祝不鼓励")
+	await _wait(3.4)
+	_check(robot.sent("gimbal", "", 90), "代解后转回正中")
+	robot._on_event({"evt": "speech", "text": "请 帮帮 我"})
+	await _wait(0.3)
+	_check(g1._guiding == false, "已通关再说不再触发")
+	robot.set_turn_dir("left")
+	_check(game.save.settings.get("robot_turn") == "left", "回头方向设置写进存档 settings")
+	robot._last_guide_ms = -100000   # 模拟 3 s 语音节流已过
+	game.start_level(game.catalog.find(&"l02"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g2 := current_scene as LevelScene
+	robot.sent_log.clear()
+	robot._on_event({"evt": "speech", "text": "请 帮帮 我"})
+	await _wait(1.4)
+	_check(g2.session.is_solved() and robot.sent("gimbal", "", 50) and not robot.sent("gimbal", "", 130), "「请帮帮我」+ 方向设左 → 回头到左极限(50)后代解")
+	robot.set_turn_dir("right")
+	# 第三章:进关当场故障;任何 cue(含「请指导我」)都是故障演出,不代解
+	game.start_level(game.catalog.find(&"l10"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g3 := current_scene as LevelScene
+	_check(robot.broken and robot.sent("say", "panic"), "进第三章小机故障(panic)")
+	_check(not g3._guide_hint.visible, "第三章不显示求助提示")
+	robot.sent_log.clear()
+	robot._last_at.clear()          # 模拟故障演出 6 s 节流已过
+	robot._last_guide_ms = -100000
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.2)
+	_check(not g3.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "第三章说「请指导我」只故障、不回头、不代解")
+	# 第四章:进关修好;「请指导我」只回头看你,不代解
+	game.start_level(game.catalog.find(&"l13"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g4 := current_scene as LevelScene
+	_check(not robot.broken and robot.sent("say", "calm"), "进第四章小机修好(calm)")
+	_check(not g4._guide_hint.visible, "第四章不代解,不显示求助提示")
+	robot.sent_log.clear()
+	robot._last_guide_ms = -100000
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.0)
+	_check(not g4.session.is_solved() and robot.sent("gimbal", "", 130), "第四章说「请指导我」只回头看你")
+	await _wait(1.6)
+	_check(robot.sent("gimbal", "", 90) and not g4.session.is_solved(), "第四章看完转回,仍不代解")
+	game.save.wipe()
 
 	_finish()
 
