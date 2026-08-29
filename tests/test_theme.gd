@@ -1,6 +1,6 @@
 extends TestBase
-## 美术规范:全部文字用站酷小薇体;UI 源码里的字面量不得含该字体没有的符号(否则会掉到系统字体)。
-## 例外:「·」(人名分隔点,美术自己的写法)允许走系统兜底。
+## 美术规范:全部文字用站酷小薇体;UI 源码里的字面量不得含该字体没有的符号(否则掉到兜底字体)。
+## 兜底两层:① 打包的 Noto 两字形子集(回/·)—— Web 导出没有系统字体,必须打包;② 系统字体。
 
 const MISSING_IN_FONT := ["☠", "◌", "✂", "📌", "▶", "✓", "🔒", "∧", "∨", "→", "⊥", "←", "↑", "↓", "①", "②", "③"]
 const SCAN_DIRS := ["res://ui", "res://board", "res://pattern", "res://narrative", "res://game"]
@@ -14,14 +14,16 @@ func test_theme_uses_art_font() -> bool:
 	var f := theme.default_font
 	var base: Font = f.base_font if f is FontVariation else f
 	return check(base != null and base.resource_path.contains("ZCOOLXiaoWei"), "默认字体 = 站酷小薇体,得 %s" % (base.resource_path if base else "null")) \
-		and check(not f.fallbacks.is_empty(), "有系统字体兜底") \
+		and check(f.fallbacks.size() >= 2 and (f.fallbacks[0] as Font).resource_path.contains("noto_fallback_subset")
+				and (f.fallbacks[0] as FontFile).has_char("回".unicode_at(0)) and (f.fallbacks[0] as FontFile).has_char("·".unicode_at(0)),
+				"第一层兜底 = 打包的 Noto 两字形子集(回/·;Web 导出没有系统字体,不打包会变豆腐块)") \
+		and check(f.fallbacks[-1] is SystemFont, "第二层兜底 = 系统字体(桌面端其余极端缺字)") \
 		and check(theme.default_font_size == 48, "默认字号 48(4K 逻辑视口)")
 
 
-## 跨平台保证:所有玩家可见文字(UI 源码字面量 + 关卡/笔记/介绍卡 .tres)的每个字符
-## 都必须在打包字体里 —— 否则掉到系统兜底字体(mac 苹方 / Windows 雅黑),两端观感不一致,
-## 兜底也缺时就是方块。
-## ALLOWED_FALLBACK = 故意走系统兜底的字符(两端系统字体都有):
+## 跨平台保证:所有玩家可见文字(UI 源码字面量 + 关卡对话/笔记 .tres)的每个字符
+## 都必须在打包字体里 —— 否则掉到兜底字体,观感不一致;Web 上连系统兜底都没有。
+## ALLOWED_FALLBACK = 故意走兜底的字符(已打包进 Noto 两字形子集,Web 也安全):
 ##   「·」人名分隔点;「回」站酷小薇体的该字形是实心块坏字形,已用 tools/fix_font_glyphs.py 剥离。
 const ALLOWED_FALLBACK := ["·", "回"]
 
@@ -52,8 +54,8 @@ func test_all_visible_text_in_bundled_font() -> bool:
 			continue
 		ok = check(font.has_char(c.unicode_at(0)),
 				"打包字体缺「%s」(U+%04X),首见于 %s" % [c, c.unicode_at(0), chars[c]]) and ok
-	# 坏字形剥离必须生效:回 不许再由打包字体渲染(它的字形是实心块)
-	ok = check(not font.has_char("回".unicode_at(0)), "「回」应已从打包字体剥离(走系统兜底)") and ok
+	# 坏字形剥离必须生效:回 不许再由站酷主字体渲染(它的字形是实心块;由打包的 Noto 子集兜底)
+	ok = check(not font.has_char("回".unicode_at(0)), "「回」应已从站酷主字体剥离(由 Noto 子集兜底)") and ok
 	return ok
 
 

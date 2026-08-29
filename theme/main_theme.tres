@@ -1,18 +1,21 @@
-[gd_resource type="Theme" load_steps=18 format=3]
+[gd_resource type="Theme" load_steps=19 format=3]
 
-; 全局主题:字体 = 美术指定的站酷小薇体(assets/fonts),系统字体只做缺字兜底(UI 文案已去掉字体没有的符号)。
+; 全局主题:字体 = 美术指定的站酷小薇体(assets/fonts)。缺字兜底分两层:
+; ① 打包的 Noto Sans SC 两字形子集(「回」坏字形已从站酷剥离 + 人名点「·」)—— Web 导出没有系统字体,必须打包;
+; ② 系统字体(桌面端其余极端缺字)。UI 文案已去掉字体没有的符号。
 ; 配色取自美术参考图:棕红描边 #6B3B33 / 深棕文字 #4A2F2A / 红棕强调 #A0463A / 乳黄 #F4ECD8 / 黄铜 #C9A24E。
 ; 纯文字按钮:无底,悬停文字变浅(美术要求);带图按钮在各自脚本里用 StyleBoxTexture 覆盖。
 ; 坐标/字号全部按 3840×2160 逻辑视口。
 
 [ext_resource type="FontFile" path="res://assets/fonts/ZCOOLXiaoWei-Regular.ttf" id="1_zcool"]
+[ext_resource type="FontFile" path="res://assets/fonts/noto_fallback_subset.otf" id="2_noto_subset"]
 
 [sub_resource type="SystemFont" id="sys_fallback"]
 font_names = PackedStringArray("PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC")
 
 [sub_resource type="FontVariation" id="font_main"]
 base_font = ExtResource("1_zcool")
-fallbacks = Array[Font]([SubResource("sys_fallback")])
+fallbacks = Array[Font]([ExtResource("2_noto_subset"), SubResource("sys_fallback")])
 
 [sub_resource type="StyleBoxEmpty" id="btn_empty"]
 content_margin_left = 24.0

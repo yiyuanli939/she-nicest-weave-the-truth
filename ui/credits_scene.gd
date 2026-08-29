@@ -21,7 +21,7 @@ const LINES: Array[String] = [
 	"美术与策划:焰陶",
 	"音乐与硬件:lyy(李熠远)",
 	"程序:LLM 与 焰陶、lyy 合作完成",
-	"字体:站酷小薇体(ZCOOL XiaoWei,免费商用授权)",
+	"字体:站酷小薇体(ZCOOL XiaoWei,免费商用授权);个别字形回退 Noto Sans SC(OFL)",
 	"标题音乐:舒伯特 A 大调钢琴奏鸣曲 D.664 第二乐章 Andante,演奏 Paul Pitman,公有领域(CC PD)",
 	"关内音乐:李熠远 与 ChatGPT 共同生成",
 	"引擎:Godot 4.7",

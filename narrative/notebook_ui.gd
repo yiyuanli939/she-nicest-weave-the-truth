@@ -17,7 +17,8 @@ const OPEN_X := 21.0                                    # 划出后的 x
 const CLOSED_PEEK := 480.0                              # 收起时露出的宽度(夹子)
 const SLIDE_SEC := 0.35
 const HANDLE_RECT := Rect2(200, 820, 300, 440)          # 夹子上「笔记 / 继续工作」按钮(抽屉内坐标)
-const FLIP_RECT := Rect2(3190, 1480, 240, 140)          # 右下角折角「翻页」
+const FLIP_RECT := Rect2(3170, 1540, 200, 120)          # 右下角折角「翻页」(文字要整体落在折角三角形内:
+														# 三角形直角在 (3185,1540),斜边 (3420,1540)→(3195,1780))
 const CONTENT_RECT := Rect2(397, 237, 3040, 1500)       # 纸面(整页图内容实测都落在此内,仅作参考)
 const PAGE_OFFSET := Vector2(-OPEN_X, -DRAWER_Y)        # 整页图按全屏导出:抽屉开位时正好与屏幕对齐
 const HANDLE_FONT_SIZE := 52

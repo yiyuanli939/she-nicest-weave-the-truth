@@ -189,6 +189,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
 | 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
+| 打 Web 包 / 传 itch.io | `export_presets.cfg`「Web」预设(nothreads 免 SharedArrayBuffer;排除 hardware/tests/素材源目录;`build/` 有 `.gdignore` 防被引擎扫描)→ `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` → `butler push build/web yiyuanli/textrix-veritatis:html5`。缺字兜底靠打包的 Noto 两字形子集(Web 无系统字体,见 `test_theme`) |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
 | 「小机不动」模式(舵机坏/展示静音动作) | `game/robot_link.gd stationary/STILL_CMDS/set_stationary`(send 层统一拦 gimbal/anim/cal_look,其余照常);开关在维护面板「小机动作」,存 settings |

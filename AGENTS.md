@@ -97,7 +97,9 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 小机 **3-1(l10)通关瞬间坏掉**(win cue = panic,代解通关也演)、3-2 起整段故障、**结局黑屏才修好**(calm),「look 模式」删除;
 新增莉娅严肃立绘 `char_lia_serious.png`、场景别名 伦敦街上/诺拉房间)✅ →
 **笔记条目换整页图**(2026-08-30:七台仪器 `assets/art/level/notebook/<rule_id>.png`,3840×2160 全屏导出透明底、
-与打开的抽屉对齐原尺寸摆放;引擎不再渲染笔记文字,NotebookEntry 只剩 id+image;源图存档 `笔记本页面补充/`)✅。
+与打开的抽屉对齐原尺寸摆放;引擎不再渲染笔记文字,NotebookEntry 只剩 id+image;源图存档 `笔记本页面补充/`)✅ →
+**Web 发布管线**(2026-08-30:export_presets「Web」预设(nothreads、排除素材源目录、build/.gdignore)、
+Noto 两字形回退子集 回/·(Web 无系统字体,test_theme 盯)、开局最大化;`butler push` → yiyuanli.itch.io/textrix-veritatis)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(15 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
