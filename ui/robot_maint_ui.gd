@@ -2,7 +2,8 @@ class_name RobotMaintUI
 extends CanvasLayer
 ## 小机维护面板(开发者信息页「小机维护」按钮 / 标题页 F9):
 ## 状态(桥接 / 串口 / 语音助手)· 接入小机(拉起桥接 + 语音助手)· 刷入固件与语音(mpremote,日志实时显示)·
-## 「请指导我」回头方向 · 小机声音(音色 / 音量 / 五句台词,保存并生成语音,可本机试听)·
+## 「请指导我」回头方向 · 「小机动作:照常/保持不动」(不动模式:云台/动画/校准一律不发,表情语音照常)·
+## 小机声音(音色 / 音量 / 五句台词,保存并生成语音,可本机试听)·
 ## 「看电脑方向」校准(自动挥手锁定 / 手动微调 / 保存)。
 ## 全部走 Robot autoload(game/robot_link.gd);脚本在 hardware/*.sh;台词配置 hardware/firmware/sounds/lines.json。
 
@@ -27,6 +28,7 @@ var _connect_btn: Button
 var _flash_btn: Button
 var _cam_btn: Button
 var _dir_btn: Button
+var _still_btn: Button
 var _cal_status: Label
 var _voice_opt: OptionButton
 var _gain: HSlider
@@ -73,6 +75,8 @@ func _init() -> void:
 	_dir_btn = _button("", _on_toggle_dir)
 	row1.add_child(_dir_btn)
 	row1.add_child(_button("试转一下", _on_try_turn))
+	_still_btn = _button("", _on_toggle_still)
+	row1.add_child(_still_btn)
 	_cam_btn = _button("摄像头验证云台", _on_cam_check)
 	row1.add_child(_cam_btn)
 	box.add_child(row1)
@@ -184,6 +188,7 @@ func _refresh() -> void:
 		lines.append("固件外设:屏幕 %s / 功放 %s" % ["正常" if _robot.oled_ok else "故障(会自动重试)", "正常" if _robot.audio_ok else "故障(静音)"])
 	_status.text = "\n".join(lines)
 	_dir_btn.text = "回头方向:" + ("右" if _robot.turn_dir == "right" else "左") + "(点击切换)"
+	_still_btn.text = "小机动作:" + ("保持不动" if _robot.stationary else "照常") + "(点击切换)"
 
 
 # ---- 接入 / 刷入 ----
@@ -245,6 +250,12 @@ func _poll_log() -> void:
 
 func _on_toggle_dir() -> void:
 	_robot.set_turn_dir("left" if _robot.turn_dir == "right" else "right")
+	_refresh()
+
+
+## 「小机不动」模式:云台/动画/自动校准一律不发,表情语音照常(舵机坏了/展示怕动静时用)
+func _on_toggle_still() -> void:
+	_robot.set_stationary(not _robot.stationary)
 	_refresh()
 
 

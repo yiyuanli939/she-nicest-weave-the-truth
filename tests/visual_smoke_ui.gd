@@ -595,6 +595,24 @@ func _run() -> void:
 	await _wait(1.0)
 	_check(not g4.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "第四章说「请指导我」也只故障")
 	game.save.wipe()
+	# 「小机不动」模式:表情/代解照常,云台/动画一条不发(维护面板「小机动作」开关的底层)
+	robot.set_stationary(true)
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g5 := current_scene as LevelScene
+	await _wait(1.0)
+	robot.sent_log.clear()
+	robot._last_guide_ms = -100000
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.4)
+	_check(g5.session.is_solved() and robot.sent("emote", "think") and not robot.sent("gimbal") and not robot.sent("anim"),
+			"不动模式:代解与表情照常,云台/动画一条不发")
+	robot.set_stationary(false)
+	_check(game.save.settings.get("robot_stationary") == false, "开关状态写进 settings")
+	game.save.wipe()
 
 	# ---- B. 回标题:BGM 淡入标题曲 ----
 	game.goto_menu()

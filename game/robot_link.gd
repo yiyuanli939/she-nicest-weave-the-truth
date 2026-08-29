@@ -4,6 +4,8 @@ extends Node
 ## 高层 cue(供 Game/对话 robot_cue 使用):greet celebrate confused hint think panic glitch calm sleep idle
 ## 剧情态:broken = true(3-1 通关瞬间坏掉,结局「感谢游玩」黑屏时修好)时任何 cue(sleep 除外)
 ## 都变成故障演出:故障脸 + 乱动 + 随机一段「坏掉」音效,没有台词。
+## 不动模式:stationary = true(维护面板「小机动作」开关,存 settings)时云台直控/云台动画/自动校准一律不发,
+## 表情、语音、口型、屏幕照常 —— 舵机坏了或展示怕动静时用。
 ## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
@@ -27,11 +29,14 @@ const SENT_LOG_MAX := 60
 const GUIDE_PHRASES: Array[String] = ["请指导我", "指导我", "请帮帮我", "帮帮我"]
 const SCRIPTS: Dictionary = {"run": "run_robot.sh", "stop": "stop_robot.sh", "flash": "flash_robot.sh", "voices": "make_voices.sh", "cam": "cam_check.sh"}
 const GLITCH_SFX_COUNT := 3            # sounds/glitch1..3.wav(hardware/make_sfx.py 合成的纯音效)
+## 不动模式下拦掉的命令:云台直控 / 云台动画 / 自动校准(要扫头);不发也不记 sent_log
+const STILL_CMDS: Array = ["gimbal", "anim", "cal_look"]
 
 var connected: bool = false        # ws 连上桥接
 var serial_open: bool = false      # 桥接报告串口(小机)在线
 var speech_online: bool = false    # 语音助手心跳在线
 var broken: bool = false           # 剧情故障态(Game.start_level 按章节设)
+var stationary: bool = false       # 「小机不动」:不发云台/动画/校准,其余照常(维护面板开关,存 settings)
 var turn_dir: String = "right"     # 「请指导我」时回头方向
 var oled_ok: bool = true           # 固件 ready 上报的外设状态
 var audio_ok: bool = true
@@ -53,6 +58,7 @@ func _ready() -> void:
 	var game := get_node_or_null("/root/Game")
 	if game != null and game.save != null:
 		turn_dir = _norm_dir(String(game.save.settings.get("robot_turn", "right")))
+		stationary = bool(game.save.settings.get("robot_stationary", false))
 	_connect()
 
 
@@ -162,6 +168,8 @@ func cue(cue_name: String) -> void:
 
 
 func send(d: Dictionary) -> void:
+	if stationary and STILL_CMDS.has(d.get("cmd")):
+		return
 	sent_log.append(d)
 	if sent_log.size() > SENT_LOG_MAX:
 		sent_log.pop_front()
@@ -200,6 +208,14 @@ func set_turn_dir(dir: String) -> void:
 		game.save.save()
 
 
+func set_stationary(on: bool) -> void:
+	stationary = on
+	var game := get_node_or_null("/root/Game")
+	if game != null and game.save != null:
+		game.save.settings["robot_stationary"] = on
+		game.save.save()
+
+
 ## 底部云台转到极限(固件 gimbal 瞬时到位,插值在这里做;期间别发 anim,固件动画会抢云台)
 func turn_to_limit(sec: float = TURN_SEC) -> void:
 	_tween_pan(turn_target(turn_dir), sec)
@@ -210,6 +226,8 @@ func return_center(sec: float = TURN_SEC) -> void:
 
 
 func _tween_pan(target: int, sec: float) -> void:
+	if stationary:
+		return   # 不动模式:客户端记账的角度也不改,关掉后从上次真实角度继续
 	if _turn_tween != null:
 		_turn_tween.kill()
 		_turn_tween = null
@@ -237,6 +255,8 @@ func calibrate_look() -> void:
 
 ## 手动微调一步后,把当前方向存为"屏幕方向"
 func nudge(d_pan: int, d_tilt: int) -> void:
+	if stationary:
+		return
 	_pan = clampi(_pan + d_pan, PAN_LEFT, PAN_RIGHT)
 	_tilt = clampi(_tilt + d_tilt, 70, 110)
 	send({cmd = "gimbal", pan = _pan, tilt = _tilt})

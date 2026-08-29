@@ -104,6 +104,26 @@ func test_voice_lines_config() -> bool:
 	return ok and check(gain > 0.0 and gain <= 1.0, "音量 0-1") and check(String(d.get("voice", "")).begins_with("zh-CN-"), "音色是中文神经语音")
 
 
+## 「小机不动」模式:云台/动画/自动校准一律不发(也不记 sent_log),表情、语音等其余命令照常;关掉即恢复
+func test_stationary_mode() -> bool:
+	var rl: Node = _rl().new()
+	rl.stationary = true
+	rl.cue("celebrate")
+	var ok := check(rl.sent("emote", "happy") and rl.sent("say", "win"), "表情/语音照常")
+	ok = check(not rl.sent("anim"), "云台动画不发") and ok
+	rl.turn_to_limit()
+	rl.nudge(6, 0)
+	rl.calibrate_look()
+	ok = check(not rl.sent("gimbal") and not rl.sent("cal_look"), "回头/微调/自动校准都不动") and ok
+	rl.send({cmd = "text", s = "hi"})
+	ok = check(rl.sent("text"), "其余命令照常") and ok
+	rl.stationary = false
+	rl.turn_to_limit()
+	ok = check(rl.sent("gimbal", "", 175), "关掉模式恢复转动") and ok
+	rl.free()
+	return ok
+
+
 ## RobotLink 解析固件回报:gimbal ack 与 ready 的外设标志(不需要真机,直接注入事件)
 func test_robot_link_parses_ack_and_ready() -> bool:
 	var rl: Node = _rl().new()
