@@ -269,16 +269,17 @@ func _on_pattern_cleared() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if _win_popup.visible:
 		return   # 通关弹窗开着:遮罩只挡鼠标,撤销/重做会把弹窗后面的通关盘改掉
-	if event.is_action_pressed("ui_undo"):
+	# ui_redo 必须先判:is_action_pressed 默认不精确匹配修饰键,Ctrl+Shift+Z 也算 ui_undo,先判 undo 的话重做永远按不出来
+	if event.is_action_pressed("ui_redo"):
+		if session.can_redo():
+			SoundFx.hit(self, &"redo")
+		session.redo()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed("ui_undo"):
 		if session.can_undo():
 			SoundFx.hit(self, &"undo")   # 栈空不响(undo() 本身是空操作)
 		session.undo()
 		_status.text = ""
-		get_viewport().set_input_as_handled()
-	elif event.is_action_pressed("ui_redo"):
-		if session.can_redo():
-			SoundFx.hit(self, &"redo")
-		session.redo()
 		get_viewport().set_input_as_handled()
 
 

@@ -265,6 +265,15 @@ RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这�
 (ffmpeg 没 libvorbis,且有损再压一遍伤音质;35 个共 1.8 MB),CLIPS 后缀改 .wav、删旧 .ogg + .import;再 `sfx_apply.py <空文件> --test` 做
 `--import` + GAIN_DB 重算 + 全量测试。授权:全部 CC0 不要求署名,但每段的标题 / 作者 / 链接 / 许可都记在 `assets/sfx/音效位置.md`「现用文件与来源」表,
 换文件必须同步补表。
+**复核(2026-09-02,用户「check 可能让人觉得奇怪的音效以及硬 bug」)**:`tools/sfx_trace.gd` 按真实输入走全流程、每步打印计数差,
+另在 Chrome 里给 Web 版打 `AudioBufferSourceNode.start` 补丁核对送进 Web Audio 的缓冲(时长 / 响度 / 过零率都与文件一致,Web 走 sample 播放、48 kHz 重采样,
+没播错文件)。查出并改掉四处:①`_unhandled_input` 先判 ui_undo —— `is_action_pressed` 默认不精确匹配修饰键,真实按 Ctrl+Shift+Z 走了撤销分支,
+重做快捷键从来按不出来(UI 冒烟原来用 `InputEventAction` 发 ui_redo 所以看不见;现在先判 ui_redo,冒烟补真实组合键);②钉纹样弹窗 Esc / 点外面关闭无声,
+只有「取消」按钮 meta 响 —— 改为 `popup_hide` 统一响 close,「确认」关的不响(`_confirming` 标记);③从已接的入口拖起线改接,引擎同帧发
+disconnection_request + connection_drag_started,连响 unplug + pick,松手再 drop —— 同帧拖线开始不再叠 pick;④换场景 / 弹窗出现时按钮正好落在光标底下,
+`mouse_entered` 也发、悬停音自己响(启动到标题页、Esc 回标题都会) —— `Sfx._input` 记鼠标移动帧,`HOVER_MOTION_FRAMES` 内没动过不响。
+核过没问题、按设计保留的:进关瞬间 hint + 首次上架的笔记 drawer_open 同时响;故事界面立绘出现响 portrait;接错线 plug → 同帧 error → 0.5 s 后 snap;
+撤销 / 重做 / 重置 / 载入 / 代解 / 示答期间静音计数进出成对(没有 await 夹在中间,换场景不会漏 pop);点节点不动鼠标不响 move。
 坑:内嵌 `class` 里别起 `_set`(撞 Object 虚方法签名,整个脚本解析错);`floor()` 返回 Variant,`:=` 推不出类型要用 `floorf`;`SceneTree` 脚本的
 `_initialize` 里一出错就走不到 `quit()`,headless 进程永远挂着 —— 新脚本先 `--check-only`,跑的时候套个 `perl -e 'alarm 60; exec @ARGV'`。
 测试:`tests/test_sfx.gd`(表与时长 / 播放器池与同帧去重 / 静音计数与音量公式 / 按钮钩子 meta / 静态 hit 安全),`test_settings` 加 sfx_volume,
@@ -322,6 +331,7 @@ RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这�
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
 | 操作音效 / 换音效 / 给某个操作加音 | `game/sfx.gd`(`CLIPS` 槽位表、`GAIN_DB`、`BASE_VOLUME`)+ `assets/sfx/音效位置.md`;某按钮换音 `set_meta(&"sfx", &"槽位")`;新挂点一行 `SoundFx.hit(self, &"槽位")`;不该响的区间 `push_mute/pop_mute` |
 | 音效不想用下载素材、想改合成配方 | `tools/sfx_synth.gd`(`_r_<槽位>` 配方、材质函数、`NAMES`/`ALIASES`)→ `tools/gen_sfx.gd` 重出 `assets/sfx/候选/D_合成/` → `tests/test_sfx_synth.gd` 盯文件 = 配方 |
+| 想知道某个操作实际响了几声 / 哪些槽位 | `godot --path . --script res://tools/sfx_trace.gd`(真实输入走全流程,每步打印计数差;弹窗内按钮走 `pressed.emit`) |
 | 打 Web 包 / 传 itch.io | `export_presets.cfg`「Web」预设(nothreads 免 SharedArrayBuffer;排除 hardware/tests/素材源目录;`build/` 有 `.gdignore` 防被引擎扫描)→ `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` → `butler push build/web yiyuanli/textrix-veritatis:html5`。缺字兜底靠打包的 Noto 两字形子集(Web 无系统字体,见 `test_theme`) |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |

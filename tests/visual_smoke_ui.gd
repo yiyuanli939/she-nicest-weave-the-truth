@@ -72,6 +72,19 @@ func _key(keycode: Key) -> void:
 		root.push_input(ev, true)
 
 
+## 真实组合键(ctrl 同时置 meta,macOS 上 ui_undo/ui_redo 映射到 Cmd)
+func _combo(keycode: Key, ctrl: bool, shift: bool) -> void:
+	for pressed in [true, false]:
+		var ev := InputEventKey.new()
+		ev.keycode = keycode
+		ev.physical_keycode = keycode
+		ev.ctrl_pressed = ctrl
+		ev.meta_pressed = ctrl
+		ev.shift_pressed = shift
+		ev.pressed = pressed
+		root.push_input(ev, true)
+
+
 func _button_named(from: Node, text: String) -> Button:
 	for b in from.find_children("*", "Button", true, false):
 		if (b as Button).text == text:
@@ -409,6 +422,14 @@ func _run() -> void:
 	_action("ui_redo")
 	await _settle()
 	_check(s.get_node_ids().size() == 3, "Ctrl+Shift+Z 重做(并织机再次删除)")
+	_action("ui_undo")
+	await _settle()
+	var redo_n: int = sfx.counts.get(&"redo", 0)
+	var undo_n: int = sfx.counts.get(&"undo", 0)
+	_combo(KEY_Z, true, true)   # 真实按键(不是 InputEventAction):非精确匹配下 Ctrl+Shift+Z 也算 ui_undo,必须先判 ui_redo
+	await _settle()
+	_check(s.get_node_ids().size() == 3 and sfx.counts.get(&"redo", 0) == redo_n + 1 and sfx.counts.get(&"undo", 0) == undo_n,
+			"真实按键 Ctrl+Shift+Z 是重做不是撤销,响 redo 不响 undo(得 %d 节点,%s)" % [s.get_node_ids().size(), sfx.last_slot])
 
 	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键;点在纹样上 —— 节点中央现在是钉按钮) ----
 	mn = board.get_node("n%d" % mid) as MachineNode
@@ -509,8 +530,29 @@ func _run() -> void:
 	_check(s.get_wire_carries_hyp(imp_id, 1, imp_id, 0), "这条线搭载未消去的假设(整条假设色)")
 	imp = board.get_node("n%d" % imp_id) as MachineNode
 	_check(imp.is_output_wired(1) and imp.is_input_wired(0), "假设口插头插进 Q 口:出口不画插头、入口整圆")
-	s.disconnect_wire(imp_id, 1, imp_id, 0)
+	var pick_n: int = sfx.counts.get(&"pick", 0)
+	var unplug_n: int = sfx.counts.get(&"unplug", 0)
+	var drop_n: int = sfx.counts.get(&"drop", 0)
+	_press(q_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)   # 从已接的入口把线拖起来放到空处(改接)
+	_motion(q_pt + Vector2(0, 260), MOUSE_BUTTON_MASK_LEFT)
 	await _settle()
+	_press(q_pt + Vector2(0, 260), MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().is_empty(), "从已接的入口拖起线放到空处:线断开")
+	_check(sfx.counts.get(&"unplug", 0) == unplug_n + 1 and sfx.counts.get(&"drop", 0) == drop_n + 1 and sfx.counts.get(&"pick", 0) == pick_n,
+			"音效:改接响 unplug 与 drop,不再叠 pick(得 pick+%d)" % (int(sfx.counts.get(&"pick", 0)) - pick_n))
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	var close_n: int = sfx.counts.get(&"close", 0)
+	_key(KEY_ESCAPE)
+	await _settle()
+	_check(not scene._editor.visible and sfx.counts.get(&"close", 0) == close_n + 1, "钉纹样弹窗按 Esc 关闭响一声 close(得 %s)" % sfx.last_slot)
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	close_n = sfx.counts.get(&"close", 0)
+	_button_named(scene._editor, "取消").pressed.emit()
+	await _settle()
+	_check(not scene._editor.visible and sfx.counts.get(&"close", 0) == close_n + 1, "弹窗「取消」只响一声 close(得 +%d)" % (int(sfx.counts.get(&"close", 0)) - close_n))
 	var stock_pt: Vector2 = imp.global_position + imp.stock_port_pos(false, 0) * board.zoom
 	_press(stock_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
 	_motion(q_pt, MOUSE_BUTTON_MASK_LEFT)

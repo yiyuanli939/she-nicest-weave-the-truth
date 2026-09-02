@@ -70,6 +70,7 @@ const BASE_VOLUME := 0.5                  # 全体基准(约 -6 dB;峰值 -1 dB 
 const POOL_SIZE := 8                      # 同时最多几声
 const META := &"sfx"                      # 按钮上的槽位覆盖:set_meta(&"sfx", &"back");&"" = 不出声
 const BUTTON_DEFAULT := &"click"
+const HOVER_MOTION_FRAMES := 2            # 悬停音只在这几帧内有过鼠标移动才响(场景切换 / 弹窗出现在光标底下的 mouse_entered 不响)
 
 var user_volume := 1.0                    # 玩家「音效音量」(settings.sfx_volume)
 var last_slot: StringName = &""           # 最近一次真正播出的槽位 / 帧号(测试与冒烟断言用)
@@ -82,6 +83,7 @@ var _next := 0
 var _streams: Dictionary = {}             # path → AudioStream
 var _frame_played: Dictionary = {}        # slot → 上次播出的帧号
 var _mute_depth := 0
+var _mouse_moved_frame := -1              # 最近一次鼠标移动的帧号(_input 里记;autoload 在场景之前收到事件)
 
 
 func _init() -> void:
@@ -98,6 +100,11 @@ func _ready() -> void:
 	if game != null and game.save != null:
 		user_volume = clampf(float(game.save.settings.get("sfx_volume", 1.0)), 0.0, 1.0)
 	get_tree().node_added.connect(_on_node_added)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		_mouse_moved_frame = Engine.get_process_frames()
 
 
 ## 任意 Node 上都能叫:找不到 autoload(测试 / 不在树里)就静默
@@ -202,6 +209,10 @@ func _on_button_pressed(b: BaseButton) -> void:
 	play(button_slot(b))
 
 
+## 禁用 / 静音按钮不响;不是鼠标移过来的 mouse_entered(换场景 / 弹窗出现时按钮落在光标底下)也不响
 func _on_button_hover(b: BaseButton) -> void:
-	if not b.disabled and button_slot(b) != &"":
-		play(&"hover")
+	if b.disabled or button_slot(b) == &"":
+		return
+	if _mouse_moved_frame < 0 or Engine.get_process_frames() - _mouse_moved_frame > HOVER_MOTION_FRAMES:
+		return
+	play(&"hover")
