@@ -49,12 +49,12 @@ func _ready() -> void:
 	add_child(_cal_ui)
 	_settings = SettingsPanel.new()
 	add_child(_settings)
-	_settings.setup(_game, get_node_or_null("/root/Robot"), bgm, _cal_ui)
+	_settings.setup(_game, get_node_or_null("/root/Robot"), bgm, _cal_ui, get_node_or_null("/root/Sfx"))
 	_cal_ui.visibility_changed.connect(_settings.refresh)   # 面板里切了无机器人模式,关面板时同步「小机联动」文字
 
 	var progressed: bool = not _game.save.solved.is_empty()
 	_start_btn = _add_option(0, "继续游戏" if progressed else "开始游戏", _game.goto_select)
-	_add_option(1, "重置进度", _on_reset)
+	_add_option(1, "重置进度", _on_reset).set_meta(SoundFx.META, &"reset_progress")
 	_add_option(2, "开发者信息", _game.goto_credits)
 	_add_option(3, "退出游戏", func() -> void:
 		var robot := get_node_or_null("/root/Robot")
@@ -62,7 +62,7 @@ func _ready() -> void:
 			robot.cue("sleep")   # 小机道晚安
 			await get_tree().create_timer(0.2).timeout
 		get_tree().quit())
-	_add_option(4, "设置", _settings.open)
+	_add_option(4, "设置", _settings.open).set_meta(SoundFx.META, &"")   # 开窗音由面板自己响
 
 	if not _game.menu_greeted:
 		_game.menu_greeted = true

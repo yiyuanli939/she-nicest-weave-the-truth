@@ -2,9 +2,10 @@ class_name SettingsPanel
 extends CanvasLayer
 ## 标题页「设置」弹窗(2026-09-02 用户要求:设置是标题页第五个选项,点进去在弹窗里改,标题页本身不放控件;
 ## 美术文档没有 → 先纯文字 + 常量留位)。半透明遮罩 + 居中乳黄面板(主题 PanelContainer 样式):
-## 「设置」→ 音乐音量(滑条)→ 全屏 开/关 → 小机联动 开/关 → 小机维护(联动开着才显示)→ 关闭(Esc 也关)。
-## 设置落 SaveManager.settings(「重置进度」不清):music_volume(0..1)、fullscreen(bool);robot_enabled 由 Robot.set_enabled 写。
-## 音量当场生效(Bgm.set_user_volume,启动时 Bgm._ready 自己读);全屏当场切窗口模式,下次启动 Game._apply_window_settings 恢复;
+## 「设置」→ 音乐音量(滑条)→ 音效音量(滑条)→ 全屏 开/关 → 小机联动 开/关 → 小机维护(联动开着才显示)→ 关闭(Esc 也关)。
+## 设置落 SaveManager.settings(「重置进度」不清):music_volume / sfx_volume(0..1)、fullscreen(bool);robot_enabled 由 Robot.set_enabled 写。
+## 音量当场生效(Bgm.set_user_volume / Sfx.set_user_volume,启动时各自 _ready 自己读;音效滑条动一下就响一声 slider 让玩家试听);
+## 全屏当场切窗口模式,下次启动 Game._apply_window_settings 恢复;
 ## 小机联动 = 无机器人模式开关(与维护面板「机器人:已启用 / 无机器人模式」同一个开关),Web 版没有机器人,这两行不显示。
 ## 文字按钮沿用主题(无底、悬停变浅);滑条按美术色板自画(乳黄轨 / 黄铜已填段 / 棕红圆钮),文字须全在站酷小薇体里。
 
@@ -29,10 +30,13 @@ const VOLUME_DEFAULT := 1.0
 var _game: Node
 var _robot: Node
 var _bgm: Node
+var _sfx: Node
 var _maint: RobotMaintUI
 var _panel: PanelContainer
 var _volume: HSlider
 var _volume_lbl: Label
+var _sfx_volume: HSlider
+var _sfx_volume_lbl: Label
 var _fullscreen_btn: Button
 var _robot_btn: Button
 var _maint_btn: Button
@@ -68,67 +72,90 @@ func _init() -> void:
 	head.add_child(_label("设置", TITLE_FONT_SIZE))
 	box.add_child(head)
 
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", int(SLIDER_GAP))
-	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	row.add_child(_label("音乐音量", FONT_SIZE))
-	_volume = HSlider.new()
-	_volume.min_value = 0.0
-	_volume.max_value = 1.0
-	_volume.step = VOLUME_STEP
-	_volume.value = VOLUME_DEFAULT
-	_volume.custom_minimum_size = Vector2(SLIDER_W, KNOB_D)
-	_volume.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_volume.focus_mode = Control.FOCUS_NONE
-	_volume.add_theme_stylebox_override("slider", _track(TRACK_BG))
-	_volume.add_theme_stylebox_override("grabber_area", _track(TRACK_FILL))
-	_volume.add_theme_stylebox_override("grabber_area_highlight", _track(TRACK_FILL))
-	var knob := _knob()
-	for icon in ["grabber", "grabber_highlight", "grabber_disabled"]:
-		_volume.add_theme_icon_override(icon, knob)
-	_volume.value_changed.connect(_on_volume_changed)
-	_volume.drag_started.connect(func() -> void: _dragging = true)
-	_volume.drag_ended.connect(_on_drag_ended)
-	row.add_child(_volume)
-	_volume_lbl = _label(volume_text(1.0), FONT_SIZE)
-	_volume_lbl.custom_minimum_size.x = _volume_lbl.get_combined_minimum_size().x   # 按「100%」预留宽度,拖动时整行不挪
-	_volume_lbl.text = volume_text(VOLUME_DEFAULT)
-	row.add_child(_volume_lbl)
-	box.add_child(row)
+	var music_row := _slider_row("音乐音量", _on_volume_changed, _on_drag_ended)
+	_volume = music_row[0]
+	_volume_lbl = music_row[1]
+	box.add_child(music_row[2])
+	var sfx_row := _slider_row("音效音量", _on_sfx_volume_changed, _on_sfx_drag_ended)
+	_sfx_volume = sfx_row[0]
+	_sfx_volume_lbl = sfx_row[1]
+	box.add_child(sfx_row[2])
 
 	_fullscreen_btn = _button(_on_toggle_fullscreen)
+	_fullscreen_btn.set_meta(SoundFx.META, &"toggle")
 	box.add_child(_fullscreen_btn)
 	_robot_btn = _button(_on_toggle_robot)
+	_robot_btn.set_meta(SoundFx.META, &"toggle")
 	box.add_child(_robot_btn)
 	_maint_btn = _button(_on_open_maint)
 	_maint_btn.text = "小机维护"
+	_maint_btn.set_meta(SoundFx.META, &"")   # 面板 open 自己响
 	box.add_child(_maint_btn)
 	_close_btn = _button(close)
 	_close_btn.text = "关闭"
+	_close_btn.set_meta(SoundFx.META, &"")   # close() 里响,Esc 同一处
 	box.add_child(_close_btn)
 
 
-## 挂到标题页后调:传入 Game / Robot / Bgm autoload(可为 null:对应行隐藏或不生效)和维护面板
-func setup(game: Node, robot: Node, bgm: Node, maint: RobotMaintUI) -> void:
+## 一行「标签 + 滑条 + 百分数」;两条音量滑条同一模板。返回 [HSlider, 百分数 Label, 整行]
+func _slider_row(label_text: String, on_changed: Callable, on_drag_ended: Callable) -> Array:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", int(SLIDER_GAP))
+	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	row.add_child(_label(label_text, FONT_SIZE))
+	var slider := HSlider.new()
+	slider.min_value = 0.0
+	slider.max_value = 1.0
+	slider.step = VOLUME_STEP
+	slider.value = VOLUME_DEFAULT
+	slider.custom_minimum_size = Vector2(SLIDER_W, KNOB_D)
+	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	slider.focus_mode = Control.FOCUS_NONE
+	slider.add_theme_stylebox_override("slider", _track(TRACK_BG))
+	slider.add_theme_stylebox_override("grabber_area", _track(TRACK_FILL))
+	slider.add_theme_stylebox_override("grabber_area_highlight", _track(TRACK_FILL))
+	var knob := _knob()
+	for icon in ["grabber", "grabber_highlight", "grabber_disabled"]:
+		slider.add_theme_icon_override(icon, knob)
+	slider.value_changed.connect(on_changed)
+	slider.drag_started.connect(func() -> void: _dragging = true)
+	slider.drag_ended.connect(on_drag_ended)
+	row.add_child(slider)
+	var lbl := _label(volume_text(1.0), FONT_SIZE)
+	lbl.custom_minimum_size.x = lbl.get_combined_minimum_size().x   # 按「100%」预留宽度,拖动时整行不挪
+	lbl.text = volume_text(VOLUME_DEFAULT)
+	row.add_child(lbl)
+	return [slider, lbl, row]
+
+
+## 挂到标题页后调:传入 Game / Robot / Bgm / Sfx autoload(可为 null:对应行隐藏或不生效)和维护面板
+func setup(game: Node, robot: Node, bgm: Node, maint: RobotMaintUI, sfx: Node = null) -> void:
 	_game = game
 	_robot = robot
 	_bgm = bgm
+	_sfx = sfx
 	_maint = maint
 	var v := VOLUME_DEFAULT
+	var sv := VOLUME_DEFAULT
 	if _game != null and _game.save != null:
 		v = clamp_volume(float(_game.save.settings.get("music_volume", VOLUME_DEFAULT)))
+		sv = clamp_volume(float(_game.save.settings.get("sfx_volume", VOLUME_DEFAULT)))
 	_volume.set_value_no_signal(v)
 	_volume_lbl.text = volume_text(v)
+	_sfx_volume.set_value_no_signal(sv)
+	_sfx_volume_lbl.text = volume_text(sv)
 	refresh()
 
 
 func open() -> void:
 	refresh()
 	visible = true
+	SoundFx.hit(self, &"open")
 
 
 func close() -> void:
 	visible = false
+	SoundFx.hit(self, &"close")
 
 
 ## Esc 关闭(维护面板压在上面时不管,交给面板)
@@ -177,18 +204,36 @@ func _on_volume_changed(v: float) -> void:
 	if _bgm != null:
 		_bgm.set_user_volume(v)
 	if not _dragging:   # 点轨道 / 滚轮:当场落盘;拖动中等松手
-		_persist_volume()
+		_persist_volume("music_volume", _volume)
+		SoundFx.hit(self, &"slider")
 
 
 func _on_drag_ended(changed: bool) -> void:
 	_dragging = false
 	if changed:
-		_persist_volume()
+		_persist_volume("music_volume", _volume)
+	SoundFx.hit(self, &"slider")
 
 
-func _persist_volume() -> void:
+## 音效音量:改一下就响一声 slider,玩家立刻听到新音量(拖动中每档也响 —— 这正是试听)
+func _on_sfx_volume_changed(v: float) -> void:
+	_sfx_volume_lbl.text = volume_text(v)
+	if _sfx != null:
+		_sfx.set_user_volume(v)
+	if not _dragging:
+		_persist_volume("sfx_volume", _sfx_volume)
+	SoundFx.hit(self, &"slider")
+
+
+func _on_sfx_drag_ended(changed: bool) -> void:
+	_dragging = false
+	if changed:
+		_persist_volume("sfx_volume", _sfx_volume)
+
+
+func _persist_volume(key: String, slider: HSlider) -> void:
 	if _game != null and _game.save != null:
-		_game.save.settings["music_volume"] = snappedf(_volume.value, VOLUME_STEP)
+		_game.save.settings[key] = snappedf(slider.value, VOLUME_STEP)
 		_game.save.save()
 
 

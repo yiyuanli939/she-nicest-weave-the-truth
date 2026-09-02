@@ -52,6 +52,7 @@ func _ready() -> void:
 			btn.add_theme_stylebox_override(state, sb)
 		btn.disabled = true
 		btn.visible = false   # set_rules 之前不闪 7 台
+		btn.set_meta(SoundFx.META, &"")   # 放上棋盘时响 place,按钮本身不响
 		btn.pressed.connect(machine_requested.emit.bind(rule_id))
 		add_child(btn)
 		_buttons[rule_id] = btn

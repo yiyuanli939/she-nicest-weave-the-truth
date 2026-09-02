@@ -15,5 +15,6 @@ static func make(on_pressed: Callable) -> Button:
 	b.position = RECT.position
 	b.size = RECT.size
 	b.add_theme_font_size_override("font_size", FONT_SIZE)
+	b.set_meta(SoundFx.META, &"back")
 	b.pressed.connect(on_pressed)
 	return b

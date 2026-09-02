@@ -56,6 +56,7 @@ func _init() -> void:
 	_continue_btn.anchor_bottom = ay
 	_continue_btn.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	_continue_btn.grow_vertical = Control.GROW_DIRECTION_BOTH
+	_continue_btn.set_meta(SoundFx.META, &"confirm")
 	_continue_btn.pressed.connect(func() -> void: continue_pressed.emit())
 	_panel.add_child(_continue_btn)
 

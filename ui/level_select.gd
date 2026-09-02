@@ -79,6 +79,7 @@ func _make_level_button(lv: LevelDef, unlocked: bool) -> Button:
 		elif state == "pressed":
 			sb.modulate_color = Color(0.92, 0.92, 0.92)
 		b.add_theme_stylebox_override(state, sb)
+	b.set_meta(SoundFx.META, &"confirm")
 	b.pressed.connect(_game.start_level.bind(lv))
 	return b
 

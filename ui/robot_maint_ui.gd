@@ -124,7 +124,9 @@ func _init() -> void:
 		edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		lrow.add_child(edit)
 		_line_edits[cue] = edit
-		lrow.add_child(_button("试听", _on_preview.bind(cue)))
+		var preview_btn := _button("试听", _on_preview.bind(cue))
+		preview_btn.set_meta(SoundFx.META, &"")   # 别在试听的语音上叠一声点击
+		lrow.add_child(preview_btn)
 		box.add_child(lrow)
 	_voices_btn = _button("保存并生成语音", _on_make_voices)
 	box.add_child(_voices_btn)
@@ -141,7 +143,9 @@ func _init() -> void:
 	row3.add_child(_button("保存为屏幕方向", func() -> void:
 		_robot.save_look_here()
 		_cal_status.text = "已请求保存…"))
-	row3.add_child(_button("关闭", func() -> void: visible = false))
+	var close_btn := _button("关闭", func() -> void: visible = false)
+	close_btn.set_meta(SoundFx.META, &"close")
+	row3.add_child(close_btn)
 	box.add_child(row3)
 	# 只在面板打开时刷新状态(低功耗模式下关着的面板不该占每帧)
 	set_process(false)
@@ -172,6 +176,7 @@ func open(robot: Node) -> void:
 	_load_voice_config()
 	_refresh()
 	visible = true
+	SoundFx.hit(self, &"open")
 
 
 func _process(delta: float) -> void:

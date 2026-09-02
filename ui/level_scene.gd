@@ -43,6 +43,7 @@ var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
 var _restoring := false               # 载入旧棋盘中:求解信号不算玩家操作(不叫小机、不弹通关)
 var _guiding := false                 # 小机代解/回头演出进行中(防重入、免鼓励)
 var _suppress_win_cue := false        # 代解通关不庆祝
+var _last_hint_step: StringName = &""  # 上次显示的指引步骤(换成新一条才响)
 
 # 默认配置(无 Game 时生效;冒烟测试注入)
 var assumptions: Array[String] = ["A & B"]
@@ -88,7 +89,9 @@ func _ready() -> void:
 			# 已通关的关重开:恢复记录的棋盘但拆掉接进目标织机的线(「差一步完成」,v1.2);
 			# 拆线在会话层读档时做,不进撤销栈、也不会重发 proof_completed
 			_restoring = true
+			_sfx_mute(true)
 			session.load_state(saved, _game.save.is_solved(lv.id))
+			_sfx_mute(false)
 			_restoring = false
 			_board.apply_positions()
 		if lv.robot_cue_on_enter != "":
@@ -181,6 +184,10 @@ func _make_tool_button(text: String, cb: Callable) -> Button:
 	b.text = text
 	b.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
 	b.pressed.connect(cb)
+	if text == "重置":
+		b.set_meta(SoundFx.META, &"")       # _on_reset 里响 reset_board
+	elif text == "选关":
+		b.set_meta(SoundFx.META, &"back")
 	return b
 
 
@@ -216,6 +223,9 @@ func _refresh_step_hint() -> void:
 	var step := StepGuide.next_step(facts, _steps_done())
 	_step_hint.text = StepGuide.TEXT.get(step, "")
 	_step_hint.visible = step != &""
+	if step != &"" and step != _last_hint_step and not _restoring:
+		SoundFx.hit(self, &"hint")
+	_last_hint_step = step
 
 
 ## 线轴排左列、目标织机放右侧(棋盘画布坐标)
@@ -244,22 +254,30 @@ func _on_pattern_committed(f: Formula) -> void:
 	var err := session.pin_hypothesis(_pin_target.x, _pin_target.y, FormulaParser.to_text(f))
 	if err != "":
 		_status.text = err
-	elif not session.is_solved():
-		_status.text = ""
+		SoundFx.hit(self, &"pin_error")
+	else:
+		SoundFx.hit(self, &"confirm")
+		if not session.is_solved():
+			_status.text = ""
 
 
 func _on_pattern_cleared() -> void:
 	session.unpin_hypothesis(_pin_target.x, _pin_target.y)
+	SoundFx.hit(self, &"unpin")
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _win_popup.visible:
 		return   # 通关弹窗开着:遮罩只挡鼠标,撤销/重做会把弹窗后面的通关盘改掉
 	if event.is_action_pressed("ui_undo"):
+		if session.can_undo():
+			SoundFx.hit(self, &"undo")   # 栈空不响(undo() 本身是空操作)
 		session.undo()
 		_status.text = ""
 		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("ui_redo"):
+		if session.can_redo():
+			SoundFx.hit(self, &"redo")
 		session.redo()
 		get_viewport().set_input_as_handled()
 
@@ -293,6 +311,8 @@ func _on_win() -> void:
 	var tw := create_tween()
 	tw.tween_property(_win_flash, "color:a", 0.35, 0.25)
 	tw.tween_property(_win_flash, "color:a", 0.0, 0.9)
+	if not _suppress_win_cue:
+		SoundFx.hit(self, &"win")   # 玩家自己织成的才响;小机代解不庆祝
 	if _game != null:
 		_game.notify_solved(session.save_state(), not _suppress_win_cue)
 		if _game.current != null:   # 冒烟注入的关(current 为空)没有推进目标,不弹
@@ -315,6 +335,7 @@ func _on_guide_requested() -> void:
 		return
 	match _game.robot_mode():
 		"guide":
+			SoundFx.hit(self, &"guide")
 			_run_guide(robot)
 		"broken":
 			_game.robot_cue("glitch")   # 故障态:任何 cue 都是故障演出
@@ -331,8 +352,10 @@ func _run_guide(robot: Node) -> void:
 	_idle_sec = 0.0
 	if not session.is_solved():   # 等待窗口里玩家自己解出来了:不重摆、不覆盖玩家的解,只完成回头演出
 		_suppress_win_cue = true
+		_sfx_mute(true)   # 代解的放机/接线/钉纹样不是玩家操作,不响
 		_reset_board()
 		LevelSolutions.apply(self, _board, _game.current.id)
+		_sfx_mute(false)
 		_suppress_win_cue = false
 	await get_tree().create_timer(GUIDE_HOLD_SEC).timeout
 	if not is_inside_tree():
@@ -375,6 +398,18 @@ func _on_reset() -> void:
 	if _guiding:
 		return   # 小机代解/回头演出中,别和它抢棋盘
 	_reset_board()
+	SoundFx.hit(self, &"reset_board")
+
+
+## 静音计数进出(代解 / 载入旧棋盘):没有 Sfx autoload(测试)就跳过
+func _sfx_mute(on: bool) -> void:
+	var sfx := get_node_or_null(^"/root/Sfx") if is_inside_tree() else null
+	if sfx == null:
+		return
+	if on:
+		sfx.push_mute()
+	else:
+		sfx.pop_mute()
 
 
 func _reset_board() -> void:
@@ -388,4 +423,6 @@ func _on_show_answer() -> void:
 	if _guiding:
 		return   # 代解 0.8s 窗口内点示答会双重摆盘、庆祝 cue 和演出打架
 	_reset_board()
+	_sfx_mute(true)
 	LevelSolutions.apply(self, _board, _game.current.id)
+	_sfx_mute(false)

@@ -131,12 +131,16 @@ func _init() -> void:
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", BRUSH_GAP)
 	_clear_btn = _make_action_button("清空", _clear_canvas)
+	_clear_btn.set_meta(SoundFx.META, &"clear")
 	actions.add_child(_clear_btn)
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	actions.add_child(sp)
-	actions.add_child(_make_action_button("取消", hide))
+	var cancel := _make_action_button("取消", hide)
+	cancel.set_meta(SoundFx.META, &"close")
+	actions.add_child(cancel)
 	_confirm = _make_action_button("确认", _on_confirm)
+	_confirm.set_meta(SoundFx.META, &"")   # 结果音由 LevelScene 按钉成功 / 拒绝 / 取消钉住分别响
 	actions.add_child(_confirm)
 	col.add_child(actions)
 
@@ -168,6 +172,7 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 	# 随后同步居中。不能 call_deferred:提交流程"打开→确认→hide"会被迟到的弹出又顶开。
 	reset_size()
 	popup_centered()
+	SoundFx.hit(self, &"open")
 
 
 func _make_action_button(text: String, cb: Callable) -> Button:
@@ -195,6 +200,7 @@ func _make_swatch(a: StringName) -> Button:
 			sb.set_border_width_all(6)
 			sb.border_color = PatternView.SPLIT_COLOR
 		b.add_theme_stylebox_override(state, sb)
+	b.set_meta(SoundFx.META, &"brush")
 	b.pressed.connect(_set_brush.bind("atom:" + String(a)))
 	return b
 
@@ -217,6 +223,7 @@ func _make_struct_button(id: String, style: String) -> Button:
 	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
 	b.add_child(icon)
+	b.set_meta(SoundFx.META, &"brush")
 	b.pressed.connect(_set_brush.bind(id))
 	return b
 
@@ -244,6 +251,7 @@ func _make_bot_button() -> Button:
 	pv.offset_right = -6
 	pv.offset_bottom = -6
 	b.add_child(pv)
+	b.set_meta(SoundFx.META, &"brush")
 	b.pressed.connect(_set_brush.bind("bot"))
 	return b
 
@@ -312,6 +320,7 @@ func apply_brush_at(point: Vector2, rect: Rect2) -> void:
 		return
 	tree = replace_at(tree, path_at(tree, rect, point), repl)
 	_sync()
+	SoundFx.hit(self, &"paint")
 
 
 ## 画布整幅还是一个孔(还没落任何笔刷 / 刚清空)

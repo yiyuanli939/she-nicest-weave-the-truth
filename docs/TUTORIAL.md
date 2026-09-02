@@ -18,7 +18,7 @@ board/       ProofBoard(GraphEdit)、MachineNode(GraphNode)、WireOverlay(错误
 pattern/     PatternEditor(挖孔画纹样的钉纹样窗口)
 narrative/   DialogueBox(对话框)、DialogueRes/Line(台词数据)、NotebookUI
 ui/          MainMenu / LevelSelect / StoryScene(进关前全屏对话)/ LevelScene(关卡)
-game/        Game autoload(流程/存档/机器人 cue 转发)、SaveManager、RobotLink、Bgm(背景音乐槽位)
+game/        Game autoload(流程/存档/机器人 cue 转发)、SaveManager、RobotLink、Bgm(背景音乐槽位)、Sfx(操作音效槽位)
 levels/      LevelDef/ChapterDef/LevelCatalog + data/*.tres(生成器产物)
 tools/       gen_levels.gd(关卡/笔记本批量生成器)
 tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
@@ -236,6 +236,34 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 测试:`tests/test_settings.gd`(映射 / 文案 / 往返 / 无 autoload 建弹窗开关)、`test_bgm.test_user_volume_scales_playback`、UI smoke T 节(第五项位置、
 标题页无控件、弹窗居中、遮罩挡点击、点滑条正中 = 50%、联动开关、小机维护开面板、关闭 / Esc)与 S 节(无机器人模式下文字同步)。
 
+### 3.9 操作音效(2026-09-02,用户要求:所有操作都配音效、不要刺耳)
+
+autoload `Sfx`(`game/sfx.gd`,`class_name SoundFx`)照 `Bgm` 的路子做**槽位表**:`CLIPS` 槽位 → `assets/sfx/<槽位>.ogg`(`""` = 静音),
+换音效只换文件或改一行;`GAIN_DB` 按槽位修正响度 × `BASE_VOLUME`(-6 dB,峰值 -1 dB 的片段修正后不削波)× 玩家「音效音量」`user_volume`
+(设置弹窗第二条滑条,与音乐滑条同一模板 `_slider_row`,落 `settings.sfx_volume`,`Sfx._ready` 读回;滑条每动一档响一声 slider = 试听)。
+播放:8 个一次性 `AudioStreamPlayer` 池,取空闲的、都忙抢最早的;**同一帧同槽位只响一次**(多选删除 / 多条线同时断 / 多枚徽章)。
+**静音计数** `push_mute/pop_mute`:`LevelScene` 在载入旧棋盘、代解、示答前后包住;`ProofBoard._on_board_rebuilt` 整段(撤销/重做/重置重建节点与徽章);
+自动断线在排队时记下当时是否静音(`_pending_breaks[key]`),载入旧档时排的 0.5 s 后不响。
+**按钮不逐个接**:`_ready` 里 `get_tree().node_added` 凡 `BaseButton` 就连 `pressed` → 播 meta `"sfx"`(默认 `click`;`set_meta(&"sfx", &"")` 不响;
+有自己动作音的按钮 —— 仪器架 / 钉纹样 / 笔记夹子与翻页 / 「设置」/ 「重置」/ 弹窗「关闭」 —— 都设成不响,免得两声叠一起)、`mouse_entered` → `hover`。
+其余挂点每处一行 `SoundFx.hit(self, &"槽位")`(静态,找不到 autoload 就静默,测试不用 mock);完整槽位表与挂点在 `assets/sfx/音效位置.md`。
+坑:GraphEdit 没有缩放信号 → `draw` 时比对 `zoom`;`connection_request` 先于 `connection_drag_ended` → 用 `_wired_this_drag` 区分「接上」与「空放」;
+`_on_connection_request` 原来丢掉 `connect_wire` 的返回值,现在按它决定响不响;徽章 `rebuild` 只在新建 chip 分支响(沿用的不响)。
+素材:Kenney CC0(`assets/sfx/LICENSE-kenney.txt`)起步;「不刺耳」量化为频谱质心 / 4 kHz 以上能量占比 / 峰值因子(`tools/sfx_audit.py`),
+候选方案(freesound CC0 / Sonniss 样例)按此筛过放 `assets/sfx/候选/`,试听后整套或单个覆盖。
+**合成版(候选 D,2026-09-02,用户要求「用 Godot 的 Audio 模块自己做一版,不下载」)**:`tools/sfx_synth.gd` 纯 GDScript 用 `AudioStreamWAV`
+拼 16 bit PCM(`save_to_wav` 落盘),每个槽位一份配方 = 材质层按时间 `_add` 叠加:黄铜轻击 `_brass`(基频 + 2.4 / 4.1 倍非谐分音)/ 木叩 `_knock`
+(低频正弦 30 ms 滑落 + 噪声瞬态)/ 木琴 `_wood`(正弦 + 4 倍泛音)/ 小铃 `_bell`(1 / 2.0 / 2.98 / 4.2 倍)/ 织物纸张 `_noise`(带通噪声扫频,RBJ 双二阶)。
+不刺耳从源头保证:无方波锯齿、分音 ≥ 3.8 kHz 不加、噪声带通 ≤ 3.5 kHz、整体 6 kHz 四阶低通、起音 ≥ 1 ms 首尾淡入淡出;响度统一 —— 按峰值 -60 dB 去尾后
+RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这套的 GAIN_DB 建议值都在 0 附近)。`tools/gen_sfx.gd` 出
+`assets/sfx/候选/D_合成/<槽位>.wav`(34 配方 + 4 别名复制;全套 1 s;每条打印时长 / 峰值 / RMS / 峰值因子 / >4k 占比,越界退出码非零);
+噪声以槽位名做种,逐样本可重现。`tests/test_sfx_synth.gd` 三例:配方覆盖 CLIPS 全部槽位 / 每条不刺耳有界 / 可重现且磁盘文件 = 当前配方(改配方没重出就红)。
+坑:内嵌 `class` 里别起 `_set`(撞 Object 虚方法签名,整个脚本解析错);`floor()` 返回 Variant,`:=` 推不出类型要用 `floorf`;`SceneTree` 脚本的
+`_initialize` 里一出错就走不到 `quit()`,headless 进程永远挂着 —— 新脚本先 `--check-only`,跑的时候套个 `perl -e 'alarm 60; exec @ARGV'`。
+测试:`tests/test_sfx.gd`(表与时长 / 播放器池与同帧去重 / 静音计数与音量公式 / 按钮钩子 meta / 静态 hit 安全),`test_settings` 加 sfx_volume,
+`test_res_paths` 走一遍 `CLIPS`,UI 冒烟在 D/F/G/U/L/T/N 各节断言 `Sfx.last_slot` / `counts`(放·钉·徽章·断线·删·撤销·拿起·接上·空放·抽屉·翻页·
+弹窗开关·音效滑条·示答全程静音)。
+
 ### 3.8 通关弹窗 + 已通关关卡重开「差一步」+ 焦纹图样笔刷(2026-09-02,策划说明 `v1.2背景/`)
 
 - **通关弹窗**:工具条「下一关」删掉,`proof_completed` → `_on_win` 记档/庆祝后 `_win_popup.open()`(`ui/win_popup.gd`,`CanvasLayer` 70,
@@ -285,6 +313,8 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
 | 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
+| 操作音效 / 换音效 / 给某个操作加音 | `game/sfx.gd`(`CLIPS` 槽位表、`GAIN_DB`、`BASE_VOLUME`)+ `assets/sfx/音效位置.md`;某按钮换音 `set_meta(&"sfx", &"槽位")`;新挂点一行 `SoundFx.hit(self, &"槽位")`;不该响的区间 `push_mute/pop_mute` |
+| 音效不想用下载素材、想改合成配方 | `tools/sfx_synth.gd`(`_r_<槽位>` 配方、材质函数、`NAMES`/`ALIASES`)→ `tools/gen_sfx.gd` 重出 `assets/sfx/候选/D_合成/` → `tests/test_sfx_synth.gd` 盯文件 = 配方 |
 | 打 Web 包 / 传 itch.io | `export_presets.cfg`「Web」预设(nothreads 免 SharedArrayBuffer;排除 hardware/tests/素材源目录;`build/` 有 `.gdignore` 防被引擎扫描)→ `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` → `butler push build/web yiyuanli/textrix-veritatis:html5`。缺字兜底靠打包的 Noto 两字形子集(Web 无系统字体,见 `test_theme`) |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |

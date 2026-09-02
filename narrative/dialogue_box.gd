@@ -104,7 +104,9 @@ func _step() -> void:
 			_tween.kill()
 		# 不能设 -1:getter 也返回 -1,会让上面的"打字中"判断永真,点击就再也推进不了
 		_text.visible_characters = _text.get_total_character_count()
+		SoundFx.hit(self, &"skip")
 	else:
+		SoundFx.hit(self, &"next")
 		_advance()
 
 

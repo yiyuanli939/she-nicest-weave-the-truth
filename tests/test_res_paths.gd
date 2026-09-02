@@ -45,6 +45,11 @@ func test_dynamic_art_and_music_paths_exact_case() -> bool:
 		var p: String = bgm.TRACKS[slot]
 		if p != "":
 			ok = check(_case_check(p) == "", "BGM %s → %s 大小写不符" % [slot, p]) and ok
+	var sfx := load("res://game/sfx.gd") as GDScript
+	for slot in sfx.CLIPS:
+		var p: String = sfx.CLIPS[slot]
+		if p != "":
+			ok = check(_case_check(p) == "", "音效 %s → %s 大小写不符" % [slot, p]) and ok
 	for e in NotebookCatalog.load_default().entries:
 		ok = check(_case_check(e.image) == "", "笔记整页图 %s 大小写不符" % e.image) and ok
 	return ok

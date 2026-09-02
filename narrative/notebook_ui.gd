@@ -56,10 +56,12 @@ func _init() -> void:
 
 	_handle = _make_text_button(Rect2(Vector2.ZERO, HANDLE_SIZE), HANDLE_FONT_SIZE)
 	_handle.add_theme_font_override("font", _pitched_font(HANDLE_FONT_SIZE, HANDLE_LINE_PITCH))
+	_handle.set_meta(SoundFx.META, &"")   # 抽屉滑出 / 收起各有音
 	_handle.pressed.connect(toggle)
 	_drawer.add_child(_handle)
 	_flip = _make_text_button(FLIP_RECT, FLIP_FONT_SIZE)
 	_flip.text = "翻页"
+	_flip.set_meta(SoundFx.META, &"")     # 翻页音在 _next_page
 	_flip.pressed.connect(_next_page)
 	_drawer.add_child(_flip)
 
@@ -143,6 +145,7 @@ func open(nb: NotebookCatalog, unlocked: Array = []) -> void:
 	_page = 0
 	_show_page()
 	_slide(true)
+	SoundFx.hit(self, &"drawer_open")
 
 
 ## 同 open(),但翻到 rule_id 对应的条目(v1.1 §5:进关时本关首次上架的仪器自动弹出它的页);找不到就第一页
@@ -157,6 +160,7 @@ func open_at(nb: NotebookCatalog, unlocked: Array, rule_id: StringName) -> void:
 
 func close() -> void:
 	_slide(false)
+	SoundFx.hit(self, &"drawer_close")
 
 
 func toggle() -> void:
@@ -208,3 +212,4 @@ func _next_page() -> void:
 		return
 	_page = (_page + 1) % _entries.size()
 	_show_page()
+	SoundFx.hit(self, &"page")

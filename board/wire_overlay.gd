@@ -69,6 +69,7 @@ func rebuild() -> void:
 				var chip := _make_chip(w)
 				add_child(chip)
 				c = {key = key, ctrl = chip, state = w.state, detached = false}
+				SoundFx.hit(self, &"error" if AUTO_BREAK.has(w.state) else &"warn")   # 新徽章才响,沿用的不响
 				if AUTO_BREAK.has(w.state):
 					_start_fade(c)
 			c.wire = w

@@ -25,6 +25,7 @@ run/low_processor_mode=true
 Game="*res://game/game.gd"
 Robot="*res://game/robot_link.gd"
 Bgm="*res://game/bgm.gd"
+Sfx="*res://game/sfx.gd"
 
 [gui]
 
