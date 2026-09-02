@@ -26,7 +26,9 @@ var session: ProofSession
 var atom_colors: Dictionary = {}
 
 var _overlay: WireOverlay
-var _pending_breaks: Dictionary = {}   # 边 Vector4i -> true:已排队等待断开
+var _pending_breaks: Dictionary = {}   # 边 Vector4i -> bool:已排队等待断开;值 = 断开时要不要出声
+var _wired_this_drag := false          # 本次拖线里已经接上(区分「接上」与「空放」音效)
+var _last_zoom := 1.0
 
 
 func _init() -> void:
@@ -50,6 +52,7 @@ func _ready() -> void:
 	end_node_move.connect(_on_end_node_move)
 	connection_drag_started.connect(_on_drag_started)
 	connection_drag_ended.connect(_on_drag_ended)
+	draw.connect(_on_zoom_check)   # GraphEdit 没有缩放信号:缩放必然重绘,重绘时比对 zoom
 	add_child(_overlay)
 	# 视区移动只留中键拖动(4.7 ViewPanner 内置):滚动条隐形且不吃鼠标。
 	# 引擎每次 _update_scroll 会自己 show()/hide(),改 visible 会被顶回,所以用 modulate;
@@ -102,6 +105,7 @@ func place_machine_at_center(rule_id: StringName) -> void:
 	var id := session.place_machine(rule_id, canvas_pos)
 	if id >= 0:
 		_spawn_node(id)
+		SoundFx.hit(self, &"place")
 
 
 func _spawn_node(id: int) -> void:
@@ -138,12 +142,17 @@ func _node_of(node_name: StringName) -> MachineNode:
 # ---- session → view ----
 
 func _on_board_rebuilt() -> void:
+	var sfx := get_node_or_null(^"/root/Sfx") if is_inside_tree() else null
+	if sfx != null:
+		sfx.push_mute()   # 撤销/重做/重置/载入整盘重建:徽章重现不算玩家操作
 	clear_connections()
 	for mn in _machine_nodes():
 		mn.name = str(mn.name) + "_dead"   # 腾出 n%d 名字给新节点(queue_free 帧末才释放)
 		mn.queue_free()
 	for id in session.get_node_ids():
 		_spawn_node(id)
+	if sfx != null:
+		sfx.pop_mute()
 
 
 func _on_board_updated() -> void:
@@ -171,16 +180,20 @@ func _schedule_breaks() -> void:
 		var key := Vector4i(w.from_id, w.from_port, w.to_id, w.to_port)
 		if _pending_breaks.has(key):
 			continue
-		_pending_breaks[key] = true
+		var sfx := get_node_or_null(^"/root/Sfx")
+		_pending_breaks[key] = sfx == null or not sfx.is_muted()   # 值 = 到时要不要出声(载入旧档时排的不响)
 		get_tree().create_timer(BAD_WIRE_SEC).timeout.connect(_break_wire.bind(key))
 
 
 func _break_wire(key: Vector4i) -> void:
+	var audible: bool = _pending_breaks.get(key, true)
 	_pending_breaks.erase(key)
 	if session == null or not is_inside_tree():
 		return
 	if not WireOverlay.AUTO_BREAK.has(session.get_wire_state(key.x, key.y, key.z, key.w)):
 		return   # 已被玩家断开 / 后续操作让它成立了
+	if audible:
+		SoundFx.hit(self, &"snap")
 	_overlay.detach_chip(key)
 	session.disconnect_wire(key.x, key.y, key.z, key.w, false)   # 自动断开不记撤销步(见 ProofSession.disconnect_wire)
 
@@ -192,7 +205,9 @@ func _on_connection_request(from_node: StringName, from_port: int, to_node: Stri
 	var tn := _node_of(to_node)
 	if fn == null or tn == null:
 		return
-	session.connect_wire(fn.node_id, fn.model_out_port(from_port), tn.node_id, to_port)
+	if session.connect_wire(fn.node_id, fn.model_out_port(from_port), tn.node_id, to_port):
+		_wired_this_drag = true
+		SoundFx.hit(self, &"plug")
 
 
 func _on_disconnection_request(from_node: StringName, from_port: int, to_node: StringName, to_port: int) -> void:
@@ -201,6 +216,7 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 	if fn == null or tn == null:
 		return
 	session.disconnect_wire(fn.node_id, fn.model_out_port(from_port), tn.node_id, to_port)
+	SoundFx.hit(self, &"unplug")
 
 
 func _on_delete_nodes_request(nodes: Array[StringName]) -> void:
@@ -220,11 +236,15 @@ func _remove_machine(id: int) -> void:
 		if mn != null:
 			mn.name = str(mn.name) + "_dead"
 			mn.queue_free()
+		SoundFx.hit(self, &"delete")
+	else:
+		SoundFx.hit(self, &"refuse")
 
 
 func _on_end_node_move() -> void:
 	for mn in _machine_nodes():
 		session.set_node_position(mn.node_id, mn.position_offset)
+	SoundFx.hit(self, &"move")
 
 
 ## 拖线开始:源口藏起插头,叠加层在鼠标处画插头(颜色随口:假设口红棕)
@@ -237,12 +257,24 @@ func _on_drag_started(from_node: StringName, from_port: int, is_output: bool) ->
 	if is_output and mn.is_hyp_out(mn.model_out_port(from_port)):
 		color = MachineNode.HYP_COLOR
 	_overlay.begin_plug(color)
+	_wired_this_drag = false
+	SoundFx.hit(self, &"pick")
 
 
+func _on_zoom_check() -> void:
+	if not is_equal_approx(zoom, _last_zoom):
+		_last_zoom = zoom
+		SoundFx.hit(self, &"zoom")
+
+
+## 引擎先发 connection_request(接上了)再发 connection_drag_ended:没接上的这一拖才响「空放」
 func _on_drag_ended() -> void:
 	for mn in _machine_nodes():
 		mn.clear_drag_port()
 	_overlay.end_plug()
+	if not _wired_this_drag:
+		SoundFx.hit(self, &"drop")
+	_wired_this_drag = false
 
 
 # ---- 端口位置接管(封程机臂内沿的口;其它口与引擎算法一致) ----

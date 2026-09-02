@@ -30,6 +30,7 @@ var _slots: Array[Control] = [null, null]            # [左, 右] 裁剪框
 var _portraits: Array[TextureRect] = [null, null]
 var _masks: Array[TextureRect] = [null, null]
 var _leaving := false
+var _shown_chars: Array[String] = ["", ""]   # 两侧当前立绘的角色名(换人才响)
 var _outro := false
 
 
@@ -137,6 +138,9 @@ func _set_portrait(side: int, char_name: String, expr: String) -> void:
 	if tex == null:
 		slot.visible = false
 		return
+	if _shown_chars[side] != char_name:
+		_shown_chars[side] = char_name
+		SoundFx.hit(self, &"portrait")
 	var mask_tex := StoryArt.mask(char_name)
 	var canvas: Vector2 = mask_tex.get_size() if mask_tex != null else tex.get_size()
 	var origin: Vector2 = Vector2(floorf((slot.size.x - canvas.x) * 0.5), slot.size.y - canvas.y) + PORTRAIT_NUDGE.get(char_name, Vector2.ZERO)

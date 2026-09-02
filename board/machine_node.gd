@@ -328,6 +328,7 @@ func _make_pin_button(model_port: int) -> Button:
 	btn.mouse_filter = Control.MOUSE_FILTER_PASS   # 左键归按钮;右键穿透到节点(右键删机在按钮上也生效)
 	var by_port: Dictionary = PIN_BG_BY_PORT.get(rule_id, {})
 	UiStyles.fill_button(btn, by_port.get(model_port, PIN_BG), PIN_MARGIN_H, PIN_MARGIN_V)
+	btn.set_meta(SoundFx.META, &"")   # 弹窗打开时响 open
 	btn.pressed.connect(pin_requested.emit.bind(model_port))
 	_pin_buttons[model_port] = btn
 	return btn

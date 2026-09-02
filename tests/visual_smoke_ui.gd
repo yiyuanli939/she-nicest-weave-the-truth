@@ -144,6 +144,7 @@ func _run() -> void:
 	var game := root.get_node("/root/Game")
 	AudioServer.set_bus_mute(0, true)   # 跑测试别真出声;playing 状态不受影响
 	var bgm := root.get_node("/root/Bgm")
+	var sfx := root.get_node("/root/Sfx")   # 操作音效:各节里断言 last_slot(播出的槽位)/ play_count
 
 	# ---- A. 故事界面:底图 + 场景插图 + 左右立绘 + 遮罩;点击落点与任意键推进;不显示场景名 ----
 	var dlg := DialogueRes.new()
@@ -254,10 +255,14 @@ func _run() -> void:
 	_click(_center(scene._palette.button_of(&"false_elim")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(s.get_node_ids().size() == 2, "点未上架仪器的空位不放置")
+	var sfx_click0: int = sfx.counts.get(&"click", 0)
+	var sfx_place0: int = sfx.counts.get(&"place", 0)
 	_click(_center(_button_named(scene._palette, "岔纹机")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	var ids := s.get_node_ids()
 	_check(ids.size() == 3, "点仪器架按钮放置一台岔纹机(得 %d 节点)" % ids.size())
+	_check(sfx.last_slot == &"place" and sfx.counts.get(&"place", 0) == sfx_place0 + 1 and sfx.counts.get(&"click", 0) == sfx_click0,
+			"音效:放仪器响一声 place,仪器架按钮本身不响 click(得 %s)" % sfx.last_slot)
 	var mid: int = ids[-1]
 	s.set_node_position(mid, Vector2(720, 720))   # 挪开:palette 默认落在视野中心,会和后面放的机器重叠
 	board.apply_positions()
@@ -331,6 +336,7 @@ func _run() -> void:
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "欠定",
 			"欠定线挂「欠定」徽章(纯文字)")
+	_check(sfx.last_slot == &"warn", "音效:欠定徽章出现响 warn(得 %s)" % sfx.last_slot)
 	var chip_label := (board._overlay._chips[0].ctrl as Control).get_child(0) as Label
 	_check(chip_label.get_theme_font_size("font_size") == WireOverlay.BADGE_FONT_SIZE and WireOverlay.BADGE_FONT_SIZE >= 64
 			and chip_label.get_theme_constant("outline_size") == WireOverlay.BADGE_OUTLINE and chip_label.get_theme_color("font_outline_color") == Color.WHITE,
@@ -342,14 +348,17 @@ func _run() -> void:
 	scene._editor._confirm.pressed.emit()
 	await _settle()
 	_check(board._overlay._chips.is_empty(), "钉下口后这条线 OK,浮层消失")
+	_check(sfx.last_slot == &"confirm", "音效:钉纹样确认成功响 confirm(得 %s)" % sfx.last_slot)
 	var undo_before: int = s._undo_stack.size()
 	s.connect_wire(mid, 1, s.goal_id, 0)   # A∨(A∧B) → 目标 B∧A:∨ 对 ∧
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "冲突",
 			"连接词对不上的线挂「冲突」徽章")
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.CONFLICT, "冲突线暂时还在")
+	_check(sfx.last_slot == &"error", "音效:冲突徽章出现响 error(得 %s)" % sfx.last_slot)
 	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.OK and s.get_wires().size() == 2, "0.5 s 后接错的线自动断开")
+	_check(sfx.last_slot == &"snap", "音效:自动断线响 snap(得 %s)" % sfx.last_slot)
 	_check(s._undo_stack.size() == undo_before and not s.can_redo(), "自动断开不记撤销步、连接线那步也弹掉:撤销历史里没有这条错线(否则 Ctrl+Z 只会复活它再断)")
 	_check(board._overlay._chips.size() == 1 and board._overlay._chips[0].detached, "断线后徽章冻结在原位继续显示")
 	await _wait(WireOverlay.BADGE_HOLD_SEC + WireOverlay.BADGE_FADE_SEC + 0.3)
@@ -373,10 +382,12 @@ func _run() -> void:
 		await _settle()
 		_check(s.describe_node(mid) == null and board.get_node_or_null("n%d" % mid) == null,
 				"右键「%s」删除仪器" % spot_names[k])
+		_check(sfx.last_slot == &"delete", "音效:删仪器响 delete(%s;得 %s)" % [spot_names[k], sfx.last_slot])
 		_action("ui_undo")
 		await _settle()
 		_check(s.describe_node(mid) != null and board.get_node_or_null("n%d" % mid) != null,
 				"Ctrl+Z 撤回删除(%s)" % spot_names[k])
+		_check(sfx.last_slot == &"undo", "音效:撤销响 undo,重建的徽章/节点不响(%s;得 %s)" % [spot_names[k], sfx.last_slot])
 	mn = board.get_node("n%d" % mid) as MachineNode
 	_check(not mn.is_ant_frame_shown(0), "撤回后仍是钉住态(无蚂蚁线)")
 
@@ -438,6 +449,7 @@ func _run() -> void:
 	_motion(mid_pt, MOUSE_BUTTON_MASK_LEFT)
 	await _settle()
 	_check(board._overlay._plug_on and spool_n._drag_port == Vector2i(1, 0), "拖线中:叠加层画插头,源口藏起插头")
+	_check(sfx.last_slot == &"pick", "音效:拿起插头响 pick(得 %s)" % sfx.last_slot)
 	_check((board._overlay.get_global_transform_with_canvas() * board._overlay._plug_pos).distance_to(mid_pt) < 2.0, "插头跟着鼠标")
 	_motion(to_pt, MOUSE_BUTTON_MASK_LEFT)
 	_press(to_pt, MOUSE_BUTTON_LEFT, false, 0)
@@ -446,8 +458,16 @@ func _run() -> void:
 			"真实拖线接上(线轴 A∧B → 目标 B∧A:冲突,稍后自动断)")
 	_check(not board._overlay._plug_on and spool_n._drag_port.x < 0, "松手后鼠标处的插头消失")
 	_check(goal_n.is_input_wired(0) and spool_n.is_output_wired(0), "接上:目标入口整圆、线轴出口不再画插头")
+	_check(sfx.last_slot == &"plug" and sfx._frame_played.get(&"plug", -1) == sfx._frame_played.get(&"error", -1) and sfx._frame_played.get(&"drop", -1) < sfx._frame_played.get(&"plug", -1),
+			"音效:接上响 plug、同帧冲突徽章 error,没有 drop(得 %s)" % sfx.last_slot)
 	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
 	_check(s.get_wires().is_empty() and not goal_n.is_input_wired(0), "接错的线自动断开,入口回到插座")
+	_press(from_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)   # 拖到空白处松手:空放
+	_motion(mid_pt + Vector2(0, 300), MOUSE_BUTTON_MASK_LEFT)
+	await _settle()
+	_press(mid_pt + Vector2(0, 300), MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().is_empty() and sfx.last_slot == &"drop", "音效:拖出去没接上松手响 drop(得 %s)" % sfx.last_slot)
 	_click(_center(_button_named(scene._palette, "封程机")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	var imp_id: int = s.get_node_ids()[-1]
@@ -518,6 +538,7 @@ func _run() -> void:
 	await nbui.slide_finished
 	await _settle()
 	_check(nbui.is_open() and is_equal_approx(nbui._drawer.position.x, NotebookUI.OPEN_X), "点「笔记」抽屉划出到位")
+	_check(sfx.last_slot == &"drawer_open", "音效:抽屉划出响 drawer_open(夹子按钮本身不响;得 %s)" % sfx.last_slot)
 	_check(nbui._handle.text.contains("继"), "划出后夹子变「继续工作」")
 	_check(nbui._entries.size() == scene.allowed_rules.size() and nbui._page == 0 and nbui._page_pic.visible
 			and nbui._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
@@ -528,6 +549,7 @@ func _run() -> void:
 	_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(nbui._page == 1 and nbui._page_pic.texture.resource_path.ends_with("notebook/and_elim.png"), "点「翻页」到第 2 页(拆股机整页图)")
+	_check(sfx.last_slot == &"page", "音效:翻页响 page(得 %s)" % sfx.last_slot)
 	for i in nbui._entries.size() - 1:
 		_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
@@ -537,6 +559,7 @@ func _run() -> void:
 	await _settle()
 	_check(not nbui.is_open() and nbui._handle.text.contains("笔")
 			and is_equal_approx(nbui._drawer.position.x, vw - NotebookUI.CLOSED_PEEK), "点「继续工作」抽屉收回")
+	_check(sfx.last_slot == &"drawer_close", "音效:抽屉收回响 drawer_close(得 %s)" % sfx.last_slot)
 
 	# ---- T. 标题页:四个选项 + 「设置」;开始游戏→选关;有进度则「继续游戏」;重置进度即清档;开发者信息 Esc 返回 ----
 	game.save.wipe()
@@ -568,6 +591,16 @@ func _run() -> void:
 		var pr: Rect2 = sp._panel.get_global_rect()
 		_check(sp.visible and absf(pr.get_center().x - 1920.0) <= 1.0 and absf(pr.get_center().y - 1080.0) <= 1.0 and pr.size.x >= SettingsPanel.PANEL_MIN_W and pr.end.y < 2160.0,
 				"点「设置」→ 弹窗打开、面板居中(%s)" % str(pr))
+		_check(sfx.last_slot == &"open", "音效:设置弹窗打开响 open(「设置」按钮本身不响;得 %s)" % sfx.last_slot)
+		var sfx_vol_before := float(game.save.settings.get("sfx_volume", 1.0))
+		_click(_center(sp._sfx_volume), MOUSE_BUTTON_LEFT)   # 音效滑条正中 = 50%
+		await _settle()
+		_check(is_equal_approx(sp._sfx_volume.value, 0.5) and is_equal_approx(sfx.user_volume, 0.5) and sp._sfx_volume_lbl.text == "50%"
+				and is_equal_approx(float(game.save.settings.get("sfx_volume", -1.0)), 0.5) and sfx.last_slot == &"slider",
+				"点音效滑条正中 → 音效音量 50%%、Sfx 当场生效、落 settings、响一声 slider 试听(得 %.2f / %s / %s)" % [sp._sfx_volume.value, sp._sfx_volume_lbl.text, sfx.last_slot])
+		sp._sfx_volume.value = sfx_vol_before
+		await _settle()
+		_check(is_equal_approx(sfx.user_volume, sfx_vol_before), "音效音量改回去")
 		_check(sp._robot_btn.visible and sp._robot_btn.text == "小机联动:开" and sp._maint_btn.visible and _button_named(sp, "关闭") != null,
 				"有机器人:「小机联动:开」+ 显示「小机维护」+ 有「关闭」")
 		var want_fs := "全屏:" + ("开" if SettingsPanel.is_fullscreen_mode(DisplayServer.window_get_mode()) else "关")
@@ -604,11 +637,13 @@ func _run() -> void:
 		_click(_center(sp._close_btn), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(not sp.visible, "点「关闭」收起弹窗")
+		_check(sfx.last_slot == &"close", "音效:「关闭」响 close 一声(按钮本身不响 click;得 %s)" % sfx.last_slot)
 		_click(_center(set_btn), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_key(KEY_ESCAPE)
 		await _settle()
 		_check(not sp.visible and current_scene == menu, "再开一次按 Esc 收起、仍在标题页")
+		_check(sfx.last_slot == &"close", "音效:Esc 收起也响 close(得 %s)" % sfx.last_slot)
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
@@ -714,9 +749,16 @@ func _run() -> void:
 		var answer_btn := _button_named(l01, "示答")
 		_check(answer_btn != null, "有脚本化解法的关(调试版)显示示答按钮")
 		if answer_btn != null:
+			var sfx_counts_ans: Dictionary = sfx.counts.duplicate()
 			_click(_center(answer_btn), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(l01.session.is_solved(), "点「示答」自动摆出答案并通关")
+			var only_click_hover := true   # 示答期间除按钮的 hover/click 外什么都不响(摆盘/接线/钉/通关全静音)
+			for k in sfx.counts:
+				if k != &"click" and k != &"hover" and int(sfx.counts[k]) != int(sfx_counts_ans.get(k, 0)):
+					only_click_hover = false
+			_check(only_click_hover and sfx.last_slot == &"click" and int(sfx.counts.get(&"win", 0)) == int(sfx_counts_ans.get(&"win", 0)) and not sfx.is_muted(),
+					"音效:示答只响按钮的 click,脚本摆盘/接线/通关全程静音、不响 win,静音计数归零(得 %s)" % sfx.last_slot)
 			# v1.2 通关弹窗:居中原尺寸图 + 中下纯文字「继续」;遮罩挡住后面的工具条;工具条没有「下一关」
 			var wp: WinPopup = l01._win_popup
 			var pr: Rect2 = wp._panel.get_global_rect()

@@ -27,14 +27,16 @@ func test_settings_keys_round_trip_and_survive_wipe() -> bool:
 	var sm := SaveManager.new()
 	sm.mark_solved(&"l01")
 	sm.settings["music_volume"] = 0.35
+	sm.settings["sfx_volume"] = 0.6
 	sm.settings["fullscreen"] = true
 	sm.save()
 	var sm2 := SaveManager.open()
-	var ok := check(is_equal_approx(float(sm2.settings.get("music_volume", -1.0)), 0.35) and sm2.settings.get("fullscreen") == true, "音量 / 全屏往返")
+	var ok := check(is_equal_approx(float(sm2.settings.get("music_volume", -1.0)), 0.35) and is_equal_approx(float(sm2.settings.get("sfx_volume", -1.0)), 0.6)
+			and sm2.settings.get("fullscreen") == true, "音量 / 音效音量 / 全屏往返")
 	sm2.wipe()
 	var sm3 := SaveManager.open()
 	ok = check(not sm3.is_solved(&"l01") and is_equal_approx(float(sm3.settings.get("music_volume", -1.0)), 0.35)
-			and sm3.settings.get("fullscreen") == true, "重置进度保留音量 / 全屏") and ok
+			and is_equal_approx(float(sm3.settings.get("sfx_volume", -1.0)), 0.6) and sm3.settings.get("fullscreen") == true, "重置进度保留音量 / 音效音量 / 全屏") and ok
 	sm3.settings = before
 	sm3.save()
 	return ok
@@ -51,13 +53,14 @@ func test_panel_without_autoloads() -> bool:
 	ok = check(not p._robot_btn.visible and not p._maint_btn.visible, "没有 Robot:小机联动 / 小机维护两行隐藏") and ok
 	ok = check(p._fullscreen_btn.text == "全屏:关", "无头下全屏显示关(得 %s)" % p._fullscreen_btn.text) and ok
 	ok = check(is_equal_approx(p._volume.value, SettingsPanel.VOLUME_DEFAULT) and p._volume_lbl.text == "100%", "默认音量 100%") and ok
+	ok = check(is_equal_approx(p._sfx_volume.value, SettingsPanel.VOLUME_DEFAULT) and p._sfx_volume_lbl.text == "100%", "默认音效音量 100%") and ok
 	var texts: Array[String] = []
 	for c in p.find_children("*", "Control", true, false):
 		if c is Label:
 			texts.append((c as Label).text)
 		elif c is Button:
 			texts.append((c as Button).text)
-	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("小机维护") and texts.has("关闭"), "文字齐全(得 %s)" % str(texts)) and ok
+	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("音效音量") and texts.has("小机维护") and texts.has("关闭"), "文字齐全(得 %s)" % str(texts)) and ok
 	p.close()
 	ok = check(not p.visible, "close 关上") and ok
 	# 百分数标签按「100%」预留宽度:拖到 5% 时行宽不变(否则整行在列里来回挪)

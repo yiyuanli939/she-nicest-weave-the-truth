@@ -96,6 +96,12 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 槽位表与做法见 `music/音乐bgm位置.md`:换曲 = 覆盖 `music/<槽位>.mp3`;新槽位第一次填曲改 `game/bgm.gd` `TRACKS` 一行;
 `--import` 后把 `.import` 一起提交。开发者信息页署名改 `ui/credits_scene.gd` `LINES`。关内四章暂共用 `music/level.wav`;新曲响度和现有曲不一致时在 `game/bgm.gd` `GAIN_DB` 按文件填 dB 修正。
 
+## 换 / 加操作音效
+
+槽位表、挂点与换法见 `assets/sfx/音效位置.md`:换音效 = 覆盖 `assets/sfx/<槽位>.ogg`(或 .wav);几个操作共用一个文件就在
+`game/sfx.gd` `CLIPS` 里指到同一路径;响度不一在 `GAIN_DB` 按槽位填 dB(`tools/sfx_audit.py` 给建议值并报刺耳的);
+`--import` 后把 `.import` 一起提交。候选方案在 `assets/sfx/候选/`(每套一个文件夹,`说明.md` 写了每个文件从哪来)。
+
 ## 验证改动
 
 ```bash

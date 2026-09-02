@@ -1,0 +1,4210 @@
+{
+ "A_黄铜机械": {
+  "click": [
+   {
+    "file": "click.ogg",
+    "title": "Menu FX 03 (ascending).wav",
+    "author": "Nightflame",
+    "url": "https://freesound.org/people/Nightflame/sounds/422516/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.21,
+    "hi4k": 0.09,
+    "centroid": 1086
+   },
+   {
+    "file": "click_2.ogg",
+    "title": "qKey.wav",
+    "author": "UberBosser",
+    "url": "https://freesound.org/people/UberBosser/sounds/421583/",
+    "license": "CC0",
+    "H": 5.2,
+    "dur": 0.16,
+    "hi4k": 0.06,
+    "centroid": 1981
+   }
+  ],
+  "hover": [
+   {
+    "file": "hover.ogg",
+    "title": "wood percussion 11",
+    "author": "PhonosUPF",
+    "url": "https://freesound.org/people/PhonosUPF/sounds/488913/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.34,
+    "hi4k": 0.0,
+    "centroid": 1088
+   },
+   {
+    "file": "hover_2.ogg",
+    "title": "wood attack",
+    "author": "PhonosUPF",
+    "url": "https://freesound.org/people/PhonosUPF/sounds/488996/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 0.51,
+    "hi4k": 0.02,
+    "centroid": 916
+   },
+   {
+    "file": "hover_3.ogg",
+    "title": "Clatter wood_05.wav",
+    "author": "deleted_user_2104797",
+    "url": "https://freesound.org/people/deleted_user_2104797/sounds/349270/",
+    "license": "CC0",
+    "H": 2.7,
+    "dur": 0.11,
+    "hi4k": 0.06,
+    "centroid": 1076
+   }
+  ],
+  "back": [
+   {
+    "file": "back.ogg",
+    "title": "Rhoda Knock",
+    "author": "neverheardof.me",
+    "url": "https://freesound.org/people/neverheardof.me/sounds/434518/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.12,
+    "hi4k": 0.0,
+    "centroid": 493
+   },
+   {
+    "file": "back_2.ogg",
+    "title": "Wooden Desk Hit 3_11",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485238/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 136
+   },
+   {
+    "file": "back_3.ogg",
+    "title": "Wood Surface Hit 2_5",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485220/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.15,
+    "hi4k": 0.01,
+    "centroid": 572
+   }
+  ],
+  "confirm": [
+   {
+    "file": "confirm.ogg",
+    "title": "Machine generated bassdrum (sorft of)",
+    "author": "Donald82",
+    "url": "https://freesound.org/people/Donald82/sounds/541810/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.45,
+    "hi4k": 0.0,
+    "centroid": 29
+   },
+   {
+    "file": "confirm_2.ogg",
+    "title": "blind lady school kids.wav",
+    "author": "clivew",
+    "url": "https://freesound.org/people/clivew/sounds/62952/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 55
+   },
+   {
+    "file": "confirm_3.ogg",
+    "title": "1911_fire",
+    "author": "db465",
+    "url": "https://freesound.org/people/db465/sounds/865988/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.14,
+    "hi4k": 0.04,
+    "centroid": 574
+   }
+  ],
+  "open": [
+   {
+    "file": "open.ogg",
+    "title": "Old_Suitcase_Latch_open.aif",
+    "author": "tmkappelt",
+    "url": "https://freesound.org/people/tmkappelt/sounds/85700/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 0.11,
+    "hi4k": 0.03,
+    "centroid": 595
+   },
+   {
+    "file": "open_2.ogg",
+    "title": "Metallic creak.wav",
+    "author": "Crinkem",
+    "url": "https://freesound.org/people/Crinkem/sounds/481786/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 0.36,
+    "hi4k": 0.01,
+    "centroid": 953
+   },
+   {
+    "file": "open_3.ogg",
+    "title": "Pop and Unlock Perc",
+    "author": "adh.dreaming",
+    "url": "https://freesound.org/people/adh.dreaming/sounds/668771/",
+    "license": "CC0",
+    "H": 6.0,
+    "dur": 0.55,
+    "hi4k": 0.28,
+    "centroid": 3154
+   }
+  ],
+  "close": [
+   {
+    "file": "close.ogg",
+    "title": "Closing the metal drawer 005",
+    "author": "AudioPapkin",
+    "url": "https://freesound.org/people/AudioPapkin/sounds/816651/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.94,
+    "hi4k": 0.01,
+    "centroid": 423
+   },
+   {
+    "file": "close_2.ogg",
+    "title": "Closing the metal drawer 001",
+    "author": "AudioPapkin",
+    "url": "https://freesound.org/people/AudioPapkin/sounds/816647/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 1.2,
+    "hi4k": 0.03,
+    "centroid": 711
+   },
+   {
+    "file": "close_3.ogg",
+    "title": "Closing the metal drawer 002",
+    "author": "AudioPapkin",
+    "url": "https://freesound.org/people/AudioPapkin/sounds/816648/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 1.4,
+    "hi4k": 0.05,
+    "centroid": 807
+   }
+  ],
+  "toggle": [
+   {
+    "file": "toggle.ogg",
+    "title": "Toggle switch On Off",
+    "author": "cookies+policy",
+    "url": "https://freesound.org/people/cookies+policy/sounds/556636/",
+    "license": "CC0",
+    "H": 5.2,
+    "dur": 0.43,
+    "hi4k": 0.06,
+    "centroid": 602
+   },
+   {
+    "file": "toggle_2.ogg",
+    "title": "Metal Switch Button Toggle 01.wav",
+    "author": "DustyWind",
+    "url": "https://freesound.org/people/DustyWind/sounds/697806/",
+    "license": "CC0",
+    "H": 5.4,
+    "dur": 0.15,
+    "hi4k": 0.17,
+    "centroid": 1909
+   }
+  ],
+  "slider": [
+   {
+    "file": "slider.ogg",
+    "title": "SingleWind2.wav",
+    "author": "BMacZero",
+    "url": "https://freesound.org/people/BMacZero/sounds/96150/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 142
+   },
+   {
+    "file": "slider_2.ogg",
+    "title": "SingleWind3.wav",
+    "author": "BMacZero",
+    "url": "https://freesound.org/people/BMacZero/sounds/96151/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 0.1,
+    "hi4k": 0.06,
+    "centroid": 727
+   },
+   {
+    "file": "slider_3.ogg",
+    "title": "SingleWind1.wav",
+    "author": "BMacZero",
+    "url": "https://freesound.org/people/BMacZero/sounds/96149/",
+    "license": "CC0",
+    "H": 4.0,
+    "dur": 0.14,
+    "hi4k": 0.13,
+    "centroid": 1297
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "reset_progress.ogg",
+    "title": "Gong_Center_Mute.wav",
+    "author": "Q.K.",
+    "url": "https://freesound.org/people/Q.K./sounds/56241/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.1,
+    "hi4k": 0.0,
+    "centroid": 382
+   },
+   {
+    "file": "reset_progress_2.ogg",
+    "title": "DOAN_Florence_2018_Gong alike.wav",
+    "author": "iut_Paris8",
+    "url": "https://freesound.org/people/iut_Paris8/sounds/428538/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 2.94,
+    "hi4k": 0.0,
+    "centroid": 507
+   },
+   {
+    "file": "reset_progress_3.ogg",
+    "title": "DUSSAUD_JESSY_2015_2016_gong.wav",
+    "author": "univ_lyon3",
+    "url": "https://freesound.org/people/univ_lyon3/sounds/324548/",
+    "license": "CC0",
+    "H": 1.2,
+    "dur": 3.0,
+    "hi4k": 0.0,
+    "centroid": 489
+   }
+  ],
+  "place": [
+   {
+    "file": "place.ogg",
+    "title": "Metallic Scrape Slide",
+    "author": "TheWandermiles",
+    "url": "https://freesound.org/people/TheWandermiles/sounds/673329/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 1.34,
+    "hi4k": 0.0,
+    "centroid": 144
+   },
+   {
+    "file": "place_2.ogg",
+    "title": "Metal Object Soft Hits.aif",
+    "author": "RutgerMuller",
+    "url": "https://freesound.org/people/RutgerMuller/sounds/104364/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.99,
+    "hi4k": 0.0,
+    "centroid": 262
+   },
+   {
+    "file": "place_3.ogg",
+    "title": "weird blow and whistle mouth foley-011.wav",
+    "author": "CVLTIV8R",
+    "url": "https://freesound.org/people/CVLTIV8R/sounds/800244/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 0.41,
+    "hi4k": 0.01,
+    "centroid": 1322
+   }
+  ],
+  "delete": [
+   {
+    "file": "delete.ogg",
+    "title": "MetalClank2",
+    "author": "Oddworld",
+    "url": "https://freesound.org/people/Oddworld/sounds/171246/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.71,
+    "hi4k": 0.0,
+    "centroid": 557
+   },
+   {
+    "file": "delete_2.ogg",
+    "title": "clonk1.aiff",
+    "author": "Jetrod",
+    "url": "https://freesound.org/people/Jetrod/sounds/362506/",
+    "license": "CC0",
+    "H": 2.7,
+    "dur": 0.39,
+    "hi4k": 0.02,
+    "centroid": 1555
+   },
+   {
+    "file": "delete_3.ogg",
+    "title": "Closing the metal drawer 003",
+    "author": "AudioPapkin",
+    "url": "https://freesound.org/people/AudioPapkin/sounds/816649/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.87,
+    "hi4k": 0.06,
+    "centroid": 996
+   }
+  ],
+  "refuse": [
+   {
+    "file": "refuse.ogg",
+    "title": "Wood block hit",
+    "author": "thomasjaunism",
+    "url": "https://freesound.org/people/thomasjaunism/sounds/218460/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.28,
+    "hi4k": 0.0,
+    "centroid": 567
+   },
+   {
+    "file": "refuse_2.ogg",
+    "title": "wood block",
+    "author": "thomasjaunism",
+    "url": "https://freesound.org/people/thomasjaunism/sounds/218461/",
+    "license": "CC0",
+    "H": 0.7,
+    "dur": 0.31,
+    "hi4k": 0.0,
+    "centroid": 630
+   },
+   {
+    "file": "refuse_3.ogg",
+    "title": "Ashboy34 - Temple block - Lunarlander 1969",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/742279/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.26,
+    "hi4k": 0.01,
+    "centroid": 1192
+   }
+  ],
+  "pick": [
+   {
+    "file": "pick.ogg",
+    "title": "Object dropped on plastic bag",
+    "author": "Dalesome",
+    "url": "https://freesound.org/people/Dalesome/sounds/352717/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.57,
+    "hi4k": 0.03,
+    "centroid": 296
+   },
+   {
+    "file": "pick_2.ogg",
+    "title": "Aluminum Can_Pick 2",
+    "author": "CAT-FOX_ALEX",
+    "url": "https://freesound.org/people/CAT-FOX_ALEX/sounds/867753/",
+    "license": "CC0",
+    "H": 4.3,
+    "dur": 0.21,
+    "hi4k": 0.03,
+    "centroid": 1805
+   },
+   {
+    "file": "pick_3.ogg",
+    "title": "10 - Balde 2.wav",
+    "author": "MichaelGillighan",
+    "url": "https://freesound.org/people/MichaelGillighan/sounds/429210/",
+    "license": "CC0",
+    "H": 5.3,
+    "dur": 0.59,
+    "hi4k": 0.08,
+    "centroid": 2213
+   }
+  ],
+  "drop": [
+   {
+    "file": "drop.ogg",
+    "title": "Object dropped on plastic bag",
+    "author": "Dalesome",
+    "url": "https://freesound.org/people/Dalesome/sounds/352717/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.57,
+    "hi4k": 0.03,
+    "centroid": 296
+   },
+   {
+    "file": "drop_2.ogg",
+    "title": "Clatter wood_05.wav",
+    "author": "deleted_user_2104797",
+    "url": "https://freesound.org/people/deleted_user_2104797/sounds/349270/",
+    "license": "CC0",
+    "H": 2.7,
+    "dur": 0.11,
+    "hi4k": 0.06,
+    "centroid": 1076
+   },
+   {
+    "file": "drop_3.ogg",
+    "title": "wood drop",
+    "author": "CosmoX45",
+    "url": "https://freesound.org/people/CosmoX45/sounds/723568/",
+    "license": "CC0",
+    "H": 3.2,
+    "dur": 0.84,
+    "hi4k": 0.04,
+    "centroid": 2006
+   }
+  ],
+  "plug": [
+   {
+    "file": "plug.ogg",
+    "title": "Plugging Into Zoom H1 [LOUD]",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/861111/",
+    "license": "CC0",
+    "H": 1.4,
+    "dur": 0.99,
+    "hi4k": 0.01,
+    "centroid": 261
+   },
+   {
+    "file": "plug_2.ogg",
+    "title": "Plug OUT",
+    "author": "unfa",
+    "url": "https://freesound.org/people/unfa/sounds/170378/",
+    "license": "CC0",
+    "H": 1.4,
+    "dur": 1.18,
+    "hi4k": 0.0,
+    "centroid": 22
+   },
+   {
+    "file": "plug_3.ogg",
+    "title": "Plug IN",
+    "author": "unfa",
+    "url": "https://freesound.org/people/unfa/sounds/170379/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.54,
+    "hi4k": 0.01,
+    "centroid": 167
+   }
+  ],
+  "unplug": [
+   {
+    "file": "unplug.ogg",
+    "title": "Whoosh - USB Cable - OS ST 4",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/855788/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 0.31,
+    "hi4k": 0.02,
+    "centroid": 793
+   },
+   {
+    "file": "unplug_2.ogg",
+    "title": "HeadphonesCase-TakeCable4",
+    "author": "Rosgardius",
+    "url": "https://freesound.org/people/Rosgardius/sounds/696361/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 1.02,
+    "hi4k": 0.03,
+    "centroid": 670
+   },
+   {
+    "file": "unplug_3.ogg",
+    "title": "Self Flaggelation - OS ST",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/855745/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.36,
+    "hi4k": 0.04,
+    "centroid": 1182
+   }
+  ],
+  "error": [
+   {
+    "file": "error.ogg",
+    "title": "Long Crackle 01.wav",
+    "author": "ironcross32",
+    "url": "https://freesound.org/people/ironcross32/sounds/582634/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.59,
+    "hi4k": 0.0,
+    "centroid": 82
+   },
+   {
+    "file": "error_2.ogg",
+    "title": "70.aiff",
+    "author": "eliasheuninck",
+    "url": "https://freesound.org/people/eliasheuninck/sounds/3617/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.06,
+    "hi4k": 0.03,
+    "centroid": 1338
+   }
+  ],
+  "warn": [
+   {
+    "file": "warn.ogg",
+    "title": "Chuông 7E",
+    "author": "SieuAmThanh",
+    "url": "https://freesound.org/people/SieuAmThanh/sounds/542075/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.24,
+    "hi4k": 0.0,
+    "centroid": 536
+   },
+   {
+    "file": "warn_2.ogg",
+    "title": "Electronic Bing Soft.wav",
+    "author": "baidonovan",
+    "url": "https://freesound.org/people/baidonovan/sounds/187337/",
+    "license": "CC0",
+    "H": 1.2,
+    "dur": 0.64,
+    "hi4k": 0.02,
+    "centroid": 1012
+   },
+   {
+    "file": "warn_3.ogg",
+    "title": "gbell_9-2_pp.aif",
+    "author": "batchku",
+    "url": "https://freesound.org/people/batchku/sounds/10464/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 0.26,
+    "hi4k": 0.0,
+    "centroid": 1349
+   }
+  ],
+  "snap": [
+   {
+    "file": "snap.ogg",
+    "title": "Rubber band twang",
+    "author": "JoMungus",
+    "url": "https://freesound.org/people/JoMungus/sounds/718596/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.43,
+    "hi4k": 0.01,
+    "centroid": 684
+   },
+   {
+    "file": "snap_2.ogg",
+    "title": "Rattle1.wav",
+    "author": "BMacZero",
+    "url": "https://freesound.org/people/BMacZero/sounds/94131/",
+    "license": "CC0",
+    "H": 4.9,
+    "dur": 0.5,
+    "hi4k": 0.15,
+    "centroid": 2060
+   },
+   {
+    "file": "snap_3.ogg",
+    "title": "Trap Springing Shut",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/752070/",
+    "license": "CC0",
+    "H": 5.5,
+    "dur": 0.96,
+    "hi4k": 0.33,
+    "centroid": 2548
+   }
+  ],
+  "move": [
+   {
+    "file": "move.ogg",
+    "title": "Glass Slide 8",
+    "author": "WasabiWielder",
+    "url": "https://freesound.org/people/WasabiWielder/sounds/323422/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.73,
+    "hi4k": 0.0,
+    "centroid": 286
+   },
+   {
+    "file": "move_2.ogg",
+    "title": "wooden slide : drawer shutting2.wav",
+    "author": "sophiehall3535",
+    "url": "https://freesound.org/people/sophiehall3535/sounds/245925/",
+    "license": "CC0",
+    "H": 3.8,
+    "dur": 0.2,
+    "hi4k": 0.01,
+    "centroid": 947
+   }
+  ],
+  "zoom": [
+   {
+    "file": "zoom.ogg",
+    "title": "Tick Tock",
+    "author": "StarNinjas37",
+    "url": "https://freesound.org/people/StarNinjas37/sounds/547305/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.73,
+    "hi4k": 0.0,
+    "centroid": 1641
+   },
+   {
+    "file": "zoom_2.ogg",
+    "title": "clock_tickC_reversed-bass_trebble-boosted",
+    "author": "Mohagged",
+    "url": "https://freesound.org/people/Mohagged/sounds/810939/",
+    "license": "CC0",
+    "H": 3.2,
+    "dur": 0.14,
+    "hi4k": 0.05,
+    "centroid": 978
+   },
+   {
+    "file": "zoom_3.ogg",
+    "title": "Ticking.WAV",
+    "author": "DiArchangeli",
+    "url": "https://freesound.org/people/DiArchangeli/sounds/405248/",
+    "license": "CC0",
+    "H": 3.3,
+    "dur": 0.17,
+    "hi4k": 0.04,
+    "centroid": 1854
+   }
+  ],
+  "redo": [
+   {
+    "file": "redo.ogg",
+    "title": "gear select.wav",
+    "author": "greatsoundstube",
+    "url": "https://freesound.org/people/greatsoundstube/sounds/629324/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 1.62,
+    "hi4k": 0.0,
+    "centroid": 119
+   },
+   {
+    "file": "redo_2.ogg",
+    "title": "gear shif fail scratch (1).m4a",
+    "author": "marciofao",
+    "url": "https://freesound.org/people/marciofao/sounds/519638/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.85,
+    "hi4k": 0.03,
+    "centroid": 983
+   },
+   {
+    "file": "redo_3.ogg",
+    "title": "Metal Gear Solid Alarm.wav",
+    "author": "jozef_sound",
+    "url": "https://freesound.org/people/jozef_sound/sounds/493941/",
+    "license": "CC0",
+    "H": 3.3,
+    "dur": 0.79,
+    "hi4k": 0.08,
+    "centroid": 1405
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "reset_board.ogg",
+    "title": "Industrial Lever",
+    "author": "Autobot8299",
+    "url": "https://freesound.org/people/Autobot8299/sounds/835550/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 0.93,
+    "hi4k": 0.03,
+    "centroid": 736
+   },
+   {
+    "file": "reset_board_2.ogg",
+    "title": "Metal Lever 1.aif",
+    "author": "timgormly",
+    "url": "https://freesound.org/people/timgormly/sounds/151271/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 0.38,
+    "hi4k": 0.07,
+    "centroid": 1322
+   },
+   {
+    "file": "reset_board_3.ogg",
+    "title": "lever.wav",
+    "author": "Krokulator",
+    "url": "https://freesound.org/people/Krokulator/sounds/696746/",
+    "license": "CC0",
+    "H": 5.1,
+    "dur": 0.53,
+    "hi4k": 0.15,
+    "centroid": 2412
+   }
+  ],
+  "brush": [
+   {
+    "file": "brush.ogg",
+    "title": "WOOD.wav",
+    "author": "Krokulator",
+    "url": "https://freesound.org/people/Krokulator/sounds/652615/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.04,
+    "hi4k": 0.0,
+    "centroid": 484
+   },
+   {
+    "file": "brush_2.ogg",
+    "title": "Wood Knock",
+    "author": "Mrguff",
+    "url": "https://freesound.org/people/Mrguff/sounds/369710/",
+    "license": "CC0",
+    "H": 1.1,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 438
+   },
+   {
+    "file": "brush_3.ogg",
+    "title": "hit - wooden 09.wav",
+    "author": "Anthousai",
+    "url": "https://freesound.org/people/Anthousai/sounds/406278/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.07,
+    "hi4k": 0.0,
+    "centroid": 769
+   }
+  ],
+  "paint": [
+   {
+    "file": "paint.ogg",
+    "title": "writing - chalk - set down 01.wav",
+    "author": "Anthousai",
+    "url": "https://freesound.org/people/Anthousai/sounds/398489/",
+    "license": "CC0",
+    "H": 4.9,
+    "dur": 0.4,
+    "hi4k": 0.02,
+    "centroid": 1488
+   },
+   {
+    "file": "paint_2.ogg",
+    "title": "Write/Draw with chalk on board",
+    "author": "Breviceps",
+    "url": "https://freesound.org/people/Breviceps/sounds/447925/",
+    "license": "CC0",
+    "H": 5.5,
+    "dur": 0.43,
+    "hi4k": 0.17,
+    "centroid": 1494
+   }
+  ],
+  "clear": [
+   {
+    "file": "clear.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "clear_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "clear_3.ogg",
+    "title": "wipe2.wav",
+    "author": "Sclolex",
+    "url": "https://freesound.org/people/Sclolex/sounds/179779/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.76,
+    "hi4k": 0.02,
+    "centroid": 360
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "drawer_open.ogg",
+    "title": "22-OpeningDrawer.wav",
+    "author": "cazadordoblekatana",
+    "url": "https://freesound.org/people/cazadordoblekatana/sounds/429143/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.9,
+    "hi4k": 0.0,
+    "centroid": 20
+   },
+   {
+    "file": "drawer_open_2.ogg",
+    "title": "22-OpeningDrawer(Amp +).wav",
+    "author": "cazadordoblekatana",
+    "url": "https://freesound.org/people/cazadordoblekatana/sounds/429144/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.9,
+    "hi4k": 0.0,
+    "centroid": 20
+   },
+   {
+    "file": "drawer_open_3.ogg",
+    "title": "Object_Drawer_Wood_Open.wav",
+    "author": "Nox_Sound",
+    "url": "https://freesound.org/people/Nox_Sound/sounds/486081/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.87,
+    "hi4k": 0.0,
+    "centroid": 289
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "drawer_close.ogg",
+    "title": "Object_Drawer_Wood_Close.wav",
+    "author": "Nox_Sound",
+    "url": "https://freesound.org/people/Nox_Sound/sounds/486082/",
+    "license": "CC0",
+    "H": 1.4,
+    "dur": 0.74,
+    "hi4k": 0.0,
+    "centroid": 294
+   },
+   {
+    "file": "drawer_close_2.ogg",
+    "title": "Opening/closing a wooden drawer",
+    "author": "fleurescence",
+    "url": "https://freesound.org/people/fleurescence/sounds/573159/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.58,
+    "hi4k": 0.03,
+    "centroid": 581
+   },
+   {
+    "file": "drawer_close_3.ogg",
+    "title": "Opening/closing a wooden drawer",
+    "author": "fleurescence",
+    "url": "https://freesound.org/people/fleurescence/sounds/573154/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.54,
+    "hi4k": 0.01,
+    "centroid": 336
+   }
+  ],
+  "page": [
+   {
+    "file": "page.ogg",
+    "title": "Page turn",
+    "author": "chungus43A",
+    "url": "https://freesound.org/people/chungus43A/sounds/705384/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.97,
+    "hi4k": 0.02,
+    "centroid": 395
+   },
+   {
+    "file": "page_2.ogg",
+    "title": "Page Turn, Big Book",
+    "author": "supaluci",
+    "url": "https://freesound.org/people/supaluci/sounds/726518/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 1.04,
+    "hi4k": 0.01,
+    "centroid": 324
+   },
+   {
+    "file": "page_3.ogg",
+    "title": "Book Turn Page 1.wav",
+    "author": "esperri",
+    "url": "https://freesound.org/people/esperri/sounds/119126/",
+    "license": "CC0",
+    "H": 4.2,
+    "dur": 1.0,
+    "hi4k": 0.11,
+    "centroid": 1531
+   }
+  ],
+  "hint": [
+   {
+    "file": "hint.ogg",
+    "title": "point-in-space.ogg",
+    "author": "bluetshirt",
+    "url": "https://freesound.org/people/bluetshirt/sounds/570243/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 0.51,
+    "hi4k": 0.0,
+    "centroid": 641
+   },
+   {
+    "file": "hint_2.ogg",
+    "title": "Tiny Dink",
+    "author": "ldsqui",
+    "url": "https://freesound.org/people/ldsqui/sounds/813182/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 0.05,
+    "hi4k": 0.0,
+    "centroid": 2545
+   },
+   {
+    "file": "hint_3.ogg",
+    "title": "point-in-space-2.ogg",
+    "author": "bluetshirt",
+    "url": "https://freesound.org/people/bluetshirt/sounds/570265/",
+    "license": "CC0",
+    "H": 3.3,
+    "dur": 0.55,
+    "hi4k": 0.03,
+    "centroid": 939
+   }
+  ],
+  "guide": [
+   {
+    "file": "guide.ogg",
+    "title": "Tractor_Hand_Rail_01.wav",
+    "author": "BenDrain",
+    "url": "https://freesound.org/people/BenDrain/sounds/488012/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 0.92,
+    "hi4k": 0.02,
+    "centroid": 205
+   },
+   {
+    "file": "guide_2.ogg",
+    "title": "botton hand dryer.wav",
+    "author": "deleted_user_3137935",
+    "url": "https://freesound.org/people/deleted_user_3137935/sounds/232777/",
+    "license": "CC0",
+    "H": 3.4,
+    "dur": 1.13,
+    "hi4k": 0.03,
+    "centroid": 987
+   },
+   {
+    "file": "guide_3.ogg",
+    "title": "Tractor_Hand_Rail_04.wav",
+    "author": "BenDrain",
+    "url": "https://freesound.org/people/BenDrain/sounds/487870/",
+    "license": "CC0",
+    "H": 3.5,
+    "dur": 1.37,
+    "hi4k": 0.02,
+    "centroid": 179
+   }
+  ],
+  "next": [
+   {
+    "file": "next.ogg",
+    "title": "Putting a pencil on paper to write",
+    "author": "ani_music",
+    "url": "https://freesound.org/people/ani_music/sounds/632474/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.05,
+    "hi4k": 0.02,
+    "centroid": 412
+   },
+   {
+    "file": "next_2.ogg",
+    "title": "Huge_Thick_Hard_01_Close_03.wav",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/552997/",
+    "license": "CC0",
+    "H": 1.1,
+    "dur": 0.69,
+    "hi4k": 0.01,
+    "centroid": 141
+   },
+   {
+    "file": "next_3.ogg",
+    "title": "That&#x27;s Not Going Anywhere (Toilet Paper Roll on Bedside Table)",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/861327/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 269
+   }
+  ],
+  "portrait": [
+   {
+    "file": "portrait.ogg",
+    "title": "Fabric_Foley_2",
+    "author": "Mediasaur",
+    "url": "https://freesound.org/people/Mediasaur/sounds/789039/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 150
+   },
+   {
+    "file": "portrait_2.ogg",
+    "title": "Blanket Movement 6",
+    "author": "OwlStorm",
+    "url": "https://freesound.org/people/OwlStorm/sounds/320144/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.98,
+    "hi4k": 0.02,
+    "centroid": 295
+   },
+   {
+    "file": "portrait_3.ogg",
+    "title": "Jacket/Cloth Rustle 9",
+    "author": "brandondelehoy",
+    "url": "https://freesound.org/people/brandondelehoy/sounds/494797/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.29,
+    "hi4k": 0.02,
+    "centroid": 535
+   }
+  ],
+  "win": [
+   {
+    "file": "win.ogg",
+    "title": "Music box note",
+    "author": "thomasjaunism",
+    "url": "https://freesound.org/people/thomasjaunism/sounds/218459/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 1.41,
+    "hi4k": 0.0,
+    "centroid": 1489
+   },
+   {
+    "file": "win_2.ogg",
+    "title": "Ballerina Music Box",
+    "author": "JordanWoodland",
+    "url": "https://freesound.org/people/JordanWoodland/sounds/411629/",
+    "license": "CC0",
+    "H": 4.2,
+    "dur": 2.56,
+    "hi4k": 0.01,
+    "centroid": 1503
+   }
+  ]
+ },
+ "B_纸布柔和": {
+  "click": [
+   {
+    "file": "click.ogg",
+    "title": "Putting a pencil on paper to write",
+    "author": "ani_music",
+    "url": "https://freesound.org/people/ani_music/sounds/632474/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.05,
+    "hi4k": 0.02,
+    "centroid": 412
+   },
+   {
+    "file": "click_2.ogg",
+    "title": "Huge_Thick_Hard_01_Close_03.wav",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/552997/",
+    "license": "CC0",
+    "H": 1.1,
+    "dur": 0.69,
+    "hi4k": 0.01,
+    "centroid": 141
+   },
+   {
+    "file": "click_3.ogg",
+    "title": "That&#x27;s Not Going Anywhere (Toilet Paper Roll on Bedside Table)",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/861327/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 269
+   }
+  ],
+  "hover": [
+   {
+    "file": "hover.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "hover_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "hover_3.ogg",
+    "title": "Cloth Flip",
+    "author": "blewis20",
+    "url": "https://freesound.org/people/blewis20/sounds/370325/",
+    "license": "CC0",
+    "H": 3.4,
+    "dur": 0.7,
+    "hi4k": 0.07,
+    "centroid": 1077
+   }
+  ],
+  "back": [
+   {
+    "file": "back.ogg",
+    "title": "paper",
+    "author": "1bob",
+    "url": "https://freesound.org/people/1bob/sounds/651514/",
+    "license": "CC0",
+    "H": 2.5,
+    "dur": 0.49,
+    "hi4k": 0.04,
+    "centroid": 858
+   },
+   {
+    "file": "back_2.ogg",
+    "title": "Paper Page Flip",
+    "author": "OnlyOz",
+    "url": "https://freesound.org/people/OnlyOz/sounds/828802/",
+    "license": "CC0",
+    "H": 4.5,
+    "dur": 0.53,
+    "hi4k": 0.02,
+    "centroid": 1570
+   }
+  ],
+  "confirm": [
+   {
+    "file": "confirm.ogg",
+    "title": "Soft Two-Finger Snap",
+    "author": "jackieAZ",
+    "url": "https://freesound.org/people/jackieAZ/sounds/388958/",
+    "license": "CC0",
+    "H": 0.2,
+    "dur": 0.09,
+    "hi4k": 0.0,
+    "centroid": 155
+   },
+   {
+    "file": "confirm_2.ogg",
+    "title": "brush2.wav",
+    "author": "Reitanna",
+    "url": "https://freesound.org/people/Reitanna/sounds/332665/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 1.32,
+    "hi4k": 0.04,
+    "centroid": 554
+   },
+   {
+    "file": "confirm_3.ogg",
+    "title": "pop out, bubble, soft bursting",
+    "author": "chaferwitt",
+    "url": "https://freesound.org/people/chaferwitt/sounds/776443/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 0.07,
+    "hi4k": 0.0,
+    "centroid": 1001
+   }
+  ],
+  "open": [
+   {
+    "file": "open.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "open_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "open_3.ogg",
+    "title": "ButterKnifeOnFabric5",
+    "author": "Huglex",
+    "url": "https://freesound.org/people/Huglex/sounds/853257/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.21,
+    "hi4k": 0.02,
+    "centroid": 334
+   }
+  ],
+  "close": [
+   {
+    "file": "close.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "close_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "close_3.ogg",
+    "title": "ButterKnifeOnFabric5",
+    "author": "Huglex",
+    "url": "https://freesound.org/people/Huglex/sounds/853257/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.21,
+    "hi4k": 0.02,
+    "centroid": 334
+   }
+  ],
+  "toggle": [
+   {
+    "file": "toggle.ogg",
+    "title": "tap_on_chalkboard.wav",
+    "author": "joedeshon",
+    "url": "https://freesound.org/people/joedeshon/sounds/258092/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.09,
+    "hi4k": 0.01,
+    "centroid": 679
+   },
+   {
+    "file": "toggle_2.ogg",
+    "title": "Digital Radio Rack Unit Button Snap 3_1",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/477706/",
+    "license": "CC0",
+    "H": 3.7,
+    "dur": 0.04,
+    "hi4k": 0.02,
+    "centroid": 2365
+   }
+  ],
+  "slider": [
+   {
+    "file": "slider.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "slider_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "slider_3.ogg",
+    "title": "ButterKnifeOnFabric5",
+    "author": "Huglex",
+    "url": "https://freesound.org/people/Huglex/sounds/853257/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.21,
+    "hi4k": 0.02,
+    "centroid": 334
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "reset_progress.ogg",
+    "title": "Canvas Dropcloth Snap 1",
+    "author": "zembacraftworks",
+    "url": "https://freesound.org/people/zembacraftworks/sounds/428337/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.3,
+    "hi4k": 0.0,
+    "centroid": 22
+   },
+   {
+    "file": "reset_progress_2.ogg",
+    "title": "Canvas Dropcloth Snap 2",
+    "author": "zembacraftworks",
+    "url": "https://freesound.org/people/zembacraftworks/sounds/428336/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.48,
+    "hi4k": 0.0,
+    "centroid": 23
+   },
+   {
+    "file": "reset_progress_3.ogg",
+    "title": "Clothes Shaking Movement 6_19",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/493495/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 0.37,
+    "hi4k": 0.03,
+    "centroid": 594
+   }
+  ],
+  "place": [
+   {
+    "file": "place.ogg",
+    "title": "book_snap_shut.wav",
+    "author": "j1987",
+    "url": "https://freesound.org/people/j1987/sounds/573198/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.04,
+    "hi4k": 0.02,
+    "centroid": 444
+   },
+   {
+    "file": "place_2.ogg",
+    "title": "book scale8",
+    "author": "nellinkowanej",
+    "url": "https://freesound.org/people/nellinkowanej/sounds/209637/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.15,
+    "hi4k": 0.1,
+    "centroid": 1333
+   },
+   {
+    "file": "place_3.ogg",
+    "title": "Book Flop",
+    "author": "kevinpro",
+    "url": "https://freesound.org/people/kevinpro/sounds/382232/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.72,
+    "hi4k": 0.02,
+    "centroid": 588
+   }
+  ],
+  "delete": [
+   {
+    "file": "delete.ogg",
+    "title": "Flapping 4",
+    "author": "NearTheAtmoshphere",
+    "url": "https://freesound.org/people/NearTheAtmoshphere/sounds/676456/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.71,
+    "hi4k": 0.01,
+    "centroid": 480
+   },
+   {
+    "file": "delete_2.ogg",
+    "title": "shoot and score.wav",
+    "author": "victoriarey91",
+    "url": "https://freesound.org/people/victoriarey91/sounds/152993/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.19,
+    "hi4k": 0.07,
+    "centroid": 1257
+   },
+   {
+    "file": "delete_3.ogg",
+    "title": "crumple-05.ogg",
+    "author": "drooler",
+    "url": "https://freesound.org/people/drooler/sounds/508598/",
+    "license": "CC0",
+    "H": 5.9,
+    "dur": 0.44,
+    "hi4k": 0.09,
+    "centroid": 2464
+   }
+  ],
+  "refuse": [
+   {
+    "file": "refuse.ogg",
+    "title": "Hit_hurt 13.wav",
+    "author": "acv23",
+    "url": "https://freesound.org/people/acv23/sounds/581615/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 4
+   },
+   {
+    "file": "refuse_2.ogg",
+    "title": "68 Golpe Ardilla.wav",
+    "author": "checholio",
+    "url": "https://freesound.org/people/checholio/sounds/443848/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.16,
+    "hi4k": 0.0,
+    "centroid": 53
+   },
+   {
+    "file": "refuse_3.ogg",
+    "title": "found matress hit.wav",
+    "author": "apinasaundi",
+    "url": "https://freesound.org/people/apinasaundi/sounds/405705/",
+    "license": "CC0",
+    "H": 0.7,
+    "dur": 0.29,
+    "hi4k": 0.0,
+    "centroid": 24
+   }
+  ],
+  "pick": [
+   {
+    "file": "pick.ogg",
+    "title": "guitar-twang-muted-b.wav",
+    "author": "JoostDev",
+    "url": "https://freesound.org/people/JoostDev/sounds/340292/",
+    "license": "CC0",
+    "H": 1.4,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 397
+   },
+   {
+    "file": "pick_2.ogg",
+    "title": "Threaded_Bar_Scraping_Very_High.wav",
+    "author": "mickyman5000",
+    "url": "https://freesound.org/people/mickyman5000/sounds/340086/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.28,
+    "hi4k": 0.05,
+    "centroid": 1704
+   },
+   {
+    "file": "pick_3.ogg",
+    "title": "guitar-twang-muted-a.wav",
+    "author": "JoostDev",
+    "url": "https://freesound.org/people/JoostDev/sounds/340293/",
+    "license": "CC0",
+    "H": 2.2,
+    "dur": 0.42,
+    "hi4k": 0.01,
+    "centroid": 396
+   }
+  ],
+  "drop": [
+   {
+    "file": "drop.ogg",
+    "title": "Canvas Dropcloth Snap 1",
+    "author": "zembacraftworks",
+    "url": "https://freesound.org/people/zembacraftworks/sounds/428337/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.3,
+    "hi4k": 0.0,
+    "centroid": 22
+   },
+   {
+    "file": "drop_2.ogg",
+    "title": "Canvas Dropcloth Snap 2",
+    "author": "zembacraftworks",
+    "url": "https://freesound.org/people/zembacraftworks/sounds/428336/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.48,
+    "hi4k": 0.0,
+    "centroid": 23
+   },
+   {
+    "file": "drop_3.ogg",
+    "title": "clothes drop 5",
+    "author": "ZoviPoland",
+    "url": "https://freesound.org/people/ZoviPoland/sounds/517729/",
+    "license": "CC0",
+    "H": 1.2,
+    "dur": 0.32,
+    "hi4k": 0.0,
+    "centroid": 361
+   }
+  ],
+  "plug": [
+   {
+    "file": "plug.ogg",
+    "title": "snap.wav",
+    "author": "jackieAZ",
+    "url": "https://freesound.org/people/jackieAZ/sounds/346579/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 82
+   },
+   {
+    "file": "plug_2.ogg",
+    "title": "tap_on_chalkboard.wav",
+    "author": "joedeshon",
+    "url": "https://freesound.org/people/joedeshon/sounds/258092/",
+    "license": "CC0",
+    "H": 2.1,
+    "dur": 0.09,
+    "hi4k": 0.01,
+    "centroid": 679
+   },
+   {
+    "file": "plug_3.ogg",
+    "title": "Snap Layered 09.wav",
+    "author": "JoshuaPomeroy",
+    "url": "https://freesound.org/people/JoshuaPomeroy/sounds/532250/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 0.06,
+    "hi4k": 0.11,
+    "centroid": 1597
+   }
+  ],
+  "unplug": [
+   {
+    "file": "unplug.ogg",
+    "title": "Velcro Opening",
+    "author": "tackbackward",
+    "url": "https://freesound.org/people/tackbackward/sounds/541255/",
+    "license": "CC0",
+    "H": 7.8,
+    "dur": 1.03,
+    "hi4k": 0.13,
+    "centroid": 3478
+   }
+  ],
+  "error": [
+   {
+    "file": "error.ogg",
+    "title": "Hit_hurt 13.wav",
+    "author": "acv23",
+    "url": "https://freesound.org/people/acv23/sounds/581615/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 4
+   },
+   {
+    "file": "error_2.ogg",
+    "title": "Hit_hurt 11.wav",
+    "author": "acv23",
+    "url": "https://freesound.org/people/acv23/sounds/581614/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.12,
+    "hi4k": 0.0,
+    "centroid": 10
+   },
+   {
+    "file": "error_3.ogg",
+    "title": "Punchy Mid Thud",
+    "author": "bassimat",
+    "url": "https://freesound.org/people/bassimat/sounds/858805/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.15,
+    "hi4k": 0.0,
+    "centroid": 621
+   }
+  ],
+  "warn": [
+   {
+    "file": "warn.ogg",
+    "title": "Wooden Desk Hit 3_11",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485238/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 136
+   },
+   {
+    "file": "warn_2.ogg",
+    "title": "Triple Knock on Door",
+    "author": "Tombombadil1988",
+    "url": "https://freesound.org/people/Tombombadil1988/sounds/351144/",
+    "license": "CC0",
+    "H": 2.5,
+    "dur": 0.74,
+    "hi4k": 0.0,
+    "centroid": 209
+   },
+   {
+    "file": "warn_3.ogg",
+    "title": "Wood Surface Hit 2_5",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485220/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.15,
+    "hi4k": 0.01,
+    "centroid": 572
+   }
+  ],
+  "snap": [
+   {
+    "file": "snap.ogg",
+    "title": "Hit_MS20 Analog String_A.wav",
+    "author": "colourofeternity",
+    "url": "https://freesound.org/people/colourofeternity/sounds/517534/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.63,
+    "hi4k": 0.0,
+    "centroid": 267
+   },
+   {
+    "file": "snap_2.ogg",
+    "title": "piano_string_hit_short 5",
+    "author": "Daphne_in_Wonderland",
+    "url": "https://freesound.org/people/Daphne_in_Wonderland/sounds/148772/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.49,
+    "hi4k": 0.0,
+    "centroid": 187
+   },
+   {
+    "file": "snap_3.ogg",
+    "title": "String Slice Short.wav",
+    "author": "johnnypanic",
+    "url": "https://freesound.org/people/johnnypanic/sounds/320825/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.33,
+    "hi4k": 0.0,
+    "centroid": 373
+   }
+  ],
+  "move": [
+   {
+    "file": "move.ogg",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 60
+   },
+   {
+    "file": "move_2.ogg",
+    "title": "Cloth Footstep-6.wav",
+    "author": "MikeFozzy98",
+    "url": "https://freesound.org/people/MikeFozzy98/sounds/670107/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 85
+   },
+   {
+    "file": "move_3.ogg",
+    "title": "ButterKnifeOnFabric5",
+    "author": "Huglex",
+    "url": "https://freesound.org/people/Huglex/sounds/853257/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.21,
+    "hi4k": 0.02,
+    "centroid": 334
+   }
+  ],
+  "zoom": [
+   {
+    "file": "zoom.ogg",
+    "title": "Warm Lo-Fi Tick",
+    "author": "bassimat",
+    "url": "https://freesound.org/people/bassimat/sounds/858801/",
+    "license": "CC0",
+    "H": 0.2,
+    "dur": 0.1,
+    "hi4k": 0.0,
+    "centroid": 211
+   },
+   {
+    "file": "zoom_2.ogg",
+    "title": "SFX Ambiance: Clock Tick",
+    "author": "trullilulli",
+    "url": "https://freesound.org/people/trullilulli/sounds/422642/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.06,
+    "hi4k": 0.0,
+    "centroid": 562
+   },
+   {
+    "file": "zoom_3.ogg",
+    "title": "Tick Tock",
+    "author": "StarNinjas37",
+    "url": "https://freesound.org/people/StarNinjas37/sounds/547305/",
+    "license": "CC0",
+    "H": 3.0,
+    "dur": 0.73,
+    "hi4k": 0.0,
+    "centroid": 1641
+   }
+  ],
+  "redo": [
+   {
+    "file": "redo.ogg",
+    "title": "Page Flip",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/442858/",
+    "license": "CC0",
+    "H": 4.1,
+    "dur": 0.52,
+    "hi4k": 0.14,
+    "centroid": 1828
+   },
+   {
+    "file": "redo_2.ogg",
+    "title": "Page flip.wav",
+    "author": "cameronpride",
+    "url": "https://freesound.org/people/cameronpride/sounds/676674/",
+    "license": "CC0",
+    "H": 4.2,
+    "dur": 0.18,
+    "hi4k": 0.05,
+    "centroid": 2415
+   },
+   {
+    "file": "redo_3.ogg",
+    "title": "Flipping Page Back",
+    "author": "Ym_The_Cosmic",
+    "url": "https://freesound.org/people/Ym_The_Cosmic/sounds/858467/",
+    "license": "CC0",
+    "H": 5.2,
+    "dur": 0.36,
+    "hi4k": 0.1,
+    "centroid": 2387
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "reset_board.ogg",
+    "title": "es-papershuffle.wav",
+    "author": "eddies2000",
+    "url": "https://freesound.org/people/eddies2000/sounds/448463/",
+    "license": "CC0",
+    "H": 4.0,
+    "dur": 2.57,
+    "hi4k": 0.03,
+    "centroid": 596
+   }
+  ],
+  "brush": [
+   {
+    "file": "brush.ogg",
+    "title": "Putting a pencil on paper to write",
+    "author": "ani_music",
+    "url": "https://freesound.org/people/ani_music/sounds/632474/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.05,
+    "hi4k": 0.02,
+    "centroid": 412
+   },
+   {
+    "file": "brush_2.ogg",
+    "title": "pencil_start_01.wav",
+    "author": "sseletskyy",
+    "url": "https://freesound.org/people/sseletskyy/sounds/180444/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 0.27,
+    "hi4k": 0.01,
+    "centroid": 701
+   },
+   {
+    "file": "brush_3.ogg",
+    "title": "Pencil Scribble (9)",
+    "author": "JellyDaisies",
+    "url": "https://freesound.org/people/JellyDaisies/sounds/761665/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 0.38,
+    "hi4k": 0.02,
+    "centroid": 404
+   }
+  ],
+  "paint": [
+   {
+    "file": "paint.ogg",
+    "title": "Pencil Stroke",
+    "author": "sokworks",
+    "url": "https://freesound.org/people/sokworks/sounds/860362/",
+    "license": "CC0",
+    "H": 2.5,
+    "dur": 0.51,
+    "hi4k": 0.08,
+    "centroid": 990
+   }
+  ],
+  "clear": [
+   {
+    "file": "clear.ogg",
+    "title": "Message Erased.wav",
+    "author": "johnnypanic",
+    "url": "https://freesound.org/people/johnnypanic/sounds/417923/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 1.01,
+    "hi4k": 0.0,
+    "centroid": 818
+   },
+   {
+    "file": "clear_2.ogg",
+    "title": "FAUGERON_Amandine_2013_2014_son4.wav",
+    "author": "univ_lyon3",
+    "url": "https://freesound.org/people/univ_lyon3/sounds/201607/",
+    "license": "CC0",
+    "H": 1.8,
+    "dur": 1.34,
+    "hi4k": 0.05,
+    "centroid": 1253
+   },
+   {
+    "file": "clear_3.ogg",
+    "title": "Erase",
+    "author": "Fupicat",
+    "url": "https://freesound.org/people/Fupicat/sounds/538144/",
+    "license": "CC0",
+    "H": 3.1,
+    "dur": 0.53,
+    "hi4k": 0.05,
+    "centroid": 1556
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "drawer_open.ogg",
+    "title": "Opening a Shoe Box",
+    "author": "DexD73",
+    "url": "https://freesound.org/people/DexD73/sounds/583718/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.32,
+    "hi4k": 0.0,
+    "centroid": 100
+   },
+   {
+    "file": "drawer_open_2.ogg",
+    "title": "Brittle Wooden Box Landing On Floor",
+    "author": "elynch0901",
+    "url": "https://freesound.org/people/elynch0901/sounds/464483/",
+    "license": "CC0",
+    "H": 3.1,
+    "dur": 0.75,
+    "hi4k": 0.05,
+    "centroid": 1273
+   },
+   {
+    "file": "drawer_open_3.ogg",
+    "title": "box_smash.wav",
+    "author": "Charnchy77",
+    "url": "https://freesound.org/people/Charnchy77/sounds/624910/",
+    "license": "CC0",
+    "H": 4.1,
+    "dur": 0.44,
+    "hi4k": 0.21,
+    "centroid": 2357
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "drawer_close.ogg",
+    "title": "Closing a Shoe Box",
+    "author": "DexD73",
+    "url": "https://freesound.org/people/DexD73/sounds/583719/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 65
+   },
+   {
+    "file": "drawer_close_2.ogg",
+    "title": "Box closing",
+    "author": "TomoMugen",
+    "url": "https://freesound.org/people/TomoMugen/sounds/788204/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.05,
+    "hi4k": 0.01,
+    "centroid": 244
+   },
+   {
+    "file": "drawer_close_3.ogg",
+    "title": "Door 1.wav",
+    "author": "WhiteLineFever",
+    "url": "https://freesound.org/people/WhiteLineFever/sounds/416885/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.3,
+    "hi4k": 0.0,
+    "centroid": 155
+   }
+  ],
+  "page": [
+   {
+    "file": "page.ogg",
+    "title": "Page turn",
+    "author": "chungus43A",
+    "url": "https://freesound.org/people/chungus43A/sounds/705384/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.97,
+    "hi4k": 0.02,
+    "centroid": 395
+   },
+   {
+    "file": "page_2.ogg",
+    "title": "Page Turn, Big Book",
+    "author": "supaluci",
+    "url": "https://freesound.org/people/supaluci/sounds/726518/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 1.04,
+    "hi4k": 0.01,
+    "centroid": 324
+   },
+   {
+    "file": "page_3.ogg",
+    "title": "Page flip.wav",
+    "author": "cameronpride",
+    "url": "https://freesound.org/people/cameronpride/sounds/676674/",
+    "license": "CC0",
+    "H": 4.2,
+    "dur": 0.18,
+    "hi4k": 0.05,
+    "centroid": 2415
+   }
+  ],
+  "hint": [
+   {
+    "file": "hint.ogg",
+    "title": "d2.wav",
+    "author": "GAMEDRIX974",
+    "url": "https://freesound.org/people/GAMEDRIX974/sounds/560663/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.12,
+    "hi4k": 0.0,
+    "centroid": 596
+   },
+   {
+    "file": "hint_2.ogg",
+    "title": "d#2.WAV",
+    "author": "stomachache",
+    "url": "https://freesound.org/people/stomachache/sounds/130531/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.21,
+    "hi4k": 0.0,
+    "centroid": 607
+   },
+   {
+    "file": "hint_3.ogg",
+    "title": "Soft Hit",
+    "author": "Nicolas4677",
+    "url": "https://freesound.org/people/Nicolas4677/sounds/446583/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.38,
+    "hi4k": 0.01,
+    "centroid": 67
+   }
+  ],
+  "guide": [
+   {
+    "file": "guide.ogg",
+    "title": "Soft Hit",
+    "author": "Nicolas4677",
+    "url": "https://freesound.org/people/Nicolas4677/sounds/446583/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.38,
+    "hi4k": 0.01,
+    "centroid": 67
+   },
+   {
+    "file": "guide_2.ogg",
+    "title": "jews_harp_13.flac",
+    "author": "EsbenSloth",
+    "url": "https://freesound.org/people/EsbenSloth/sounds/80574/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.9,
+    "hi4k": 0.0,
+    "centroid": 1153
+   },
+   {
+    "file": "guide_3.ogg",
+    "title": "harp pluck",
+    "author": "PhonosUPF",
+    "url": "https://freesound.org/people/PhonosUPF/sounds/490833/",
+    "license": "CC0",
+    "H": 2.7,
+    "dur": 0.49,
+    "hi4k": 0.0,
+    "centroid": 1154
+   }
+  ],
+  "next": [
+   {
+    "file": "next.ogg",
+    "title": "Page turn",
+    "author": "chungus43A",
+    "url": "https://freesound.org/people/chungus43A/sounds/705384/",
+    "license": "CC0",
+    "H": 2.3,
+    "dur": 0.97,
+    "hi4k": 0.02,
+    "centroid": 395
+   },
+   {
+    "file": "next_2.ogg",
+    "title": "Page Turn, Big Book",
+    "author": "supaluci",
+    "url": "https://freesound.org/people/supaluci/sounds/726518/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 1.04,
+    "hi4k": 0.01,
+    "centroid": 324
+   },
+   {
+    "file": "next_3.ogg",
+    "title": "Light Wood Surface Scratching 1_2",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/477716/",
+    "license": "CC0",
+    "H": 3.8,
+    "dur": 1.18,
+    "hi4k": 0.09,
+    "centroid": 1544
+   }
+  ],
+  "portrait": [
+   {
+    "file": "portrait.ogg",
+    "title": "Woosh - Plastic perforated steak spatula 6",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/742905/",
+    "license": "CC0",
+    "H": 0.0,
+    "dur": 0.25,
+    "hi4k": 0.0,
+    "centroid": 25
+   },
+   {
+    "file": "portrait_2.ogg",
+    "title": "Swish wipe HZA 16-05-2022.wav",
+    "author": "hz37",
+    "url": "https://freesound.org/people/hz37/sounds/667419/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.42,
+    "hi4k": 0.02,
+    "centroid": 577
+   },
+   {
+    "file": "portrait_3.ogg",
+    "title": "Blanket Movement 6",
+    "author": "OwlStorm",
+    "url": "https://freesound.org/people/OwlStorm/sounds/320144/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.98,
+    "hi4k": 0.02,
+    "centroid": 295
+   }
+  ],
+  "win": [
+   {
+    "file": "win.ogg",
+    "title": "DX Harp-C2.wav",
+    "author": "tarane468",
+    "url": "https://freesound.org/people/tarane468/sounds/557643/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 2.18,
+    "hi4k": 0.0,
+    "centroid": 196
+   },
+   {
+    "file": "win_2.ogg",
+    "title": "Mouth harp 9 -  lower formant staccato down",
+    "author": "giddster",
+    "url": "https://freesound.org/people/giddster/sounds/434912/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.69,
+    "hi4k": 0.0,
+    "centroid": 613
+   },
+   {
+    "file": "win_3.ogg",
+    "title": "jaw_harp9.mp3",
+    "author": "3bagbrew",
+    "url": "https://freesound.org/people/3bagbrew/sounds/95613/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 1.91,
+    "hi4k": 0.0,
+    "centroid": 856
+   }
+  ]
+ },
+ "C_柔和界面": {
+  "click": [
+   {
+    "file": "click.ogg",
+    "title": "Kick_Soft &amp; bright_#3.wav",
+    "author": "Renovatio871",
+    "url": "https://freesound.org/people/Renovatio871/sounds/192556/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.46,
+    "hi4k": 0.0,
+    "centroid": 56
+   },
+   {
+    "file": "click_2.ogg",
+    "title": "[Perc] tom kick",
+    "author": "waveplaySFX",
+    "url": "https://freesound.org/people/waveplaySFX/sounds/221364/",
+    "license": "CC0",
+    "H": 0.1,
+    "dur": 0.14,
+    "hi4k": 0.0,
+    "centroid": 70
+   },
+   {
+    "file": "click_3.ogg",
+    "title": "Soft Two-Finger Snap",
+    "author": "jackieAZ",
+    "url": "https://freesound.org/people/jackieAZ/sounds/388958/",
+    "license": "CC0",
+    "H": 0.2,
+    "dur": 0.09,
+    "hi4k": 0.0,
+    "centroid": 155
+   }
+  ],
+  "hover": [
+   {
+    "file": "hover.ogg",
+    "title": "UI_Hover",
+    "author": "unfa",
+    "url": "https://freesound.org/people/unfa/sounds/565131/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.08,
+    "hi4k": 0.02,
+    "centroid": 364
+   },
+   {
+    "file": "hover_2.ogg",
+    "title": "Simple or Cute UI / UX / Interface Hover sound",
+    "author": "Feraly_",
+    "url": "https://freesound.org/people/Feraly_/sounds/836451/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.37,
+    "hi4k": 0.0,
+    "centroid": 763
+   }
+  ],
+  "back": [
+   {
+    "file": "back.ogg",
+    "title": "Arcade UI Cancel",
+    "author": "plasterbrain",
+    "url": "https://freesound.org/people/plasterbrain/sounds/464912/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.17,
+    "hi4k": 0.01,
+    "centroid": 335
+   },
+   {
+    "file": "back_2.ogg",
+    "title": "UI back sound",
+    "author": "KieranKeegan",
+    "url": "https://freesound.org/people/KieranKeegan/sounds/418231/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 498
+   },
+   {
+    "file": "back_3.ogg",
+    "title": "Simple or Cute UI / UX / Interface Cancel sound",
+    "author": "Feraly_",
+    "url": "https://freesound.org/people/Feraly_/sounds/836449/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.45,
+    "hi4k": 0.0,
+    "centroid": 690
+   }
+  ],
+  "confirm": [
+   {
+    "file": "confirm.ogg",
+    "title": "GASP_UI_Confirm.wav",
+    "author": "Rob_Marion",
+    "url": "https://freesound.org/people/Rob_Marion/sounds/542044/",
+    "license": "CC0",
+    "H": 1.1,
+    "dur": 0.29,
+    "hi4k": 0.0,
+    "centroid": 1081
+   },
+   {
+    "file": "confirm_2.ogg",
+    "title": "UI_Confirm",
+    "author": "MATUSTRM",
+    "url": "https://freesound.org/people/MATUSTRM/sounds/836200/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.03,
+    "hi4k": 0.0,
+    "centroid": 1395
+   },
+   {
+    "file": "confirm_3.ogg",
+    "title": "vg_select.wav",
+    "author": "Mihacappy",
+    "url": "https://freesound.org/people/Mihacappy/sounds/829014/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 0.27,
+    "hi4k": 0.0,
+    "centroid": 773
+   }
+  ],
+  "open": [
+   {
+    "file": "open.ogg",
+    "title": "whoosh-click01.wav",
+    "author": "Qat",
+    "url": "https://freesound.org/people/Qat/sounds/108334/",
+    "license": "CC0",
+    "H": 0.3,
+    "dur": 0.69,
+    "hi4k": 0.0,
+    "centroid": 133
+   },
+   {
+    "file": "open_2.ogg",
+    "title": "slide-click.wav",
+    "author": "Qat",
+    "url": "https://freesound.org/people/Qat/sounds/108335/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.92,
+    "hi4k": 0.0,
+    "centroid": 160
+   },
+   {
+    "file": "open_3.ogg",
+    "title": "Close Book 2",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/862316/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.23,
+    "hi4k": 0.01,
+    "centroid": 268
+   }
+  ],
+  "close": [
+   {
+    "file": "close.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "close_2.ogg",
+    "title": "UI back sound",
+    "author": "KieranKeegan",
+    "url": "https://freesound.org/people/KieranKeegan/sounds/418231/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 498
+   },
+   {
+    "file": "close_3.ogg",
+    "title": "Close Book 2",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/862316/",
+    "license": "CC0",
+    "H": 1.6,
+    "dur": 0.23,
+    "hi4k": 0.01,
+    "centroid": 268
+   }
+  ],
+  "toggle": [
+   {
+    "file": "toggle.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "toggle_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "toggle_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "slider": [
+   {
+    "file": "slider.ogg",
+    "title": "Points_Tick2",
+    "author": "BaggoNotes",
+    "url": "https://freesound.org/people/BaggoNotes/sounds/721514/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.01,
+    "hi4k": 0.0,
+    "centroid": 1295
+   },
+   {
+    "file": "slider_2.ogg",
+    "title": "Click Tick 2.wav",
+    "author": "malle99",
+    "url": "https://freesound.org/people/malle99/sounds/496760/",
+    "license": "CC0",
+    "H": 3.6,
+    "dur": 0.06,
+    "hi4k": 0.06,
+    "centroid": 714
+   },
+   {
+    "file": "slider_3.ogg",
+    "title": "Soft UI Button Click",
+    "author": "Jummit",
+    "url": "https://freesound.org/people/Jummit/sounds/528561/",
+    "license": "CC0",
+    "H": 4.1,
+    "dur": 0.07,
+    "hi4k": 0.04,
+    "centroid": 3195
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "reset_progress.ogg",
+    "title": "PC Game UI Error",
+    "author": "plasterbrain",
+    "url": "https://freesound.org/people/plasterbrain/sounds/423169/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.14,
+    "hi4k": 0.0,
+    "centroid": 440
+   },
+   {
+    "file": "reset_progress_2.ogg",
+    "title": "ui-popup-sfx",
+    "author": "JeffPearson",
+    "url": "https://freesound.org/people/JeffPearson/sounds/849841/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.16,
+    "hi4k": 0.0,
+    "centroid": 419
+   },
+   {
+    "file": "reset_progress_3.ogg",
+    "title": "User Interface, Beep, Error, 404, Glitch",
+    "author": "Vein_Adams",
+    "url": "https://freesound.org/people/Vein_Adams/sounds/713179/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 1.53,
+    "hi4k": 0.0,
+    "centroid": 1156
+   }
+  ],
+  "place": [
+   {
+    "file": "place.ogg",
+    "title": "GASP_UI_Pop_1.wav",
+    "author": "Rob_Marion",
+    "url": "https://freesound.org/people/Rob_Marion/sounds/541993/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 627
+   },
+   {
+    "file": "place_2.ogg",
+    "title": "The Best Bubble Pop Sound For Game and UI",
+    "author": "el_boss",
+    "url": "https://freesound.org/people/el_boss/sounds/669918/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.12,
+    "hi4k": 0.0,
+    "centroid": 869
+   },
+   {
+    "file": "place_3.ogg",
+    "title": "UI pop sound",
+    "author": "Aesnas",
+    "url": "https://freesound.org/people/Aesnas/sounds/812555/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.23,
+    "hi4k": 0.0,
+    "centroid": 76
+   }
+  ],
+  "delete": [
+   {
+    "file": "delete.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "delete_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "delete_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "refuse": [
+   {
+    "file": "refuse.ogg",
+    "title": "Access Denied",
+    "author": "suntemple",
+    "url": "https://freesound.org/people/suntemple/sounds/249300/",
+    "license": "CC0",
+    "H": 0.3,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 327
+   },
+   {
+    "file": "refuse_2.ogg",
+    "title": "Access Denied.wav",
+    "author": "LilMati",
+    "url": "https://freesound.org/people/LilMati/sounds/489486/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.26,
+    "hi4k": 0.01,
+    "centroid": 222
+   },
+   {
+    "file": "refuse_3.ogg",
+    "title": "UI_Cancel",
+    "author": "unfa",
+    "url": "https://freesound.org/people/unfa/sounds/565133/",
+    "license": "CC0",
+    "H": 0.7,
+    "dur": 0.18,
+    "hi4k": 0.0,
+    "centroid": 707
+   }
+  ],
+  "pick": [
+   {
+    "file": "pick.ogg",
+    "title": "Puzzle piece picked up from table",
+    "author": "el_boss",
+    "url": "https://freesound.org/people/el_boss/sounds/560699/",
+    "license": "CC0",
+    "H": 1.5,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 544
+   },
+   {
+    "file": "pick_2.ogg",
+    "title": "Pop in sfx",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/824189/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 0.11,
+    "hi4k": 0.0,
+    "centroid": 878
+   },
+   {
+    "file": "pick_3.ogg",
+    "title": "&quot;Pick up&quot; UI sound",
+    "author": "Nomagician",
+    "url": "https://freesound.org/people/Nomagician/sounds/833632/",
+    "license": "CC0",
+    "H": 2.7,
+    "dur": 0.89,
+    "hi4k": 0.0,
+    "centroid": 1901
+   }
+  ],
+  "drop": [
+   {
+    "file": "drop.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "drop_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "drop_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "plug": [
+   {
+    "file": "plug.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "plug_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "plug_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "unplug": [
+   {
+    "file": "unplug.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "unplug_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "unplug_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "error": [
+   {
+    "file": "error.ogg",
+    "title": "PC Game UI Error",
+    "author": "plasterbrain",
+    "url": "https://freesound.org/people/plasterbrain/sounds/423169/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.14,
+    "hi4k": 0.0,
+    "centroid": 440
+   },
+   {
+    "file": "error_2.ogg",
+    "title": "ui-popup-sfx",
+    "author": "JeffPearson",
+    "url": "https://freesound.org/people/JeffPearson/sounds/849841/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.16,
+    "hi4k": 0.0,
+    "centroid": 419
+   },
+   {
+    "file": "error_3.ogg",
+    "title": "GASP_UI_Reject.wav",
+    "author": "Rob_Marion",
+    "url": "https://freesound.org/people/Rob_Marion/sounds/542040/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.25,
+    "hi4k": 0.0,
+    "centroid": 359
+   }
+  ],
+  "warn": [
+   {
+    "file": "warn.ogg",
+    "title": "UIMisc_Digital, Intreface, Data, Notification, Alert, 50_JW Audio_UI1",
+    "author": "JW_Audio",
+    "url": "https://freesound.org/people/JW_Audio/sounds/815974/",
+    "license": "CC0",
+    "H": 0.3,
+    "dur": 0.4,
+    "hi4k": 0.01,
+    "centroid": 213
+   },
+   {
+    "file": "warn_2.ogg",
+    "title": "Studio Grand Notification",
+    "author": "Allesyt",
+    "url": "https://freesound.org/people/Allesyt/sounds/818998/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.77,
+    "hi4k": 0.0,
+    "centroid": 466
+   },
+   {
+    "file": "warn_3.ogg",
+    "title": "Bubbling Water Notification – UI Alert (CC0)",
+    "author": "ATP2-kh",
+    "url": "https://freesound.org/people/ATP2-kh/sounds/844241/",
+    "license": "CC0",
+    "H": 1.0,
+    "dur": 0.55,
+    "hi4k": 0.0,
+    "centroid": 710
+   }
+  ],
+  "snap": [
+   {
+    "file": "snap.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "snap_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "snap_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "move": [
+   {
+    "file": "move.ogg",
+    "title": "Arcade UI Move Cursor",
+    "author": "plasterbrain",
+    "url": "https://freesound.org/people/plasterbrain/sounds/464903/",
+    "license": "CC0",
+    "H": 0.2,
+    "dur": 0.06,
+    "hi4k": 0.0,
+    "centroid": 193
+   },
+   {
+    "file": "move_2.ogg",
+    "title": "swoosh_v2",
+    "author": "migoreng1",
+    "url": "https://freesound.org/people/migoreng1/sounds/786514/",
+    "license": "CC0",
+    "H": 0.3,
+    "dur": 0.3,
+    "hi4k": 0.0,
+    "centroid": 255
+   },
+   {
+    "file": "move_3.ogg",
+    "title": "half second rough growl",
+    "author": "Jerimee",
+    "url": "https://freesound.org/people/Jerimee/sounds/720945/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.45,
+    "hi4k": 0.0,
+    "centroid": 171
+   }
+  ],
+  "zoom": [
+   {
+    "file": "zoom.ogg",
+    "title": "UI back sound",
+    "author": "KieranKeegan",
+    "url": "https://freesound.org/people/KieranKeegan/sounds/418231/",
+    "license": "CC0",
+    "H": 1.3,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 498
+   },
+   {
+    "file": "zoom_2.ogg",
+    "title": "Killswitch being turned off",
+    "author": "KieranKeegan",
+    "url": "https://freesound.org/people/KieranKeegan/sounds/418233/",
+    "license": "CC0",
+    "H": 4.4,
+    "dur": 0.11,
+    "hi4k": 0.2,
+    "centroid": 2252
+   },
+   {
+    "file": "zoom_3.ogg",
+    "title": "Killswitch being turned on",
+    "author": "KieranKeegan",
+    "url": "https://freesound.org/people/KieranKeegan/sounds/418232/",
+    "license": "CC0",
+    "H": 5.6,
+    "dur": 0.2,
+    "hi4k": 0.19,
+    "centroid": 2299
+   }
+  ],
+  "redo": [
+   {
+    "file": "redo.ogg",
+    "title": "swoosh_v2",
+    "author": "migoreng1",
+    "url": "https://freesound.org/people/migoreng1/sounds/786514/",
+    "license": "CC0",
+    "H": 0.3,
+    "dur": 0.3,
+    "hi4k": 0.0,
+    "centroid": 255
+   },
+   {
+    "file": "redo_2.ogg",
+    "title": "half second rough growl",
+    "author": "Jerimee",
+    "url": "https://freesound.org/people/Jerimee/sounds/720945/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.45,
+    "hi4k": 0.0,
+    "centroid": 171
+   },
+   {
+    "file": "redo_3.ogg",
+    "title": "Swipe Up",
+    "author": "Baconation",
+    "url": "https://freesound.org/people/Baconation/sounds/592443/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.67,
+    "hi4k": 0.05,
+    "centroid": 366
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "reset_board.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "reset_board_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "reset_board_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "brush": [
+   {
+    "file": "brush.ogg",
+    "title": "select.wav",
+    "author": "Krokulator",
+    "url": "https://freesound.org/people/Krokulator/sounds/653382/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.14,
+    "hi4k": 0.0,
+    "centroid": 440
+   },
+   {
+    "file": "brush_2.ogg",
+    "title": "UI_Correct_button12.wav",
+    "author": "ZenithInfinitiveStudios",
+    "url": "https://freesound.org/people/ZenithInfinitiveStudios/sounds/342996/",
+    "license": "CC0",
+    "H": 0.5,
+    "dur": 0.62,
+    "hi4k": 0.0,
+    "centroid": 501
+   },
+   {
+    "file": "brush_3.ogg",
+    "title": "File Select (metallic wet, hollow)",
+    "author": "Breviceps",
+    "url": "https://freesound.org/people/Breviceps/sounds/583079/",
+    "license": "CC0",
+    "H": 1.1,
+    "dur": 0.23,
+    "hi4k": 0.0,
+    "centroid": 299
+   }
+  ],
+  "paint": [
+   {
+    "file": "paint.ogg",
+    "title": "Retro Inspect Sound, UI, or In-Game Notification.wav",
+    "author": "LilMati",
+    "url": "https://freesound.org/people/LilMati/sounds/658266/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 830
+   },
+   {
+    "file": "paint_2.ogg",
+    "title": "Blip Wave",
+    "author": "Breviceps",
+    "url": "https://freesound.org/people/Breviceps/sounds/452998/",
+    "license": "CC0",
+    "H": 1.4,
+    "dur": 0.52,
+    "hi4k": 0.04,
+    "centroid": 957
+   },
+   {
+    "file": "paint_3.ogg",
+    "title": "Quick Blip",
+    "author": "se2001",
+    "url": "https://freesound.org/people/se2001/sounds/518558/",
+    "license": "CC0",
+    "H": 2.9,
+    "dur": 0.13,
+    "hi4k": 0.11,
+    "centroid": 2045
+   }
+  ],
+  "clear": [
+   {
+    "file": "clear.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "clear_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "clear_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "drawer_open.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "drawer_open_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "drawer_open_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "drawer_close.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "drawer_close_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "drawer_close_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "page": [
+   {
+    "file": "page.ogg",
+    "title": "Game UI Screen Transition Book Page Turn",
+    "author": "el_boss",
+    "url": "https://freesound.org/people/el_boss/sounds/677857/",
+    "license": "CC0",
+    "H": 4.6,
+    "dur": 0.44,
+    "hi4k": 0.0,
+    "centroid": 1451
+   },
+   {
+    "file": "page_2.ogg",
+    "title": "Paper page turn 1",
+    "author": "HenKonen",
+    "url": "https://freesound.org/people/HenKonen/sounds/757221/",
+    "license": "CC0",
+    "H": 5.4,
+    "dur": 0.86,
+    "hi4k": 0.05,
+    "centroid": 1430
+   }
+  ],
+  "hint": [
+   {
+    "file": "hint.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "hint_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "hint_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "guide": [
+   {
+    "file": "guide.ogg",
+    "title": "PC Game UI Error",
+    "author": "plasterbrain",
+    "url": "https://freesound.org/people/plasterbrain/sounds/423169/",
+    "license": "CC0",
+    "H": 0.4,
+    "dur": 0.14,
+    "hi4k": 0.0,
+    "centroid": 440
+   },
+   {
+    "file": "guide_2.ogg",
+    "title": "SFX_WHOOSHYKORN_slayer_148.wav",
+    "author": "MrFossy",
+    "url": "https://freesound.org/people/MrFossy/sounds/590911/",
+    "license": "CC0",
+    "H": 2.6,
+    "dur": 0.33,
+    "hi4k": 0.03,
+    "centroid": 1653
+   },
+   {
+    "file": "guide_3.ogg",
+    "title": "[UI Sound] Approval - High Pitched Bell Synth",
+    "author": "GabFitzgerald",
+    "url": "https://freesound.org/people/GabFitzgerald/sounds/625174/",
+    "license": "CC0",
+    "H": 2.9,
+    "dur": 0.69,
+    "hi4k": 0.0,
+    "centroid": 2194
+   }
+  ],
+  "next": [
+   {
+    "file": "next.ogg",
+    "title": "UI Close menu",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/587834/",
+    "license": "CC0",
+    "H": 0.8,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 747
+   },
+   {
+    "file": "next_2.ogg",
+    "title": "Retro_UI_38",
+    "author": "kzarkses",
+    "url": "https://freesound.org/people/kzarkses/sounds/766993/",
+    "license": "CC0",
+    "H": 0.9,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 908
+   },
+   {
+    "file": "next_3.ogg",
+    "title": "ChripyUI-08",
+    "author": "shaman32",
+    "url": "https://freesound.org/people/shaman32/sounds/840277/",
+    "license": "CC0",
+    "H": 1.7,
+    "dur": 0.17,
+    "hi4k": 0.0,
+    "centroid": 1426
+   }
+  ],
+  "portrait": [
+   {
+    "file": "portrait.ogg",
+    "title": "hint.wav",
+    "author": "dland",
+    "url": "https://freesound.org/people/dland/sounds/320181/",
+    "license": "CC0",
+    "H": 0.6,
+    "dur": 0.15,
+    "hi4k": 0.0,
+    "centroid": 598
+   },
+   {
+    "file": "portrait_2.ogg",
+    "title": "ComboMessage_Appear2",
+    "author": "BaggoNotes",
+    "url": "https://freesound.org/people/BaggoNotes/sounds/721511/",
+    "license": "CC0",
+    "H": 1.9,
+    "dur": 0.16,
+    "hi4k": 0.03,
+    "centroid": 1562
+   },
+   {
+    "file": "portrait_3.ogg",
+    "title": "Pop in sfx",
+    "author": "Sadiquecat",
+    "url": "https://freesound.org/people/Sadiquecat/sounds/824189/",
+    "license": "CC0",
+    "H": 2.4,
+    "dur": 0.11,
+    "hi4k": 0.0,
+    "centroid": 878
+   }
+  ],
+  "win": [
+   {
+    "file": "win.ogg",
+    "title": "Beep confirmation OK",
+    "author": "SamsterBirdies",
+    "url": "https://freesound.org/people/SamsterBirdies/sounds/581603/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 0.2,
+    "hi4k": 0.06,
+    "centroid": 1455
+   },
+   {
+    "file": "win_2.ogg",
+    "title": "Game Success Fanfare",
+    "author": "el_boss",
+    "url": "https://freesound.org/people/el_boss/sounds/677859/",
+    "license": "CC0",
+    "H": 2.0,
+    "dur": 2.47,
+    "hi4k": 0.0,
+    "centroid": 699
+   },
+   {
+    "file": "win_3.ogg",
+    "title": "Positive Blip Effect",
+    "author": "CogFireStudios",
+    "url": "https://freesound.org/people/CogFireStudios/sounds/531512/",
+    "license": "CC0",
+    "H": 2.8,
+    "dur": 1.31,
+    "hi4k": 0.0,
+    "centroid": 1223
+   }
+  ]
+ },
+ "S_Sonniss样例": {
+  "click": [
+   {
+    "file": "click.wav",
+    "title": "Scatter Plops 04",
+    "author": "Sonniss GDC 包样例(la_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.9,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 931
+   }
+  ],
+  "hover": [
+   {
+    "file": "hover.wav",
+    "title": "Hovers 03",
+    "author": "Sonniss GDC 包样例(la_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.7,
+    "dur": 0.59,
+    "hi4k": 0.0,
+    "centroid": 1660
+   }
+  ],
+  "back": [],
+  "confirm": [
+   {
+    "file": "confirm.wav",
+    "title": "UI_Mechanical_Confirm_04_FX",
+    "author": "Sonniss GDC 包样例(ui_mechanical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.8,
+    "dur": 1.2,
+    "hi4k": 0.01,
+    "centroid": 126
+   }
+  ],
+  "open": [
+   {
+    "file": "open.wav",
+    "title": "Transitions_Low_DDM16",
+    "author": "Sonniss GDC 包样例(ui_menu)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.7,
+    "dur": 0.64,
+    "hi4k": 0.06,
+    "centroid": 803
+   }
+  ],
+  "close": [
+   {
+    "file": "close.wav",
+    "title": "UI_Mechanical_Turning-On_03_Raw",
+    "author": "Sonniss GDC 包样例(ui_mechanical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.0,
+    "dur": 1.2,
+    "hi4k": 0.01,
+    "centroid": 203
+   }
+  ],
+  "toggle": [
+   {
+    "file": "toggle.wav",
+    "title": "Wall_Light_Double_Switch_Off-004",
+    "author": "Sonniss GDC 包样例(clicks_switches)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 7.2,
+    "dur": 0.11,
+    "hi4k": 0.24,
+    "centroid": 2708
+   }
+  ],
+  "slider": [
+   {
+    "file": "slider.wav",
+    "title": "Electronic_Knob_Multi_Turns_Slow-016",
+    "author": "Sonniss GDC 包样例(clicks_switches)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 8.0,
+    "dur": 0.29,
+    "hi4k": 0.31,
+    "centroid": 3241
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "reset_progress.wav",
+    "title": "MODERN LP BELL COWBELL STRAIGHT MUTED STICK HITS",
+    "author": "Sonniss GDC 包样例(bells)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 3.6,
+    "dur": 0.17,
+    "hi4k": 0.07,
+    "centroid": 1246
+   }
+  ],
+  "place": [
+   {
+    "file": "place.wav",
+    "title": "Bluezone_BC0254_wood_falling_log_002_006",
+    "author": "Sonniss GDC 包样例(wood_bluezone)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 0.8,
+    "dur": 0.32,
+    "hi4k": 0.01,
+    "centroid": 542
+   }
+  ],
+  "delete": [
+   {
+    "file": "delete.wav",
+    "title": "Bluezone_BC0254_wood_handling_003",
+    "author": "Sonniss GDC 包样例(wood_bluezone)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 3.4,
+    "dur": 1.19,
+    "hi4k": 0.07,
+    "centroid": 1460
+   }
+  ],
+  "refuse": [
+   {
+    "file": "refuse.wav",
+    "title": "ERROR 13",
+    "author": "Sonniss GDC 包样例(scoba_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.6,
+    "dur": 0.49,
+    "hi4k": 0.02,
+    "centroid": 424
+   }
+  ],
+  "pick": [
+   {
+    "file": "pick.wav",
+    "title": "large gear 02 metal wood slow 8040",
+    "author": "Sonniss GDC 包样例(gears)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 6.7,
+    "dur": 0.17,
+    "hi4k": 0.22,
+    "centroid": 2273
+   }
+  ],
+  "drop": [
+   {
+    "file": "drop.wav",
+    "title": "UI_Mechanical_Move_40",
+    "author": "Sonniss GDC 包样例(ui_mechanical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 7.3,
+    "dur": 0.13,
+    "hi4k": 0.25,
+    "centroid": 2722
+   }
+  ],
+  "plug": [
+   {
+    "file": "plug.wav",
+    "title": "Latchlocker,cable,steel,wood,room,channel,slide,catch,alt2",
+    "author": "Sonniss GDC 包样例(latchlocker)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.1,
+    "dur": 1.2,
+    "hi4k": 0.0,
+    "centroid": 443
+   }
+  ],
+  "unplug": [
+   {
+    "file": "unplug.wav",
+    "title": "Bluezone_BC0282_steampunk_mechanical_mechanism_metal_008",
+    "author": "Sonniss GDC 包样例(steampunk)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 7.8,
+    "dur": 0.53,
+    "hi4k": 0.44,
+    "centroid": 3245
+   }
+  ],
+  "error": [
+   {
+    "file": "error.wav",
+    "title": "UI_Mechanical_Error_11_FX_01",
+    "author": "Sonniss GDC 包样例(ui_mechanical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 2.4,
+    "dur": 1.2,
+    "hi4k": 0.01,
+    "centroid": 1349
+   }
+  ],
+  "warn": [
+   {
+    "file": "warn.wav",
+    "title": "BALAFON - NOTIF OCT UP",
+    "author": "Sonniss GDC 包样例(scoba_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.2,
+    "dur": 0.8,
+    "hi4k": 0.01,
+    "centroid": 804
+   }
+  ],
+  "snap": [
+   {
+    "file": "snap.wav",
+    "title": "Latchlocker,aluminum,link,jostle,slide,click,out,over",
+    "author": "Sonniss GDC 包样例(latchlocker)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 14.3,
+    "dur": 0.08,
+    "hi4k": 0.74,
+    "centroid": 6924
+   }
+  ],
+  "move": [
+   {
+    "file": "move.wav",
+    "title": "SFX CLOTH Foley Jacket Synthetic Soft Shell Whoosh Flutter",
+    "author": "Sonniss GDC 包样例(cloth)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 2.3,
+    "dur": 0.48,
+    "hi4k": 0.04,
+    "centroid": 1025
+   }
+  ],
+  "zoom": [
+   {
+    "file": "zoom.wav",
+    "title": "UI_Mechanical_Move_40",
+    "author": "Sonniss GDC 包样例(ui_mechanical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 7.3,
+    "dur": 0.13,
+    "hi4k": 0.25,
+    "centroid": 2722
+   }
+  ],
+  "redo": [
+   {
+    "file": "redo.wav",
+    "title": "CLOCKMisc_Wall Clock Handling Gearwheel Spinning_JSE_CM_Stereo",
+    "author": "Sonniss GDC 包样例(clocks)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 6.5,
+    "dur": 1.2,
+    "hi4k": 0.23,
+    "centroid": 3318
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "reset_board.wav",
+    "title": "Action_Exit (Scratch)",
+    "author": "Sonniss GDC 包样例(ui_musical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 2.7,
+    "dur": 1.2,
+    "hi4k": 0.05,
+    "centroid": 1352
+   }
+  ],
+  "brush": [
+   {
+    "file": "brush.wav",
+    "title": "UIMisc_User Interface Vocalisation, Robotic, Futuristic,_344 Audio_Organic User Interface_12",
+    "author": "Sonniss GDC 包样例(organic_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.0,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 496
+   }
+  ],
+  "paint": [
+   {
+    "file": "paint.wav",
+    "title": "PAPER PEN CROSS OUT 2",
+    "author": "Sonniss GDC 包样例(scoba_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 3.2,
+    "dur": 0.22,
+    "hi4k": 0.07,
+    "centroid": 1850
+   }
+  ],
+  "clear": [
+   {
+    "file": "clear.wav",
+    "title": "a4_sheet_page_sliding_001",
+    "author": "Sonniss GDC 包样例(paper)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 3.2,
+    "dur": 0.24,
+    "hi4k": 0.0,
+    "centroid": 1367
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "drawer_open.wav",
+    "title": "Cloth 61",
+    "author": "Sonniss GDC 包样例(cloths_sponges)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 1.4,
+    "dur": 0.32,
+    "hi4k": 0.01,
+    "centroid": 879
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "drawer_close.wav",
+    "title": "paper_scissors_cutting_004",
+    "author": "Sonniss GDC 包样例(paper)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 5.1,
+    "dur": 0.2,
+    "hi4k": 0.1,
+    "centroid": 2144
+   }
+  ],
+  "page": [
+   {
+    "file": "page.wav",
+    "title": "newspaper_opening_009",
+    "author": "Sonniss GDC 包样例(paper)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 8.2,
+    "dur": 0.31,
+    "hi4k": 0.3,
+    "centroid": 3563
+   }
+  ],
+  "hint": [
+   {
+    "file": "hint.wav",
+    "title": "CLOCKChim_Old Wall Clock 1920 Chimes Ringing_JSE_CM_Stereo",
+    "author": "Sonniss GDC 包样例(clocks)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 4.3,
+    "dur": 0.21,
+    "hi4k": 0.05,
+    "centroid": 1941
+   }
+  ],
+  "guide": [
+   {
+    "file": "guide.wav",
+    "title": "Notification_Bridge Operation 01",
+    "author": "Sonniss GDC 包样例(ui_musical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 3.2,
+    "dur": 0.54,
+    "hi4k": 0.07,
+    "centroid": 2510
+   }
+  ],
+  "next": [
+   {
+    "file": "next.wav",
+    "title": "UIMisc_User Interface Vocalisation, Robotic, Futuristic,_344 Audio_Organic User Interface_33",
+    "author": "Sonniss GDC 包样例(organic_ui)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 0.7,
+    "dur": 0.55,
+    "hi4k": 0.0,
+    "centroid": 451
+   }
+  ],
+  "portrait": [
+   {
+    "file": "portrait.wav",
+    "title": "SFX CLOTH Foley Jacket Synthetic Polyester Zip Ties Zip Unzip",
+    "author": "Sonniss GDC 包样例(cloth)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 2.8,
+    "dur": 0.26,
+    "hi4k": 0.09,
+    "centroid": 1770
+   }
+  ],
+  "win": [
+   {
+    "file": "win.wav",
+    "title": "Selection_Ukelele chord 04",
+    "author": "Sonniss GDC 包样例(ui_musical)",
+    "url": "https://gamesounds.xyz/",
+    "license": "Sonniss 免版税",
+    "H": 0.4,
+    "dur": 1.2,
+    "hi4k": 0.0,
+    "centroid": 274
+   }
+  ]
+ },
+ "K_Kenney现用": {
+  "click": [
+   {
+    "file": "../click.ogg",
+    "title": "click.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "hover": [
+   {
+    "file": "../hover.ogg",
+    "title": "hover.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "back": [
+   {
+    "file": "../back.ogg",
+    "title": "back.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "confirm": [
+   {
+    "file": "../confirm.ogg",
+    "title": "confirm.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "open": [
+   {
+    "file": "../open.ogg",
+    "title": "open.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "close": [
+   {
+    "file": "../close.ogg",
+    "title": "close.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "toggle": [
+   {
+    "file": "../toggle.ogg",
+    "title": "toggle.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "slider": [
+   {
+    "file": "../slider.ogg",
+    "title": "slider.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "../reset_progress.ogg",
+    "title": "reset_progress.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "place": [
+   {
+    "file": "../place.ogg",
+    "title": "place.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "delete": [
+   {
+    "file": "../delete.ogg",
+    "title": "delete.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "refuse": [
+   {
+    "file": "../refuse.ogg",
+    "title": "refuse.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "pick": [
+   {
+    "file": "../pick.ogg",
+    "title": "pick.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "drop": [
+   {
+    "file": "../drop.ogg",
+    "title": "drop.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "plug": [
+   {
+    "file": "../plug.ogg",
+    "title": "plug.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "unplug": [
+   {
+    "file": "../unplug.ogg",
+    "title": "unplug.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "error": [
+   {
+    "file": "../error.ogg",
+    "title": "error.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "warn": [
+   {
+    "file": "../warn.ogg",
+    "title": "warn.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "snap": [
+   {
+    "file": "../snap.ogg",
+    "title": "snap.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "move": [
+   {
+    "file": "../move.ogg",
+    "title": "move.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "zoom": [
+   {
+    "file": "../zoom.ogg",
+    "title": "zoom.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "redo": [
+   {
+    "file": "../redo.ogg",
+    "title": "redo.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "../reset_board.ogg",
+    "title": "reset_board.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "brush": [
+   {
+    "file": "../brush.ogg",
+    "title": "brush.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "paint": [
+   {
+    "file": "../paint.ogg",
+    "title": "paint.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "clear": [
+   {
+    "file": "../clear.ogg",
+    "title": "clear.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "../drawer_open.ogg",
+    "title": "drawer_open.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "../drawer_close.ogg",
+    "title": "drawer_close.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "page": [
+   {
+    "file": "../page.ogg",
+    "title": "page.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "hint": [
+   {
+    "file": "../hint.ogg",
+    "title": "hint.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "guide": [
+   {
+    "file": "../guide.ogg",
+    "title": "guide.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "next": [
+   {
+    "file": "../next.ogg",
+    "title": "next.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "portrait": [
+   {
+    "file": "../portrait.ogg",
+    "title": "portrait.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "win": [
+   {
+    "file": "../win.ogg",
+    "title": "win.ogg",
+    "author": "Kenney",
+    "url": "https://kenney.nl/assets",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ]
+ }
+}

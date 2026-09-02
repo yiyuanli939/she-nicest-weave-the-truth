@@ -55,7 +55,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正 × 玩家音量 `user_volume`(设置模块);各场景 `_ready` 报槽位 |
-| `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量滑条 / 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
+| `game/sfx.gd` | autoload Sfx(class_name SoundFx):操作音效槽位表 `CLIPS`(38 槽位 → `assets/sfx/<槽位>.ogg`,"" 静音)、8 个一次性播放器池、同帧同槽位去重、`push_mute/pop_mute`(代解/示答/载入/重建静音)、`GAIN_DB` × `BASE_VOLUME` × 玩家音量 `user_volume`;`node_added` 总钩子给所有 BaseButton 接 pressed(meta "sfx" 覆盖槽位 / "" 静音)与 hover;各挂点一行 `SoundFx.hit(self, &"槽位")`;槽位表与换法见 `assets/sfx/音效位置.md` |
+| `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量 / 音效音量滑条(同一模板 `_slider_row`)/ 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` / `Sfx._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
 | `ui/win_popup.gd` | 通关弹窗「织成了」(v1.2,替代工具条「下一关」):CanvasLayer 遮罩 + 居中原尺寸美术图 + 纯文字「继续」(`continue_pressed` → `LevelScene._on_continue`:下一关 / 结局 / 回选关);已通关的关重开走 `ProofSession.load_state(d, detach_goal=true)` 拆目标线成「差一步」态 |
 | `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(pin/place/wire;v1.1 删了 fix/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
@@ -152,7 +153,12 @@ headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅ 
 **v1.2 通关弹窗 + 差一步重开 + 焦纹图样**(2026-09-02,策划说明 `v1.2背景/`:工具条「下一关」删掉,通关弹出 `ui/win_popup.gd`(美术图 1174×816 居中原尺寸,
 「继续」纯文字钉在图内 (587,640),遮罩挡鼠标、开弹窗时放掉键盘焦点并停收撤销)→ 下一关 / l16 结局;已通关的关重开 `ProofSession.load_state(saved, true)`
 在快照前拆掉目标织机的输入线(不进撤销栈、不重发 proof_completed),接回即通关;纹样绘制弹窗的焦纹笔刷改成 `PatternView` 画的 ⊥ 图样。
-`v1.2背景/` 入库 + `.gdignore` + 两个导出预设排除;`test_session` 新例、m3 冒烟真实点击「继续」推进、UI 冒烟 N/E/S 段、`shot_4k` 出 `4k_win`;TUTORIAL 3.8)✅。
+`v1.2背景/` 入库 + `.gdignore` + 两个导出预设排除;`test_session` 新例、m3 冒烟真实点击「继续」推进、UI 冒烟 N/E/S 段、`shot_4k` 出 `4k_win`;TUTORIAL 3.8)✅ →
+**操作音效**(2026-09-02,用户要求「所有操作都配音效、不要刺耳」:autoload `Sfx`(`game/sfx.gd`)槽位表 + `assets/sfx/<槽位>.ogg`,38 个槽位覆盖
+按钮 / 棋盘(放·删·拿起·空放·接上·拔线·徽章·自动断·拖动·缩放·撤销重做·重置·通关)/ 钉纹样弹窗 / 笔记 / 指引 / 对话 / 立绘;按钮走 `node_added`
+总钩子不逐个接(meta 覆盖 / 静音);代解·示答·载入·重建静音,同帧去重;设置弹窗加「音效音量」滑条(`settings.sfx_volume`);
+素材 Kenney CC0 起步,候选方案按频谱(质心 / 4 kHz 以上占比 / 峰值因子)筛掉刺耳的放 `assets/sfx/候选/`;`tests/test_sfx.gd` 5 例 +
+`test_settings`/`test_res_paths` 补项 + UI 冒烟每个挂点断言 `last_slot`;TUTORIAL 3.9)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
