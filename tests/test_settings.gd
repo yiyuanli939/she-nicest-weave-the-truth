@@ -1,6 +1,6 @@
 extends TestBase
 ## 标题页设置模块(SettingsPanel)的纯逻辑:全屏 ↔ 窗口模式映射、音量文案/夹取、
-## settings 键(music_volume / fullscreen)往返且「重置进度」保留;无 autoload 时面板能建、小机两行隐藏。
+## settings 键(music_volume / fullscreen)往返且「重置进度」保留;无 autoload 时弹窗能建、开关、小机两行隐藏。
 
 
 func test_window_mode_mapping() -> bool:
@@ -43,7 +43,10 @@ func test_panel_without_autoloads() -> bool:
 	var p := SettingsPanel.new()
 	tree.root.add_child(p)   # Range 只在树里才发 value_changed
 	p.setup(null, null, null, null)
-	var ok := check(not p._robot_btn.visible and not p._maint_btn.visible, "没有 Robot:小机联动 / 小机维护两行隐藏")
+	var ok := check(not p.visible, "建好时弹窗是关着的")
+	p.open()
+	ok = check(p.visible, "open 打开") and ok
+	ok = check(not p._robot_btn.visible and not p._maint_btn.visible, "没有 Robot:小机联动 / 小机维护两行隐藏") and ok
 	ok = check(p._fullscreen_btn.text == "全屏:关", "无头下全屏显示关(得 %s)" % p._fullscreen_btn.text) and ok
 	ok = check(is_equal_approx(p._volume.value, SettingsPanel.VOLUME_DEFAULT) and p._volume_lbl.text == "100%", "默认音量 100%") and ok
 	var texts: Array[String] = []
@@ -52,7 +55,9 @@ func test_panel_without_autoloads() -> bool:
 			texts.append((c as Label).text)
 		elif c is Button:
 			texts.append((c as Button).text)
-	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("小机维护"), "文字齐全(得 %s)" % str(texts)) and ok
+	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("小机维护") and texts.has("关闭"), "文字齐全(得 %s)" % str(texts)) and ok
+	p.close()
+	ok = check(not p.visible, "close 关上") and ok
 	# 百分数标签按「100%」预留宽度:拖到 5% 时行宽不变(否则整行在列里来回挪)
 	var w100 := p._volume_lbl.get_combined_minimum_size().x
 	p._volume.value = 0.05

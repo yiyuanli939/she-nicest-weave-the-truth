@@ -524,7 +524,7 @@ func _run() -> void:
 	_check(not nbui.is_open() and nbui._handle.text.contains("笔")
 			and is_equal_approx(nbui._drawer.position.x, vw - NotebookUI.CLOSED_PEEK), "点「继续工作」抽屉收回")
 
-	# ---- T. 标题页:恰好四个选项;开始游戏→选关;有进度则「继续游戏」;重置进度即清档;开发者信息 Esc 返回 ----
+	# ---- T. 标题页:四个选项 + 「设置」;开始游戏→选关;有进度则「继续游戏」;重置进度即清档;开发者信息 Esc 返回 ----
 	game.save.wipe()
 	game.goto_menu()
 	await _settle()
@@ -537,15 +537,25 @@ func _run() -> void:
 		for b in menu.find_children("*", "Button", true, false):
 			if b.get_parent() == menu:
 				names.append((b as Button).text)
-		_check(names == ["开始游戏", "重置进度", "开发者信息", "退出游戏"], "标题页恰好四个选项(得 %s)" % str(names))
-		# 设置模块:四个选项正下方同列居中,不出屏;音量滑条当场改 Bgm 并落 settings;小机联动开关 = 无机器人模式;小机维护开面板
+		_check(names == ["开始游戏", "重置进度", "开发者信息", "退出游戏", "设置"], "标题页四个选项 + 第五项「设置」(得 %s)" % str(names))
+		# 「设置」弹窗:标题页本身没有控件;点「设置」弹出居中面板(遮罩挡住后面);音量滑条当场改 Bgm 并落 settings;
+		# 小机联动开关 = 无机器人模式;小机维护开面板;关闭 / Esc 收起
 		var sp: SettingsPanel = menu._settings
 		var quit_btn := _button_named(menu, "退出游戏")
-		_check(sp != null and sp.visible and sp.position.y >= quit_btn.position.y + quit_btn.size.y, "设置模块在四个选项正下方")
-		_check(sp != null and absf(sp.get_global_rect().get_center().x - MainMenu.SETTINGS_CENTER_X) <= 1.0
-				and sp.get_global_rect().end.y <= 2160.0, "设置模块与选项同列居中、不出屏(底 %s)" % str(sp.get_global_rect().end.y if sp != null else -1))
-		_check(sp != null and _button_named(sp, "小机维护") != null and sp._robot_btn.visible and sp._robot_btn.text == "小机联动:开" and sp._maint_btn.visible,
-				"有机器人:「小机联动:开」+ 显示「小机维护」")
+		var set_btn := _button_named(menu, "设置")
+		_check(sp != null and not sp.visible and set_btn != null and is_equal_approx(set_btn.get_global_rect().get_center().y - quit_btn.get_global_rect().get_center().y, MainMenu.MENU_PITCH)
+				and absf(set_btn.get_global_rect().get_center().x - MainMenu.MENU_CENTER_X) <= 1.0, "「设置」在「退出游戏」正下方同列同间距,弹窗默认关着")
+		var kinds: Dictionary = {}   # 标题页本身(弹窗层不算)只有两张图 + 五个文字按钮,没有滑条等设置控件
+		for child in menu.get_children():
+			kinds[child.get_class()] = int(kinds.get(child.get_class(), 0)) + 1
+		_check(kinds == {"TextureRect": 2, "Button": 5, "CanvasLayer": 2}, "标题页本身只有背景/标题图 + 五个文字按钮 + 两个弹窗层(得 %s)" % str(kinds))
+		_click(_center(set_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		var pr: Rect2 = sp._panel.get_global_rect()
+		_check(sp.visible and absf(pr.get_center().x - 1920.0) <= 1.0 and absf(pr.get_center().y - 1080.0) <= 1.0 and pr.size.x >= SettingsPanel.PANEL_MIN_W and pr.end.y < 2160.0,
+				"点「设置」→ 弹窗打开、面板居中(%s)" % str(pr))
+		_check(sp._robot_btn.visible and sp._robot_btn.text == "小机联动:开" and sp._maint_btn.visible and _button_named(sp, "关闭") != null,
+				"有机器人:「小机联动:开」+ 显示「小机维护」+ 有「关闭」")
 		var want_fs := "全屏:" + ("开" if SettingsPanel.is_fullscreen_mode(DisplayServer.window_get_mode()) else "关")
 		_check(sp != null and sp._fullscreen_btn.text == want_fs, "全屏按钮文字跟随真实窗口模式(得 %s)" % (sp._fullscreen_btn.text if sp != null else ""))
 		var vol_before := float(game.save.settings.get("music_volume", 1.0))
@@ -570,10 +580,21 @@ func _run() -> void:
 		game.save.save()
 		_click(_center(sp._maint_btn), MOUSE_BUTTON_LEFT)
 		await _settle()
-		_check(menu._cal_ui.visible, "点「小机维护」打开维护面板")
+		_check(menu._cal_ui.visible, "点「小机维护」打开维护面板(压在设置弹窗上)")
 		_click(_center(_button_named(menu._cal_ui, "关闭")), MOUSE_BUTTON_LEFT)
 		await _settle()
-		_check(not menu._cal_ui.visible and current_scene == menu, "关闭面板仍在标题页")
+		_check(not menu._cal_ui.visible and sp.visible and current_scene == menu, "关掉维护面板回到设置弹窗")
+		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)   # 遮罩挡住:点不到后面的选项
+		await _settle()
+		_check(current_scene == menu and sp.visible, "弹窗开着时点不到后面的「开始游戏」")
+		_click(_center(sp._close_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(not sp.visible, "点「关闭」收起弹窗")
+		_click(_center(set_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_key(KEY_ESCAPE)
+		await _settle()
+		_check(not sp.visible and current_scene == menu, "再开一次按 Esc 收起、仍在标题页")
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
