@@ -204,7 +204,9 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 对照截图:`tools/shot_4k.gd` 多出 `4k_machines.png`(七台仪器全摆上)与 `4k_editor.png`(弹窗;`SubViewport.gui_embed_subwindows = true` 才截得到 Window)。
 像素对位:示意图各张比例不同,以纹样宽 128 / 预览宽 720 为尺折算后逐项量测,引擎常量按折算值定,数字表在 `docs/ART_INTERFACE.md` §3.6。
 顺手修掉的 bug:左臂的假设纹样曾被同格更宽的钉按钮撑到 160 宽(VBox 子项默认 FILL)→ 纹样 `SIZE_SHRINK_BEGIN`;
-凹形多边形在排版前一帧尺寸为零会自交、三角化报错 → `_draw_concave_shape` 先查几何退化再画。
+凹形多边形在排版前一帧尺寸为零会自交、三角化报错 → `_draw_concave_shape` 先查几何退化再画;
+逐图放大对比又修了三处:蚂蚁线压描边(可钉纹样离边再留 `ANT_EDGE_INSET`)、凹形描边闭合点在圆角露缝(闭合点挪到底边中点)、
+对角分割线平头端帽戳出纹样角(`PatternView._draw` 两端缩半个线宽)。
 
 ### 3.4 审查后修掉的 bug(值得记住的坑)
 

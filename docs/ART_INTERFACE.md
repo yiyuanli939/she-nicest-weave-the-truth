@@ -62,7 +62,7 @@
 | 节点区:端口图形(v1.1 §1:输出口 = 圆 + 朝右尖角的插头,输入口 = 缺口朝左的插座;接上后输入口整圆、输出口不画;拖线时插头跟着鼠标) | `board/machine_node.gd` → `PORT_R` `PORT_TIP` `PORT_NOTCH_DEG`(画法 `draw_plug/draw_socket`,拖线中的插头在 `board/wire_overlay.gd`) |
 | 节点区:纹样边框按子命题着色(v1.1 §4.2) | `board/machine_node.gd` → `META_COLORS`(P 金 C9A24E / Q 棕 775241 / R 青 7B9B8B)`META_COLOR_OVERRIDES`(岔纹机两口 C2CAB9 / A8B9BE);线宽 `api/pattern_view.gd` `REGION_BORDER_W` |
 | 节点区:「钉纹样」按钮底色 / 位置(默认纹样下方,岔纹机在纹样左侧)/ 字号 / 内边距 / 与纹样的间距;圆角 | `board/machine_node.gd` → `PIN_BG` `PIN_BG_BY_PORT` `PIN_BUTTON_SIDE` `PIN_FONT_SIZE` `PIN_MARGIN_H` `PIN_MARGIN_V` `PIN_GAP`;`ui/ui_styles.gd` → `RADIUS` |
-| 节点区:未钉口的蚂蚁线(静态虚线)颜色 / 外扩 / 线宽 / 虚线段 | `board/machine_node.gd` → `ANT_COLOR` `ANT_INSET` `ANT_W` `ANT_DASH` |
+| 节点区:未钉口的蚂蚁线(静态虚线)颜色 / 外扩 / 线宽 / 虚线段;可钉纹样离节点边缘的额外留白(蚂蚁线不压描边) | `board/machine_node.gd` → `ANT_COLOR` `ANT_INSET` `ANT_W` `ANT_DASH` `ANT_EDGE_INSET` |
 | 节点区:汇路机三行分割线两色 / 线宽(v1.1 §4.3) | `board/machine_node.gd` → `DIVIDER_GOLD` `DIVIDER_CREAM` `DIVIDER_W` |
 | 节点区:封程机凹形(v1.1 §4.4:缺口 spacer 宽 / 两臂顶端留白 / 左臂宽 / 右臂纹样两侧留白 / 缺口底到标题带 / 标题字号 / 底边距;底色 / 标题带色 / 描边 / 圆角;假设口与输入口在两臂内沿) | `board/machine_node.gd` → `IMP_NOTCH_W` `IMP_TOP_PAD` `IMP_ARM_L_W` `IMP_ARM_R_INSET` `IMP_BASE_PAD` `IMP_TITLE_FONT_SIZE` `IMP_BOTTOM_PAD`;`NODE_BG` `NODE_TITLE_BG` `NODE_BORDER` `NODE_BORDER_SELECTED` `NODE_BORDER_W` `NODE_RADIUS`(口位 `port_pos()`) |
 | 连线:搭载未消去假设的线整条的颜色(v1.1 §2) | `theme/main_theme.tres` → `GraphEdit/colors/activity`(= `HYP_COLOR`) |
@@ -125,6 +125,8 @@
 | 弹窗:标题带高(含 3 px 线)/ 标题墨高 / 标题缩进 | 178 / 63 / 37(image 13) | 174 / 74 号 / 37 |
 | 弹窗:预览 / 左右边距 / 预览→提示 / 提示墨高 / 提示→笔刷 / 笔刷 / 笔刷间距 / 笔刷→按钮 / 按钮 / 底边距 | 720 × 421 / 18–22 / 58 / 27 / 17 / 100–116 × 76 / 15 / 76 / 106–128 × 58–61 / 48 | 720 × 420 / 20 / 58 / 33 号 / 17 / 110 × 76 / 15 / 76 / 122 × 61 / 48 |
 
+逐图对比后修掉的图形问题:可钉纹样的蚂蚁线外扩后压在节点 6 px 描边上(image 12 纹样距边 30)→ 可钉纹样及其按钮再离边 `ANT_EDGE_INSET` 16(封程机左臂离左边 8);
+封程机描边的闭合点落在圆角上露缝 → 闭合点挪到底边中点并首尾重叠;对角分割线的平头端帽戳出纹样角 → 两端各缩回半个线宽。
 未照做的地方(示意图彼此矛盾或手绘偏差):image 9 里 P>Q 出口画在节点边缘内侧 12 px,其它图的口都压在边缘上,引擎统一压边缘;
 各图的节点左右内边距 10–24 不一,引擎沿用 theme 的 16;钉按钮高 53 比示意图上限多 3 px(36 号字的行高下限)。
 

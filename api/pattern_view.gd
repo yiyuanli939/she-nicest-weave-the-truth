@@ -190,7 +190,13 @@ func _draw() -> void:
 			draw_polyline(pts, spec.color, REGION_BORDER_W)
 	for e: Dictionary in entries:
 		if e.shape == "line":
-			draw_line(e.from, e.to, SPLIT_COLOR, e.width)
+			var a: Vector2 = e.from
+			var b: Vector2 = e.to
+			if a.x != b.x and a.y != b.y:   # 对角线:两端各缩回半个线宽,平头端帽不露出纹样角
+				var d: Vector2 = (b - a).normalized() * float(e.width) * 0.5
+				a += d
+				b -= d
+			draw_line(a, b, SPLIT_COLOR, e.width)
 	if region_borders.is_empty():
 		draw_rect(rect, SPLIT_COLOR, false, 2.0)
 

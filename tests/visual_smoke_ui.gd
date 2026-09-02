@@ -273,8 +273,9 @@ func _run() -> void:
 	_check(mn._in_views[0].ghost and mn._out_views[0].ghost and mn._out_views[1].ghost, "新放置的仪器所有口都是幽灵")
 	_check(mn._pin_buttons.size() == 2 and (mn._pin_buttons[0] as Button).text == "钉纹样" and (mn._pin_buttons[1] as Button).text == "钉纹样"
 			and mn.get_titlebar_hbox().get_child_count() == 1, "岔纹机两个可钉口各有一个「钉纹样」按钮,标题栏里没有按钮")
-	_check(mn._pin_buttons[0].get_parent() == mn._out_views[0].get_parent().get_parent()
-			and mn._pin_buttons[0].get_index() == mn._out_views[0].get_parent().get_index() - 1, "岔纹机钉按钮在输出纹样左侧同一行")
+	var out0_wrap: Node = mn._out_views[0].get_parent().get_parent()   # 纹样格外再包一层离边容器(蚂蚁线不压描边)
+	_check(mn._pin_buttons[0].get_parent() == out0_wrap.get_parent()
+			and mn._pin_buttons[0].get_index() == out0_wrap.get_index() - 1, "岔纹机钉按钮在输出纹样左侧同一行")
 	_check(mn.is_ant_frame_shown(0) and mn.is_ant_frame_shown(1), "未钉的两口都画蚂蚁线")
 	_check(mn.get_theme_constant("separation") == MachineNode.ROW_GAP and MachineNode.ROW_GAP >= 32, "纹样行距拉开到 ROW_GAP")
 	_click(_center(mn._pin_buttons[0]), MOUSE_BUTTON_LEFT)
@@ -451,7 +452,8 @@ func _run() -> void:
 			"假设口在左臂右沿、输入口在右臂左沿,中间是缺口(%.0f..%.0f)" % [hyp_local.x, q_local.x])
 	_check(is_equal_approx(hyp_local.y, imp._local_rect_of(imp._out_views[1]).get_center().y)
 			and is_equal_approx(q_local.y, imp._local_rect_of(imp._in_views[0]).get_center().y), "两个口的 y 都在各自纹样中心")
-	_check(imp._pin_buttons.has(1) and imp._pin_buttons[1].get_parent() == imp._arm_l, "钉纹样按钮在左臂假设纹样下方")
+	_check(imp._pin_buttons.has(1) and imp._arm_l.is_ancestor_of(imp._pin_buttons[1])
+			and imp._pin_buttons[1].get_parent() == imp._out_views[1].get_parent(), "钉纹样按钮在左臂假设纹样下方(同一竖排)")
 	_check(imp._out_views[0].region_borders.size() == 2 and imp._out_views[0].region_borders[0].color == MachineNode.META_COLORS[&"P"]
 			and imp._out_views[0].region_borders[1].color == MachineNode.META_COLORS[&"Q"], "封程机 P>Q 口:上半金 / 下半棕两段边框")
 	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)

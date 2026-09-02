@@ -49,6 +49,7 @@ const PIN_BUTTON_SIDE: Dictionary = {&"or_intro": &"left"}
 # 蚂蚁线:未钉的可钉口纹样外扩一圈静态虚线(image 9/11/12 采样为乳黄)
 const ANT_COLOR := Color("F0E4C8")
 const ANT_INSET := 14.0                         # image 9/11/12 实测 11–15
+const ANT_EDGE_INSET := 16.0                    # 可钉纹样再离节点边缘远一点,蚂蚁线不压到 6 px 描边(image 12:纹样距边 30)
 const ANT_W := 2.0
 const ANT_DASH := 8.0
 # §4.3 汇路机分割线(策划给的两色:金线在上、乳黄线紧贴其下)
@@ -154,17 +155,22 @@ func _build_rows(info: ProofSession.NodeInfo) -> void:
 		if row < info.outputs.size():
 			if side == &"left" and _pin_ports.has(row):
 				h.add_child(_make_pin_button(row))
-			_out_views.append(_add_cell(h, big, _borders_for(info, info.outputs[row].label)))
+			if _pin_ports.has(row):
+				var v := _make_view(big, _borders_for(info, info.outputs[row].label))
+				_out_views.append(v)
+				h.add_child(_edge_inset(_cell(v)))
+			else:
+				_out_views.append(_add_cell(h, big, _borders_for(info, info.outputs[row].label)))
 		add_child(h)
 		_rows.append(h)
 		set_slot(row,
 				row < info.inputs.size(), 0, GOAL_COLOR if is_goal else PORT_COLOR,
 				row < info.outputs.size(), 0, HYP_COLOR if _out_is_hyp.get(row, false) else PORT_COLOR)
 	if side == &"below" and not _pin_ports.is_empty():
-		var h := _row()   # 无口的一行:按钮右对齐在输出纹样下方
+		var h := _row()   # 无口的一行:按钮右对齐在输出纹样下方(与纹样同样离边)
 		h.add_child(_spacer())
 		for p in _pin_ports:
-			h.add_child(_make_pin_button(p))
+			h.add_child(_edge_inset(_make_pin_button(p)))
 		var pull := MarginContainer.new()   # 行距是整节点统一的 ROW_GAP,这一行用负上边距收到 PIN_GAP
 		pull.add_theme_constant_override("margin_top", int(PIN_GAP) - ROW_GAP)
 		pull.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -196,8 +202,15 @@ func _build_concave(info: ProofSession.NodeInfo) -> void:
 	var in_view := _make_view(false, _borders_for(info, info.inputs[0].label))
 	_in_views = [in_view]
 	var row0 := _row()
-	_arm_l = _cell(hyp_view)
-	_arm_l.add_child(_make_pin_button(1))
+	var arm_l_cell := _cell(hyp_view)
+	arm_l_cell.add_child(_make_pin_button(1))
+	_arm_l = MarginContainer.new()   # 左臂:纹样与按钮离臂的左边缘再远一点(蚂蚁线不压描边);臂宽 IMP_ARM_L_W,右沿 = 假设口
+	_arm_l.add_theme_constant_override("margin_left", int(ANT_EDGE_INSET * 0.5))
+	_arm_l.add_theme_constant_override("margin_right", 0)
+	_arm_l.add_theme_constant_override("margin_top", 0)
+	_arm_l.add_theme_constant_override("margin_bottom", 0)
+	_arm_l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arm_l.add_child(arm_l_cell)
 	_arm_l.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	_arm_l.custom_minimum_size.x = IMP_ARM_L_W
 	row0.add_child(_arm_l)
@@ -272,6 +285,19 @@ func _cell(v: Control) -> VBoxContainer:
 	v.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN   # 纹样保持原尺寸,不被同格更宽的钉按钮撑开
 	box.add_child(v)
 	return box
+
+
+## 可钉纹样(及其下方的按钮)离节点右边缘再留 ANT_EDGE_INSET:蚂蚁线外扩后不压到描边
+func _edge_inset(c: Control) -> MarginContainer:
+	var m := MarginContainer.new()
+	m.add_theme_constant_override("margin_left", 0)
+	m.add_theme_constant_override("margin_right", int(ANT_EDGE_INSET))
+	m.add_theme_constant_override("margin_top", 0)
+	m.add_theme_constant_override("margin_bottom", 0)
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	m.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	m.add_child(c)
+	return m
 
 
 ## 右臂 / 右列:纹样两侧各留 IMP_ARM_R_INSET(image 9 右臂比左臂宽,纹样居中偏右)
@@ -539,8 +565,17 @@ func _draw_concave_shape() -> void:
 	band.append_array(_arc(Vector2(w - NODE_RADIUS, h - NODE_RADIUS), 0.0, 0.5 * PI))
 	band.append_array(_arc(Vector2(NODE_RADIUS, h - NODE_RADIUS), 0.5 * PI, PI))
 	draw_colored_polygon(band, NODE_TITLE_BG)
-	var outline := pts.duplicate()
-	outline.append(pts[0])
+	# 描边:闭合点放在底边中点(直线段上,首尾重叠一段),圆角处接缝会露出缺口
+	var outline := PackedVector2Array([Vector2(w * 0.5, h)])
+	var start := 0
+	for i in pts.size():
+		if pts[i].y >= h - 0.5 and pts[i].x <= w * 0.5:
+			start = i
+			break
+	for i in pts.size():
+		outline.append(pts[(start + i) % pts.size()])
+	outline.append(Vector2(w * 0.5, h))
+	outline.append(Vector2(w * 0.5 + NODE_BORDER_W, h))
 	draw_polyline(outline, NODE_BORDER_SELECTED if selected else NODE_BORDER, NODE_BORDER_W)
 
 
