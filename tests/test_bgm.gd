@@ -92,6 +92,28 @@ func test_level_slots_share_one_looping_track() -> bool:
 	return ok
 
 
+## 玩家音量(设置模块滑条)乘在目标音量上、当场生效;淡化中途改音量直接落到终态
+func test_user_volume_scales_playback() -> bool:
+	var tree := Engine.get_main_loop() as SceneTree
+	var B: GDScript = load(BGM_SCRIPT)
+	var bgm: Node = B.new()
+	tree.root.add_child(bgm)
+	var ok := check(is_equal_approx(bgm.user_volume, 1.0), "没有 Game 的实例默认音量 1.0")
+	bgm.play(&"title")
+	var p0: AudioStreamPlayer = bgm.active_player()
+	bgm.set_user_volume(0.5)
+	ok = check(is_equal_approx(p0.volume_linear, B.target_volume("res://music/title.mp3") * 0.5) and p0.playing, "改到 50%:淡入被截断,当场落到目标音量 x 0.5") and ok
+	bgm.set_user_volume(1.7)
+	ok = check(is_equal_approx(bgm.user_volume, 1.0) and is_equal_approx(p0.volume_linear, B.target_volume("res://music/title.mp3")), "越界夹到 1.0") and ok
+	bgm.play(&"level_1")
+	bgm.set_user_volume(0.0)
+	var p1: AudioStreamPlayer = bgm.active_player()
+	ok = check(p1 != p0 and is_equal_approx(p1.volume_linear, 0.0) and not p0.playing, "换曲淡化中改成 0:来者静音、去者立即停") and ok
+	tree.root.remove_child(bgm)
+	bgm.free()
+	return ok
+
+
 func test_set_looping_covers_whole_wav_and_keeps_existing_loop_points() -> bool:
 	var B: GDScript = load(BGM_SCRIPT)
 	var ok := true

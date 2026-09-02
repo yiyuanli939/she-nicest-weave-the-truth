@@ -3,7 +3,7 @@ extends Node
 ## 场景在 _ready 里 play(槽位):同槽位不重启(标题/选关/开发者信息互切、同章下一关),
 ## 换槽位用两个播放器交叉淡化;槽位没曲子就淡出到静音(补曲只改 TRACKS 一行)。
 ## 故事界面(开场 / 结局对话)也报 title:从选关进来标题曲接着播不重启,从棋盘进来关内曲淡出换回标题曲;关内曲只在棋盘起。
-## 美术文档没有音量 UI,音量是常量。
+## 音量:基准 VOLUME_LINEAR × 文件响度修正 × 玩家设置 user_volume(标题页设置模块的滑条,存 settings.music_volume,启动时这里读)。
 
 const TRACKS: Dictionary = {
 	&"title": "res://music/title.mp3",   # 标题 / 选关 / 故事界面(开场 / 结局对话)/ 开发者信息
@@ -20,6 +20,7 @@ const GAIN_DB: Dictionary = {
 }
 
 var slot: StringName = &""    # 当前请求的槽位(静音槽位也记着,同槽位再调才能免重启)
+var user_volume := 1.0        # 玩家设置的音乐音量(0..1),乘在 target_volume 上;SettingsPanel 改,启动时 _ready 从 settings 读
 var _path := ""               # 正在播的文件("" = 静音);几个槽位共用一首时换槽位不重启
 
 var _players: Array[AudioStreamPlayer] = []
@@ -38,6 +39,13 @@ func _init() -> void:
 		_players.append(p)
 
 
+## autoload 顺序 Game → Robot → Bgm:这里能读到存档里的音量设置(没有 Game 的测试实例保持 1.0)
+func _ready() -> void:
+	var game := get_node_or_null("/root/Game")
+	if game != null and game.save != null:
+		user_volume = clampf(float(game.save.settings.get("music_volume", 1.0)), 0.0, 1.0)
+
+
 ## 章号(Game.current_chapter,0..3)对应关内槽位;-1(无 Game / 测试注入关)给空槽位 = 静音
 static func slot_for_chapter(ch: int) -> StringName:
 	if ch >= 0 and ch <= 3:
@@ -45,9 +53,27 @@ static func slot_for_chapter(ch: int) -> StringName:
 	return &""
 
 
-## 某文件的目标音量(线性)= 基准音量 x 响度修正
+## 某文件的目标音量(线性)= 基准音量 x 响度修正(不含玩家设置;实际播放用 _target)
 static func target_volume(path: String) -> float:
 	return VOLUME_LINEAR * db_to_linear(float(GAIN_DB.get(path, 0.0)))
+
+
+func _target(path: String) -> float:
+	return target_volume(path) * user_volume
+
+
+## 玩家改音量(设置模块滑条):当场生效。淡化进行中就直接落到终态(来者到目标音量、去者停),不等淡化结束
+func set_user_volume(v: float) -> void:
+	user_volume = clampf(v, 0.0, 1.0)
+	if _tween != null and _tween.is_valid():
+		_tween.kill()
+	for i in _players.size():
+		var p := _players[i]
+		if i == _active:
+			p.volume_linear = _target(_path)
+		else:
+			p.volume_linear = 0.0
+			p.stop()
 
 
 func play(new_slot: StringName) -> void:
@@ -71,7 +97,7 @@ func play(new_slot: StringName) -> void:
 		incoming.play()
 	# 只 tween volume_linear,别碰 volume_db(0 线性 = -inf dB)
 	_tween = create_tween().set_parallel(true)
-	_tween.tween_property(incoming, "volume_linear", target_volume(path), FADE_SEC)
+	_tween.tween_property(incoming, "volume_linear", _target(path), FADE_SEC)
 	_tween.tween_property(outgoing, "volume_linear", 0.0, FADE_SEC)
 	_tween.chain().tween_callback(outgoing.stop)
 

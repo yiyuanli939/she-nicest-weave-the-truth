@@ -2,8 +2,9 @@ class_name SaveManager
 extends RefCounted
 ## 存档:user://save.json。结构:
 ## { layout: 关卡编排版本, solved: {level_id: true}, boards: {level_id: session.save_state()},
-##   steps: {操作名: true}(关内操作指引里做过一次的操作,见 StepGuide), settings: {robot_turn: "right"|"left"} }
-## settings 是设备/偏好设置(小机回头方向等),「重置进度」wipe() 不清它。
+##   steps: {操作名: true}(关内操作指引里做过一次的操作,见 StepGuide),
+##   settings: {music_volume: 0..1, fullscreen: bool, robot_enabled: bool, robot_turn: "right"|"left", robot_stationary: bool} }
+## settings 是设备/偏好设置(标题页设置模块 SettingsPanel + 小机维护面板写),「重置进度」wipe() 不清它。
 ## layout:关卡 id 整体重排后(2026-09-02 第一章加第三纹,l03 起后移一位),旧档里的 boards 是别的题目的棋盘,
 ## load_state 会把旧题的线轴/目标织机整套换进来 —— 读到旧版本就丢弃 boards,只保留 solved(顶多错位一关,不伤进度)。
 
