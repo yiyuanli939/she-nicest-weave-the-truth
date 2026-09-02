@@ -81,7 +81,7 @@ tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
 ### 2.5 流程与剧情
 
 ```
-MainMenu(标题页:右列 开始/继续游戏 · 重置进度 · 开发者信息 · 退出,左侧 设置(弹窗))→ LevelSelect → Game.start_level(lv)
+MainMenu(标题页:开始/继续游戏 · 重置进度 · 开发者信息 · 退出 · 设置(弹窗))→ LevelSelect → Game.start_level(lv)
                             ├─ 有 intro_dialogue → StoryScene(固定底图 + 场景插图 + 左右立绘 + 遮罩 + 对话区)
                             │                         播完 → Game.enter_board()
                             └─ 无 → enter_board() → LevelScene(仪器架 + 棋盘 + 右缘笔记抽屉)
@@ -155,7 +155,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 |---|---|---|
 | 逻辑视口 3840×2160,PNG 原尺寸 | `project.godot [display]`、`gui/theme/default_theme_scale=2` | 美术:不改图片大小与长宽比;窗口开局最大化(`size/mode=2`,适配 1920×1080 等任意屏),取消最大化还原 1440×810,整体等比缩放。所有像素常量都是 4K 坐标 |
 | 站酷小薇体 + 纯文字按钮悬停变浅 | `theme/main_theme.tres`(FontVariation + 系统字体兜底;Button 四态 StyleBoxEmpty) | 字体没有 ☠📌▶✓∧∨→⊥ 等符号,UI 字面量全部去符号(`tests/test_theme.gd` 扫) |
-| 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页右列美术四个选项(+ 后加的左侧「设置」,见 3.7)、重置点击即清档;选关/开发者页左上角「返回主界面」(`ui/back_button.gd`),Esc 也回;关名「第N纹」 |
+| 标题页 / 选关页 / 开发者信息页 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` | 标题页美术四个选项(+ 后加的第五项「设置」,见 3.7)、重置点击即清档;选关/开发者页左上角「返回主界面」(`ui/back_button.gd`),Esc 也回;关名「第N纹」 |
 | 故事界面换图 | `ui/story_scene.gd`、`narrative/story_art.gd`、`DialogueLine` 新字段、`tools/import_dialogue.gd` | 删地点铭牌与 `DialogueRes.location_title/background`、`DialogueLine.side_right/portrait` |
 | 关内界面 | `board/palette_panel.gd`(固定 7 格)、`ui/level_scene.gd`(绝对布局、工具条按钮)、`narrative/notebook_ui.gd`(图片抽屉) | 删 HUD 关名/目标文字、节点端口 Label、`MachineGuidePanel`/`RuleGuide*`、`LevelDef.notebook_unlocks`、`SaveManager.notebook` |
 | 测试 | `visual_smoke_ui.gd` 重写(`push_input(ev, true)`:视口≠窗口时坐标要按视口给)、新增 `test_story_art/test_dialogue_import/test_theme` | 81/81 + 三 smoke 全绿 |
@@ -224,8 +224,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 
 ### 3.7 标题页设置模块(2026-09-02,用户要求;美术文档没有 → 先纯文字,常量留位)
 
-标题页左侧纯文字选项「设置」(用户:右下四项已经够密,影响视觉引导 → 单独放左边空白处 `SETTINGS_CENTER (260, 940)`,与右列首项同高;
-`_add_text_button`,字号字距同右列)点开 `ui/settings_panel.gd`(`SettingsPanel`,CanvasLayer 50:
+标题页第五个选项「设置」(与美术的四项同列同间距,`_add_option(4, …)`)点开 `ui/settings_panel.gd`(`SettingsPanel`,CanvasLayer 50:
 半透明遮罩挡住标题页 + 居中主题乳黄面板;标题页本身不放任何控件):
 「设置」→ 音乐音量滑条(0–100%,`Bgm.set_user_volume` 当场生效,松手落 `settings.music_volume`)→ 「全屏:开/关」
 (`DisplayServer.window_set_mode`,关 = 回工程默认最大化;落 `settings.fullscreen`,下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口)
@@ -306,7 +305,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
   U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
   假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页;笔记抽屉划出/变「继续工作」/翻页循环/收回;
-  标题页右列四项 + 左侧「设置」弹窗(位置、居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
+  标题页四项 + 「设置」弹窗(居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写
   (mac/Windows 文件系统大小写不敏感,开发期写错不报错;导出 PCK 严格区分,一到导出版才炸)。
