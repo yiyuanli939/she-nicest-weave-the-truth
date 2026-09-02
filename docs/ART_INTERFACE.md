@@ -41,10 +41,9 @@
 | 界面 / 元素 | 文件 → 常量 |
 |---|---|
 | 标题页:标题图左上角 | `ui/main_menu.gd` → `TITLE_POS` |
-| 标题页:四个选项的水平中心 / 首项垂直中心 / 间距 / 字号 / 字距 | `ui/main_menu.gd` → `MENU_CENTER_X` `MENU_Y0` `MENU_PITCH` `MENU_FONT_SIZE` `MENU_GLYPH_SPACING` |
+| 标题页:五个选项(美术四项 + 用户要求的「设置」排第五)的水平中心 / 首项垂直中心 / 间距 / 字号 / 字距 | `ui/main_menu.gd` → `MENU_CENTER_X` `MENU_Y0` `MENU_PITCH` `MENU_FONT_SIZE` `MENU_GLYPH_SPACING` |
 | 标题页:流光周期 / 宽度 / 强度 | `assets/shaders/title_sheen.gdshader` → `period` `band_width` `strength` |
-| 标题页:设置模块(四个选项正下方,同列居中;用户要求,美术文档没有 → 先纯文字)水平中心 / 顶边 | `ui/main_menu.gd` → `SETTINGS_CENTER_X` `SETTINGS_TOP` |
-| 标题页:设置模块 「设置」字号 / 项字号 / 行距 / 标题下空隙 / 滑条宽·间距·轨厚·圆钮直径 / 轨色·已填色·钮色 | `ui/settings_panel.gd` → `TITLE_FONT_SIZE` `FONT_SIZE` `ROW_GAP` `TITLE_GAP` `SLIDER_W` `SLIDER_GAP` `TRACK_H` `KNOB_D` `TRACK_BG` `TRACK_FILL` `KNOB_COLOR` |
+| 标题页「设置」弹窗(点第五项弹出,居中;用户要求,美术文档没有 → 先纯文字 + 主题乳黄面板):面板最小宽 / 内边距 / 遮罩色 / 「设置」字号 / 项字号 / 行距 / 标题下空隙 / 滑条宽·间距·轨厚·圆钮直径 / 轨色·已填色·钮色 | `ui/settings_panel.gd` → `PANEL_MIN_W` `PAD` `DIM_COLOR` `TITLE_FONT_SIZE` `FONT_SIZE` `ROW_GAP` `TITLE_GAP` `SLIDER_W` `SLIDER_GAP` `TRACK_H` `KNOB_D` `TRACK_BG` `TRACK_FILL` `KNOB_COLOR`(截图 `build/shots4k/4k_settings.png`) |
 | 选关页:章间距 / 章标题与按钮行间距 / 同行按钮间距 / 字号 / 颜色 | `ui/level_select.gd` → `CHAPTER_GAP` `TITLE_GAP` `ROW_GAP` `CHAPTER_FONT_SIZE` `LEVEL_FONT_SIZE` `*_COLOR` |
 | 开发者信息页:文字与行距 | `ui/credits_scene.gd` → `LINES` `TEXT_FONT_SIZE` `LINE_GAP` |
 | 故事界面:底图左上角 / 底图外圈的白底 | `ui/story_scene.gd` → `BASE_POS` `BG_COLOR`(底图 3835×2123 比视口小,四边垫白;换场清屏色在 `project.godot` `default_clear_color`) |

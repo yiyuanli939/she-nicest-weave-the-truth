@@ -1,23 +1,28 @@
 class_name SettingsPanel
-extends VBoxContainer
-## 标题页的设置模块(2026-09-02 用户要求;美术文档没有 → 先纯文字,字号/间距常量留给美术,位置在 ui/main_menu.gd SETTINGS_*):
-## 放在四个选项正下方、同一列居中:「设置」→ 音乐音量(滑条)→ 全屏 开/关 → 小机联动 开/关 → 小机维护(联动开着才显示)。
+extends CanvasLayer
+## 标题页「设置」弹窗(2026-09-02 用户要求:设置是标题页第五个选项,点进去在弹窗里改,标题页本身不放控件;
+## 美术文档没有 → 先纯文字 + 常量留位)。半透明遮罩 + 居中乳黄面板(主题 PanelContainer 样式):
+## 「设置」→ 音乐音量(滑条)→ 全屏 开/关 → 小机联动 开/关 → 小机维护(联动开着才显示)→ 关闭(Esc 也关)。
 ## 设置落 SaveManager.settings(「重置进度」不清):music_volume(0..1)、fullscreen(bool);robot_enabled 由 Robot.set_enabled 写。
 ## 音量当场生效(Bgm.set_user_volume,启动时 Bgm._ready 自己读);全屏当场切窗口模式,下次启动 Game._apply_window_settings 恢复;
 ## 小机联动 = 无机器人模式开关(与维护面板「机器人:已启用 / 无机器人模式」同一个开关),Web 版没有机器人,这两行不显示。
 ## 文字按钮沿用主题(无底、悬停变浅);滑条按美术色板自画(乳黄轨 / 黄铜已填段 / 棕红圆钮),文字须全在站酷小薇体里。
 
-const TITLE_FONT_SIZE := 52
-const FONT_SIZE := 42
-const ROW_GAP := 6             # 行与行之间的空隙(主题 Button 自带上下 12 内边距,行距主要靠它)
-const TITLE_GAP := 12          # 「设置」与第一行之间额外的空隙
-const SLIDER_W := 180.0
-const SLIDER_GAP := 12.0       # 「音乐音量」/ 滑条 / 百分数 之间
-const TRACK_H := 12.0          # 滑轨厚度
-const KNOB_D := 36             # 圆钮直径
+const LAYER := 50              # 小机维护面板是 60:从这里打开时压在上面
+const PANEL_MIN_W := 1200.0
+const PAD := 40                # 面板内容边距(主题 panel_cream 自带 28/24 之外再加)
+const TITLE_FONT_SIZE := 64
+const FONT_SIZE := 48
+const ROW_GAP := 20            # 行与行之间的空隙(主题 Button 自带上下 12 内边距)
+const TITLE_GAP := 16          # 「设置」与第一行之间额外的空隙
+const SLIDER_W := 560.0
+const SLIDER_GAP := 24.0       # 「音乐音量」/ 滑条 / 百分数 之间
+const TRACK_H := 14.0          # 滑轨厚度
+const KNOB_D := 44             # 圆钮直径
 const TRACK_BG := Color("E6D9BC")
 const TRACK_FILL := Color("C9A24E")
 const KNOB_COLOR := Color(0.42, 0.23, 0.2)
+const DIM_COLOR := Color(0, 0, 0, 0.45)
 const VOLUME_STEP := 0.05
 const VOLUME_DEFAULT := 1.0
 
@@ -25,28 +30,47 @@ var _game: Node
 var _robot: Node
 var _bgm: Node
 var _maint: RobotMaintUI
+var _panel: PanelContainer
 var _volume: HSlider
 var _volume_lbl: Label
 var _fullscreen_btn: Button
 var _robot_btn: Button
 var _maint_btn: Button
+var _close_btn: Button
 var _dragging := false
 
 
 func _init() -> void:
-	add_theme_constant_override("separation", ROW_GAP)
-	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layer = LAYER
+	visible = false
+	var dim := ColorRect.new()   # 默认 mouse_filter = STOP:挡住后面的标题页
+	dim.color = DIM_COLOR
+	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	add_child(dim)
+	var center := CenterContainer.new()   # 用 CenterContainer 包 panel 才是真居中(见 RobotMaintUI)
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(center)
+	_panel = PanelContainer.new()
+	_panel.custom_minimum_size = Vector2(PANEL_MIN_W, 0)
+	center.add_child(_panel)
+	var margin := MarginContainer.new()
+	for side in ["margin_left", "margin_top", "margin_right", "margin_bottom"]:
+		margin.add_theme_constant_override(side, PAD)
+	_panel.add_child(margin)
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", ROW_GAP)
+	margin.add_child(box)
+
 	var head := MarginContainer.new()   # 「设置」下面比普通行多留 TITLE_GAP
 	head.add_theme_constant_override("margin_bottom", TITLE_GAP)
 	head.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	head.add_child(_label("设置", TITLE_FONT_SIZE))
-	add_child(head)
+	box.add_child(head)
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", int(SLIDER_GAP))
 	row.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	row.add_child(_label("音乐音量", FONT_SIZE))
 	_volume = HSlider.new()
 	_volume.min_value = 0.0
@@ -70,15 +94,18 @@ func _init() -> void:
 	_volume_lbl.custom_minimum_size.x = _volume_lbl.get_combined_minimum_size().x   # 按「100%」预留宽度,拖动时整行不挪
 	_volume_lbl.text = volume_text(VOLUME_DEFAULT)
 	row.add_child(_volume_lbl)
-	add_child(row)
+	box.add_child(row)
 
 	_fullscreen_btn = _button(_on_toggle_fullscreen)
-	add_child(_fullscreen_btn)
+	box.add_child(_fullscreen_btn)
 	_robot_btn = _button(_on_toggle_robot)
-	add_child(_robot_btn)
+	box.add_child(_robot_btn)
 	_maint_btn = _button(_on_open_maint)
 	_maint_btn.text = "小机维护"
-	add_child(_maint_btn)
+	box.add_child(_maint_btn)
+	_close_btn = _button(close)
+	_close_btn.text = "关闭"
+	box.add_child(_close_btn)
 
 
 ## 挂到标题页后调:传入 Game / Robot / Bgm autoload(可为 null:对应行隐藏或不生效)和维护面板
@@ -93,6 +120,22 @@ func setup(game: Node, robot: Node, bgm: Node, maint: RobotMaintUI) -> void:
 	_volume.set_value_no_signal(v)
 	_volume_lbl.text = volume_text(v)
 	refresh()
+
+
+func open() -> void:
+	refresh()
+	visible = true
+
+
+func close() -> void:
+	visible = false
+
+
+## Esc 关闭(维护面板压在上面时不管,交给面板)
+func _unhandled_input(event: InputEvent) -> void:
+	if visible and event.is_action_pressed("ui_cancel") and not (_maint != null and _maint.visible):
+		close()
+		get_viewport().set_input_as_handled()
 
 
 ## 按当前真实状态刷新文字/显隐(维护面板里切了无机器人模式、OS 快捷键切了全屏,都以此为准)
@@ -130,7 +173,7 @@ func _on_volume_changed(v: float) -> void:
 	_volume_lbl.text = volume_text(v)
 	if _bgm != null:
 		_bgm.set_user_volume(v)
-	if not _dragging:   # 点轨道 / 键盘:当场落盘;拖动中等松手
+	if not _dragging:   # 点轨道 / 滚轮:当场落盘;拖动中等松手
 		_persist_volume()
 
 

@@ -4,7 +4,8 @@ extends SceneTree
 ##   "$GODOT" --path . --script res://tools/shot_4k.gd
 ## 出图(build/shots4k/,已 gitignore + .gdignore,编辑器不会给截图生成 .import):
 ##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
-##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗。
+##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗
+##   4k_settings.png 标题页「设置」弹窗。
 ## 对照法:与 笔记本页面补充/位置参考.png、美术预览图叠图看边,或用 Python(PIL/numpy)做模板匹配;
 ## 引擎常量与参考实测数字见 docs/ART_INTERFACE.md「参考基准与实测值」。
 
@@ -30,7 +31,14 @@ func _initialize() -> void:
 		if with_machines != first:
 			break
 
-	await _shot(load("res://ui/main_menu.tscn").instantiate(), "4k_title", 0.6)
+	var menu: MainMenu = load("res://ui/main_menu.tscn").instantiate()
+	_mount(menu)
+	await _wait(0.6)
+	_save("4k_title")
+	menu._settings.open()
+	await _wait(0.3)
+	_save("4k_settings")
+	_unmount()
 
 	game.current = first
 	game.ending_pending = false
