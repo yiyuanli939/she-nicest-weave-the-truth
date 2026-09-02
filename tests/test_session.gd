@@ -183,3 +183,61 @@ func test_connected_getters() -> bool:
 		and check(not s.is_output_connected(oi, 1), "没钉没线的另一口不算 connected")
 	s.free()
 	return ok
+
+
+## 自动断开的错线(record_undo = false)不记撤销步,且断开后棋盘回到接线前 → 连接线那一步也弹掉(撤销历史里没有这条线);
+## 玩家自己断线照旧记一步
+func test_disconnect_without_undo_entry() -> bool:
+	var s := ProofSession.new()
+	var ok := check(s.setup(["A & B"], "B & A") == "", "setup")
+	var m := s.place_machine(&"and_intro")
+	var spool: int = s.assumption_ids[0]
+	var goal: int = s.goal_id
+	var ok_wire := s.connect_wire(spool, 0, goal, 0)
+	ok = check(ok_wire and s.get_wire_state(spool, 0, goal, 0) == ProofSession.WireState.CONFLICT, "线轴 A&B 直接接目标 B&A = 冲突线") and ok
+	s.disconnect_wire(spool, 0, goal, 0, false)
+	ok = check(s.get_wires().is_empty() and s.can_undo() and not s.can_redo(), "自动断开:线没了,只剩「放仪器」可撤销") and ok
+	s.undo()
+	ok = check(s.get_node_ids().size() == 2 and not s.can_undo(), "撤销一步直接回到放仪器之前(不会复活错线)") and ok
+	s.redo()
+	s.connect_wire(spool, 0, goal, 0)
+	s.disconnect_wire(spool, 0, goal, 0)
+	ok = check(s.get_wires().is_empty() and s.can_undo(), "玩家手动断线照旧记一步") and ok
+	s.undo()
+	ok = check(s.get_wires().size() == 1, "撤销手动断线 → 线回来") and ok
+	s.free()
+	return ok
+
+
+## v1.2:已通关的关重开 → load_state(d, true) 把接进目标织机的线拆掉:不通关、载入不发 proof_completed、拆线不可撤销;
+## 玩家接回那根线 = 正常通关(发一次 proof_completed)。默认 load_state 不拆线
+func test_load_state_detach_goal() -> bool:
+	var s := ProofSession.new()
+	_build_conj_proof(s)
+	var d: Dictionary = JSON.parse_string(JSON.stringify(s.save_state()))
+	var last: ProofSession.WireInfo = null
+	for w in s.get_wires():
+		if w.to_id == s.goal_id:
+			last = w
+	var s2 := ProofSession.new()
+	var counts := {"completed": 0}
+	s2.proof_completed.connect(func() -> void: counts.completed += 1)
+	s2.load_state(d, true)
+	var goal_in := 0
+	for w in s2.get_wires():
+		if w.to_id == s2.goal_id:
+			goal_in += 1
+	var ok := check(last != null and goal_in == 0, "目标织机输入口的线应被拆掉") \
+		and check(not s2.is_solved() and counts.completed == 0, "拆线后未通关,载入不发 proof_completed") \
+		and check(s2.get_node_ids().size() == s.get_node_ids().size() and s2.get_wires().size() == s.get_wires().size() - 1,
+				"节点不动,只少目标那一根线") \
+		and check(not s2.can_undo(), "拆线不进撤销历史")
+	s2.connect_wire(last.from_id, last.from_port, last.to_id, last.to_port)
+	ok = check(s2.is_solved() and counts.completed == 1, "接回目标线 → 通关,proof_completed 发一次") and ok
+	var s3 := ProofSession.new()
+	s3.load_state(d)
+	ok = check(s3.is_solved(), "默认 load_state 不拆线(往返仍通关)") and ok
+	s.free()
+	s2.free()
+	s3.free()
+	return ok

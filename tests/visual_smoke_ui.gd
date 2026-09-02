@@ -219,7 +219,7 @@ func _run() -> void:
 	_check(_button_named(scene, "重置") != null, "有重置按钮")
 	_check(_button_named(scene, "示答") == null, "没有脚本化解法的关不显示示答按钮")
 	_check(_labels_with(scene, "第九纹") == 0 and _labels_with(scene, "目标纹样") == 0, "关内不显示当前关名/目标文字")
-	# 状态文字在按钮之后:文字变长不再把按钮推着跑(通关瞬间「下一关」曾从鼠标下溜走)
+	# 状态文字在按钮之后:文字变长不再把按钮推着跑(v1.2 前通关瞬间「下一关」曾从鼠标下溜走;现在通关走弹窗,工具条只剩 重置/示答/选关)
 	var back_tool := _button_named(scene, "选关")
 	var back_x0: float = back_tool.get_global_rect().position.x
 	scene._status.text = "一段相当长的状态文字用来验证工具条按钮不再被文字推着跑一二三四五六七八"
@@ -294,6 +294,18 @@ func _run() -> void:
 			"弹窗按钮是 清空/取消/确认")
 	_check(_labels_with(scene._editor, "斜纹处") == 0 and _labels_with(scene._editor, "点选笔刷进行绘制") == 1 and _labels_with(scene._editor, "纹样绘制") == 1,
 			"弹窗有标题「纹样绘制」与「点选笔刷进行绘制:」,旧提示删掉")
+	# v1.2:解锁焦纹(第四章)时第四个笔刷是焦纹图样(PatternView 画 ⊥),不是文字「焦纹」
+	scene._editor.open_for(scene.atoms, scene.atom_colors, null, true)
+	await _settle()
+	var brushes: Array[Node] = scene._editor._brush_row.get_children()
+	var bot_btn: Button = brushes[-1] as Button
+	var bot_view: PatternView = bot_btn.get_child(0) as PatternView if bot_btn != null and bot_btn.get_child_count() > 0 else null
+	_check(_button_named(scene._editor, "焦纹") == null and bot_btn.text == "" and bot_view != null
+			and bot_view.formula != null and bot_view.formula.kind == Formula.Kind.BOT
+			and bot_btn.custom_minimum_size == PatternEditor.SWATCH_SIZE,
+			"焦纹笔刷是焦纹图样(PatternView ⊥),与其它笔刷同尺寸,不写字")
+	scene._editor.open_for(scene.atoms, scene.atom_colors, null, false)
+	await _settle()
 	scene._editor.tree = FormulaParser.parse("B")
 	scene._editor._confirm.pressed.emit()
 	await _settle()
@@ -330,6 +342,7 @@ func _run() -> void:
 	scene._editor._confirm.pressed.emit()
 	await _settle()
 	_check(board._overlay._chips.is_empty(), "钉下口后这条线 OK,浮层消失")
+	var undo_before: int = s._undo_stack.size()
 	s.connect_wire(mid, 1, s.goal_id, 0)   # A∨(A∧B) → 目标 B∧A:∨ 对 ∧
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "冲突",
@@ -337,6 +350,7 @@ func _run() -> void:
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.CONFLICT, "冲突线暂时还在")
 	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.OK and s.get_wires().size() == 2, "0.5 s 后接错的线自动断开")
+	_check(s._undo_stack.size() == undo_before and not s.can_redo(), "自动断开不记撤销步、连接线那步也弹掉:撤销历史里没有这条错线(否则 Ctrl+Z 只会复活它再断)")
 	_check(board._overlay._chips.size() == 1 and board._overlay._chips[0].detached, "断线后徽章冻结在原位继续显示")
 	await _wait(WireOverlay.BADGE_HOLD_SEC + WireOverlay.BADGE_FADE_SEC + 0.3)
 	_check(board._overlay._chips.is_empty(), "徽章停 1 s 后淡出释放")
@@ -703,6 +717,20 @@ func _run() -> void:
 			_click(_center(answer_btn), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(l01.session.is_solved(), "点「示答」自动摆出答案并通关")
+			# v1.2 通关弹窗:居中原尺寸图 + 中下纯文字「继续」;遮罩挡住后面的工具条;工具条没有「下一关」
+			var wp: WinPopup = l01._win_popup
+			var pr: Rect2 = wp._panel.get_global_rect()
+			_check(wp.visible and pr.position.distance_to(Vector2(1333, 672)) <= 1.0 and pr.size == Vector2(1174, 816),
+					"通关弹窗居中、图原尺寸 1174×816(得 %s)" % pr)
+			var br: Rect2 = wp._continue_btn.get_global_rect()
+			_check(br.position.y >= pr.position.y + 512 and br.end.y <= pr.position.y + 744
+					and absf(br.get_center().x - pr.get_center().x) <= 1.0 and wp._continue_btn.text == "继续",
+					"「继续」在弹窗中下空白带内、水平居中(得 %s)" % br)
+			_check(_button_named(l01, "下一关") == null and _button_named(l01, "继续") == wp._continue_btn,
+					"工具条没有「下一关」,「继续」只在弹窗里")
+			_click(_center(_button_named(l01, "重置")), MOUSE_BUTTON_LEFT)
+			await _settle()
+			_check(l01.session.is_solved() and wp.visible, "弹窗开着时点不到后面的「重置」")
 
 	# ---- R. 小机「请指导我」:坏掉前回头到极限后代解(无庆祝)/ 方向设置 / 3-1 通关瞬间坏掉 / 坏掉后只故障 ----
 	var robot := root.get_node("/root/Robot")
@@ -827,6 +855,7 @@ func _run() -> void:
 	s1.session.connect_wire(s1.session.assumption_ids[0], 0, s1.session.goal_id, 0)
 	await _settle()
 	_check(not s1._step_hint.visible and game.save.is_step_done(&"wire"), "拉线通关 → 指引消失、拉线记为做过")
+	_check(s1._win_popup.visible, "拉线通关 → 弹出「织成了」弹窗")
 	game.start_level(game.catalog.find(&"l02"))
 	await _settle()
 	if current_scene is StoryScene:

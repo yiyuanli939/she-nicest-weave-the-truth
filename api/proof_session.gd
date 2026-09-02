@@ -167,12 +167,19 @@ func connect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> boo
 	return true
 
 
-func disconnect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> void:
+## record_undo = false:接错的线被棋盘自动断开(v1.1 §3)—— 不记撤销步,否则 Ctrl+Z 只会把错线复活、0.5 s 后再断,
+## 永远撤不回接线之前,且每次自动断开都清空重做栈。断开后若棋盘图与栈顶快照(接这条线之前)一模一样,把那步也弹掉:
+## 撤销历史里不留这条线的痕迹(位置是视图元数据,不参与比较)。
+func disconnect_wire(from_id: int, from_port: int, to_id: int, to_port: int, record_undo: bool = true) -> void:
 	var e := Vector4i(from_id, from_port, to_id, to_port)
 	if not _graph.edges.has(e):
 		return
-	_push_undo()
+	if record_undo:
+		_push_undo()
 	_graph.remove_edge(e)
+	if not record_undo and not _undo_stack.is_empty() \
+			and JSON.stringify((_undo_stack.back() as Dictionary).graph) == JSON.stringify(_graph.to_dict()):
+		_undo_stack.pop_back()
 	_notify(false)
 
 
@@ -368,10 +375,18 @@ func save_state() -> Dictionary:
 
 
 ## 读档(清空撤销历史)。数据可以来自 save_state 或 JSON 往返后的字典。
-func load_state(d: Dictionary) -> void:
+## detach_goal = true:载入后把接进目标织机的线拆掉(已通关关卡重开时呈「差一步完成」态,v1.2)。
+## 拆线放在快照与求解之前:不进撤销栈(Ctrl+Z 不能一键回到通关),载入时也不会重发 proof_completed;
+## 玩家自己把最后一根线接回去就是正常通关。
+func load_state(d: Dictionary, detach_goal: bool = false) -> void:
 	_undo_stack.clear()
 	_redo_stack.clear()
 	_apply_state(d)
+	if detach_goal:
+		var g := goal_id
+		for e in _graph.edges.duplicate():   # x,y,z,w = from_id, from_port, to_id, to_port
+			if e.z == g:
+				_graph.remove_edge(e)
 	_initial_state = save_state()
 	_was_solved = false
 	_notify(true)

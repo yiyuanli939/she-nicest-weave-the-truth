@@ -29,6 +29,7 @@
 | 对话界面/莉娅(默认/苦恼).png(821×1675) | `assets/art/story/char_lia_{default,worried}.png` | 配角立绘 |
 | 对话界面/亚瑟(默认).png(801×1778) | `assets/art/story/char_arthur_default.png` | 配角立绘 |
 | 对话界面/*遮罩.png | `assets/art/story/char_{nora,lia,arthur}_mask.png` | 非发言者 50% 遮罩 |
+| v1.2背景/image.png(1174×816,圆角透明) | `assets/art/level/win_popup.png` | 通关弹窗「织成了」(v1.2;居中原尺寸,「继续」为纯文字叠在图上) |
 
 新加立绘/场景:按上面的命名规则放进目录,再在 `narrative/story_art.gd` 的 `CHARACTERS / EXPRESSIONS / SCENES` 表补一行。
 所有 PNG 的导入都开了 mipmaps(`.import` 里 `mipmaps/generate=true`),窗口缩小显示不闪;**新图导入必须也开**
@@ -57,6 +58,7 @@
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
 | 关内:夹子「笔 / 记」「继续 / 工作」两行字的中心 / 字号 / 行距 / 热区尺寸;「翻页」矩形与字号;整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_CENTER_CLOSED` `HANDLE_CENTER_OPEN` `HANDLE_FONT_SIZE` `HANDLE_LINE_PITCH` `HANDLE_SIZE`;`FLIP_RECT` `FLIP_FONT_SIZE`;`PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
+| 关内:通关弹窗「织成了」(v1.2;图居中原尺寸,左上角 (1333, 672))「继续」中心(图内坐标)/ 字号 / 字色 / 悬停色 / 遮罩色 / 层号;实测:标题下花纹到 y 508、底框 y 748 起,空白带 512–744,「继续」实际占 581–699 | `ui/win_popup.gd` → `CONTINUE_CENTER` `CONTINUE_FONT_SIZE` `CONTINUE_COLOR` `CONTINUE_HOVER_COLOR` `DIM_COLOR` `LAYER` |
 | 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
 | 节点区:端口颜色 / 纹样口尺寸 / 行距 / 行内间距 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` `ROW_GAP` `CELL_GAP` |
@@ -146,7 +148,8 @@
 | 命题纹样(节点口 / 编辑器 / 线轴 / 目标) | `api/pattern_view.gd`(LINEN / CHAR_BLACK / SPLIT_COLOR / BASE_LINE_W);原子配色在关卡 `atom_colors`,缺省表 `levels/level_def.gd DEFAULT_COLORS`(低饱和高明度:藕粉红/灰蓝/豆青/紫藕) |
 | 选关/开发者页「返回主界面」 | `ui/back_button.gd`(RECT 左上角坐标 / FONT_SIZE) |
 | 连线错误徽章(纯文字:冲突 / 欠定 / 成环 / 逃逸;64 号白描边,接错的线 0.5 s 自动断、徽章停 1 s 淡出) | `board/wire_overlay.gd` BADGE / BADGE_COLOR / BADGE_FONT_SIZE / BADGE_OUTLINE / BADGE_HOLD_SEC / BADGE_FADE_SEC;`board/proof_board.gd` BAD_WIRE_SEC |
-| 纹样绘制弹窗(标题带 / 预览 / 「点选笔刷进行绘制:」/ 色块 + 三个线描结构笔刷 / 清空·取消·确认) | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE / TITLE_* / HINT_* / BUTTON_BG / ICON_*) |
+| 纹样绘制弹窗(标题带 / 预览 / 「点选笔刷进行绘制:」/ 色块 + 三个线描结构笔刷 + 焦纹图样笔刷(v1.2,`PatternView` 画 ⊥,不写字)/ 清空·取消·确认) | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE / TITLE_* / HINT_* / BUTTON_BG / ICON_*) |
 | 节点端口图形 / 纹样区域边框 / 钉按钮 / 蚂蚁线 / 汇路机分割线 / 封程机凹形 | `board/machine_node.gd` 顶部常量(§3 表);策划说明与示意图在 `v1.1交互调整说明/` |
 | 胜利绿光 | `ui/level_scene.gd _on_win()` |
+| 通关弹窗上的「继续」(纯文字,金色;弹窗图本身是美术图) | `ui/win_popup.gd`(§3 表) |
 | 机器人 OLED 表情 | `hardware/firmware/main.py draw_face()` |

@@ -5,7 +5,9 @@ extends TestBase
 
 func test_window_mode_mapping() -> bool:
 	var ok := check(SettingsPanel.window_mode_for(true) == DisplayServer.WINDOW_MODE_FULLSCREEN, "全屏开 = 全屏窗口模式")
-	ok = check(SettingsPanel.window_mode_for(false) == DisplayServer.WINDOW_MODE_MAXIMIZED, "全屏关 = 回工程默认的最大化") and ok
+	ok = check(SettingsPanel.window_mode_for(false, false) == DisplayServer.WINDOW_MODE_MAXIMIZED, "桌面:全屏关 = 回工程默认的最大化") and ok
+	ok = check(SettingsPanel.window_mode_for(false, true) == DisplayServer.WINDOW_MODE_WINDOWED and SettingsPanel.window_mode_for(true, true) == DisplayServer.WINDOW_MODE_FULLSCREEN,
+			"Web:全屏关 = 窗口模式(浏览器只认 WINDOWED 退出全屏,MAXIMIZED 是空操作)") and ok
 	ok = check(SettingsPanel.is_fullscreen_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 			and SettingsPanel.is_fullscreen_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
 			and not SettingsPanel.is_fullscreen_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)

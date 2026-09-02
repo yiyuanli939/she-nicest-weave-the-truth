@@ -140,7 +140,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 ## 按当前真实状态刷新文字/显隐(维护面板里切了无机器人模式、OS 快捷键切了全屏,都以此为准)
 func refresh() -> void:
-	_fullscreen_btn.text = "全屏:" + ("开" if is_fullscreen_mode(DisplayServer.window_get_mode()) else "关")
+	_set_fullscreen_text(is_fullscreen_mode(DisplayServer.window_get_mode()))
 	var possible: bool = _robot != null and bool(_robot.robot_possible())
 	_robot_btn.visible = possible
 	_maint_btn.visible = possible and bool(_robot.enabled)
@@ -162,9 +162,12 @@ static func is_fullscreen_mode(mode: int) -> bool:
 	return mode == DisplayServer.WINDOW_MODE_FULLSCREEN or mode == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
 
 
-## 全屏开 = 全屏;关 = 回工程默认的最大化窗口(project.godot window/size/mode=2)
-static func window_mode_for(fullscreen: bool) -> DisplayServer.WindowMode:
-	return DisplayServer.WINDOW_MODE_FULLSCREEN if fullscreen else DisplayServer.WINDOW_MODE_MAXIMIZED
+## 全屏开 = 全屏;关 = 回工程默认的最大化窗口(project.godot window/size/mode=2)。
+## Web 没有"最大化"(DisplayServerWeb 对 MAXIMIZED 不做事,只有 WINDOWED 才退出浏览器全屏),关 = 窗口模式
+static func window_mode_for(fullscreen: bool, web: bool = OS.has_feature("web")) -> DisplayServer.WindowMode:
+	if fullscreen:
+		return DisplayServer.WINDOW_MODE_FULLSCREEN
+	return DisplayServer.WINDOW_MODE_WINDOWED if web else DisplayServer.WINDOW_MODE_MAXIMIZED
 
 
 # ---- 音量 ----
@@ -198,6 +201,11 @@ func _on_toggle_fullscreen() -> void:
 		_game.save.settings["fullscreen"] = on
 		_game.save.save()
 	refresh()
+	_set_fullscreen_text(on)   # Web 的 window_get_mode 要等浏览器回调才更新:文字先按请求的状态显示
+
+
+func _set_fullscreen_text(on: bool) -> void:
+	_fullscreen_btn.text = "全屏:" + ("开" if on else "关")
 
 
 # ---- 小机 ----

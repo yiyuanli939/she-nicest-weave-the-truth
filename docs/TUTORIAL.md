@@ -75,7 +75,7 @@ tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
   未钉时纹样外一圈虚线;封程机是凹形(假设口/输入口在两臂内沿,`port_pos()` + 板的三个虚函数接管;图口号 ≠ 模型口号,
   `graph_out_port/model_out_port` 换算);右键节点体 → `delete_requested` → 板转 `session.remove_machine`(线轴/目标模型层拒删)。
   详见 3.6。
-  关卡必需按钮(重置/示答/下一关/选关)挂在 GraphEdit 自带工具条上(`ProofBoard.add_toolbar_item`)。
+  关卡必需按钮(重置/示答/选关)挂在 GraphEdit 自带工具条上(`ProofBoard.add_toolbar_item`);通关推进不在工具条上,是 `WinPopup` 弹窗(v1.2,见 3.8)。
 - `PatternView`:哑控件,给 Formula 画纹样(AND 竖分 / IMP 横分 / OR 对角 / META 斜纹 / BOT 焦纹),`ghost` 用 `self_modulate` 调透明度。
 
 ### 2.5 流程与剧情
@@ -85,8 +85,8 @@ MainMenu(标题页:开始/继续游戏 · 重置进度 · 开发者信息 · 退
                             ├─ 有 intro_dialogue → StoryScene(固定底图 + 场景插图 + 左右立绘 + 遮罩 + 对话区)
                             │                         播完 → Game.enter_board()
                             └─ 无 → enter_board() → LevelScene(仪器架 + 棋盘 + 右缘笔记抽屉)
-LevelScene.proof_completed → Game.notify_solved(记档、robot_cue 庆祝)→ 工具条「下一关」
-末关 l16 通关 → 「继续」→ Game.play_ending() → StoryScene 播 outro_dialogue(4-3,通关后剧情)
+LevelScene.proof_completed → Game.notify_solved(记档、robot_cue 庆祝)→ WinPopup「织成了」弹窗 → 「继续」→ start_level(next)
+末关 l16 通关 → 弹窗「继续」→ Game.play_ending() → StoryScene 播 outro_dialogue(4-3,通关后剧情)
     → 「感谢游玩」黑屏淡入(此刻小机修好)→ Game.finish_ending() → CreditsScene 从黑淡入
 CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```
@@ -190,17 +190,17 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 |---|---|
 | §1 端口形状:输出口 = 带尖角的圆(插头),输入口 = 缺口圆(插座);拖线时插头随鼠标;接上合成整圆 | `GraphNode._draw_port` 覆写为空压掉默认圆点,图形画在节点最后一个子节点 `PortLayer`(Node2D,不算 slot)上 —— `_draw_port` 在 C++ `NOTIFICATION_DRAW` 里、早于脚本 `_draw`,画在那里会被自画外形盖住。拖线中的插头由 `WireOverlay._input`(鼠标移动才重绘,不用 `_process`)画在鼠标处,`connection_drag_started/ended` 开关 |
 | §2 依赖未消去假设的线整条粉红 | 模型:`_propagate_hyps` 的边→假设集存进 `SolveResult.edge_hyps`,`WireInfo.carries_hyp` / `get_wire_carries_hyp`;视图:GraphEdit 没有逐线颜色,用 `set_connection_activity(…, 1.0)` 把整条线插值到主题 `GraphEdit/colors/activity`(= HYP_COLOR) |
-| §3 错误字放大 ≥2× + 白描边;接错的线 0.5 s 自动断开,提示停 1 s 淡出 | `WireOverlay`:64 号 + `outline_size 8`;徽章按线键缓存(同线同状态不重建、不重启计时),自动断开的三种状态(`AUTO_BREAK` = 冲突/成环/逃逸)的徽章建好即起 Tween(停 1 s → 0.3 s 淡出 → 释放);`ProofBoard._schedule_breaks` 每次 `board_updated` 给错线排 0.5 s 定时器,回调再核对状态才 `detach_chip` + `session.disconnect_wire`(示答/代解一帧内连完、终态 OK 的线不会被断;可撤销)。「欠定」不是接错,保留 |
+| §3 错误字放大 ≥2× + 白描边;接错的线 0.5 s 自动断开,提示停 1 s 淡出 | `WireOverlay`:64 号 + `outline_size 8`;徽章按线键缓存(同线同状态不重建、不重启计时),自动断开的三种状态(`AUTO_BREAK` = 冲突/成环/逃逸)的徽章建好即起 Tween(停 1 s → 0.3 s 淡出 → 释放);`ProofBoard._schedule_breaks` 每次 `board_updated` 给错线排 0.5 s 定时器,回调再核对状态才 `detach_chip` + `session.disconnect_wire(…, record_undo = false)`(示答/代解一帧内连完、终态 OK 的线不会被断)。自动断开**不记撤销步**,断开后棋盘若回到接线前那步也弹掉 —— 撤销历史里没有这条错线(否则 Ctrl+Z 只会复活它再断、还清空重做栈)。「欠定」不是接错,保留 |
 | §4.1 纹样间距 | `MachineNode` `separation` 覆盖 = `ROW_GAP`(32,image 4 间距 ≈ 纹样高 × 0.45);纹样格 `SIZE_SHRINK_CENTER` 保证口在纹样中心 |
 | §4.2 纹样边框按子命题着色 | `PatternView.region_borders`([{path, color}])+ `region_of_path()`(与 `layout()` 同一套切分);`MachineNode._borders_for` 按**仪器模板**结构走叶子,元变量查 `META_COLORS` / `META_COLOR_OVERRIDES`(岔纹机两口各自的钉色);描边在填色之后、分割线之前(分割处只剩灰条,同参考图);线轴/目标无 spec 照旧深色外框 |
 | §4.3 汇路机分割线 | `MachineNode._draw` 在相邻两行间隙中点画金 + 乳黄两条 2 px 线 |
 | §4.4 封程机凹形 | GraphNode 的口只能在左右边缘、左右缩进对称(`port_h_offset`),做不到"臂内沿";于是:行结构 [左臂 VBox(假设 P + 钉按钮) \| 缺口 spacer \| 右臂 Q] / [spacer \| P>Q] / [标题 Label],`title=""` + 顶部标题栏字号 1 + panel/titlebar 样式覆盖为空,U 形与底部标题带在 `_draw` 自画;口位 `port_pos()`,`ProofBoard` 覆写 `_is_in_input/output_hotzone`(热区矩形按主题 inner/outer extent 自算)与 `_get_connection_line`(端点命中引擎口位就换成 `port_pos`,再按引擎同款 `Curve2D` 贝塞尔出线;正式连线端点 = `(position_offset + 口位) * zoom`,拖线预览 = `position + 口位 * zoom`,两种都试)。引擎按 slot 顺序给右口编号,假设口在第一排 → 图口号 ≠ 模型口号,`graph_out_port/model_out_port` 换算;脚本/测试连线一律走 `session.connect_wire`(模型口号) |
 | §4.5 钉纹样按钮进节点 + 蚂蚁线 | 按钮文字一律「钉纹样」,`UiStyles.fill_button` 底色(默认乳黄,岔纹机两口用各自钉色),位置 `PIN_BUTTON_SIDE`(默认纹样下方另起无口一行;岔纹机在纹样左侧同一行);`mouse_filter = PASS` 让右键穿透到节点(右键删机在按钮上也生效);未钉口 `_draw` 画静态虚线框(低功耗模式不做无限动画,`set_loops` 被测试禁止);「已钉」小字删除 |
-| §4.6 弹窗改版 | `PatternEditor` 照 image 13 重排:标题带「纹样绘制」→ 预览 → 「点选笔刷进行绘制:」→ 色块 + 并织/迭层/岔纹线描图标(`BrushIcon`)[+ 焦纹] → 清空 / 取消 / 确认(带底色);删提示行与「挖回孔」;「清空」擦回一个孔不关窗,「确认」全染时钉住、整幅还是孔时 = 取消钉住(`pattern_cleared`);外框内容边距只留描边宽、标题带贴满上缘 |
+| §4.6 弹窗改版 | `PatternEditor` 照 image 13 重排:标题带「纹样绘制」→ 预览 → 「点选笔刷进行绘制:」→ 色块 + 并织/迭层/岔纹线描图标(`BrushIcon`)[+ 焦纹图样(v1.2)] → 清空 / 取消 / 确认(带底色);删提示行与「挖回孔」;「清空」擦回一个孔不关窗,「确认」全染时钉住、整幅还是孔时 = 取消钉住(`pattern_cleared`);外框内容边距只留描边宽、标题带贴满上缘 |
 | §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步 |
 
 用户答复的歧义:「清空」= 清空画布、空画布「确认」= 取消钉住;弹窗完全照 image 13;笔记每次进关都弹。
-自定的假设:端口/假设口颜色沿用;蚂蚁线静态;只有 冲突/成环/逃逸 自动断;提示计时从接线起;「焦纹」笔刷保留文字。
+自定的假设:端口/假设口颜色沿用;蚂蚁线静态;只有 冲突/成环/逃逸 自动断;提示计时从接线起;「焦纹」笔刷起初保留文字(v1.2 改成焦纹图样,见 3.8)。
 对照截图:`tools/shot_4k.gd` 多出 `4k_machines.png`(七台仪器全摆上)与 `4k_editor.png`(弹窗;`SubViewport.gui_embed_subwindows = true` 才截得到 Window)。
 像素对位:示意图各张比例不同,以纹样宽 128 / 预览宽 720 为尺折算后逐项量测,引擎常量按折算值定,数字表在 `docs/ART_INTERFACE.md` §3.6。
 顺手修掉的 bug:左臂的假设纹样曾被同格更宽的钉按钮撑到 160 宽(VBox 子项默认 FILL)→ 纹样 `SIZE_SHRINK_BEGIN`;
@@ -218,7 +218,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 点在对话面板/台词上不推进 | 面板是全屏捕捉层的兄弟,PanelContainer 默认 STOP 吃掉点击 | 去掉捕捉层,`DialogueBox._input` 在输入层截获左键(模态) |
 | 右键节点正中不删、左键拖不动 | 行中间的 spacer `Control` 默认 STOP | spacer `mouse_filter = IGNORE` |
 | 左键拖节点时按右键会误删手里的节点 | 右键事件发给鼠标焦点节点 | `_gui_input` 里 `button_mask` 含左键则忽略 |
-| 旧档在新语义下"已通关但棋盘欠定",没有下一关按钮 | 按钮只在 `_on_win` 显示 | 进关时记档已通关就显示"下一关" |
+| 旧档在新语义下"已通关但棋盘欠定",没有下一关按钮 | 按钮只在 `_on_win` 显示 | (v1.2 起已无此按钮:已通关的关重开一律拆掉目标线,玩家接回即通关弹窗;推进靠弹窗或「选关」) |
 
 教训:UI 交互回归要走 `Window.push_input` 的真实输入管线(见 `visual_smoke_m3.gd` 的 `_click`),直接调 `_on_click/_gui_input` 测不出 mouse_filter 这类问题。
 
@@ -227,13 +227,32 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 标题页第五个选项「设置」(与美术的四项同列同间距,`_add_option(4, …)`)点开 `ui/settings_panel.gd`(`SettingsPanel`,CanvasLayer 50:
 半透明遮罩挡住标题页 + 居中主题乳黄面板;标题页本身不放任何控件):
 「设置」→ 音乐音量滑条(0–100%,`Bgm.set_user_volume` 当场生效,松手落 `settings.music_volume`)→ 「全屏:开/关」
-(`DisplayServer.window_set_mode`,关 = 回工程默认最大化;落 `settings.fullscreen`,下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口)
+(`DisplayServer.window_set_mode`,关 = 回工程默认最大化,Web 上 = 窗口模式(浏览器只认 WINDOWED 退出全屏,MAXIMIZED 是空操作);落 `settings.fullscreen`,
+下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口;Web 的 `window_get_mode` 要等浏览器回调,按钮文字先按请求的状态显示)
 → 「小机联动:开/关」(= 无机器人模式开关,`Robot.set_enabled`,与维护面板同一开关;Web 版 `robot_possible()` 为假不显示)
 → 「小机维护」(联动开着才显示,打开 `RobotMaintUI`(层 60,压在弹窗上);F9 仍直通面板)→ 「关闭」(Esc 也关,面板压着时不管)。
 维护面板关掉时 `refresh()` 同步文字;文字按钮沿用主题(无底、悬停变浅),滑条按色板自画(乳黄轨 / 黄铜已填段 / 棕红圆钮 `GradientTexture2D` 径向渐变)。
 「重置进度」不清 settings。1:1 截图 `tools/shot_4k.gd` → `build/shots4k/4k_settings.png`。
 测试:`tests/test_settings.gd`(映射 / 文案 / 往返 / 无 autoload 建弹窗开关)、`test_bgm.test_user_volume_scales_playback`、UI smoke T 节(第五项位置、
 标题页无控件、弹窗居中、遮罩挡点击、点滑条正中 = 50%、联动开关、小机维护开面板、关闭 / Esc)与 S 节(无机器人模式下文字同步)。
+
+### 3.8 通关弹窗 + 已通关关卡重开「差一步」+ 焦纹图样笔刷(2026-09-02,策划说明 `v1.2背景/`)
+
+- **通关弹窗**:工具条「下一关」删掉,`proof_completed` → `_on_win` 记档/庆祝后 `_win_popup.open()`(`ui/win_popup.gd`,`CanvasLayer` 70,
+  遮罩 + `CenterContainer` 真居中,面板就是美术图 `TextureRect`(`STRETCH_KEEP`,默认 `EXPAND_KEEP_SIZE` 最小尺寸 = 纹理尺寸,容器给它原尺寸 1174×816,
+  左上角恰是 (1333, 672));「继续」按锚点钉在图内坐标 `CONTINUE_CENTER`,`GROW_DIRECTION_BOTH` 以锚点为中心长,不用量尺寸。
+  `open()` 先 `gui_release_focus()`:遮罩只挡鼠标,GraphEdit 保有焦点时 Delete 会删弹窗后面的节点;`LevelScene._unhandled_input` 弹窗开着时也不收撤销/重做。
+  「继续」= `_on_continue`:有下一关 → `start_level`;末关有 `outro_dialogue` → `play_ending()`;都没有(目录外注入的关)→ `goto_select()`。
+  这里不再 `store_board`(`notify_solved` 已存过通关盘)。小机代解通关也弹(原来「下一关」也会出现)。`current == null`(m2 冒烟注入)不弹。
+- **已通关的关重开**:`ProofSession.load_state(d, detach_goal)` —— `detach_goal` 时在快照与求解**之前**拆掉所有 `to_id == goal_id` 的边:
+  不进撤销栈(Ctrl+Z 不能一键回到通关再触发庆祝)、载入时不重发 `proof_completed`、`_initial_state` 就是拆线后的盘。
+  放会话层而不是 UI 层去动 `saved.graph.edges`,是不让存档格式漏出 `ProofGraph`。`LevelScene._ready` 按 `save.is_solved(lv.id)` 决定拆不拆;
+  玩家接回最后一根线 = 正常通关(弹窗 + 重记档 + 庆祝;l11 会再演一次坏掉,与重玩语义一致)。`_restoring` 只剩「载入中不叫小机」的用途。
+- **焦纹笔刷**:`PatternEditor._make_bot_button` —— 同 `SWATCH_SIZE` 的 toggle 按钮里嵌一个 `PatternView`(`formula = Formula.bot()`,四边缩 6 让按钮描边露出),
+  与棋盘上的 ⊥ 同一画法(焦黑 + 破洞);文字只在 tooltip。
+- 测试:`test_session.test_load_state_detach_goal`;m3 冒烟改为真实点击弹窗「继续」推进 16 关、l16/l04 重开断言差一步态、l16 接回目标线 → 弹窗 → 结局
+  (`_reconnect_goal` 按解法表最后一根线接,机器 id 升序 = 摆放顺序);UI 冒烟 N 段(弹窗矩形 (1333,672,1174,816)、「继续」在空白带、遮罩挡「重置」、无「下一关」)、
+  E 段(焦纹图样)、S 段;`tools/shot_4k.gd` 出 `4k_win.png`(直接 `open()`,不走通关以免写存档)与 `4k_editor_bot.png`(解锁焦纹的笔刷行)。
 
 ## 4. 想改 X,去哪改
 
@@ -261,6 +280,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量;「设置」弹窗 `ui/settings_panel.gd` 顶部常量 |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
+| 通关弹窗(图 / 「继续」位置字号字色 / 遮罩 / 推进去向)、已通关重开的「差一步」 | `ui/win_popup.gd` 常量;`ui/level_scene.gd` `_on_win` `_on_continue`;`api/proof_session.gd` `load_state(d, detach_goal)`;测试 `test_session` + m3 / UI 冒烟 N 段 |
 | 关内操作指引(文案 / 触发条件 / 优先级 / 位置;v1.1 起只剩 钉/放/拉 三步) | `narrative/step_guide.gd`(`TEXT`、`ORDER`、`_applies`、`newly_done`)+ `ui/level_scene.gd` `STEP_HINT_*`;记忆在 `SaveManager.steps`;测试 `tests/test_step_guide.gd` + `visual_smoke_ui.gd` S 段 |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
 | 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
@@ -305,7 +325,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
   U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
   假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页;笔记抽屉划出/变「继续工作」/翻页循环/收回;
-  标题页四项 + 「设置」弹窗(居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
+  标题页四项 + 「设置」弹窗(居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答 → 通关弹窗(居中原尺寸、「继续」在中下、遮罩挡「重置」、无「下一关」);焦纹图样笔刷。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写
   (mac/Windows 文件系统大小写不敏感,开发期写错不报错;导出 PCK 严格区分,一到导出版才炸)。

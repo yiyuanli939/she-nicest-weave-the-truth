@@ -56,6 +56,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正 × 玩家音量 `user_volume`(设置模块);各场景 `_ready` 报槽位 |
 | `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量滑条 / 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
+| `ui/win_popup.gd` | 通关弹窗「织成了」(v1.2,替代工具条「下一关」):CanvasLayer 遮罩 + 居中原尺寸美术图 + 纯文字「继续」(`continue_pressed` → `LevelScene._on_continue`:下一关 / 结局 / 回选关);已通关的关重开走 `ProofSession.load_state(d, detach_goal=true)` 拆目标线成「差一步」态 |
 | `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(pin/place/wire;v1.1 删了 fix/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
 | `tests/` | headless 测试,126 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
@@ -96,6 +97,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   必须放在最后一个子 Node2D(`PortLayer`)上,`_draw_port` 只留空壳压掉默认圆点。
 - **GraphEdit 的口号是按 slot 顺序数的,不等于模型口号**(封程机假设口排第一排):板内所有信号进出都过
   `MachineNode.graph_out_port/model_out_port`;脚本/测试直接连线走 `session.connect_wire`,别调 `board._on_connection_request`。
+- **棋盘自动断开的错线不记撤销步**:`ProofBoard._break_wire` 调 `session.disconnect_wire(…, false)`。记的话 Ctrl+Z 只会把错线复活、
+  0.5 s 后再断,永远撤不回接线之前,而且每次自动断开都清空重做栈;断开后棋盘图若与栈顶快照(接线前)相同,那步也一并弹掉
+  (`test_session.test_disconnect_without_undo_entry`、UI smoke F 节盯)。载入旧棋盘时的错线同样会被自动断开。
 - **节点里的 Button 要 `mouse_filter = PASS`**:STOP 会把右键也吃掉(右键删机失效),PASS 下左键仍归按钮、其余穿透到 GraphNode;
   真实输入测试点节点"中央"前先看那里是不是按钮(`visual_smoke_ui` H/I 段改点纹样)。
 
@@ -144,7 +148,11 @@ headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅ 
 **标题页「设置」弹窗**(2026-09-02,用户要求、美术文档没有 → 纯文字 + 常量留位:标题页第五个选项「设置」(与四项同列同间距)点开
 `ui/settings_panel.gd` 居中弹窗,标题页本身不放控件;音乐音量滑条(`Bgm.user_volume`,当场生效)/ 全屏开关(`DisplayServer` 窗口模式,启动恢复)/
 小机联动开关(= 无机器人模式,Web 不显示)/ 小机维护入口 / 关闭(Esc 也关);
-全部落 `settings`;`tests/test_settings.gd` + `test_bgm` 音量例 + UI smoke T/S 节;TUTORIAL 3.7)✅。
+全部落 `settings`;`tests/test_settings.gd` + `test_bgm` 音量例 + UI smoke T/S 节;TUTORIAL 3.7)✅ →
+**v1.2 通关弹窗 + 差一步重开 + 焦纹图样**(2026-09-02,策划说明 `v1.2背景/`:工具条「下一关」删掉,通关弹出 `ui/win_popup.gd`(美术图 1174×816 居中原尺寸,
+「继续」纯文字钉在图内 (587,640),遮罩挡鼠标、开弹窗时放掉键盘焦点并停收撤销)→ 下一关 / l16 结局;已通关的关重开 `ProofSession.load_state(saved, true)`
+在快照前拆掉目标织机的输入线(不进撤销栈、不重发 proof_completed),接回即通关;纹样绘制弹窗的焦纹笔刷改成 `PatternView` 画的 ⊥ 图样。
+`v1.2背景/` 入库 + `.gdignore` + 两个导出预设排除;`test_session` 新例、m3 冒烟真实点击「继续」推进、UI 冒烟 N/E/S 段、`shot_4k` 出 `4k_win`;TUTORIAL 3.8)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

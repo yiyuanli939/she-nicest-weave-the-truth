@@ -282,9 +282,7 @@ func _on_toggle_still() -> void:
 
 
 func _on_try_turn() -> void:
-	_robot.turn_to_limit()
-	await get_tree().create_timer(1.0).timeout
-	_robot.return_center()
+	_robot.try_turn()   # 等待在 Robot autoload 上,面板随场景释放也会回中
 
 
 # ---- 小机声音 ----

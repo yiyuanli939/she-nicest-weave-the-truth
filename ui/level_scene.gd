@@ -33,14 +33,14 @@ var _status: Label
 var _win_flash: ColorRect
 var _editor: PatternEditor
 var _notebook_ui: NotebookUI
-var _next_btn: Button
+var _win_popup: WinPopup              # 通关弹窗「织成了」(v1.2):「继续」推进下一关/结局
 var _guide_hint: Label
 var _step_hint: Label                 # 操作指引一行字(做过一次的操作不再提示)
 var _steps_local: Dictionary = {}     # 无 Game(冒烟注入)时的已做操作表
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
-var _restoring := false               # 载入旧棋盘触发的 proof_completed 不算新胜利
+var _restoring := false               # 载入旧棋盘中:求解信号不算玩家操作(不叫小机、不弹通关)
 var _guiding := false                 # 小机代解/回头演出进行中(防重入、免鼓励)
 var _suppress_win_cue := false        # 代解通关不庆祝
 
@@ -85,13 +85,12 @@ func _ready() -> void:
 	if lv != null:
 		var saved: Dictionary = _game.save.board_state(lv.id)
 		if not saved.is_empty():
+			# 已通关的关重开:恢复记录的棋盘但拆掉接进目标织机的线(「差一步完成」,v1.2);
+			# 拆线在会话层读档时做,不进撤销栈、也不会重发 proof_completed
 			_restoring = true
-			session.load_state(saved)
+			session.load_state(saved, _game.save.is_solved(lv.id))
 			_restoring = false
 			_board.apply_positions()
-		# 记档已通关的关卡总能推进:旧档棋盘可能因求解语义变更不再是通关态
-		if _game.save.is_solved(lv.id):
-			_update_next_button()
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
 		var debut: Array = _game.catalog.debut_rules(lv)
@@ -129,11 +128,8 @@ func _build_ui() -> void:
 			answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
 			answer_btn.modulate.a = 0.7
 			_board.add_toolbar_item(answer_btn)
-		_next_btn = _make_tool_button("下一关", _on_next)
-		_next_btn.visible = false
-		_board.add_toolbar_item(_next_btn)
 		_board.add_toolbar_item(_make_tool_button("选关", _on_back))
-	# 状态文字放在按钮之后:文字长短变化不会把按钮推来推去(通关瞬间按钮从鼠标下溜走)
+	# 状态文字放在按钮之后:文字长短变化不会把按钮推来推去(通关瞬间按钮曾从鼠标下溜走)
 	_status = Label.new()
 	_status.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
 	_board.add_toolbar_item(_status)
@@ -173,6 +169,11 @@ func _build_ui() -> void:
 	_notebook_ui = NotebookUI.new()
 	_notebook_ui.open_requested.connect(_on_open_notebook)
 	add_child(_notebook_ui)
+
+	# 通关弹窗(v1.2,替代工具条「下一关」):随场景销毁;无 Game/关卡(冒烟注入)时建了不弹
+	_win_popup = WinPopup.new()
+	_win_popup.continue_pressed.connect(_on_continue)
+	add_child(_win_popup)
 
 
 func _make_tool_button(text: String, cb: Callable) -> Button:
@@ -252,6 +253,8 @@ func _on_pattern_cleared() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _win_popup.visible:
+		return   # 通关弹窗开着:遮罩只挡鼠标,撤销/重做会把弹窗后面的通关盘改掉
 	if event.is_action_pressed("ui_undo"):
 		session.undo()
 		_status.text = ""
@@ -285,14 +288,15 @@ func _on_conflict_check() -> void:
 
 func _on_win() -> void:
 	_status.text = "织成了!"
-	_update_next_button()
 	if _restoring:
-		return   # 只是恢复旧棋盘:不闪光、不叫小机、不重复记档
+		return   # 记档未通关却载入了通关盘(不该发生的旧档):不闪光、不叫小机、不记档、不弹
 	var tw := create_tween()
 	tw.tween_property(_win_flash, "color:a", 0.35, 0.25)
 	tw.tween_property(_win_flash, "color:a", 0.0, 0.9)
 	if _game != null:
 		_game.notify_solved(session.save_state(), not _suppress_win_cue)
+		if _game.current != null:   # 冒烟注入的关(current 为空)没有推进目标,不弹
+			_win_popup.open()       # 小机代解通关也弹(原来「下一关」也会出现)
 
 
 # ---- 小机「请指导我」 ----
@@ -338,7 +342,7 @@ func _run_guide(robot: Node) -> void:
 	_guiding = false
 
 
-## 演出/代解期间点「下一关/选关」离开:协程随场景销毁,await 之后的回正永不执行 ——
+## 演出/代解期间点「继续/选关」离开:协程随场景销毁,await 之后的回正永不执行 ——
 ## 否则实体小机会永远停在极限角 + think 脸。这里兜底转回正面。
 func _exit_tree() -> void:
 	if not _guiding:
@@ -350,25 +354,16 @@ func _exit_tree() -> void:
 		robot.cue("idle")
 
 
-## 通关后的推进按钮:有下一关 →「下一关」;最后一关且有结局剧情 →「继续」(播 4-3 → 感谢游玩)
-func _update_next_button() -> void:
-	if _next_btn == null or _game == null:
-		return
-	if _game.next_level() != null:
-		_next_btn.text = "下一关"
-		_next_btn.visible = true
-	elif _game.current != null and _game.current.outro_dialogue != null \
-			and not _game.current.outro_dialogue.lines.is_empty():
-		_next_btn.text = "继续"
-		_next_btn.visible = true
-
-
-func _on_next() -> void:
-	_game.store_board(session.save_state())
+## 通关弹窗「继续」:有下一关 → 下一关;最后一关且有结局剧情 → 播 4-3 → 感谢游玩;
+## 都没有(目录外注入的关)→ 回选关。通关盘已由 notify_solved 记档,弹窗是模态的,盘不会再变
+func _on_continue() -> void:
 	if _game.next_level() != null:
 		_game.start_level(_game.next_level())
-	else:
+	elif _game.current != null and _game.current.outro_dialogue != null \
+			and not _game.current.outro_dialogue.lines.is_empty():
 		_game.play_ending()
+	else:
+		_game.goto_select()
 
 
 func _on_back() -> void:
