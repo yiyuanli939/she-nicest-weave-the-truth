@@ -167,12 +167,19 @@ func connect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> boo
 	return true
 
 
-func disconnect_wire(from_id: int, from_port: int, to_id: int, to_port: int) -> void:
+## record_undo = false:接错的线被棋盘自动断开(v1.1 §3)—— 不记撤销步,否则 Ctrl+Z 只会把错线复活、0.5 s 后再断,
+## 永远撤不回接线之前,且每次自动断开都清空重做栈。断开后若棋盘图与栈顶快照(接这条线之前)一模一样,把那步也弹掉:
+## 撤销历史里不留这条线的痕迹(位置是视图元数据,不参与比较)。
+func disconnect_wire(from_id: int, from_port: int, to_id: int, to_port: int, record_undo: bool = true) -> void:
 	var e := Vector4i(from_id, from_port, to_id, to_port)
 	if not _graph.edges.has(e):
 		return
-	_push_undo()
+	if record_undo:
+		_push_undo()
 	_graph.remove_edge(e)
+	if not record_undo and not _undo_stack.is_empty() \
+			and JSON.stringify((_undo_stack.back() as Dictionary).graph) == JSON.stringify(_graph.to_dict()):
+		_undo_stack.pop_back()
 	_notify(false)
 
 

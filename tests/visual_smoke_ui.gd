@@ -330,6 +330,7 @@ func _run() -> void:
 	scene._editor._confirm.pressed.emit()
 	await _settle()
 	_check(board._overlay._chips.is_empty(), "钉下口后这条线 OK,浮层消失")
+	var undo_before: int = s._undo_stack.size()
 	s.connect_wire(mid, 1, s.goal_id, 0)   # A∨(A∧B) → 目标 B∧A:∨ 对 ∧
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "冲突",
@@ -337,6 +338,7 @@ func _run() -> void:
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.CONFLICT, "冲突线暂时还在")
 	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
 	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.OK and s.get_wires().size() == 2, "0.5 s 后接错的线自动断开")
+	_check(s._undo_stack.size() == undo_before and not s.can_redo(), "自动断开不记撤销步、连接线那步也弹掉:撤销历史里没有这条错线(否则 Ctrl+Z 只会复活它再断)")
 	_check(board._overlay._chips.size() == 1 and board._overlay._chips[0].detached, "断线后徽章冻结在原位继续显示")
 	await _wait(WireOverlay.BADGE_HOLD_SEC + WireOverlay.BADGE_FADE_SEC + 0.3)
 	_check(board._overlay._chips.is_empty(), "徽章停 1 s 后淡出释放")

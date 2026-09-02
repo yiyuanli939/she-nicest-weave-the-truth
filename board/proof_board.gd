@@ -182,7 +182,7 @@ func _break_wire(key: Vector4i) -> void:
 	if not WireOverlay.AUTO_BREAK.has(session.get_wire_state(key.x, key.y, key.z, key.w)):
 		return   # 已被玩家断开 / 后续操作让它成立了
 	_overlay.detach_chip(key)
-	session.disconnect_wire(key.x, key.y, key.z, key.w)
+	session.disconnect_wire(key.x, key.y, key.z, key.w, false)   # 自动断开不记撤销步(见 ProofSession.disconnect_wire)
 
 
 # ---- view → session ----

@@ -281,6 +281,14 @@ func return_center(sec: float = TURN_SEC) -> void:
 	_tween_pan(PAN_CENTER, sec)
 
 
+## 维护面板「试转一下」:转到极限,停 1 s 再回中。await 放在 autoload 上 —— 放在面板里的话,这 1 s 内换场景面板被释放,
+## 协程静默丢弃、回中永远不发,小机会停在极限位
+func try_turn() -> void:
+	turn_to_limit()
+	await get_tree().create_timer(1.0).timeout
+	return_center()
+
+
 func _tween_pan(target: int, sec: float) -> void:
 	if stationary:
 		return   # 不动模式:客户端记账的角度也不改,关掉后从上次真实角度继续

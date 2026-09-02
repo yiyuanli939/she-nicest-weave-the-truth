@@ -190,7 +190,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 |---|---|
 | §1 端口形状:输出口 = 带尖角的圆(插头),输入口 = 缺口圆(插座);拖线时插头随鼠标;接上合成整圆 | `GraphNode._draw_port` 覆写为空压掉默认圆点,图形画在节点最后一个子节点 `PortLayer`(Node2D,不算 slot)上 —— `_draw_port` 在 C++ `NOTIFICATION_DRAW` 里、早于脚本 `_draw`,画在那里会被自画外形盖住。拖线中的插头由 `WireOverlay._input`(鼠标移动才重绘,不用 `_process`)画在鼠标处,`connection_drag_started/ended` 开关 |
 | §2 依赖未消去假设的线整条粉红 | 模型:`_propagate_hyps` 的边→假设集存进 `SolveResult.edge_hyps`,`WireInfo.carries_hyp` / `get_wire_carries_hyp`;视图:GraphEdit 没有逐线颜色,用 `set_connection_activity(…, 1.0)` 把整条线插值到主题 `GraphEdit/colors/activity`(= HYP_COLOR) |
-| §3 错误字放大 ≥2× + 白描边;接错的线 0.5 s 自动断开,提示停 1 s 淡出 | `WireOverlay`:64 号 + `outline_size 8`;徽章按线键缓存(同线同状态不重建、不重启计时),自动断开的三种状态(`AUTO_BREAK` = 冲突/成环/逃逸)的徽章建好即起 Tween(停 1 s → 0.3 s 淡出 → 释放);`ProofBoard._schedule_breaks` 每次 `board_updated` 给错线排 0.5 s 定时器,回调再核对状态才 `detach_chip` + `session.disconnect_wire`(示答/代解一帧内连完、终态 OK 的线不会被断;可撤销)。「欠定」不是接错,保留 |
+| §3 错误字放大 ≥2× + 白描边;接错的线 0.5 s 自动断开,提示停 1 s 淡出 | `WireOverlay`:64 号 + `outline_size 8`;徽章按线键缓存(同线同状态不重建、不重启计时),自动断开的三种状态(`AUTO_BREAK` = 冲突/成环/逃逸)的徽章建好即起 Tween(停 1 s → 0.3 s 淡出 → 释放);`ProofBoard._schedule_breaks` 每次 `board_updated` 给错线排 0.5 s 定时器,回调再核对状态才 `detach_chip` + `session.disconnect_wire(…, record_undo = false)`(示答/代解一帧内连完、终态 OK 的线不会被断)。自动断开**不记撤销步**,断开后棋盘若回到接线前那步也弹掉 —— 撤销历史里没有这条错线(否则 Ctrl+Z 只会复活它再断、还清空重做栈)。「欠定」不是接错,保留 |
 | §4.1 纹样间距 | `MachineNode` `separation` 覆盖 = `ROW_GAP`(32,image 4 间距 ≈ 纹样高 × 0.45);纹样格 `SIZE_SHRINK_CENTER` 保证口在纹样中心 |
 | §4.2 纹样边框按子命题着色 | `PatternView.region_borders`([{path, color}])+ `region_of_path()`(与 `layout()` 同一套切分);`MachineNode._borders_for` 按**仪器模板**结构走叶子,元变量查 `META_COLORS` / `META_COLOR_OVERRIDES`(岔纹机两口各自的钉色);描边在填色之后、分割线之前(分割处只剩灰条,同参考图);线轴/目标无 spec 照旧深色外框 |
 | §4.3 汇路机分割线 | `MachineNode._draw` 在相邻两行间隙中点画金 + 乳黄两条 2 px 线 |
@@ -227,7 +227,8 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 标题页第五个选项「设置」(与美术的四项同列同间距,`_add_option(4, …)`)点开 `ui/settings_panel.gd`(`SettingsPanel`,CanvasLayer 50:
 半透明遮罩挡住标题页 + 居中主题乳黄面板;标题页本身不放任何控件):
 「设置」→ 音乐音量滑条(0–100%,`Bgm.set_user_volume` 当场生效,松手落 `settings.music_volume`)→ 「全屏:开/关」
-(`DisplayServer.window_set_mode`,关 = 回工程默认最大化;落 `settings.fullscreen`,下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口)
+(`DisplayServer.window_set_mode`,关 = 回工程默认最大化,Web 上 = 窗口模式(浏览器只认 WINDOWED 退出全屏,MAXIMIZED 是空操作);落 `settings.fullscreen`,
+下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口;Web 的 `window_get_mode` 要等浏览器回调,按钮文字先按请求的状态显示)
 → 「小机联动:开/关」(= 无机器人模式开关,`Robot.set_enabled`,与维护面板同一开关;Web 版 `robot_possible()` 为假不显示)
 → 「小机维护」(联动开着才显示,打开 `RobotMaintUI`(层 60,压在弹窗上);F9 仍直通面板)→ 「关闭」(Esc 也关,面板压着时不管)。
 维护面板关掉时 `refresh()` 同步文字;文字按钮沿用主题(无底、悬停变浅),滑条按色板自画(乳黄轨 / 黄铜已填段 / 棕红圆钮 `GradientTexture2D` 径向渐变)。

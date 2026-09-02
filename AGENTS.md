@@ -96,6 +96,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   必须放在最后一个子 Node2D(`PortLayer`)上,`_draw_port` 只留空壳压掉默认圆点。
 - **GraphEdit 的口号是按 slot 顺序数的,不等于模型口号**(封程机假设口排第一排):板内所有信号进出都过
   `MachineNode.graph_out_port/model_out_port`;脚本/测试直接连线走 `session.connect_wire`,别调 `board._on_connection_request`。
+- **棋盘自动断开的错线不记撤销步**:`ProofBoard._break_wire` 调 `session.disconnect_wire(…, false)`。记的话 Ctrl+Z 只会把错线复活、
+  0.5 s 后再断,永远撤不回接线之前,而且每次自动断开都清空重做栈;断开后棋盘图若与栈顶快照(接线前)相同,那步也一并弹掉
+  (`test_session.test_disconnect_without_undo_entry`、UI smoke F 节盯)。载入旧棋盘时的错线同样会被自动断开。
 - **节点里的 Button 要 `mouse_filter = PASS`**:STOP 会把右键也吃掉(右键删机失效),PASS 下左键仍归按钮、其余穿透到 GraphNode;
   真实输入测试点节点"中央"前先看那里是不是按钮(`visual_smoke_ui` H/I 段改点纹样)。
 

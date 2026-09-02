@@ -183,3 +183,27 @@ func test_connected_getters() -> bool:
 		and check(not s.is_output_connected(oi, 1), "没钉没线的另一口不算 connected")
 	s.free()
 	return ok
+
+
+## 自动断开的错线(record_undo = false)不记撤销步,且断开后棋盘回到接线前 → 连接线那一步也弹掉(撤销历史里没有这条线);
+## 玩家自己断线照旧记一步
+func test_disconnect_without_undo_entry() -> bool:
+	var s := ProofSession.new()
+	var ok := check(s.setup(["A & B"], "B & A") == "", "setup")
+	var m := s.place_machine(&"and_intro")
+	var spool: int = s.assumption_ids[0]
+	var goal: int = s.goal_id
+	var ok_wire := s.connect_wire(spool, 0, goal, 0)
+	ok = check(ok_wire and s.get_wire_state(spool, 0, goal, 0) == ProofSession.WireState.CONFLICT, "线轴 A&B 直接接目标 B&A = 冲突线") and ok
+	s.disconnect_wire(spool, 0, goal, 0, false)
+	ok = check(s.get_wires().is_empty() and s.can_undo() and not s.can_redo(), "自动断开:线没了,只剩「放仪器」可撤销") and ok
+	s.undo()
+	ok = check(s.get_node_ids().size() == 2 and not s.can_undo(), "撤销一步直接回到放仪器之前(不会复活错线)") and ok
+	s.redo()
+	s.connect_wire(spool, 0, goal, 0)
+	s.disconnect_wire(spool, 0, goal, 0)
+	ok = check(s.get_wires().is_empty() and s.can_undo(), "玩家手动断线照旧记一步") and ok
+	s.undo()
+	ok = check(s.get_wires().size() == 1, "撤销手动断线 → 线回来") and ok
+	s.free()
+	return ok
