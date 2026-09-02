@@ -54,6 +54,7 @@ func _ready() -> void:
 
 	var progressed: bool = not _game.save.solved.is_empty()
 	_start_btn = _add_option(0, "继续游戏" if progressed else "开始游戏", _game.goto_select)
+	_start_btn.set_meta(SoundFx.META, &"")   # 进入选关只响选关页 _ready 的纸翻页声,按钮本身不再叮一下(用户 2026-09-02)
 	_add_option(1, "重置进度", _on_reset).set_meta(SoundFx.META, &"reset_progress")
 	_add_option(2, "开发者信息", _game.goto_credits)
 	_add_option(3, "退出游戏", func() -> void:

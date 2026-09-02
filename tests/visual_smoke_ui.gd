@@ -644,9 +644,13 @@ func _run() -> void:
 		await _settle()
 		_check(not sp.visible and current_scene == menu, "再开一次按 Esc 收起、仍在标题页")
 		_check(sfx.last_slot == &"close", "音效:Esc 收起也响 close(得 %s)" % sfx.last_slot)
+		var click_n: int = sfx.counts.get(&"click", 0)
+		var page_n: int = sfx.counts.get(&"page", 0)
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
+		_check(sfx.counts.get(&"click", 0) == click_n and sfx.counts.get(&"page", 0) == page_n + 1 and sfx.last_slot == &"page",
+				"音效:点「开始游戏」只响一声纸翻页 page、按钮本身不响 click(得 %s)" % sfx.last_slot)
 		_check(bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0, "标题到选关 BGM 不重启(同一播放器接着播)")
 		game.save.mark_solved(&"l01")
 		game.save.save()
@@ -698,7 +702,7 @@ func _run() -> void:
 	await _settle()
 	var select := current_scene as LevelSelect
 	_check(select != null, "选关页加载")
-	_check(sfx.last_slot == &"loom", "音效:进入选关页响织布机声 loom(得 %s)" % sfx.last_slot)
+	_check(sfx.last_slot == &"page", "音效:进入选关页响纸翻页声 page(得 %s)" % sfx.last_slot)
 	if select != null:
 		var level_btns: Array[Button] = []
 		var enabled := 0

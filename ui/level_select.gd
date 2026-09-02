@@ -25,7 +25,7 @@ func _ready() -> void:
 	var bgm := get_node_or_null("/root/Bgm")
 	if bgm != null:
 		bgm.play(&"title")
-	SoundFx.hit(self, &"loom")   # 进入选关页:织布机声(用户 2026-09-02)
+	SoundFx.hit(self, &"page")   # 进入选关页:纸翻页声(用户 2026-09-02「进入选关纸翻页就可以了」;织布机声只留给选定一关)
 	var bg := TextureRect.new()
 	bg.texture = load(BG_PATH)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)

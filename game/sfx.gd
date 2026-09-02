@@ -21,7 +21,7 @@ const CLIPS: Dictionary = {
 	&"toggle": "res://assets/sfx/toggle.wav",            # 全屏 / 小机联动等开关
 	&"slider": "res://assets/sfx/slider.wav",            # 音量滑条松手 / 点轨道
 	&"reset_progress": "res://assets/sfx/reset_progress.wav",
-	&"loom": "res://assets/sfx/loom.wav",                # 织布机声:进入选关页、选定一关(用户 2026-09-02:原翻页音挪到这里)
+	&"loom": "res://assets/sfx/loom.wav",                # 织布机声:点选关牌子选定一关(用户 2026-09-02:原翻页音挪到这里;进入选关页改响 page)
 	# 棋盘
 	&"place": "res://assets/sfx/place.wav",              # 仪器放上棋盘
 	&"delete": "res://assets/sfx/delete.wav",            # 删仪器
@@ -47,7 +47,7 @@ const CLIPS: Dictionary = {
 	# 笔记 / 指引 / 故事
 	&"drawer_open": "res://assets/sfx/drawer_open.wav",
 	&"drawer_close": "res://assets/sfx/drawer_close.wav",
-	&"page": "res://assets/sfx/page.wav",                # 翻页 = 纸翻页声(用户要求)
+	&"page": "res://assets/sfx/page.wav",                # 纸翻页声:笔记翻页、进入选关页(用户要求)
 	&"hint": "res://assets/sfx/hint.wav",                # 操作指引换成新一条
 	&"guide": "res://assets/sfx/guide.wav",              # 语音求助被接受
 	&"next": "res://assets/sfx/next.wav",                # 对话推进到下一句

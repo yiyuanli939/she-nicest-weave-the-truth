@@ -166,7 +166,7 @@ headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅ 
 **音效选定装入**(2026-09-02,用户在试听台逐槽位挑定 33 段 freesound CC0 + 2 段 Kenney(unplug / loom),并要求「保证音效声音的一致性」「保留音效的授权」:
 `tools/sfx_normalize.py` 就地把 CLIPS 全部文件统一成 16 bit 单声道 44.1 kHz WAV —— 起始静音裁到 5 ms、尾部 -60 dB 裁掉、淡入淡出、迭代软限幅峰值因子 ≤ 21 dB、
 RMS -18 / 峰值 -1 dBFS,CLIPS 后缀改 .wav;`sfx_apply.py` 重算 GAIN_DB(全在 0 到 +1,只剩 hover -4 / win -5 意图);逐文件标题 / 作者 / 链接 / 许可表在
-`assets/sfx/音效位置.md`「现用文件与来源」;合成器补 loom 配方;headless 145/145)✅。
+`assets/sfx/音效位置.md`「现用文件与来源」;合成器补 loom 配方;headless 145/145;用户听过 itch.io 版后改:进入选关页响纸翻页 page(「开始游戏」按钮静音),织布机 loom 只留选定一关)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
