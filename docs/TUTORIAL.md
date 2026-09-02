@@ -84,7 +84,7 @@ MainMenu(标题页:开始/继续游戏 · 重置进度 · 开发者信息 · 退
                             │                         播完 → Game.enter_board()
                             └─ 无 → enter_board() → LevelScene(仪器架 + 棋盘 + 右缘笔记抽屉)
 LevelScene.proof_completed → Game.notify_solved(记档、robot_cue 庆祝)→ 工具条「下一关」
-末关 l15 通关 → 「继续」→ Game.play_ending() → StoryScene 播 outro_dialogue(4-3,通关后剧情)
+末关 l16 通关 → 「继续」→ Game.play_ending() → StoryScene 播 outro_dialogue(4-3,通关后剧情)
     → 「感谢游玩」黑屏淡入(此刻小机修好)→ Game.finish_ending() → CreditsScene 从黑淡入
 CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```
@@ -93,15 +93,17 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   每行 `robot_cue` 转发给 `Game.robot_cue` → `RobotLink`(有实机才发)。
 - 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
   主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从策划 xlsx 灌
-  (`python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`;4-3 段写进 l15 的 `outro_dialogue`)。
-- 诺拉的笔记 = 七台仪器说明(`notebook.tres`,由 `gen_levels.gd` 的 `RULE_GUIDE` 表生成),关内按本关 allowed_rules 过滤显示;
+  (`python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`;4-3 段写进 l16 的 `outro_dialogue`)。
+- 诺拉的笔记 = 七台仪器整页图(`notebook.tres`,由 `gen_levels.gd` 的 `NOTEBOOK_IDS` 生成),关内按本关 allowed_rules 过滤显示;
   关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
-- 小机剧情弧(`Game.robot_mode()` 按关卡序,分界 `Game.BREAK_LEVEL = l10`):坏掉前(l01–l10)`guide` —— 玩家对麦克风说
+- 小机剧情弧(`Game.robot_mode()` 按关卡序,分界 `Game.BREAK_LEVEL = l11`):坏掉前(l01–l11)`guide` —— 玩家对麦克风说
   「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 → `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限
   (`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后 `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;
-  **3-1(l10)通关瞬间坏掉**:win cue = `panic`(坏掉是剧情节点,代解通关也演),`notify_solved` 随即置 `Robot.broken`;
-  l11 起 `broken` —— 任何 cue 都映射成故障三连(`RobotLink.commands_for`);**结局才修好**:「感谢游玩」黑屏时 `broken=false` + `calm`(`ui/story_scene.gd _play_thanks`)。
+  **3-1(l11)通关瞬间坏掉**:win cue = `panic`(坏掉是剧情节点,代解通关也演),`notify_solved` 随即置 `Robot.broken`;
+  l12 起 `broken` —— 任何 cue 都映射成故障三连(`RobotLink.commands_for`);**结局才修好**:「感谢游玩」黑屏时 `broken=false` + `calm`(`ui/story_scene.gd _play_thanks`)。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖(对话字段除外:重跑原样保留现有 intro/outro 台词)。
+  仪器**按关上架**:`LEVELS` 每行末列是本关新上架的仪器,之后的关累计(l01 一台都没有);解法只能用架上仪器(`test_levels` 盯)。
+  重排关卡 id 时先按新编号 `git mv` .tres(降序)再重生成,对话就按路径跟着搬;`information/dialogue.csv` 的章-节要同步改,`test_tres_dialogue_matches_csv` 逐句核对。
 
 **背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;故事界面与关内 = 该章 `level_N`)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。wav 的循环点由 `Bgm.set_looping` 运行时兜底(没有循环点就整曲循环,`.import` 不用改;只开 `loop_mode` 不设 `loop_end` 会混 1 帧即停,见 AGENTS 踩过的坑)。
 
@@ -170,9 +172,9 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 |---|---|
 | 改台词/场景/立绘/表情 | 改剧情 xlsx(`剧情文件及美术补充/`)→ `python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue` / `outro_dialogue`(Inspector) |
 | 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
-| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS`/`CH_*` 表;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
-| 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
-| 加一台仪器 | `logic/rules.gd` 一行链式定义(自由变量所在口标 `pinnable`)→ `CH_RULES` 放进某章 → 测试 `test_describe_rule_metadata` 的台数 → 解法 |
+| 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS` 表,末列 = 本关新上架仪器;`CH_OF_LEVEL`/`CH_TITLES`;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
+| 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(§0.5 现网 16 关编排表、旧 15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
+| 加一台仪器 | `logic/rules.gd` 一行链式定义(自由变量所在口标 `pinnable`)→ 在 `LEVELS` 里它裸机关那行的上架列加进去 → 测试 `test_describe_rule_metadata` 的台数 → 解法 |
 | 改"钉"的规则(哪些口可钉) | 只改 `rules.gd` 的 `pinnable` 标记;`_port_free_meta` 要求可钉口恰有一个自由变量 |
 | 改求解语义 | `logic/proof_graph.gd solve()` + `logic/unifier.gd match_into`;先看 `tests/test_graph.gd` 末尾的正向语义测试和 `test_unifier.test_match_into_is_one_way` |
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
@@ -201,8 +203,8 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 102 例,退出码 = 失败数
-"$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 15 关自动通关 + 对话点击回归 + 截图
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 107 例,退出码 = 失败数
+"$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 16 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
 "$GODOT" --path .                                                  # 实跑看手感

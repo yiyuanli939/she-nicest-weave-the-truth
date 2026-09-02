@@ -2,8 +2,8 @@ extends Node
 ## Autoload "Game":游戏流程唯一单例(逻辑层保持可 new,不进这里)。
 ## 场景切换、当前关卡、存档、机器人 cue 转发都从这里走。
 ## 诺拉的笔记 = 七台仪器的说明(narrative/data/notebook.tres),关内按本关 allowed_rules 过滤显示。
-## 小机剧情弧(按关卡序):3-1(l10)通关瞬间坏掉 —— 坏掉前玩家说「请指导我」小机代解("guide"),
-## 坏掉后整段故障("broken",所有 cue 变故障演出);结局(l15 通关后 4-3 剧情播完,感谢游玩黑屏)才修好。
+## 小机剧情弧(按关卡序):3-1(l11)通关瞬间坏掉 —— 坏掉前玩家说「请指导我」小机代解("guide"),
+## 坏掉后整段故障("broken",所有 cue 变故障演出);结局(l16 通关后 4-3 剧情播完,感谢游玩黑屏)才修好。
 ## 不在目录里的关(测试注入)不触发("off")。
 
 var catalog: LevelCatalog
@@ -46,7 +46,7 @@ func current_chapter() -> int:
 
 
 ## 小机坏掉的分界关:这一关(3-1)通关瞬间坏掉(notify_solved 里置 Robot.broken)
-const BREAK_LEVEL := &"l10"
+const BREAK_LEVEL := &"l11"
 
 
 ## 纯查表(测试用):坏掉分界关(含当关)之前代解,之后故障
@@ -104,7 +104,7 @@ var ending_pending := false        # StoryScene 据此播 outro_dialogue 而非 
 var credits_fade_pending := false  # 开发者信息页从黑淡入一次(「淡出到开发者信息界面」)
 
 
-## l15 通关后点「继续」:全屏播 current.outro_dialogue
+## l16 通关后点「继续」:全屏播 current.outro_dialogue
 func play_ending() -> void:
 	ending_pending = true
 	get_tree().change_scene_to_file("res://ui/story_scene.tscn")

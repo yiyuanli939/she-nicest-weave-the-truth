@@ -546,8 +546,8 @@ func _run() -> void:
 	await _wait_until(func() -> bool: return g2.session.is_solved())
 	_check(g2.session.is_solved() and robot.sent("gimbal", "", 5) and not robot.sent("gimbal", "", 175), "「请帮帮我」+ 方向设左 → 回头到左极限(5)后代解")
 	robot.set_turn_dir("right")
-	# 3-1(l10):小机还没坏 —— 进关不故障、提示照显、说「请指导我」仍回头代解;通关瞬间坏掉(panic 演出)
-	game.start_level(game.catalog.find(&"l10"))
+	# 3-1(l11):小机还没坏 —— 进关不故障、提示照显、说「请指导我」仍回头代解;通关瞬间坏掉(panic 演出)
+	game.start_level(game.catalog.find(&"l11"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
@@ -567,8 +567,8 @@ func _run() -> void:
 	_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic")
 			and (robot.sent("say", "glitch1") or robot.sent("say", "glitch2") or robot.sent("say", "glitch3")),
 			"3-1 通关瞬间小机坏掉:乱动 + 坏掉音效,没有台词")
-	# 3-2(l11):坏掉后任何 cue(含「请指导我」)都是故障演出,不回头、不代解
-	game.start_level(game.catalog.find(&"l11"))
+	# 3-2(l12):坏掉后任何 cue(含「请指导我」)都是故障演出,不回头、不代解
+	game.start_level(game.catalog.find(&"l12"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
@@ -576,15 +576,15 @@ func _run() -> void:
 	var g3b := current_scene as LevelScene
 	_check(robot.broken, "3-2 起小机坏掉")
 	_check(not g3b._guide_hint.visible, "坏掉后不显示求助提示")
-	await _wait(3.4)                # 等 l10 代解演出的 hold/回正走完(Robot autoload 跨场景继续)
+	await _wait(3.4)                # 等 l11 代解演出的 hold/回正走完(Robot autoload 跨场景继续)
 	robot.sent_log.clear()
 	robot._last_at.clear()          # 模拟故障演出 6 s 节流已过
 	robot._last_guide_ms = -100000
 	robot._on_event({"evt": "speech", "text": "请 指导 我"})
 	await _wait(1.2)
 	_check(not g3b.session.is_solved() and robot.sent("emote", "glitch") and not robot.sent("gimbal"), "坏掉后说「请指导我」只故障、不回头、不代解")
-	# 第四章(l13):仍是坏的(修好在结局「感谢游玩」黑屏,不在进关)
-	game.start_level(game.catalog.find(&"l13"))
+	# 第四章(l14):仍是坏的(修好在结局「感谢游玩」黑屏,不在进关)
+	game.start_level(game.catalog.find(&"l14"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()

@@ -1,44 +1,45 @@
 [gd_resource type="Resource" script_class="LevelCatalog" format=3]
 
-[ext_resource type="Script" path="res://levels/chapter_def.gd" id="1_ljj35"]
-[ext_resource type="Script" path="res://levels/level_def.gd" id="2_0sxbx"]
-[ext_resource type="Resource" path="res://levels/data/l01_l01.tres" id="3_echqs"]
-[ext_resource type="Resource" path="res://levels/data/l02_l02.tres" id="4_urugv"]
-[ext_resource type="Resource" path="res://levels/data/l03_l03.tres" id="5_33pqu"]
-[ext_resource type="Resource" path="res://levels/data/l04_l04.tres" id="6_fg67j"]
-[ext_resource type="Resource" path="res://levels/data/l05_l05.tres" id="7_wlkb3"]
-[ext_resource type="Resource" path="res://levels/data/l06_l06.tres" id="8_5dnp8"]
-[ext_resource type="Resource" path="res://levels/data/l07_l07.tres" id="9_hyw4g"]
-[ext_resource type="Resource" path="res://levels/data/l08_l08.tres" id="10_2qrau"]
-[ext_resource type="Resource" path="res://levels/data/l09_l09.tres" id="11_a4wpr"]
-[ext_resource type="Resource" path="res://levels/data/l10_l10.tres" id="12_wckoa"]
-[ext_resource type="Resource" path="res://levels/data/l11_l11.tres" id="13_cohgv"]
-[ext_resource type="Resource" path="res://levels/data/l12_l12.tres" id="14_tcwnj"]
-[ext_resource type="Resource" path="res://levels/data/l13_l13.tres" id="15_jn1rt"]
-[ext_resource type="Resource" path="res://levels/data/l14_l14.tres" id="16_6myto"]
-[ext_resource type="Resource" path="res://levels/data/l15_l15.tres" id="17_g7qwh"]
-[ext_resource type="Script" path="res://levels/level_catalog.gd" id="18_xtkgp"]
-
-[sub_resource type="Resource" id="Resource_r13jp"]
-script = ExtResource("1_ljj35")
-title = "第一章 并纹"
-levels = Array[ExtResource("2_0sxbx")]([ExtResource("3_echqs"), ExtResource("4_urugv"), ExtResource("5_33pqu"), ExtResource("6_fg67j")])
-
-[sub_resource type="Resource" id="Resource_1t2kf"]
-script = ExtResource("1_ljj35")
-title = "第二章 叠层纹"
-levels = Array[ExtResource("2_0sxbx")]([ExtResource("7_wlkb3"), ExtResource("8_5dnp8"), ExtResource("9_hyw4g"), ExtResource("10_2qrau"), ExtResource("11_a4wpr")])
+[ext_resource type="Script" path="res://levels/chapter_def.gd" id="1_0sxbx"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="2_echqs"]
+[ext_resource type="Resource" path="res://levels/data/l01_l01.tres" id="3_urugv"]
+[ext_resource type="Resource" path="res://levels/data/l02_l02.tres" id="4_33pqu"]
+[ext_resource type="Resource" path="res://levels/data/l03_l03.tres" id="5_fg67j"]
+[ext_resource type="Resource" path="res://levels/data/l04_l04.tres" id="6_wlkb3"]
+[ext_resource type="Resource" path="res://levels/data/l05_l05.tres" id="7_5dnp8"]
+[ext_resource type="Resource" path="res://levels/data/l06_l06.tres" id="8_hyw4g"]
+[ext_resource type="Resource" path="res://levels/data/l07_l07.tres" id="9_2qrau"]
+[ext_resource type="Resource" path="res://levels/data/l08_l08.tres" id="10_a4wpr"]
+[ext_resource type="Resource" path="res://levels/data/l09_l09.tres" id="11_wckoa"]
+[ext_resource type="Resource" path="res://levels/data/l10_l10.tres" id="12_cohgv"]
+[ext_resource type="Resource" path="res://levels/data/l11_l11.tres" id="13_tcwnj"]
+[ext_resource type="Resource" path="res://levels/data/l12_l12.tres" id="14_jn1rt"]
+[ext_resource type="Resource" path="res://levels/data/l13_l13.tres" id="15_6myto"]
+[ext_resource type="Resource" path="res://levels/data/l14_l14.tres" id="16_g7qwh"]
+[ext_resource type="Resource" path="res://levels/data/l15_l15.tres" id="17_xtkgp"]
+[ext_resource type="Resource" path="res://levels/data/l16_l16.tres" id="18_r13jp"]
+[ext_resource type="Script" path="res://levels/level_catalog.gd" id="19_1t2kf"]
 
 [sub_resource type="Resource" id="Resource_arxw0"]
-script = ExtResource("1_ljj35")
-title = "第三章 岔纹"
-levels = Array[ExtResource("2_0sxbx")]([ExtResource("12_wckoa"), ExtResource("13_cohgv"), ExtResource("14_tcwnj")])
+script = ExtResource("1_0sxbx")
+title = "第一章 并纹"
+levels = Array[ExtResource("2_echqs")]([ExtResource("3_urugv"), ExtResource("4_33pqu"), ExtResource("5_fg67j"), ExtResource("6_wlkb3"), ExtResource("7_5dnp8")])
 
 [sub_resource type="Resource" id="Resource_mm40q"]
-script = ExtResource("1_ljj35")
+script = ExtResource("1_0sxbx")
+title = "第二章 叠层纹"
+levels = Array[ExtResource("2_echqs")]([ExtResource("8_hyw4g"), ExtResource("9_2qrau"), ExtResource("10_a4wpr"), ExtResource("11_wckoa"), ExtResource("12_cohgv")])
+
+[sub_resource type="Resource" id="Resource_a2wu5"]
+script = ExtResource("1_0sxbx")
+title = "第三章 岔纹"
+levels = Array[ExtResource("2_echqs")]([ExtResource("13_tcwnj"), ExtResource("14_jn1rt"), ExtResource("15_6myto")])
+
+[sub_resource type="Resource" id="Resource_txyt2"]
+script = ExtResource("1_0sxbx")
 title = "第四章 焦纹"
-levels = Array[ExtResource("2_0sxbx")]([ExtResource("15_jn1rt"), ExtResource("16_6myto"), ExtResource("17_g7qwh")])
+levels = Array[ExtResource("2_echqs")]([ExtResource("16_g7qwh"), ExtResource("17_xtkgp"), ExtResource("18_r13jp")])
 
 [resource]
-script = ExtResource("18_xtkgp")
-chapters = Array[ExtResource("1_ljj35")]([SubResource("Resource_r13jp"), SubResource("Resource_1t2kf"), SubResource("Resource_arxw0"), SubResource("Resource_mm40q")])
+script = ExtResource("19_1t2kf")
+chapters = Array[ExtResource("1_0sxbx")]([SubResource("Resource_arxw0"), SubResource("Resource_mm40q"), SubResource("Resource_a2wu5"), SubResource("Resource_txyt2")])

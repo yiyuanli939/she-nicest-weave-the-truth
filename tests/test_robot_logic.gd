@@ -20,14 +20,14 @@ func test_guide_phrase_matching() -> bool:
 func test_chapter_lookup_and_robot_mode() -> bool:
 	var cat := LevelCatalog.load_default()
 	var game := load(GAME)
-	var ok := check(cat.chapter_of(cat.find(&"l01")) == 0 and cat.chapter_of(cat.find(&"l05")) == 1
-			and cat.chapter_of(cat.find(&"l10")) == 2 and cat.chapter_of(cat.find(&"l13")) == 3, "l01/l05/l10/l13 → 第 1/2/3/4 章")
+	var ok := check(cat.chapter_of(cat.find(&"l01")) == 0 and cat.chapter_of(cat.find(&"l06")) == 1
+			and cat.chapter_of(cat.find(&"l11")) == 2 and cat.chapter_of(cat.find(&"l14")) == 3, "l01/l06/l11/l14 → 第 1/2/3/4 章")
 	ok = check(cat.chapter_of(LevelDef.new()) == -1, "不在目录的关 → -1") and ok
-	# 小机弧:3-1(l10)通关瞬间坏掉 —— 含 l10 在内之前代解,l11 起整段故障;修好在结局(不存在 look 模式)
-	var brk := cat.all_levels().find(cat.find(&"l10"))
-	ok = check(brk == 9, "l10 = 第 10 关(序号 9)") and ok
+	# 小机弧:3-1(l11)通关瞬间坏掉 —— 含 l11 在内之前代解,l12 起整段故障;修好在结局(不存在 look 模式)
+	var brk := cat.all_levels().find(cat.find(&"l11"))
+	ok = check(brk == 10, "l11 = 第 11 关(序号 10)") and ok
 	ok = check(game.robot_mode_at(0, brk) == "guide" and game.robot_mode_at(brk, brk) == "guide", "坏掉前(含 3-1 当关)代解") and ok
-	ok = check(game.robot_mode_at(brk + 1, brk) == "broken" and game.robot_mode_at(14, brk) == "broken", "3-2 起到第四章全程故障") and ok
+	ok = check(game.robot_mode_at(brk + 1, brk) == "broken" and game.robot_mode_at(15, brk) == "broken", "3-2 起到第四章全程故障") and ok
 	ok = check(game.robot_mode_at(-1, brk) == "off", "目录外不触发") and ok
 	return ok
 
@@ -70,14 +70,14 @@ func test_settings_survive_wipe() -> bool:
 	return ok
 
 
-## 关卡数据:3-1(l10)通关瞬间坏掉 → l10 通关演出 = panic(故障),其余庆祝;
+## 关卡数据:3-1(l11)通关瞬间坏掉 → l11 通关演出 = panic(故障),其余庆祝;
 ## 进关一律无演出;修好在结局「感谢游玩」黑屏(StoryScene._play_thanks),不在任何关卡数据里
-func test_cues_mark_breakdown_at_l10_win() -> bool:
+func test_cues_mark_breakdown_at_l11_win() -> bool:
 	var cat := LevelCatalog.load_default()
 	var ok := true
 	for lv in cat.all_levels():
 		ok = check(lv.robot_cue_on_enter == "", "%s 进关无演出" % lv.id) and ok
-		var want := "panic" if lv.id == &"l10" else "celebrate"
+		var want := "panic" if lv.id == &"l11" else "celebrate"
 		ok = check(lv.robot_cue_on_win == want, "%s 通关演出 = %s" % [lv.id, want]) and ok
 	return ok
 

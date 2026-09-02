@@ -154,13 +154,13 @@ func test_level_solutions_complete_minimal_and_order_free() -> bool:
 
 func test_legacy_save_entries_are_harmless() -> bool:
 	var sm := SaveManager.new()
-	sm.mark_solved(&"l16")
-	sm.mark_solved(&"l17")
-	sm.set_board_state(&"l16", {"graph": {"next_meta": 2, "nodes": [], "edges": []}, "positions": {}})
+	sm.mark_solved(&"l98")
+	sm.mark_solved(&"l99")
+	sm.set_board_state(&"l98", {"graph": {"next_meta": 2, "nodes": [], "edges": []}, "positions": {}})
 	sm.save()
 	# 旧版存档带 notebook 数组:读档应静默忽略
 	var f := FileAccess.open(SaveManager.PATH, FileAccess.WRITE)
-	f.store_string(JSON.stringify({solved = {"l16": true, "l17": true}, boards = {}, notebook = ["notebook_tnd", "notebook_and"]}))
+	f.store_string(JSON.stringify({solved = {"l98": true, "l99": true}, boards = {}, notebook = ["notebook_tnd", "notebook_and"]}))
 	f.close()
 	var sm2 := SaveManager.open()
 	var nb := NotebookCatalog.load_default()
@@ -173,7 +173,7 @@ func test_legacy_save_entries_are_harmless() -> bool:
 	ui.open(nb, [])
 	var shown_none: int = ui._entries.size()
 	ui.free()
-	var ok := check(sm2.is_solved(&"l16"), "残留的通关记录读回来照旧") \
+	var ok := check(sm2.is_solved(&"l98"), "残留的通关记录读回来照旧") \
 		and check(shown == nb.entries.size(), "传全部 rule_id:显示 %d 条(得 %d)" % [nb.entries.size(), shown]) \
 		and check(shown_none == 0, "传空:一条不显示(严格过滤,无空=全量兜底)") \
 		and check(nb.entry(&"notebook_tnd") == null, "目录里不再有两仪条目")

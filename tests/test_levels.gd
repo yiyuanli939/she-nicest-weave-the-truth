@@ -2,11 +2,11 @@ extends TestBase
 ## 关卡/笔记数据校验:catalog 载入、公式可解析、规则存在、章名关名按美术规范、笔记 = 七台仪器。
 
 
-func test_catalog_loads_15_levels() -> bool:
+func test_catalog_loads_16_levels() -> bool:
 	var cat := LevelCatalog.load_default()
 	return check(cat != null, "catalog.tres 应能加载") \
 		and check(cat.chapters.size() == 4, "4 章 (得 %d)" % cat.chapters.size()) \
-		and check(cat.all_levels().size() == 15, "15 关 (得 %d)" % cat.all_levels().size())
+		and check(cat.all_levels().size() == 16, "16 关 (得 %d)" % cat.all_levels().size())
 
 
 func test_levels_wellformed() -> bool:
@@ -80,8 +80,8 @@ func test_dialogue_lines_reference_registered_art() -> bool:
 				ok = check(StoryArt.EXPRESSIONS.has(line.left_expr) and StoryArt.EXPRESSIONS.has(line.nora_expr), "%s 表情" % lv.id) and ok
 	# 剧情表注意事项②:4-3 是通关后剧情 → 最后一关必须有 outro、没有 intro
 	var last: LevelDef = cat.all_levels()[-1]
-	ok = check(last.outro_dialogue != null and not last.outro_dialogue.lines.is_empty(), "l15 有通关后剧情(4-3)") and ok
-	ok = check(last.intro_dialogue == null or last.intro_dialogue.lines.is_empty(), "l15 无进关对话") and ok
+	ok = check(last.outro_dialogue != null and not last.outro_dialogue.lines.is_empty(), "l16 有通关后剧情(4-3)") and ok
+	ok = check(last.intro_dialogue == null or last.intro_dialogue.lines.is_empty(), "l16 无进关对话") and ok
 	return ok
 
 
@@ -97,3 +97,84 @@ func test_save_manager_roundtrip() -> bool:
 	var sm3 := SaveManager.open()
 	return ok and check(not sm3.is_solved(&"l01"), "wipe 生效")
 
+
+
+## 仪器按关上架(2026-09-02 编排):l01 一台都没有,之后逐关累计;每关解法只能用本关架上的仪器
+func test_rules_unlock_per_level() -> bool:
+	var cat := LevelCatalog.load_default()
+	var debut: Dictionary = {   # 本关新上架的仪器
+		&"l02": &"and_intro", &"l03": &"and_elim", &"l06": &"imp_elim", &"l07": &"imp_intro",
+		&"l11": &"or_intro", &"l12": &"or_elim", &"l14": &"false_elim",
+	}
+	var shelved: Array[StringName] = []
+	var ok := check(cat.all_levels()[0].allowed_rules.is_empty(), "l01 一台仪器都不上架")
+	for lv in cat.all_levels():
+		if debut.has(lv.id):
+			shelved.append(debut[lv.id])
+		ok = check(lv.allowed_rules == shelved, "%s 架上仪器应为 %s,得 %s" % [lv.id, str(shelved), str(lv.allowed_rules)]) and ok
+		var sol: Dictionary = LevelSolutions.DATA.get(lv.id, {})
+		ok = check(not sol.is_empty(), "%s 缺脚本化解法" % lv.id) and ok
+		for r in sol.get("m", []):
+			ok = check(lv.allowed_rules.has(r), "%s 解法用了未上架的 %s" % [lv.id, r]) and ok
+	ok = check(shelved.size() == Rules.all_ids().size(), "七台仪器到末关全部上架") and ok
+	return ok
+
+
+## 2026-09-02 编排:第一章第三纹是新加的裸拆股关(无剧情、直进棋盘),原第三/四纹后移;
+## 第二章 2-2/2-3 只对调题目(2-2 = 封程裸机),剧情按「章-节」位置不动;「章-节」映射随目录变
+func test_reordered_levels_2026_09() -> bool:
+	var cat := LevelCatalog.load_default()
+	var l03 := cat.find(&"l03")
+	var l07 := cat.find(&"l07")
+	var l08 := cat.find(&"l08")
+	var ok := check(cat.chapters[0].levels.size() == 5 and cat.chapters[1].levels.size() == 5
+			and cat.chapters[2].levels.size() == 3 and cat.chapters[3].levels.size() == 3, "各章 5/5/3/3 关")
+	ok = check(l03.assumptions.size() == 1 and l03.assumptions[0] == "A & B" and l03.goal == "A"
+			and l03.title == "第三纹", "l03 = A & B ⊢ A,第三纹") and ok
+	ok = check(l03.intro_dialogue == null or l03.intro_dialogue.lines.is_empty(), "l03 无进关剧情") and ok
+	ok = check(cat.find(&"l04").goal == "B & A" and cat.find(&"l04").title == "第四纹", "原第三纹后移为 l04 第四纹") and ok
+	ok = check(l07.goal == "A > A" and l07.assumptions.is_empty() and l07.title == "第二纹", "2-2 = ⊢ A > A(封程裸机)") and ok
+	ok = check(l08.goal == "A > C" and l08.title == "第三纹", "2-3 = A > B, B > C ⊢ A > C") and ok
+	ok = check(cat.find(&"l11").robot_cue_on_win == "panic" and cat.chapter_of(cat.find(&"l11")) == 2
+			and cat.find(&"l11").title == "第一纹", "3-1 = l11,通关演出 panic") and ok
+	var ep: Dictionary = load("res://tools/import_dialogue.gd").episode_map()
+	ok = check(ep.get("1-3") == "l03" and ep.get("1-5") == "l05" and ep.get("2-1") == "l06"
+			and ep.get("3-1") == "l11" and ep.get("4-3") == "l16" and ep.size() == 16, "章-节 → id 映射随目录") and ok
+	return ok
+
+
+## 剧情表 information/dialogue.csv 与 .tres 逐句一致(关卡重排时剧情按「章-节」位置留在原处,靠这条盯着不错位)
+func test_tres_dialogue_matches_csv() -> bool:
+	var importer: GDScript = load("res://tools/import_dialogue.gd")
+	var csv := FileAccess.get_file_as_string("res://information/dialogue.csv")
+	var r: Dictionary = importer.parse_csv(csv, importer.episode_map())
+	var ok := check((r.errors as Array).is_empty(), "剧情表无错误: %s" % str(r.errors))
+	var cat := LevelCatalog.load_default()
+	for lv in cat.all_levels():
+		var got: Dictionary = r.levels.get(String(lv.id), {intro = null, outro = null})
+		for slot in ["intro", "outro"]:
+			var want: DialogueRes = got[slot]
+			var have: DialogueRes = lv.intro_dialogue if slot == "intro" else lv.outro_dialogue
+			var want_n: int = want.lines.size() if want != null else 0
+			var have_n: int = have.lines.size() if have != null else 0
+			ok = check(want_n == have_n, "%s %s 句数:表 %d / tres %d" % [lv.id, slot, want_n, have_n]) and ok
+			for i in mini(want_n, have_n):
+				ok = check(want.lines[i].text == have.lines[i].text and want.lines[i].speaker == have.lines[i].speaker,
+						"%s %s 第 %d 句与表不同" % [lv.id, slot, i + 1]) and ok
+	return ok
+
+
+## 关卡编排版本:旧版存档(无 layout 字段 = 1)的 boards 是别的题目的棋盘 → 读档丢弃 boards,保留 solved 与 settings
+func test_save_layout_version_drops_stale_boards() -> bool:
+	var f := FileAccess.open(SaveManager.PATH, FileAccess.WRITE)
+	f.store_string(JSON.stringify({solved = {"l05": true}, boards = {"l05": {"graph": {}, "positions": {}}}, settings = {"robot_turn": "left"}}))
+	f.close()
+	var sm := SaveManager.open()
+	var ok := check(sm.is_solved(&"l05") and sm.settings.get("robot_turn") == "left", "旧档 solved/settings 保留") \
+		and check(sm.board_state(&"l05").is_empty(), "旧编排的棋盘丢弃")
+	sm.set_board_state(&"l05", {"graph": {}, "positions": {}})
+	sm.save()
+	var sm2 := SaveManager.open()
+	ok = check(not sm2.board_state(&"l05").is_empty(), "新档带 layout 版本,棋盘照读") and ok
+	sm2.wipe()
+	return ok

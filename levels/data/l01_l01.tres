@@ -100,7 +100,6 @@ id = &"l01"
 title = "第一纹"
 assumptions = Array[String](["A"])
 goal = "A"
-allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A"])
 intro_dialogue = SubResource("Resource_4ku7p")
 robot_cue_on_win = "celebrate"

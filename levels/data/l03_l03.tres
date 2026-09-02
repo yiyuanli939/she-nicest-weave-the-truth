@@ -1,55 +1,13 @@
 [gd_resource type="Resource" script_class="LevelDef" format=3]
 
-[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_kjkf3"]
-[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_f8yfv"]
-[ext_resource type="Script" path="res://levels/level_def.gd" id="3_jjorm"]
-
-[sub_resource type="Resource" id="Resource_kjkf3"]
-script = ExtResource("1_kjkf3")
-speaker = "诺拉·拉芙蒂"
-text = "以前走这条街从没注意过……门边的铜槽、邮报机的滚轮，连路口信号器背后都有静语纹。"
-scene = "伦敦街上"
-nora_expr = "惊讶"
-
-[sub_resource type="Resource" id="Resource_f8yfv"]
-script = ExtResource("1_kjkf3")
-speaker = "诺拉·拉芙蒂"
-text = "原来我们白天织的那一小块，真的会跑到这里来。"
-scene = "伦敦街上"
-nora_expr = "惊讶"
-
-[sub_resource type="Resource" id="Resource_jjorm"]
-script = ExtResource("1_kjkf3")
-speaker = "亚瑟·威客利夫"
-text = "拉芙蒂小姐？这么晚还在研究市政器件？"
-scene = "伦敦街上"
-left_char = "亚瑟"
-
-[sub_resource type="Resource" id="Resource_odvgm"]
-script = ExtResource("1_kjkf3")
-speaker = "诺拉·拉芙蒂"
-text = "只是觉得奇怪。它们看起来都不一样，却能认同一种纹样。"
-scene = "伦敦街上"
-left_char = "亚瑟"
-
-[sub_resource type="Resource" id="Resource_8crae"]
-script = ExtResource("1_kjkf3")
-speaker = "亚瑟·威客利夫"
-text = "因为外形只是载体。真正统一它们的是学院给出的程式。工坊的任务，是把程式可靠地实现出来。"
-scene = "伦敦街上"
-left_char = "亚瑟"
-
-[sub_resource type="Resource" id="Resource_xcogr"]
-script = ExtResource("2_f8yfv")
-lines = Array[ExtResource("1_kjkf3")]([SubResource("Resource_kjkf3"), SubResource("Resource_f8yfv"), SubResource("Resource_jjorm"), SubResource("Resource_odvgm"), SubResource("Resource_8crae")])
+[ext_resource type="Script" path="res://levels/level_def.gd" id="1_88ugm"]
 
 [resource]
-script = ExtResource("3_jjorm")
+script = ExtResource("1_88ugm")
 id = &"l03"
 title = "第三纹"
 assumptions = Array[String](["A & B"])
-goal = "B & A"
+goal = "A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_xcogr")
 robot_cue_on_win = "celebrate"

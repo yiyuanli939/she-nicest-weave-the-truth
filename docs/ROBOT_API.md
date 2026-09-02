@@ -80,11 +80,11 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 
 | 阶段 | 模式 | 玩家说「请指导我 / 请帮帮我」 | 其它 cue |
 |---|---|---|---|
-| l01–l10(第一章 ~ 3-1) | `guide` | 小机 think 脸、底部云台转到极限(方向可设)→ 0.8 s 后游戏**直接代解本关**(不庆祝不鼓励)→ 停 2.5 s 转回 | 照常 |
-| l11–l15(3-2 起) | `broken` | 只故障(故障脸 + 乱动 + 坏掉音效,没有台词),不回头不代解 | **全部**变故障演出(sleep 除外) |
+| l01–l11(第一章 ~ 3-1) | `guide` | 小机 think 脸、底部云台转到极限(方向可设)→ 0.8 s 后游戏**直接代解本关**(不庆祝不鼓励)→ 停 2.5 s 转回 | 照常 |
+| l12–l16(3-2 起) | `broken` | 只故障(故障脸 + 乱动 + 坏掉音效,没有台词),不回头不代解 | **全部**变故障演出(sleep 除外) |
 
-**坏掉时点 = 3-1(l10)通关瞬间**:l10 的 `robot_cue_on_win = "panic"`(小机代解通关也演,`Game.notify_solved` 随即置 `Robot.broken`);
-**修好时点 = 结局**:l15 通关点「继续」→ 4-3 剧情播完 → 「感谢游玩」黑屏时 `broken = false` + `calm`(`ui/story_scene.gd _play_thanks`)。
+**坏掉时点 = 3-1(l11)通关瞬间**:l11 的 `robot_cue_on_win = "panic"`(小机代解通关也演,`Game.notify_solved` 随即置 `Robot.broken`);
+**修好时点 = 结局**:l16 通关点「继续」→ 4-3 剧情播完 → 「感谢游玩」黑屏时 `broken = false` + `calm`(`ui/story_scene.gd _play_thanks`)。
 
 关内坏掉前显示提示「有困难可以对小机说:「请指导我」或「请帮帮我」」(`ui/level_scene.gd GUIDE_HINT`)。
 
@@ -125,12 +125,12 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 | `celebrate` | 通关(`robot_cue_on_win`;小机代解时不发) | happy + **俯仰轴连续点头**(不左右摇)+ "太棒了!织成了!" |
 | `confused` | 接出冲突线(节流 8s;代解期间不发) | 困惑脸 + 摇头 + **鼓励**"别灰心,换个口试试,你可以的!" |
 | `hint` | 发呆 45s(节流 15s) | 先 `look_pc` **装作看一眼电脑再转回来**,think 脸 + "要不要试试仪器架上的新机器?" |
-| `panic` | l10 通关瞬间(3-1 打完小机坏掉,代解通关也演);故障态下任何 cue 都是这套 | 故障脸 + 云台乱动 + 随机一段**坏掉音效**(`glitch1..3.wav`,`hardware/make_sfx.py` 合成;**没有台词**,屏幕上也不显示任何报警文字) |
+| `panic` | l11 通关瞬间(3-1 打完小机坏掉,代解通关也演);故障态下任何 cue 都是这套 | 故障脸 + 云台乱动 + 随机一段**坏掉音效**(`glitch1..3.wav`,`hardware/make_sfx.py` 合成;**没有台词**,屏幕上也不显示任何报警文字) |
 | `calm` | 结局「感谢游玩」黑屏(修好那一刻,`ui/story_scene.gd`) | happy + 点头 + "谢谢你,诺拉……" |
 | `glitch` `think` `sleep` `idle` | 对话行 robot_cue 任意挂 | 单表情 |
 
-未知 cue 会按 `emote` 原样下发,策划可直接扩展。故障态(`Robot.broken`)由 `Game.start_level` 按关卡序设置(l11 起;
-l10 通关瞬间由 `notify_solved` 置真,结局黑屏由 `StoryScene._play_thanks` 置假),节流 6 s。
+未知 cue 会按 `emote` 原样下发,策划可直接扩展。故障态(`Robot.broken`)由 `Game.start_level` 按关卡序设置(l12 起;
+l11 通关瞬间由 `notify_solved` 置真,结局黑屏由 `StoryScene._play_thanks` 置假),节流 6 s。
 
 ## 运维(命令行等价物)
 
@@ -182,6 +182,6 @@ bash hardware/flash_robot.sh      # 灌 main.py / paj7620.py / sounds,软复位,
 4. `godot --headless --path . --script res://tests/robot_smoke.gd` → 六个 cue + 回头/回正依次实机演出;
    `tests/robot_turn_smoke.gd` 只测回头:右极限 → 回正 → 左极限 → 回正,每步等固件 ack(退出码 = 失败数)。
    `bash hardware/cam_check.sh` 用摄像头判定舵机真的转了(小机要在画面里)。
-5. 进第一纹对麦克风说「请指导我」→ 小机回头 → 关卡自动织成、小机不欢呼 → 转回;3-1(l10)打完小机当场故障演出并坏掉;
-   3-2 起说话只故障、不回头;打完 l15 点「继续」看完结局,「感谢游玩」黑屏时小机修好(calm)。
+5. 进第一纹对麦克风说「请指导我」→ 小机回头 → 关卡自动织成、小机不欢呼 → 转回;3-1(l11)打完小机当场故障演出并坏掉;
+   3-2 起说话只故障、不回头;打完 l16 点「继续」看完结局,「感谢游玩」黑屏时小机修好(calm)。
 6. 拔掉 USB → 游戏无报错照常玩。

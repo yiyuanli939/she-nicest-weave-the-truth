@@ -1,10 +1,13 @@
 class_name SaveManager
 extends RefCounted
 ## 存档:user://save.json。结构:
-## { solved: {level_id: true}, boards: {level_id: session.save_state()}, settings: {robot_turn: "right"|"left"} }
+## { layout: 关卡编排版本, solved: {level_id: true}, boards: {level_id: session.save_state()}, settings: {robot_turn: "right"|"left"} }
 ## settings 是设备/偏好设置(小机回头方向等),「重置进度」wipe() 不清它。
+## layout:关卡 id 整体重排后(2026-09-02 第一章加第三纹,l03 起后移一位),旧档里的 boards 是别的题目的棋盘,
+## load_state 会把旧题的线轴/目标织机整套换进来 —— 读到旧版本就丢弃 boards,只保留 solved(顶多错位一关,不伤进度)。
 
 const PATH := "user://save.json"
+const LAYOUT_VERSION := 2   # 1 = 15 关(2026-08);2 = 16 关(第一章加第三纹、第二章 2-2/2-3 对调、仪器按关上架)
 
 var solved: Dictionary = {}
 var boards: Dictionary = {}
@@ -18,8 +21,9 @@ static func open() -> SaveManager:
 		var d: Variant = JSON.parse_string(txt)
 		if d is Dictionary:
 			sm.solved = d.get("solved", {})
-			sm.boards = d.get("boards", {})
 			sm.settings = d.get("settings", {})
+			if int(d.get("layout", 1)) == LAYOUT_VERSION:   # JSON 数字读回是 float
+				sm.boards = d.get("boards", {})
 	return sm
 
 
@@ -28,7 +32,7 @@ func save() -> void:
 	if f == null:
 		push_error("存档写入失败: " + PATH)
 		return
-	f.store_string(JSON.stringify({solved = solved, boards = boards, settings = settings}))
+	f.store_string(JSON.stringify({layout = LAYOUT_VERSION, solved = solved, boards = boards, settings = settings}))
 
 
 func is_solved(level_id: StringName) -> bool:

@@ -1,5 +1,5 @@
 extends SceneTree
-## M3 全流程验收:清档 → 主菜单 → 逐关(15)开场对话→解题→「下一关」推进 →
+## M3 全流程验收:清档 → 主菜单 → 逐关(16)开场对话→解题→「下一关」推进 →
 ## 选关页 → 重进旧关棋盘恢复 → 关内笔记抽屉。
 ##   godot --path . --script res://tests/visual_smoke_m3.gd
 ## 退出码 0 = 全部通过。截图在 tests/screenshots/。
@@ -75,7 +75,7 @@ func _run() -> void:
 	# 逐关通关:第一关从菜单逻辑入口进,之后走「下一关」按钮
 	game.start_level(game.first_unsolved())
 	await _settle()
-	for i in 15:
+	for i in 16:
 		await _skip_story()   # 开场对话在进关前的 StoryScene 播,先跳过
 		var scene := current_scene as LevelScene
 		if scene == null:
@@ -84,11 +84,11 @@ func _run() -> void:
 		var lv: LevelDef = game.current
 		_check(bgm.slot == bgm.slot_for_chapter(game.current_chapter()), "%s BGM 槽位随章节" % lv.id)
 		var robot := root.get_node("/root/Robot")
-		if lv.id == &"l10":
-			_check(not robot.broken, "l10(3-1)进关小机还没坏")
-		elif lv.id == &"l11":
-			_check(robot.broken, "l11(3-2)起小机坏掉(3-1 通关瞬间)")
-		elif lv.id == &"l13":
+		if lv.id == &"l11":
+			_check(not robot.broken, "l11(3-1)进关小机还没坏")
+		elif lv.id == &"l12":
+			_check(robot.broken, "l12(3-2)起小机坏掉(3-1 通关瞬间)")
+		elif lv.id == &"l14":
 			_check(robot.broken and not robot.sent("say", "calm"), "第四章小机仍坏(修好在结局)")
 		var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 		LevelSolutions.apply(scene, board, lv.id)
@@ -100,16 +100,16 @@ func _run() -> void:
 			var lp: AudioStreamPlayer = bgm.active_player()
 			_check(lp.playing and lp.get_playback_position() > 0.0,
 					"关内曲播放头在推进(playing=%s pos=%.2f)" % [lp.playing, lp.get_playback_position()])
-		if lv.id == &"l10":
+		if lv.id == &"l11":
 			_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic"),
 					"3-1 通关瞬间小机坏掉(乱动 + 音效,没有台词)")
-		if lv.id == &"l08":
-			_shot("m3_l08_board")
+		if lv.id == &"l09":
+			_shot("m3_l09_board")
 		if game.next_level() != null:
 			scene._on_next()
 			await _settle()
 
-	_check(game.save.solved.size() == 15, "存档记录 15 关 (得 %d)" % game.save.solved.size())
+	_check(game.save.solved.size() == 16, "存档记录 16 关 (得 %d)" % game.save.solved.size())
 
 	# 选关页金印
 	game.goto_select()
@@ -134,21 +134,21 @@ func _run() -> void:
 		await _settle()
 		_check(current_scene is LevelScene, "对话播完自动进棋盘")
 
-	# 结局(剧情表注意事项②):l15 无进关对话;通关后「继续」→ 4-3 → 感谢游玩黑屏 → 开发者信息
-	game.start_level(game.catalog.all_levels()[14])
+	# 结局(剧情表注意事项②):l16 无进关对话;通关后「继续」→ 4-3 → 感谢游玩黑屏 → 开发者信息
+	game.start_level(game.catalog.all_levels()[15])
 	await _settle()
-	_check(current_scene is LevelScene, "l15(4-3 移到通关后)进关直接是棋盘")
-	var l15 := current_scene as LevelScene
-	_check(l15._next_btn.visible and l15._next_btn.text == "继续", "已通关的 l15 工具条显示「继续」")
+	_check(current_scene is LevelScene, "l16(4-3 移到通关后)进关直接是棋盘")
+	var l16 := current_scene as LevelScene
+	_check(l16._next_btn.visible and l16._next_btn.text == "继续", "已通关的 l16 工具条显示「继续」")
 	var robot_end := root.get_node("/root/Robot")
 	_check(robot_end.broken, "结局前小机仍是坏的")
-	l15._on_next()
+	l16._on_next()
 	await _settle()
 	var outro := current_scene as StoryScene
 	_check(outro != null and game.current.outro_dialogue != null and game.current.outro_dialogue.lines.size() > 0,
-			"「继续」→ 全屏结局剧情(l15.outro_dialogue)")
+			"「继续」→ 全屏结局剧情(l16.outro_dialogue)")
 	if outro != null:
-		_shot("m3_l15_outro")
+		_shot("m3_l16_outro")
 		outro.finish()
 		await _wait(StoryScene.THANKS_FADE_SEC + 0.3)
 		_shot("m3_thanks")
@@ -158,40 +158,40 @@ func _run() -> void:
 		_check(not robot_end.broken and robot_end.sent("say", "calm"), "结局黑屏时小机修好(calm)")
 		_shot("m3_credits")
 
-	# 棋盘恢复:重进 l03 应已是通关棋盘
-	game.start_level(game.catalog.all_levels()[2])
+	# 棋盘恢复:重进 l04 应已是通关棋盘
+	game.start_level(game.catalog.all_levels()[3])
 	await _settle()
 	await _skip_story()
-	var l03 := current_scene as LevelScene
-	_check(l03.session.get_node_ids().size() == 4, "l03 棋盘恢复(线轴+目标+两台仪器)")
-	_check(l03.session.is_solved(), "l03 恢复后仍通关")
-	_shot("m3_l03_restored")
+	var l04 := current_scene as LevelScene
+	_check(l04.session.get_node_ids().size() == 4, "l04(原第三纹 B & A)棋盘恢复(线轴+目标+两台仪器)")
+	_check(l04.session.is_solved(), "l04 恢复后仍通关")
+	_shot("m3_l04_restored")
 
 	# 右键删节点回归(真实输入,点在节点正中):右键仪器 → 删;右键线轴 → 不删;Ctrl+Z 撤回
-	var l03_board: ProofBoard = l03.find_children("*", "ProofBoard", true, false)[0]
-	var spool_node := l03_board.get_node("n%d" % l03.session.assumption_ids[0]) as MachineNode
+	var l04_board: ProofBoard = l04.find_children("*", "ProofBoard", true, false)[0]
+	var spool_node := l04_board.get_node("n%d" % l04.session.assumption_ids[0]) as MachineNode
 	_click(spool_node.get_global_rect().get_center(), MOUSE_BUTTON_RIGHT)
 	await _settle()
-	_check(l03.session.get_node_ids().size() == 4, "右键线轴不应删除")
+	_check(l04.session.get_node_ids().size() == 4, "右键线轴不应删除")
 	var machine_id := -1
-	for id in l03.session.get_node_ids():
-		if l03.session.describe_node(id).type == ProofSession.NodeType.MACHINE:
+	for id in l04.session.get_node_ids():
+		if l04.session.describe_node(id).type == ProofSession.NodeType.MACHINE:
 			machine_id = id
 			break
-	var machine_node := l03_board.get_node("n%d" % machine_id) as MachineNode
+	var machine_node := l04_board.get_node("n%d" % machine_id) as MachineNode
 	_click(machine_node.get_global_rect().get_center(), MOUSE_BUTTON_RIGHT)
 	await _settle()
-	_check(l03.session.get_node_ids().size() == 3, "右键仪器正中(曾是 spacer 死区)应删除该节点")
-	_check(l03_board.get_node_or_null("n%d" % machine_id) == null, "视图节点应同步移除")
-	l03.session.undo()
+	_check(l04.session.get_node_ids().size() == 3, "右键仪器正中(曾是 spacer 死区)应删除该节点")
+	_check(l04_board.get_node_or_null("n%d" % machine_id) == null, "视图节点应同步移除")
+	l04.session.undo()
 	await _settle()
-	_check(l03.session.get_node_ids().size() == 4 and l03.session.is_solved(), "撤销后节点与通关态恢复")
+	_check(l04.session.get_node_ids().size() == 4 and l04.session.is_solved(), "撤销后节点与通关态恢复")
 
-	# 关内诺拉的笔记抽屉:只显示本关上架仪器的说明(l03 第一章 = 2 台),划出后截图
-	l03._on_open_notebook()
-	await l03._notebook_ui.slide_finished
+	# 关内诺拉的笔记抽屉:只显示本关上架仪器的说明(l04 第一章 = 2 台),划出后截图
+	l04._on_open_notebook()
+	await l04._notebook_ui.slide_finished
 	await _settle()
-	_check(l03._notebook_ui.is_open() and l03._notebook_ui._entries.size() == 2, "笔记抽屉划出,第一章两台仪器说明")
+	_check(l04._notebook_ui.is_open() and l04._notebook_ui._entries.size() == 2, "笔记抽屉划出,第一章两台仪器说明")
 	_shot("m3_notebook")
 
 	print("M3_SMOKE_FAILS=", _fails)

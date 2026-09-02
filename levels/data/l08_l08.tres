@@ -1,87 +1,71 @@
 [gd_resource type="Resource" script_class="LevelDef" format=3]
 
-[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_1j3q3"]
-[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_trim7"]
-[ext_resource type="Script" path="res://levels/level_def.gd" id="3_na7fi"]
+[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_flmij"]
+[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_e2nhv"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="3_whgl2"]
 
-[sub_resource type="Resource" id="Resource_1j3q3"]
-script = ExtResource("1_1j3q3")
+[sub_resource type="Resource" id="Resource_flmij"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_e2nhv"]
+script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
-text = "莉娅，刚才那台旧织机怎么同时闪了两道光？你停机也太熟练了，难道经常这样？"
+text = "在检验台下面。我昨晚才发现是您的。给您。"
 scene = "工坊"
-nora_expr = "惊讶"
+left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_trim7"]
-script = ExtResource("1_1j3q3")
+[sub_resource type="Resource" id="Resource_whgl2"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "谢谢。你翻过吗？"
+scene = "工坊"
+left_char = "亚瑟"
+
+[sub_resource type="Resource" id="Resource_568a1"]
+script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
-text = "刚才那两道光是怎么回事？"
+text = "只看见了几页。那些规则……和我们的织法很像。"
 scene = "工坊"
-nora_expr = "惊讶"
+left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_na7fi"]
-script = ExtResource("1_1j3q3")
-speaker = "莉娅·科尔宾"
-text = "三号静语丝受潮后的“余响”。上一种状态有时候不会立刻消干净，会和下一种叠一小会儿。"
+[sub_resource type="Resource" id="Resource_8tgij"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。"
 scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
-nora_expr = "惊讶"
+left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_1trig"]
-script = ExtResource("1_1j3q3")
+[sub_resource type="Resource" id="Resource_bpotd"]
+script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
-text = "学院知道吗？"
+text = "可如果规则完全一样呢？"
 scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
+left_char = "亚瑟"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_dbvdn"]
-script = ExtResource("1_1j3q3")
-speaker = "莉娅·科尔宾"
-text = "我两年前就写过。湿度、线批、出现次数，全记了。"
+[sub_resource type="Resource" id="Resource_hnd1j"]
+script = ExtResource("1_flmij")
+speaker = "亚瑟·威客利夫"
+text = "那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。"
 scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
+left_char = "亚瑟"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_mn6vw"]
-script = ExtResource("1_1j3q3")
-speaker = "莉娅·科尔宾"
-text = "他们把纸退回来，说“缺乏合资格观察者确认，不纳入公档”。后来我就把它钉在我们自己的记录册里了。"
-scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
-nora_expr = "苦恼"
-
-[sub_resource type="Resource" id="Resource_fq3od"]
-script = ExtResource("1_1j3q3")
-speaker = "诺拉·拉芙蒂"
-text = "可如果它真的会影响机器呢？"
-scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
-nora_expr = "苦恼"
-
-[sub_resource type="Resource" id="Resource_r0vmd"]
-script = ExtResource("1_1j3q3")
-speaker = "莉娅·科尔宾"
-text = "那就等机器出事以后，他们再派一位先生来重新发现一遍吧。"
-scene = "工坊"
-left_char = "莉娅"
-left_expr = "苦恼"
-nora_expr = "苦恼"
-
-[sub_resource type="Resource" id="Resource_3gfex"]
-script = ExtResource("2_trim7")
-lines = Array[ExtResource("1_1j3q3")]([SubResource("Resource_1j3q3"), SubResource("Resource_trim7"), SubResource("Resource_na7fi"), SubResource("Resource_1trig"), SubResource("Resource_dbvdn"), SubResource("Resource_mn6vw"), SubResource("Resource_fq3od"), SubResource("Resource_r0vmd")])
+[sub_resource type="Resource" id="Resource_jljsi"]
+script = ExtResource("2_e2nhv")
+lines = Array[ExtResource("1_flmij")]([SubResource("Resource_flmij"), SubResource("Resource_e2nhv"), SubResource("Resource_whgl2"), SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j")])
 
 [resource]
-script = ExtResource("3_na7fi")
+script = ExtResource("3_whgl2")
 id = &"l08"
-title = "第四纹"
-goal = "A > (B > A)"
-allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim"])
-atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_3gfex")
+title = "第三纹"
+assumptions = Array[String](["A > B", "B > C"])
+goal = "A > C"
+allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro"])
+atoms = Array[StringName]([&"A", &"B", &"C"])
+intro_dialogue = SubResource("Resource_jljsi")
 robot_cue_on_win = "celebrate"

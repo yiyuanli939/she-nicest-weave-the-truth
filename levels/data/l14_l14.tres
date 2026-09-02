@@ -1,49 +1,61 @@
 [gd_resource type="Resource" script_class="LevelDef" format=3]
 
-[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_83lky"]
-[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_koucd"]
-[ext_resource type="Script" path="res://levels/level_def.gd" id="3_cy8qg"]
+[ext_resource type="Script" path="res://narrative/dialogue_line.gd" id="1_6k73p"]
+[ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_qyfhi"]
+[ext_resource type="Script" path="res://levels/level_def.gd" id="3_2v4km"]
 
-[sub_resource type="Resource" id="Resource_83lky"]
-script = ExtResource("1_83lky")
+[sub_resource type="Resource" id="Resource_6k73p"]
+script = ExtResource("1_6k73p")
+speaker = "亚瑟·威客利夫"
+text = "我们已经关闭大部分自动机，但停机前的记录更糟。同一扇门被要求同时开启、锁死、报警，甚至执行和门毫无关系的命令。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_qyfhi"]
+script = ExtResource("1_6k73p")
+speaker = "亚瑟·威客利夫"
+text = "推演记录里出现了矛盾。一旦系统得到某命题与它的否定，就会形成底部矛盾；而现行程式允许从矛盾推出任意后续命令。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_2v4km"]
+script = ExtResource("1_6k73p")
 speaker = "诺拉·拉芙蒂"
-text = "学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。"
-scene = "诺拉房间"
-nora_expr = "苦恼"
+text = "所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_koucd"]
-script = ExtResource("1_83lky")
+[sub_resource type="Resource" id="Resource_5y1rg"]
+script = ExtResource("1_6k73p")
+speaker = "亚瑟·威客利夫"
+text = "……是。我们原以为推演器损坏了。但目前没有发现非法推演。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="Resource_7lqpg"]
+script = ExtResource("1_6k73p")
 speaker = "诺拉·拉芙蒂"
-text = "如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。"
-scene = "诺拉房间"
-nora_expr = "苦恼"
+text = "那就不是结论出了问题。要往前找。"
+scene = "伦敦街上"
+left_char = "亚瑟"
+nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_cy8qg"]
-script = ExtResource("1_83lky")
-speaker = "诺拉·拉芙蒂"
-text = "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
-scene = "诺拉房间"
-nora_expr = "苦恼"
-
-[sub_resource type="Resource" id="Resource_24q0c"]
-script = ExtResource("1_83lky")
-speaker = "诺拉·拉芙蒂"
-text = "学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。"
-scene = "诺拉房间"
-nora_expr = "苦恼"
-
-[sub_resource type="Resource" id="Resource_rtuof"]
-script = ExtResource("2_koucd")
-lines = Array[ExtResource("1_83lky")]([SubResource("Resource_83lky"), SubResource("Resource_koucd"), SubResource("Resource_cy8qg"), SubResource("Resource_24q0c")])
+[sub_resource type="Resource" id="Resource_nwmgp"]
+script = ExtResource("2_qyfhi")
+lines = Array[ExtResource("1_6k73p")]([SubResource("Resource_6k73p"), SubResource("Resource_qyfhi"), SubResource("Resource_2v4km"), SubResource("Resource_5y1rg"), SubResource("Resource_7lqpg")])
 
 [resource]
-script = ExtResource("3_cy8qg")
+script = ExtResource("3_2v4km")
 id = &"l14"
-title = "第二纹"
-assumptions = Array[String](["A > B"])
-goal = "(B > false) > (A > false)"
-allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim", &"false_elim"])
-atoms = Array[StringName]([&"A", &"B"])
+title = "第一纹"
+assumptions = Array[String](["false"])
+goal = "A"
+allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro", &"or_intro", &"or_elim", &"false_elim"])
+atoms = Array[StringName]([&"A"])
 allow_bot = true
-intro_dialogue = SubResource("Resource_rtuof")
+intro_dialogue = SubResource("Resource_nwmgp")
 robot_cue_on_win = "celebrate"
