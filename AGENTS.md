@@ -79,6 +79,10 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   `run_tests.gd` 开头已 `await process_frame`;新写 SceneTree 脚本照做。
 - **存档里的钉是外部边界**:`from_dict` 只收"可钉口 + 全染色"的钉;含 `?` 的钉值
   会让 `Unifier.walk` 追自己死循环。
+- **`AudioStreamWAV` 运行时设 `loop_mode` 必须同时设 `loop_end`**:导入器只在 `.import` 选了 Forward 时才写循环点,
+  「Detect From WAV」+ 无 smpl 块的 wav 导入后 `loop_end=0`,只开 `loop_mode` 会让混音在第 0 帧就碰到循环末尾、
+  混 1 帧即停(关内无声,`playing` 下一帧翻 false;只查 `loop_mode`/`playing` 的测试看不出来)。循环统一走
+  `Bgm.set_looping`(没有循环点就整曲循环),有测试盯。
 
 ## 当前进度
 

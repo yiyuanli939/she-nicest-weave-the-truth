@@ -80,10 +80,40 @@ func test_level_slots_share_one_looping_track() -> bool:
 	var p1: AudioStreamPlayer = bgm.active_player()
 	ok = check(p1 != p0 and p1.playing and p1.stream != null, "进关内换播放器播关内曲") and ok
 	ok = check(p1.stream is AudioStreamWAV and p1.stream.get("loop_mode") == AudioStreamWAV.LOOP_FORWARD, "关内曲 wav 已设循环") and ok
+	var wav := p1.stream as AudioStreamWAV
+	var frames := int(round(wav.get_length() * wav.mix_rate))
+	ok = check(wav.loop_begin == 0 and wav.loop_end == frames - 1 and frames > 44100, "关内曲 wav 循环点覆盖整曲(导入无 smpl 块时 loop_end 默认 0:只设 loop_mode 会混 1 帧即停 → 关内无声),得 %d..%d / %d 帧" % [wav.loop_begin, wav.loop_end, frames]) and ok
 	bgm.play(&"level_3")
 	ok = check(bgm.slot == &"level_3" and bgm.active_player() == p1 and p1.playing, "换章但同一首:不重启不换播放器") and ok
 	bgm.play(&"title")
 	ok = check(bgm.active_player() == p0 and p0.playing, "回标题换回标题曲") and ok
 	tree.root.remove_child(bgm)
 	bgm.free()
+	return ok
+
+
+func test_set_looping_covers_whole_wav_and_keeps_existing_loop_points() -> bool:
+	var B: GDScript = load(BGM_SCRIPT)
+	var ok := true
+	var pcm := PackedByteArray()
+	pcm.resize(1000 * 2)   # 1000 帧 16-bit 单声道静音
+	# 没有循环点的 wav(导入器「Detect From WAV」+ 无 smpl 块的产物):整曲循环,loop_end = 帧数-1(导入器 loop_end=-1 的约定)
+	var plain := AudioStreamWAV.new()
+	plain.format = AudioStreamWAV.FORMAT_16_BITS
+	plain.stereo = false
+	plain.mix_rate = 44100
+	plain.data = pcm
+	B.set_looping(plain)
+	ok = check(plain.loop_mode == AudioStreamWAV.LOOP_FORWARD and plain.loop_begin == 0 and plain.loop_end == 999, "无循环点的 wav → 整曲循环 0..999,得 %d..%d" % [plain.loop_begin, plain.loop_end]) and ok
+	# 自带循环点的 wav(smpl 块 / .import 手填的无缝循环):原样保留
+	var cut := AudioStreamWAV.new()
+	cut.format = AudioStreamWAV.FORMAT_16_BITS
+	cut.data = pcm
+	cut.loop_begin = 10
+	cut.loop_end = 100
+	B.set_looping(cut)
+	ok = check(cut.loop_mode == AudioStreamWAV.LOOP_FORWARD and cut.loop_begin == 10 and cut.loop_end == 100, "自带循环点的 wav 原样保留,得 %d..%d" % [cut.loop_begin, cut.loop_end]) and ok
+	var mp3 := AudioStreamMP3.new()
+	B.set_looping(mp3)
+	ok = check(mp3.loop, "mp3 设 loop") and ok
 	return ok

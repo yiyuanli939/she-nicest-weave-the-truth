@@ -90,7 +90,7 @@ func active_player() -> AudioStreamPlayer:
 	return _players[_active]
 
 
-## 按路径缓存加载;三种格式都设循环,音乐同学交 mp3 / ogg / wav 都行
+## 按路径缓存加载;三种格式都经 set_looping 设整曲循环,音乐同学交 mp3 / ogg / wav 都行
 func _stream_for(s: StringName) -> AudioStream:
 	var path: String = TRACKS.get(s, "")
 	if path == "":
@@ -101,9 +101,20 @@ func _stream_for(s: StringName) -> AudioStream:
 	if stream == null:
 		push_warning("Bgm: 加载失败 %s(槽位 %s)" % [path, s])
 		return null
+	set_looping(stream)
+	_streams[path] = stream
+	return stream
+
+
+## 整曲循环。wav 要连循环点一起设:导入器只在 .import 选了 Forward 时才写 loop_end,「Detect From WAV」+ 无 smpl 块
+## 的 wav 导入后 loop_end=0,只开 loop_mode 会让混音在第 0 帧就碰到循环末尾、混 1 帧即停(关内无声,2026-09 踩过)。
+## 没有循环点就整曲循环(loop_end = 帧数-1,与导入器 loop_end=-1 的约定一致);wav 自带 smpl 循环点则保留。
+static func set_looping(stream: AudioStream) -> void:
 	if stream is AudioStreamMP3 or stream is AudioStreamOggVorbis:
 		stream.loop = true
 	elif stream is AudioStreamWAV:
-		stream.loop_mode = AudioStreamWAV.LOOP_FORWARD
-	_streams[path] = stream
-	return stream
+		var wav := stream as AudioStreamWAV
+		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		if wav.loop_end <= wav.loop_begin:
+			wav.loop_begin = 0
+			wav.loop_end = int(round(wav.get_length() * wav.mix_rate)) - 1

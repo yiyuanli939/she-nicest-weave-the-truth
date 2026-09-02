@@ -94,6 +94,12 @@ func _run() -> void:
 		LevelSolutions.apply(scene, board, lv.id)
 		await _settle()
 		_check(scene.session.is_solved(), "%s %s 通关" % [lv.id, lv.title])
+		if i == 0:
+			# 关内曲真的在响:wav 循环点缺 loop_end 时混 1 帧即停、playing 翻 false、播放头停在 0
+			# (自动通关跑得快,从故事界面起播到这里可能不到半秒,只要求 > 0)
+			var lp: AudioStreamPlayer = bgm.active_player()
+			_check(lp.playing and lp.get_playback_position() > 0.0,
+					"关内曲播放头在推进(playing=%s pos=%.2f)" % [lp.playing, lp.get_playback_position()])
 		if lv.id == &"l10":
 			_check(robot.broken and robot.sent("anim", "panic") and not robot.sent("say", "panic"),
 					"3-1 通关瞬间小机坏掉(乱动 + 音效,没有台词)")

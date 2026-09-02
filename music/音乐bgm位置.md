@@ -17,6 +17,8 @@
    某章要单独配曲:放 `music/level_N.mp3`,把 `TRACKS` 里那一章改成它。
 2. 新槽位第一次填曲:`game/bgm.gd` `TRACKS` 里把该槽位的 `""` 改成 `"res://music/<槽位>.mp3"`;之后换曲不用改代码。
 3. `godot --headless --path . --import` 生成 `.import`(和音频文件一起提交),再跑 `tests/run_tests.gd`(会检查表里的文件都存在)。
+   wav 不用在 `.import` 里设循环:引擎运行时(`Bgm.set_looping`)把没有循环点的 wav 设成整曲循环;
+   wav 自带 smpl 循环点(剪好首尾的无缝循环)会保留。
 4. 在这张表里补上曲目 / 演奏 / 授权;开发者信息页的署名在 `ui/credits_scene.gd` `LINES`。
 
 循环接缝:MP3 从头循环会有编码填充的小空隙,想无缝循环交剪好首尾的 OGG。
