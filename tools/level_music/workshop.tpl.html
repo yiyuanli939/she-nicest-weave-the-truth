@@ -1,0 +1,97 @@
+<title>静语纹关内曲工坊</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--ground:#ECE6D8;--panel:#F7F3EA;--panel2:#E4DCCB;--ink:#262320;--muted:#6E6558;--line:#D3C9B4;--brass:#9A7A2C;--brass-soft:#E6D6A6;--thread:#2E6F69;--thread-soft:#CFE3DF;--roll:#F1ECDF;--focus:#2E6F69;
+ --serif:"Noto Serif SC","Songti SC","STSong",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB",sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ground:#1E1B17;--panel:#27231E;--panel2:#332D26;--ink:#EDE6D7;--muted:#A89E8E;--line:#3F3730;--brass:#D3AB4C;--brass-soft:#4A3C1C;--thread:#74B8B0;--thread-soft:#1F3B38;--roll:#1A1714;--focus:#74B8B0;}}
+:root[data-theme="dark"]{--ground:#1E1B17;--panel:#27231E;--panel2:#332D26;--ink:#EDE6D7;--muted:#A89E8E;--line:#3F3730;--brass:#D3AB4C;--brass-soft:#4A3C1C;--thread:#74B8B0;--thread-soft:#1F3B38;--roll:#1A1714;--focus:#74B8B0;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+h1{font-family:var(--serif);font-weight:700;font-size:22px;margin:0;letter-spacing:.02em}
+h1 small{font-family:var(--sans);font-weight:400;font-size:13px;color:var(--muted);margin-left:12px}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.ctl label{text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-family:var(--mono)}
+input[type=range]{accent-color:var(--brass);width:140px}
+button{font:inherit;cursor:pointer;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:5px 10px}
+button:hover{border-color:var(--brass)}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+button.primary{background:var(--brass);border-color:var(--brass);color:#fff;font-weight:500}
+main{padding:18px 24px 60px;max-width:1180px}
+.intro{color:var(--muted);font-size:13px;margin:0 0 16px;max-width:70ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card.playing{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass-soft)}
+.card h2{font-family:var(--serif);font-size:19px;margin:0;display:flex;align-items:baseline;gap:10px}
+.card h2 .id{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.06em}
+.mood{color:var(--muted);font-size:13px;margin:0}
+.meta{display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted);flex-wrap:wrap;font-variant-numeric:tabular-nums}
+canvas.roll{width:100%;height:96px;background:var(--roll);border:1px solid var(--line);border-radius:4px;display:block}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.play{min-width:84px}
+.play.on{background:var(--thread);border-color:var(--thread);color:#fff}
+.bar{flex:1;height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;min-width:80px}
+.bar i{display:block;height:100%;width:0;background:var(--brass)}
+.chap{display:flex;gap:6px;flex-wrap:wrap}
+.chap button{font-size:12px;padding:3px 9px}
+.chap button.sel{background:var(--thread-soft);border-color:var(--thread);color:var(--ink)}
+.tracks{font-size:12px;color:var(--muted)}
+#out{display:none;margin-top:16px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;white-space:pre-wrap}
+.toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:var(--ground);padding:8px 14px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+.summary{margin:18px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 18px;font-size:13px}
+.summary b{font-family:var(--mono);font-weight:600;color:var(--brass);margin-right:8px}
+</style>
+<header>
+ <h1>静语纹关内曲工坊<small>五首自作循环曲 · 页面里现场合成 · 给四章各挑一首</small></h1>
+ <div class="ctl"><label>音量</label><input id="vol" type="range" min="0" max="1" step="0.05" value="0.7"></div>
+ <div class="ctl"><button class="primary" id="copy">复制选择结果</button><button id="stopall">全部停止</button></div>
+</header>
+<main>
+ <p class="intro">每首都是按小节写死的音符数据(不是随机生成),用浏览器的 Web Audio 现场合成、无缝循环。点「播放」试听,再用下面的章节按钮把它指派给第一到第四章;同一章只能一首,没指派的章保持现在的 level.wav。选定后点「复制选择结果」贴给我,我用同一份音符数据离线渲染成 wav 放进 music/ 并填槽位表。</p>
+ <div class="grid" id="grid"></div>
+ <div class="summary" id="summary"></div>
+ <div id="out"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const P=JSON.parse(document.getElementById('data').textContent);
+const CH=['第一章 并纹','第二章 叠层纹','第三章 岔纹','第四章 焦纹'];
+const KEY='she-nicest-level-music-v1';
+let assign={};try{assign=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){assign={}}
+let ctx=null,master=null,wet=null,comp=null,noiseBuf=null;
+let playing=null;   // {id, t0, loopLen, timer, nodes:[], nextLoop}
+const vol=document.getElementById('vol');
+function ensureCtx(){if(ctx)return;ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=parseFloat(vol.value);comp=ctx.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=3;comp.attack.value=0.01;comp.release.value=0.25;const conv=ctx.createConvolver();conv.buffer=impulse(2.4);wet=ctx.createGain();wet.gain.value=0.24;master.connect(comp);master.connect(conv);conv.connect(wet);wet.connect(comp);comp.connect(ctx.destination);const n=ctx.sampleRate*1.0;noiseBuf=ctx.createBuffer(1,n,ctx.sampleRate);const d=noiseBuf.getChannelData(0);let s=1234567;for(let i=0;i<n;i++){s=(s*1664525+1013904223)>>>0;d[i]=(s/4294967296)*2-1}}
+function impulse(sec){const n=Math.floor(ctx.sampleRate*sec),b=ctx.createBuffer(2,n,ctx.sampleRate);for(let c=0;c<2;c++){const d=b.getChannelData(c);let s=98765+c;for(let i=0;i<n;i++){s=(s*1664525+1013904223)>>>0;const x=(s/4294967296)*2-1;d[i]=x*Math.pow(1-i/n,2.6)*0.5}}return b}
+vol.oninput=()=>{if(master)master.gain.setTargetAtTime(parseFloat(vol.value),ctx.currentTime,0.02)};
+const f=m=>440*Math.pow(2,(m-69)/12);
+function osc(type,freq,t,stopAt,detune){const o=ctx.createOscillator();o.type=type;o.frequency.value=freq;if(detune)o.detune.value=detune;o.start(t);o.stop(stopAt);return o}
+function env(g,t,a,peak,decayTo,decaySec,rel,end){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(peak,0.0002),t+a);if(decaySec>0)g.gain.setTargetAtTime(Math.max(decayTo,0.0001),t+a,decaySec/4);g.gain.setTargetAtTime(0.0001,end,rel/4)}
+function note(inst,dest,t,dur,m,v,nodes){const fr=f(m);const g=ctx.createGain();g.connect(dest);let end=t+dur,stopAt;
+ switch(inst){
+ case 'musicbox':{stopAt=t+Math.max(dur,1.4)+0.4;const o=osc('sine',fr,t,stopAt);o.connect(g);env(g,t,0.003,v,0.0001,Math.max(dur,1.2)*1.6,0.2,end+0.6);const g2=ctx.createGain();g2.connect(dest);const o2=osc('sine',fr*4,t,t+0.5);o2.connect(g2);env(g2,t,0.002,v*0.18,0.0001,0.25,0.05,t+0.25);nodes.push(o,o2);break}
+ case 'pluck':{stopAt=end+0.9;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.Q.value=1.2;lp.frequency.setValueAtTime(2600,t);lp.frequency.setTargetAtTime(500,t,0.12);lp.connect(g);const o=osc('sawtooth',fr,t,stopAt);o.connect(lp);const o2=osc('triangle',fr,t,stopAt);o2.connect(lp);env(g,t,0.004,v*0.7,v*0.12,0.5,0.25,end);nodes.push(o,o2);break}
+ case 'harpsi':{stopAt=t+0.6;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=3200;lp.connect(g);const o=osc('square',fr,t,stopAt);o.connect(lp);const o2=osc('sawtooth',fr*2,t,stopAt);const g2=ctx.createGain();g2.gain.value=0.25;o2.connect(g2);g2.connect(lp);env(g,t,0.003,v*0.45,0.0001,0.32,0.06,t+0.4);nodes.push(o,o2);break}
+ case 'piano':{stopAt=end+0.8;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=2400;lp.connect(g);const o=osc('triangle',fr,t,stopAt);o.connect(lp);const o2=osc('sine',fr*2,t,stopAt);const g2=ctx.createGain();g2.gain.value=0.2;o2.connect(g2);g2.connect(lp);const o3=osc('sine',fr,t,stopAt);const g3=ctx.createGain();g3.gain.value=0.5;o3.connect(g3);g3.connect(lp);env(g,t,0.005,v*0.6,v*0.2,0.9,0.35,end);nodes.push(o,o2,o3);break}
+ case 'pad':{stopAt=end+1.6;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=850;lp.Q.value=0.5;lp.connect(g);const o=osc('sawtooth',fr,t,stopAt,-7);const o2=osc('sawtooth',fr,t,stopAt,7);o.connect(lp);o2.connect(lp);g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v*0.35,t+0.9);g.gain.setValueAtTime(v*0.35,end-0.2);g.gain.linearRampToValueAtTime(0.0001,end+1.3);nodes.push(o,o2);break}
+ case 'bass':{stopAt=end+0.3;const o=osc('sine',fr,t,stopAt);o.connect(g);const o2=osc('triangle',fr,t,stopAt);const g2=ctx.createGain();g2.gain.value=0.35;o2.connect(g2);g2.connect(g);env(g,t,0.01,v*0.8,v*0.55,0.6,0.15,end);nodes.push(o,o2);break}
+ case 'bell':{stopAt=t+2.2;const parts=[[1,1,1.6],[2.76,0.4,0.9],[5.4,0.15,0.45]];for(const [r,a,dec] of parts){const gg=ctx.createGain();gg.connect(dest);const o=osc('sine',fr*r,t,stopAt);o.connect(gg);env(gg,t,0.002,v*a*0.6,0.0001,dec*1.6,0.1,t+dec*2);nodes.push(o)}break}
+ case 'tick':{stopAt=t+0.08;const src=ctx.createBufferSource();src.buffer=noiseBuf;src.start(t);src.stop(stopAt);const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1500;bp.Q.value=1.6;src.connect(bp);bp.connect(g);env(g,t,0.002,v*0.5,0.0001,0.03,0.01,t+0.03);nodes.push(src);break}
+ case 'block':{stopAt=t+0.12;const o=osc('sine',fr*1.5,t,stopAt);o.frequency.setTargetAtTime(fr*0.9,t,0.02);o.connect(g);env(g,t,0.002,v*0.6,0.0001,0.06,0.02,t+0.06);nodes.push(o);break}
+ case 'drone':{stopAt=end+0.8;const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=420;lp.connect(g);const o=osc('sawtooth',fr,t,stopAt,-5);const o2=osc('sawtooth',fr,t,stopAt,5);const o3=osc('sine',fr,t,stopAt);o.connect(lp);o2.connect(lp);o3.connect(g);g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v*0.3,t+0.5);g.gain.setValueAtTime(v*0.3,end-0.1);g.gain.linearRampToValueAtTime(0.0001,end+0.6);nodes.push(o,o2,o3);break}
+ }}
+function scheduleLoop(p,st,loopStart){const bl=60/p.bpm;for(const tr of p.tracks){const tg=ctx.createGain();tg.gain.value=tr.gain;tg.connect(master);st.trackGains.push(tg);for(const [b,d,m,v] of tr.notes)note(tr.inst,tg,loopStart+b*bl,Math.max(d*bl,0.03),m,v,st.nodes)}}
+function play(id){ensureCtx();if(ctx.state==='suspended')ctx.resume();if(playing&&playing.id===id){stop();return}stop();const p=P.find(x=>x.id===id);const t0=ctx.currentTime+0.12;const st={id,t0,loopLen:p.duration,nodes:[],trackGains:[],nextLoop:0,timer:null};playing=st;const tick=()=>{if(playing!==st)return;while(st.t0+st.nextLoop*st.loopLen<ctx.currentTime+1.2){scheduleLoop(p,st,st.t0+st.nextLoop*st.loopLen);st.nextLoop++;st.nodes=st.nodes.filter(n=>true)}};tick();st.timer=setInterval(tick,250);document.querySelectorAll('.card').forEach(c=>{const on=c.dataset.id===id;c.classList.toggle('playing',on);const b=c.querySelector('.play');b.classList.toggle('on',on);b.textContent=on?'■ 停止':'▶ 播放'});anim()}
+function stop(){if(!playing)return;const st=playing;playing=null;clearInterval(st.timer);const now=ctx.currentTime;for(const g of st.trackGains){g.gain.setTargetAtTime(0.0001,now,0.05)}setTimeout(()=>{for(const n of st.nodes){try{n.stop()}catch(e){}}},400);document.querySelectorAll('.card').forEach(c=>{c.classList.remove('playing');const b=c.querySelector('.play');b.classList.remove('on');b.textContent='▶ 播放';c.querySelector('.bar i').style.width='0'})}
+function anim(){if(!playing)return;const st=playing;const pos=((ctx.currentTime-st.t0)%st.loopLen+st.loopLen)%st.loopLen;const c=document.querySelector(`.card[data-id="${st.id}"] .bar i`);if(c)c.style.width=(100*pos/st.loopLen)+'%';requestAnimationFrame(anim)}
+function drawRoll(cv,p){const dpr=window.devicePixelRatio||1;const W=cv.clientWidth||600,H=96;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.scale(dpr,dpr);const bl=60/p.bpm;let lo=127,hi=0;for(const tr of p.tracks)for(const n of tr.notes){if(tr.inst==='tick'||tr.inst==='block')continue;lo=Math.min(lo,n[2]);hi=Math.max(hi,n[2])}const span=Math.max(hi-lo,12);const cs=getComputedStyle(document.documentElement);g.strokeStyle=cs.getPropertyValue('--line');g.lineWidth=1;for(let b=0;b<=p.bars;b+=Math.max(1,Math.round(p.bars/8))){const x=b*p.beats_per_bar*bl/p.duration*W;g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}const colors={musicbox:cs.getPropertyValue('--brass'),pluck:cs.getPropertyValue('--brass'),harpsi:cs.getPropertyValue('--thread'),piano:cs.getPropertyValue('--brass'),pad:cs.getPropertyValue('--thread'),bass:cs.getPropertyValue('--ink'),bell:cs.getPropertyValue('--brass'),drone:cs.getPropertyValue('--thread'),tick:cs.getPropertyValue('--muted'),block:cs.getPropertyValue('--muted')};for(const tr of p.tracks){g.fillStyle=colors[tr.inst]||'#888';g.globalAlpha=(tr.inst==='tick'||tr.inst==='block')?0.25:0.85;for(const [b,d,m,v] of tr.notes){const x=b*bl/p.duration*W,w=Math.max(1.5,d*bl/p.duration*W);let y;if(tr.inst==='tick'||tr.inst==='block'){y=H-4}else{y=H-6-((m-lo)/span)*(H-12)}g.fillRect(x,y-1.5,w-0.5,3)}}g.globalAlpha=1}
+function render(){const grid=document.getElementById('grid');grid.innerHTML='';for(const p of P){const card=document.createElement('div');card.className='card';card.dataset.id=p.id;card.innerHTML=`<h2>${p.name}<span class="id">${p.id}</span></h2><p class="mood">${p.mood}</p><div class="meta"><span>${p.key}</span><span>${p.meter}</span><span>${p.bpm} bpm</span><span>${p.bars} 小节 · ${p.duration.toFixed(1)} s 循环</span><span>${p.note_count} 音</span></div><canvas class="roll"></canvas><div class="row"><button class="play">▶ 播放</button><div class="bar"><i></i></div></div><div class="tracks">${p.tracks.map(t=>t.name+'('+t.inst+')').join(' · ')}</div><div class="chap">${CH.map((c,i)=>`<button data-ch="${i+1}" class="${assign['level_'+(i+1)]===p.id?'sel':''}">${c.slice(0,3)}</button>`).join('')}</div>`;card.querySelector('.play').onclick=()=>play(p.id);card.querySelectorAll('.chap button').forEach(b=>{b.onclick=()=>{const k='level_'+b.dataset.ch;assign[k]=assign[k]===p.id?'':p.id;try{localStorage.setItem(KEY,JSON.stringify(assign))}catch(e){}render()}});grid.appendChild(card);drawRoll(card.querySelector('canvas'),p)}summary()}
+function summary(){const s=document.getElementById('summary');s.innerHTML=CH.map((c,i)=>{const id=assign['level_'+(i+1)];const p=P.find(x=>x.id===id);return `<div><b>level_${i+1}</b>${c}:${p?p.name:'现用 level.wav'}</div>`}).join('')}
+document.getElementById('copy').onclick=()=>{const lines=CH.map((c,i)=>{const id=assign['level_'+(i+1)];const p=P.find(x=>x.id===id);return `level_${i+1}: ${p?p.id:'(保持 level.wav)'}   # ${c}${p?' → '+p.name:''}`});const txt=lines.join('\n');const o=document.getElementById('out');o.style.display='block';o.textContent=txt;navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('已复制,贴给我即可'),()=>toast('已列在下方,手动复制'))};
+document.getElementById('stopall').onclick=stop;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+render();window.addEventListener('resize',()=>{for(const p of P){const cv=document.querySelector(`.card[data-id="${p.id}"] canvas`);if(cv)drawRoll(cv,p)}});
+</script>
