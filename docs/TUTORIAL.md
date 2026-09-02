@@ -252,7 +252,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
   与棋盘上的 ⊥ 同一画法(焦黑 + 破洞);文字只在 tooltip。
 - 测试:`test_session.test_load_state_detach_goal`;m3 冒烟改为真实点击弹窗「继续」推进 16 关、l16/l04 重开断言差一步态、l16 接回目标线 → 弹窗 → 结局
   (`_reconnect_goal` 按解法表最后一根线接,机器 id 升序 = 摆放顺序);UI 冒烟 N 段(弹窗矩形 (1333,672,1174,816)、「继续」在空白带、遮罩挡「重置」、无「下一关」)、
-  E 段(焦纹图样)、S 段;`tools/shot_4k.gd` 出 `4k_win.png`(直接 `open()`,不走通关以免写存档)。
+  E 段(焦纹图样)、S 段;`tools/shot_4k.gd` 出 `4k_win.png`(直接 `open()`,不走通关以免写存档)与 `4k_editor_bot.png`(解锁焦纹的笔刷行)。
 
 ## 4. 想改 X,去哪改
 

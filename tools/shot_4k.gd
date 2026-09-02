@@ -5,6 +5,7 @@ extends SceneTree
 ## 出图(build/shots4k/,已 gitignore + .gdignore,编辑器不会给截图生成 .import):
 ##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
 ##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗
+##   4k_editor_bot.png 同弹窗解锁焦纹(第四章)时的笔刷行:第四个笔刷是焦纹图样(v1.2)
 ##   4k_settings.png 标题页「设置」弹窗 / 4k_win.png 通关弹窗「织成了」(v1.2,直接弹出不走通关:通关会写存档)。
 ## 对照法:与 笔记本页面补充/位置参考.png、美术预览图叠图看边,或用 Python(PIL/numpy)做模板匹配;
 ## 引擎常量与参考实测数字见 docs/ART_INTERFACE.md「参考基准与实测值」。
@@ -88,6 +89,9 @@ func _initialize() -> void:
 	scene2._on_pin_requested(ids[2], 0)                     # 岔纹机上口的纹样绘制弹窗
 	await _wait(0.4)
 	_save("4k_editor")
+	scene2._editor.open_for(scene2.atoms, scene2.atom_colors, null, true)   # 解锁焦纹:多一个焦纹图样笔刷
+	await _wait(0.4)
+	_save("4k_editor_bot")
 	scene2._editor.hide()
 	_unmount()
 	print("4K 截图已写到 %s/4k_*.png" % OUT_DIR)
