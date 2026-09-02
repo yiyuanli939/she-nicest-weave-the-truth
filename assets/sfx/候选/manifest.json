@@ -4206,5 +4206,501 @@
     "dur": null
    }
   ]
+ },
+ "D_合成": {
+  "back": [
+   {
+    "file": "back.wav",
+    "title": "合成:back",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.0,
+    "dur": 0.54,
+    "hi4k": 0.0,
+    "centroid": 492.0
+   }
+  ],
+  "brush": [
+   {
+    "file": "brush.wav",
+    "title": "合成:brush",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.8,
+    "dur": 0.12,
+    "hi4k": 0.02,
+    "centroid": 1637.0
+   }
+  ],
+  "clear": [
+   {
+    "file": "clear.wav",
+    "title": "合成:clear",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.0,
+    "dur": 0.28,
+    "hi4k": 0.01,
+    "centroid": 1198.0
+   }
+  ],
+  "click": [
+   {
+    "file": "click.wav",
+    "title": "合成:click",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.5,
+    "dur": 0.18,
+    "hi4k": 0.0,
+    "centroid": 762.0
+   }
+  ],
+  "close": [
+   {
+    "file": "close.wav",
+    "title": "合成:close",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.41,
+    "hi4k": 0.0,
+    "centroid": 306.0
+   }
+  ],
+  "confirm": [
+   {
+    "file": "confirm.wav",
+    "title": "合成:confirm",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.9,
+    "dur": 1.57,
+    "hi4k": 0.0,
+    "centroid": 915.0
+   }
+  ],
+  "delete": [
+   {
+    "file": "delete.wav",
+    "title": "合成:delete",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.8,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 196.0
+   }
+  ],
+  "drawer_close": [
+   {
+    "file": "drawer_close.wav",
+    "title": "合成:drawer_close",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.3,
+    "dur": 0.53,
+    "hi4k": 0.0,
+    "centroid": 208.0
+   }
+  ],
+  "drawer_open": [
+   {
+    "file": "drawer_open.wav",
+    "title": "合成:drawer_open",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.2,
+    "dur": 0.55,
+    "hi4k": 0.0,
+    "centroid": 238.0
+   }
+  ],
+  "drop": [
+   {
+    "file": "drop.wav",
+    "title": "合成:drop",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.7,
+    "dur": 0.28,
+    "hi4k": 0.0,
+    "centroid": 202.0
+   }
+  ],
+  "error": [
+   {
+    "file": "error.wav",
+    "title": "合成:error",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.0,
+    "dur": 0.8,
+    "hi4k": 0.0,
+    "centroid": 234.0
+   }
+  ],
+  "guide": [
+   {
+    "file": "guide.wav",
+    "title": "合成:guide",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.4,
+    "dur": 1.48,
+    "hi4k": 0.0,
+    "centroid": 709.0
+   }
+  ],
+  "hint": [
+   {
+    "file": "hint.wav",
+    "title": "合成:hint",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.1,
+    "dur": 1.0,
+    "hi4k": 0.0,
+    "centroid": 1108.0
+   }
+  ],
+  "hover": [
+   {
+    "file": "hover.wav",
+    "title": "合成:hover",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.1,
+    "hi4k": 0.0,
+    "centroid": 391.0
+   }
+  ],
+  "move": [
+   {
+    "file": "move.wav",
+    "title": "合成:move",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.0,
+    "dur": 0.33,
+    "hi4k": 0.0,
+    "centroid": 378.0
+   }
+  ],
+  "next": [
+   {
+    "file": "next.wav",
+    "title": "合成:next",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 506.0
+   }
+  ],
+  "open": [
+   {
+    "file": "open.wav",
+    "title": "合成:open",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.39,
+    "hi4k": 0.0,
+    "centroid": 392.0
+   }
+  ],
+  "page": [
+   {
+    "file": "page.wav",
+    "title": "合成:page",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.6,
+    "dur": 0.2,
+    "hi4k": 0.04,
+    "centroid": 1826.0
+   }
+  ],
+  "paint": [
+   {
+    "file": "paint.wav",
+    "title": "合成:paint",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.9,
+    "dur": 0.13,
+    "hi4k": 0.0,
+    "centroid": 302.0
+   }
+  ],
+  "pick": [
+   {
+    "file": "pick.wav",
+    "title": "合成:pick",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.4,
+    "dur": 0.22,
+    "hi4k": 0.0,
+    "centroid": 936.0
+   }
+  ],
+  "pin_error": [
+   {
+    "file": "pin_error.wav",
+    "title": "合成:pin_error",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.0,
+    "dur": 0.8,
+    "hi4k": 0.0,
+    "centroid": 234.0
+   }
+  ],
+  "place": [
+   {
+    "file": "place.wav",
+    "title": "合成:place",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.8,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 182.0
+   }
+  ],
+  "plug": [
+   {
+    "file": "plug.wav",
+    "title": "合成:plug",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.0,
+    "dur": 0.31,
+    "hi4k": 0.0,
+    "centroid": 1116.0
+   }
+  ],
+  "portrait": [
+   {
+    "file": "portrait.wav",
+    "title": "合成:portrait",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.0,
+    "dur": 0.13,
+    "hi4k": 0.01,
+    "centroid": 1098.0
+   }
+  ],
+  "redo": [
+   {
+    "file": "redo.wav",
+    "title": "合成:redo",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.54,
+    "hi4k": 0.0,
+    "centroid": 643.0
+   }
+  ],
+  "refuse": [
+   {
+    "file": "refuse.wav",
+    "title": "合成:refuse",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.3,
+    "dur": 0.38,
+    "hi4k": 0.0,
+    "centroid": 158.0
+   }
+  ],
+  "reset_board": [
+   {
+    "file": "reset_board.wav",
+    "title": "合成:reset_board",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.8,
+    "dur": 0.7,
+    "hi4k": 0.0,
+    "centroid": 245.0
+   }
+  ],
+  "reset_progress": [
+   {
+    "file": "reset_progress.wav",
+    "title": "合成:reset_progress",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.3,
+    "dur": 0.96,
+    "hi4k": 0.0,
+    "centroid": 415.0
+   }
+  ],
+  "skip": [
+   {
+    "file": "skip.wav",
+    "title": "合成:skip",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.7,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 600.0
+   }
+  ],
+  "slider": [
+   {
+    "file": "slider.wav",
+    "title": "合成:slider",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.4,
+    "dur": 0.06,
+    "hi4k": 0.0,
+    "centroid": 552.0
+   }
+  ],
+  "snap": [
+   {
+    "file": "snap.wav",
+    "title": "合成:snap",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.9,
+    "dur": 0.27,
+    "hi4k": 0.0,
+    "centroid": 212.0
+   }
+  ],
+  "toggle": [
+   {
+    "file": "toggle.wav",
+    "title": "合成:toggle",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.5,
+    "dur": 0.2,
+    "hi4k": 0.0,
+    "centroid": 803.0
+   }
+  ],
+  "undo": [
+   {
+    "file": "undo.wav",
+    "title": "合成:undo",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.0,
+    "dur": 0.54,
+    "hi4k": 0.0,
+    "centroid": 492.0
+   }
+  ],
+  "unpin": [
+   {
+    "file": "unpin.wav",
+    "title": "合成:unpin",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.1,
+    "dur": 0.41,
+    "hi4k": 0.0,
+    "centroid": 306.0
+   }
+  ],
+  "unplug": [
+   {
+    "file": "unplug.wav",
+    "title": "合成:unplug",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 1.4,
+    "dur": 0.4,
+    "hi4k": 0.0,
+    "centroid": 592.0
+   }
+  ],
+  "warn": [
+   {
+    "file": "warn.wav",
+    "title": "合成:warn",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.7,
+    "dur": 0.7,
+    "hi4k": 0.0,
+    "centroid": 340.0
+   }
+  ],
+  "win": [
+   {
+    "file": "win.wav",
+    "title": "合成:win",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 2.1,
+    "dur": 2.87,
+    "hi4k": 0.0,
+    "centroid": 988.0
+   }
+  ],
+  "zoom": [
+   {
+    "file": "zoom.wav",
+    "title": "合成:zoom",
+    "author": "tools/sfx_synth.gd(纯 GDScript 合成)",
+    "url": "",
+    "license": "自制",
+    "H": 0.7,
+    "dur": 0.08,
+    "hi4k": 0.0,
+    "centroid": 600.0
+   }
+  ]
  }
 }
