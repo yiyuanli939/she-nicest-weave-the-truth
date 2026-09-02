@@ -145,6 +145,16 @@ func open(nb: NotebookCatalog, unlocked: Array = []) -> void:
 	_slide(true)
 
 
+## 同 open(),但翻到 rule_id 对应的条目(v1.1 §5:进关时本关首次上架的仪器自动弹出它的页);找不到就第一页
+func open_at(nb: NotebookCatalog, unlocked: Array, rule_id: StringName) -> void:
+	open(nb, unlocked)
+	for i in _entries.size():
+		if _entries[i].id == rule_id:
+			_page = i
+			_show_page()
+			return
+
+
 func close() -> void:
 	_slide(false)
 

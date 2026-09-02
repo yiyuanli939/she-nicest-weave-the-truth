@@ -149,6 +149,24 @@ func _build_conj_proof(s: ProofSession) -> void:
 	s.connect_wire(join, 0, s.goal_id, 0)
 
 
+func test_wire_carries_hyp() -> bool:
+	var s := ProofSession.new()
+	var ok := check(s.setup([], "A > A") == "", "setup")
+	var m := s.place_machine(&"imp_intro")
+	ok = check(s.pin_hypothesis(m, 1, "A") == "", "钉 A") and ok
+	s.connect_wire(m, 1, m, 0)
+	s.connect_wire(m, 0, s.goal_id, 0)
+	ok = check(s.get_wire_carries_hyp(m, 1, m, 0) and not s.get_wire_carries_hyp(m, 0, s.goal_id, 0), "假设口→Q 口的线搭载假设,出口→目标的不搭载") and ok
+	var n_hyp := 0
+	for w in s.get_wires():
+		if w.carries_hyp:
+			n_hyp += 1
+	ok = check(n_hyp == 1, "WireInfo.carries_hyp 与查询一致(得 %d)" % n_hyp) and ok
+	ok = check(not s.get_wire_carries_hyp(m, 0, m, 0), "不存在的线 → false") and ok
+	s.free()
+	return ok
+
+
 func test_connected_getters() -> bool:
 	var s := ProofSession.new()
 	s.setup(["A | B"], "B | A")

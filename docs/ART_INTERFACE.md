@@ -58,7 +58,16 @@
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
 | 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
-| 节点区:端口颜色 / 纹样口尺寸 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` |
+| 节点区:端口颜色 / 纹样口尺寸 / 行距 / 行内间距 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` `ROW_GAP` `CELL_GAP` |
+| 节点区:端口图形(v1.1 §1:输出口 = 圆 + 朝右尖角的插头,输入口 = 缺口朝左的插座;接上后输入口整圆、输出口不画;拖线时插头跟着鼠标) | `board/machine_node.gd` → `PORT_R` `PORT_TIP` `PORT_NOTCH_DEG`(画法 `draw_plug/draw_socket`,拖线中的插头在 `board/wire_overlay.gd`) |
+| 节点区:纹样边框按子命题着色(v1.1 §4.2) | `board/machine_node.gd` → `META_COLORS`(P 金 C9A24E / Q 棕 775241 / R 青 7B9B8B)`META_COLOR_OVERRIDES`(岔纹机两口 C2CAB9 / A8B9BE);线宽 `api/pattern_view.gd` `REGION_BORDER_W` |
+| 节点区:「钉纹样」按钮底色 / 位置(默认纹样下方,岔纹机在纹样左侧)/ 字号;圆角与内边距 | `board/machine_node.gd` → `PIN_BG` `PIN_BG_BY_PORT` `PIN_BUTTON_SIDE` `PIN_FONT_SIZE`;`ui/ui_styles.gd` → `RADIUS` `MARGIN_H` `MARGIN_V` |
+| 节点区:未钉口的蚂蚁线(静态虚线)颜色 / 外扩 / 线宽 / 虚线段 | `board/machine_node.gd` → `ANT_COLOR` `ANT_INSET` `ANT_W` `ANT_DASH` |
+| 节点区:汇路机三行分割线两色 / 线宽(v1.1 §4.3) | `board/machine_node.gd` → `DIVIDER_GOLD` `DIVIDER_CREAM` `DIVIDER_W` |
+| 节点区:封程机凹形(v1.1 §4.4:缺口宽 / 底色 / 底部标题带 / 描边 / 圆角;假设口与输入口在两臂内沿) | `board/machine_node.gd` → `IMP_NOTCH_W` `NODE_BG` `NODE_TITLE_BG` `NODE_BORDER` `NODE_BORDER_SELECTED` `NODE_BORDER_W` `NODE_RADIUS`(口位 `port_pos()`) |
+| 连线:搭载未消去假设的线整条的颜色(v1.1 §2) | `theme/main_theme.tres` → `GraphEdit/colors/activity`(= `HYP_COLOR`) |
+| 连线:错误徽章字号 / 白描边 / 停留与淡出时长;接错的线自动断开时长(v1.1 §3) | `board/wire_overlay.gd` → `BADGE_FONT_SIZE` `BADGE_OUTLINE` `BADGE_HOLD_SEC` `BADGE_FADE_SEC`;`board/proof_board.gd` → `BAD_WIRE_SEC` |
+| 纹样绘制弹窗(v1.1 §4.6,照 image 13):标题 / 提示字号、按钮底色、图标线宽与颜色、内边距 | `pattern/pattern_editor.gd` → `TITLE_FONT_SIZE` `HINT_FONT_SIZE` `BUTTON_BG` `ICON_LINE_W` `ICON_COLOR` `CONTENT_MARGIN` `PREVIEW_SIZE` `SWATCH_SIZE` |
 
 ## 3.5 参考基准与实测值(2026-09-02 像素对齐审查)
 
@@ -100,7 +109,8 @@
 
 `theme/main_theme.tres`(Project Settings → GUI → Theme 已指向它):
 - 纯文字按钮:四态 `StyleBoxEmpty`,`font_hover_color` 比 `font_color` 浅(美术:悬停文字变浅、离开恢复);
-  带图按钮(关卡按钮、仪器按钮)在各自脚本里用 `StyleBoxTexture` 覆盖,`modulate_color` 做悬停提亮 / 置灰。
+  带图按钮(关卡按钮、仪器按钮)在各自脚本里用 `StyleBoxTexture` 覆盖,`modulate_color` 做悬停提亮 / 置灰;
+  带底色按钮(v1.1:节点内「钉纹样」、纹样绘制弹窗的 清空/取消/确认)用 `ui/ui_styles.gd` `UiStyles.fill_button(按钮, 底色)`,悬停/按下底色变暗。
 - 配色(取自参考图):棕红描边 `#6B3B33` · 深棕文字 `#4A2F2A` · 红棕强调 `#A0463A` · 乳黄 `#F4ECD8` · 黄铜 `#C9A24E`。
 
 ## 5. 仍为程序化的部分(没有对应美术)
@@ -109,7 +119,8 @@
 |---|---|
 | 命题纹样(节点口 / 编辑器 / 线轴 / 目标) | `api/pattern_view.gd`(LINEN / CHAR_BLACK / SPLIT_COLOR / BASE_LINE_W);原子配色在关卡 `atom_colors`,缺省表 `levels/level_def.gd DEFAULT_COLORS`(低饱和高明度:藕粉红/灰蓝/豆青/紫藕) |
 | 选关/开发者页「返回主界面」 | `ui/back_button.gd`(RECT 左上角坐标 / FONT_SIZE) |
-| 连线错误徽章(纯文字:冲突 / 欠定 / 成环 / 逃逸) | `board/wire_overlay.gd` BADGE / BADGE_COLOR |
-| 纹样编辑器弹窗 | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE) |
+| 连线错误徽章(纯文字:冲突 / 欠定 / 成环 / 逃逸;64 号白描边,接错的线 0.5 s 自动断、徽章停 1 s 淡出) | `board/wire_overlay.gd` BADGE / BADGE_COLOR / BADGE_FONT_SIZE / BADGE_OUTLINE / BADGE_HOLD_SEC / BADGE_FADE_SEC;`board/proof_board.gd` BAD_WIRE_SEC |
+| 纹样绘制弹窗(标题带 / 预览 / 「点选笔刷进行绘制:」/ 色块 + 三个线描结构笔刷 / 清空·取消·确认) | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE / TITLE_* / HINT_* / BUTTON_BG / ICON_*) |
+| 节点端口图形 / 纹样区域边框 / 钉按钮 / 蚂蚁线 / 汇路机分割线 / 封程机凹形 | `board/machine_node.gd` 顶部常量(§3 表);策划说明与示意图在 `v1.1交互调整说明/` |
 | 胜利绿光 | `ui/level_scene.gd _on_win()` |
 | 机器人 OLED 表情 | `hardware/firmware/main.py draw_face()` |

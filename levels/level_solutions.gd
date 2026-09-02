@@ -63,7 +63,8 @@ const DATA: Dictionary = {
 }
 
 
-## 在 scene 上按解法执行(走 view 路径:palette 同款放置 + connection_request 接线)
+## 在 scene 上按解法执行(palette 同款放置 + 编辑器路径钉纹样 + session.connect_wire 接线;
+## 连线不再借用棋盘的 connection_request 处理器 —— 那边是 GraphEdit 图口号,封程机与模型口号不同)
 static func apply(scene: LevelScene, board: ProofBoard, level_id: StringName) -> bool:
 	if not DATA.has(level_id):
 		return false
@@ -86,7 +87,7 @@ static func apply(scene: LevelScene, board: ProofBoard, level_id: StringName) ->
 	for w: Array in sol.w:
 		var from_id := _resolve(w[0], session, machines)
 		var to_id := _resolve(w[2], session, machines)
-		board._on_connection_request("n%d" % from_id, w[1], "n%d" % to_id, w[3])
+		session.connect_wire(from_id, w[1], to_id, w[3])
 	return true
 
 

@@ -176,6 +176,7 @@ Button/styles/disabled = SubResource("btn_empty")
 Button/styles/focus = SubResource("empty")
 DialoguePanel/base_type = &"PanelContainer"
 DialoguePanel/styles/panel = SubResource("empty")
+GraphEdit/colors/activity = Color(0.77, 0.42, 0.42, 1)
 GraphEdit/colors/connection_rim_color = Color(0.42, 0.23, 0.2, 1)
 GraphEdit/colors/grid_major = Color(0.42, 0.23, 0.2, 0.18)
 GraphEdit/colors/grid_minor = Color(0.42, 0.23, 0.2, 0.08)

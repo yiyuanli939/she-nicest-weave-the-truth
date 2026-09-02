@@ -165,6 +165,7 @@ func solve() -> SolveResult:
 
 	# 4) 辖域检查
 	var edge_hyps := _propagate_hyps(topo)
+	result.edge_hyps = edge_hyps   # UI 用:搭载未消去假设的线整条画假设色
 	var goal := _goal_node()
 	for e in edges:
 		if goal != null and e.z == goal.id and not (edge_hyps[e] as Dictionary).is_empty():

@@ -70,9 +70,11 @@ tests/       headless 单测(run_tests.gd)+ 开窗 smoke(visual_smoke_m2/m3)
   UI 只用它的查询 getter(`get_input_pattern`/`is_input_connected`/`get_wires`/`describe_node`…),**从不直接碰 SolveResult**。
 - `ProofBoard`(GraphEdit)与 `MachineNode`(GraphNode)是全项目**唯一**允许出现 GraphEdit API 的两个文件。
   `board_updated` 后:清空连线 → 按 `get_wires()` 重挂 → 每个节点 `refresh()` → `WireOverlay.rebuild()`(只给出错的线挂徽章)。
-- `MachineNode`:每行一对(输入口,输出口)单元格,**只画纹样不写公式文字**(美术要求);可钉口在标题栏出按钮
-  (单口"钉纹样",岔纹机"钉上口/钉下口"),钉住后口下出「已钉」小字;
-  右键节点体 → `delete_requested` → 板转 `session.remove_machine`(线轴/目标模型层拒删)。
+- `MachineNode`:每行一对(输入口,输出口)单元格,**只画纹样不写公式文字**(美术要求);端口图形自画
+  (`PortLayer`:输出口插头 / 输入口插座 / 接上整圆),纹样边框按仪器模板的元变量着色,可钉口旁有带底色的「钉纹样」按钮、
+  未钉时纹样外一圈虚线;封程机是凹形(假设口/输入口在两臂内沿,`port_pos()` + 板的三个虚函数接管;图口号 ≠ 模型口号,
+  `graph_out_port/model_out_port` 换算);右键节点体 → `delete_requested` → 板转 `session.remove_machine`(线轴/目标模型层拒删)。
+  详见 3.6。
   关卡必需按钮(重置/示答/下一关/选关)挂在 GraphEdit 自带工具条上(`ProofBoard.add_toolbar_item`)。
 - `PatternView`:哑控件,给 Formula 画纹样(AND 竖分 / IMP 横分 / OR 对角 / META 斜纹 / BOT 焦纹),`ghost` 用 `self_modulate` 调透明度。
 
@@ -102,9 +104,10 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   **3-1(l11)通关瞬间坏掉**:win cue = `panic`(坏掉是剧情节点,代解通关也演),`notify_solved` 随即置 `Robot.broken`;
   l12 起 `broken` —— 任何 cue 都映射成故障三连(`RobotLink.commands_for`);**结局才修好**:「感谢游玩」黑屏时 `broken=false` + `calm`(`ui/story_scene.gd _play_thanks`)。
 - **关内操作指引**(`narrative/step_guide.gd`,纯函数):每次 `board_updated` 由 `StepGuide.facts_of` 从 ProofSession 查事实
-  (机器数/线数/冲突/未钉口/已钉/本关有新仪器/已通关),`newly_done` 把盘上已经做出来的操作(放/拉/钉,断线拆机看 prev)记进
-  `SaveManager.steps`,`next_step` 按 `ORDER`(fix → pin → place → wire → notebook)取第一条没做过的显示在 `LevelScene._step_hint`
-  (棋盘左下、求助提示上一行,`STEP_HINT_*` 常量);翻笔记由 `_on_open_notebook` 自己报。已通关不显示;重置进度清 `steps`。
+  (机器数/线数/未钉口/已钉/已通关),`newly_done` 把盘上已经做出来的操作(放/拉/钉)记进 `SaveManager.steps`,
+  `next_step` 按 `ORDER`(pin → place → wire)取第一条没做过的显示在 `LevelScene._step_hint`
+  (棋盘左下、求助提示上一行,`STEP_HINT_*` 常量)。已通关不显示;重置进度清 `steps`。v1.1 起删掉了「断线拆机」「翻笔记」两步:
+  接错的线自己断、首次上架仪器的笔记进关自动弹出(`LevelScene._ready` → `NotebookUI.open_at`)。
   文案 `StepGuide.TEXT` 只讲操作(文案守则同笔记)。用户要求加、美术文档没有 → 先纯文字,美术要换图/挪位只动常量。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖(对话字段除外:重跑原样保留现有 intro/outro 台词)。
   仪器**按关上架**:`LEVELS` 每行末列是本关新上架的仪器,之后的关累计(l01 一台都没有);解法只能用架上仪器(`test_levels` 盯)。
@@ -181,6 +184,25 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源目录,单文件 exe),
 `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/she_nicest.exe`(目录要先建好)。
 
+### 3.6 v1.1 交互调整(2026-09-02,策划说明 `v1.1交互调整说明/`,md + 14 张示意图)
+
+| 说明条目 | 做法与落点 |
+|---|---|
+| §1 端口形状:输出口 = 带尖角的圆(插头),输入口 = 缺口圆(插座);拖线时插头随鼠标;接上合成整圆 | `GraphNode._draw_port` 覆写为空压掉默认圆点,图形画在节点最后一个子节点 `PortLayer`(Node2D,不算 slot)上 —— `_draw_port` 在 C++ `NOTIFICATION_DRAW` 里、早于脚本 `_draw`,画在那里会被自画外形盖住。拖线中的插头由 `WireOverlay._input`(鼠标移动才重绘,不用 `_process`)画在鼠标处,`connection_drag_started/ended` 开关 |
+| §2 依赖未消去假设的线整条粉红 | 模型:`_propagate_hyps` 的边→假设集存进 `SolveResult.edge_hyps`,`WireInfo.carries_hyp` / `get_wire_carries_hyp`;视图:GraphEdit 没有逐线颜色,用 `set_connection_activity(…, 1.0)` 把整条线插值到主题 `GraphEdit/colors/activity`(= HYP_COLOR) |
+| §3 错误字放大 ≥2× + 白描边;接错的线 0.5 s 自动断开,提示停 1 s 淡出 | `WireOverlay`:64 号 + `outline_size 8`;徽章按线键缓存(同线同状态不重建、不重启计时),自动断开的三种状态(`AUTO_BREAK` = 冲突/成环/逃逸)的徽章建好即起 Tween(停 1 s → 0.3 s 淡出 → 释放);`ProofBoard._schedule_breaks` 每次 `board_updated` 给错线排 0.5 s 定时器,回调再核对状态才 `detach_chip` + `session.disconnect_wire`(示答/代解一帧内连完、终态 OK 的线不会被断;可撤销)。「欠定」不是接错,保留 |
+| §4.1 纹样间距 | `MachineNode` `separation` 覆盖 = `ROW_GAP`(32,image 4 间距 ≈ 纹样高 × 0.45);纹样格 `SIZE_SHRINK_CENTER` 保证口在纹样中心 |
+| §4.2 纹样边框按子命题着色 | `PatternView.region_borders`([{path, color}])+ `region_of_path()`(与 `layout()` 同一套切分);`MachineNode._borders_for` 按**仪器模板**结构走叶子,元变量查 `META_COLORS` / `META_COLOR_OVERRIDES`(岔纹机两口各自的钉色);描边在填色之后、分割线之前(分割处只剩灰条,同参考图);线轴/目标无 spec 照旧深色外框 |
+| §4.3 汇路机分割线 | `MachineNode._draw` 在相邻两行间隙中点画金 + 乳黄两条 2 px 线 |
+| §4.4 封程机凹形 | GraphNode 的口只能在左右边缘、左右缩进对称(`port_h_offset`),做不到"臂内沿";于是:行结构 [左臂 VBox(假设 P + 钉按钮) \| 缺口 spacer \| 右臂 Q] / [spacer \| P>Q] / [标题 Label],`title=""` + 顶部标题栏字号 1 + panel/titlebar 样式覆盖为空,U 形与底部标题带在 `_draw` 自画;口位 `port_pos()`,`ProofBoard` 覆写 `_is_in_input/output_hotzone`(热区矩形按主题 inner/outer extent 自算)与 `_get_connection_line`(端点命中引擎口位就换成 `port_pos`,再按引擎同款 `Curve2D` 贝塞尔出线;正式连线端点 = `(position_offset + 口位) * zoom`,拖线预览 = `position + 口位 * zoom`,两种都试)。引擎按 slot 顺序给右口编号,假设口在第一排 → 图口号 ≠ 模型口号,`graph_out_port/model_out_port` 换算;脚本/测试连线一律走 `session.connect_wire`(模型口号) |
+| §4.5 钉纹样按钮进节点 + 蚂蚁线 | 按钮文字一律「钉纹样」,`UiStyles.fill_button` 底色(默认乳黄,岔纹机两口用各自钉色),位置 `PIN_BUTTON_SIDE`(默认纹样下方另起无口一行;岔纹机在纹样左侧同一行);`mouse_filter = PASS` 让右键穿透到节点(右键删机在按钮上也生效);未钉口 `_draw` 画静态虚线框(低功耗模式不做无限动画,`set_loops` 被测试禁止);「已钉」小字删除 |
+| §4.6 弹窗改版 | `PatternEditor` 照 image 13 重排:标题带「纹样绘制」→ 预览 → 「点选笔刷进行绘制:」→ 色块 + 并织/迭层/岔纹线描图标(`BrushIcon`)[+ 焦纹] → 清空 / 取消 / 确认(带底色);删提示行与「挖回孔」;「清空」擦回一个孔不关窗,「确认」全染时钉住、整幅还是孔时 = 取消钉住(`pattern_cleared`);外框内容边距只留描边宽、标题带贴满上缘 |
+| §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步 |
+
+用户答复的歧义:「清空」= 清空画布、空画布「确认」= 取消钉住;弹窗完全照 image 13;笔记每次进关都弹。
+自定的假设:端口/假设口颜色沿用;蚂蚁线静态;只有 冲突/成环/逃逸 自动断;提示计时从接线起;「焦纹」笔刷保留文字。
+对照截图:`tools/shot_4k.gd` 多出 `4k_machines.png`(七台仪器全摆上)与 `4k_editor.png`(弹窗;`SubViewport.gui_embed_subwindows = true` 才截得到 Window)。
+
 ### 3.4 审查后修掉的 bug(值得记住的坑)
 
 | 问题 | 根因 | 修法 |
@@ -207,17 +229,21 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 改"钉"的规则(哪些口可钉) | 只改 `rules.gd` 的 `pinnable` 标记;`_port_free_meta` 要求可钉口恰有一个自由变量 |
 | 改求解语义 | `logic/proof_graph.gd solve()` + `logic/unifier.gd match_into`;先看 `tests/test_graph.gd` 末尾的正向语义测试和 `test_unifier.test_match_into_is_one_way` |
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
-| 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
+| 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`(顶部常量:端口图形、行距、`META_COLORS` 边框配色、钉按钮底色/位置、蚂蚁线、汇路机分割线、封程机凹形);连线与整板行为在 `board/proof_board.gd`(口位热区/连线端点接管、`BAD_WIRE_SEC` 自动断线、假设线 activity 染色) |
+| 改端口形状 / 拖线中的插头 | `board/machine_node.gd draw_plug/draw_socket`、`PortLayer`;鼠标处的插头 `board/wire_overlay.gd begin_plug/_input/_draw` |
+| 改封程机凹形 / 口位 | `board/machine_node.gd _build_concave/_draw_concave_shape/port_pos`;板侧 `board/proof_board.gd _in_hotzone/_get_connection_line/_remap_port_point`(见 3.6) |
+| 改纹样绘制弹窗(标题/提示/笔刷/按钮) | `pattern/pattern_editor.gd`(`TITLE_TEXT` `HINT_TEXT` `STRUCT_BRUSHES` `BrushIcon`;`clear_canvas/_on_confirm` 语义) |
+| 笔记自动弹出的时机 | `ui/level_scene.gd _ready` 末尾(`debut_rules` → `NotebookUI.open_at`) |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
-| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示);位置常量见 `docs/ART_INTERFACE.md` §3(实测基准在 §3.5)。夹子两行字用 `FontVariation` 的 spacing_top/bottom 把行距垫到参考的 92(Button 自然行距 79) |
+| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示),`open_at(nb, unlocked, rule_id)` 翻到指定仪器(进关自动弹出用);位置常量见 `docs/ART_INTERFACE.md` §3(实测基准在 §3.5)。夹子两行字用 `FontVariation` 的 spacing_top/bottom 把行距垫到参考的 92(Button 自然行距 79) |
 | 笔记条目(= 仪器整页图) | 覆盖 `assets/art/level/notebook/<rule_id>.png`(3840×2160 全屏导出、透明底,标题/正文画在图里);新增仪器页改 `tools/gen_levels.gd` `NOTEBOOK_IDS` → 重跑生成器 |
 | 仪器架按钮/顺序/显隐 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外不显示,可见按钮紧凑重排 |
 | 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
-| 改错误徽章文字/颜色 | `board/wire_overlay.gd BADGE/BADGE_COLOR`(纯文字,不用符号) |
+| 改错误徽章文字/颜色/字号/描边/停留时长;接错的线多久断 | `board/wire_overlay.gd BADGE/BADGE_COLOR/BADGE_FONT_SIZE/BADGE_OUTLINE/BADGE_HOLD_SEC/BADGE_FADE_SEC/AUTO_BREAK`(纯文字,不用符号);`board/proof_board.gd BAD_WIRE_SEC` |
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
-| 关内操作指引(文案 / 触发条件 / 优先级 / 位置) | `narrative/step_guide.gd`(`TEXT`、`ORDER`、`_applies`、`newly_done`)+ `ui/level_scene.gd` `STEP_HINT_*`;记忆在 `SaveManager.steps`;测试 `tests/test_step_guide.gd` + `visual_smoke_ui.gd` S 段 |
+| 关内操作指引(文案 / 触发条件 / 优先级 / 位置;v1.1 起只剩 钉/放/拉 三步) | `narrative/step_guide.gd`(`TEXT`、`ORDER`、`_applies`、`newly_done`)+ `ui/level_scene.gd` `STEP_HINT_*`;记忆在 `SaveManager.steps`;测试 `tests/test_step_guide.gd` + `visual_smoke_ui.gd` S 段 |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
 | 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
@@ -235,7 +261,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 112 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 126 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 16 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
@@ -256,9 +282,11 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   存档残留 l16/l17/notebook_tnd 无害;ProofSession 随机操作序列 undo 全回初态、redo 全回终态。
 - `tests/visual_smoke_ui.gd` — 真实输入(`push_input(ev, true)`,坐标按 3840×2160 视口给):故事界面的场景/立绘/遮罩切换,
   名字/正文/屏幕角/立绘/插图六个落点点击与任意键推进,不显示场景名;无对话关直进棋盘;工具条无撤销/重做、不显示关名;
-  仪器架 7 格顺序与置灰、点置灰不放置;节点内无公式字母;右键在标题/纹样/spacer/「已钉」/几何中心都能删,
-  拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→色块编辑器→钉住→「已钉」;
-  幽灵态切换;欠定/冲突纯文字徽章与断线;重置;笔记抽屉划出/变「继续工作」/翻页循环/收回;
+  仪器架 7 格顺序与置灰、点置灰不放置;节点内无公式字母;右键在标题/纹样/spacer/几何中心(钉按钮上)都能删,
+  拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→纹样绘制弹窗(清空/取消/确认、三个图标笔刷)→确认→蚂蚁线消失;
+  幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
+  U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
+  假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页;笔记抽屉划出/变「继续工作」/翻页循环/收回;
   标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写

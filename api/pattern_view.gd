@@ -16,6 +16,7 @@ const BASE_LINE_W := 8.0
 const LINEN := Color(0.91, 0.87, 0.78)      # 亚麻底
 const CHAR_BLACK := Color(0.12, 0.10, 0.09) # 焦黑
 const SPLIT_COLOR := Color(0.23, 0.18, 0.12)
+const REGION_BORDER_W := 3.0   # 按子命题着色的区域边框线宽(v1.1 §4.2)
 
 const GHOST_ALPHA := 0.5   # 原子色降饱和提亮后,0.4 的幽灵态在乳黄节点底上会糊
 
@@ -42,6 +43,14 @@ const GHOST_ALPHA := 0.5   # 原子色降饱和提亮后,0.4 的幽灵态在乳�
 				_parse_failed = true
 				push_warning("PatternView: 公式解析失败 \"%s\" — %s" % [v, FormulaParser.last_error])
 			_formula = f
+		queue_redraw()
+
+## 区域边框(v1.1 §4.2):[{path: Array[int], color: Color}],path 是子式路径(0 左/上,1 右/下,[] 整幅)。
+## 非空时按 spec 描每个区域的轮廓、不再画整体深色外框;空(线轴/目标)时照旧画深色外框。
+## 由 MachineNode 按仪器模板结构算好注入;实际纹样与模板同构,路径一定落在对应区域上。
+var region_borders: Array[Dictionary] = []:
+	set(v):
+		region_borders = v
 		queue_redraw()
 
 var _formula: Formula = null
@@ -119,6 +128,36 @@ static func split_width(depth: int) -> float:
 	return maxf(2.0, BASE_LINE_W * pow(0.62, depth))
 
 
+## path 指向的子式在 rect 里占的区域(与 layout 同一套切分):
+## {shape:"rect", rect:Rect2} 或(OR 的直接子式){shape:"tri", points:PackedVector2Array};
+## path 越过叶子 / 形状不符 → 空字典。[] = 整幅。
+static func region_of_path(f: Formula, rect: Rect2, path: Array[int]) -> Dictionary:
+	if path.is_empty():
+		return {shape = "rect", rect = rect}
+	if f == null or not f.is_binary():
+		return {}
+	var side: int = path[0]
+	var rest: Array[int] = path.slice(1)
+	var child := f.left if side == 0 else f.right
+	match f.kind:
+		Formula.Kind.AND:
+			var half := Vector2(rect.size.x * 0.5, rect.size.y)
+			return region_of_path(child, Rect2(rect.position + Vector2(side * half.x, 0), half), rest)
+		Formula.Kind.IMP:
+			var half := Vector2(rect.size.x, rect.size.y * 0.5)
+			return region_of_path(child, Rect2(rect.position + Vector2(0, side * half.y), half), rest)
+		Formula.Kind.OR:
+			var tl := rect.position
+			var tr := Vector2(rect.end.x, rect.position.y)
+			var bl := Vector2(rect.position.x, rect.end.y)
+			var br := rect.end
+			if rest.is_empty():
+				return {shape = "tri", points = PackedVector2Array([tl, tr, bl]) if side == 0 else PackedVector2Array([tr, br, bl])}
+			var inner := Rect2(tl, rect.size * 0.48) if side == 0 else Rect2(br - rect.size * 0.48, rect.size * 0.48)
+			return region_of_path(child, inner, rest)
+	return {}
+
+
 func _draw() -> void:
 	var rect := Rect2(Vector2.ZERO, size)
 	if _parse_failed:
@@ -126,20 +165,34 @@ func _draw() -> void:
 		draw_line(rect.position, rect.end, Color.MAGENTA, 2.0)
 		draw_line(Vector2(rect.end.x, 0), Vector2(0, rect.end.y), Color.MAGENTA, 2.0)
 		return
-	for e: Dictionary in layout(_formula, rect):
+	# 先填色,再描区域边框,最后画分割线:与分割线重合的边框段被分割线盖住(参考图里分割处只有灰条)
+	var entries := layout(_formula, rect)
+	for e: Dictionary in entries:
 		match e.shape:
 			"rect":
 				_fill_rect_leaf(e)
 			"tri":
 				_fill_tri_leaf(e)
-			"line":
-				draw_line(e.from, e.to, SPLIT_COLOR, e.width)
 			"deep":
 				draw_rect(e.rect, LINEN.darkened(0.15))
 				var c: Vector2 = e.rect.get_center()
 				for i in 3:
 					draw_circle(c + Vector2((i - 1) * 10.0, 0), 3.0, SPLIT_COLOR)
-	draw_rect(rect, SPLIT_COLOR, false, 2.0)
+	for spec: Dictionary in region_borders:
+		var reg := region_of_path(_formula, rect, spec.path)
+		if reg.is_empty():
+			continue
+		if reg.shape == "rect":
+			draw_rect(reg.rect, spec.color, false, REGION_BORDER_W)
+		else:
+			var pts: PackedVector2Array = reg.points
+			pts.append(pts[0])
+			draw_polyline(pts, spec.color, REGION_BORDER_W)
+	for e: Dictionary in entries:
+		if e.shape == "line":
+			draw_line(e.from, e.to, SPLIT_COLOR, e.width)
+	if region_borders.is_empty():
+		draw_rect(rect, SPLIT_COLOR, false, 2.0)
 
 
 func _fill_rect_leaf(e: Dictionary) -> void:

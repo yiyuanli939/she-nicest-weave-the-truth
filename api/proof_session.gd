@@ -55,6 +55,7 @@ class WireInfo:
 	var to_id: int
 	var to_port: int
 	var state: int               ## WireState
+	var carries_hyp: bool = false  ## 搭载未消去的局部假设(UI 整条画假设色,v1.1 §2)
 
 
 var _graph := ProofGraph.new()
@@ -282,8 +283,14 @@ func get_wires() -> Array[WireInfo]:
 		w.to_id = e.z
 		w.to_port = e.w
 		w.state = _last_result.edge_status.get(e, WireState.OK)
+		w.carries_hyp = _last_result.carries_hyp(e)
 		out.append(w)
 	return out
+
+
+## 这条线是否搭载未消去的局部假设(线不存在 → false)
+func get_wire_carries_hyp(from_id: int, from_port: int, to_id: int, to_port: int) -> bool:
+	return _last_result.carries_hyp(Vector4i(from_id, from_port, to_id, to_port))
 
 
 ## 结论链上还没接线的输入口:x = 节点 id,y = 输入口下标(UI 画红框提示)

@@ -25,6 +25,11 @@ var connected_ports: Dictionary = {}
 ## 结论祖先链上还没接线的输入口,Vector2i(节点 id, 输入口下标)
 var missing_inputs: Array[Vector2i] = []
 
+## 每条边搭载的未封存局部假设。键 = 边 Vector4i,值 = {HypId Vector2i(机器 id, 假设口下标): true}
+## (辖域检查 _propagate_hyps 的产物;UI 据此把"依赖未消去假设"的线整条画成假设色 —— v1.1 §2)。
+## 环上的边不参与传播,集合为空(它们另标 CYCLE)。
+var edge_hyps: Dictionary = {}
+
 ## 整个证明是否完成
 var solved: bool = false
 
@@ -43,3 +48,8 @@ func input_connected(node_id: int, port: int) -> bool:
 
 func output_connected(node_id: int, port: int) -> bool:
 	return connected_ports.has(Vector3i(node_id, 1, port))
+
+
+## 这条边是否搭载未消去的局部假设(不存在的边 → false)
+func carries_hyp(e: Vector4i) -> bool:
+	return not (edge_hyps.get(e, {}) as Dictionary).is_empty()

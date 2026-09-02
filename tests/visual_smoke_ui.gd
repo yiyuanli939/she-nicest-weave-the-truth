@@ -47,6 +47,14 @@ func _press(at: Vector2, button: MouseButton, pressed: bool, mask: int) -> void:
 	root.push_input(ev, true)
 
 
+func _motion(at: Vector2, mask: int) -> void:
+	var ev := InputEventMouseMotion.new()
+	ev.position = at
+	ev.global_position = at
+	ev.button_mask = mask
+	root.push_input(ev, true)
+
+
 func _action(name: String) -> void:
 	for pressed in [true, false]:
 		var ev := InputEventAction.new()
@@ -256,56 +264,81 @@ func _run() -> void:
 	await _settle()
 	var mn := board.get_node("n%d" % mid) as MachineNode
 
-	# ---- E. 节点无公式文字;幽灵态:未连未钉全幽灵;钉上口后上口实显 + 「已钉」;接线后入口实显 ----
+	# ---- E. 节点无公式文字;幽灵态:未连未钉全幽灵;钉纹样(上口)后上口实显、蚂蚁线消失;接线后入口实显;弹窗改版 ----
 	var leak := false
 	for l in mn.find_children("*", "Label", true, false):
 		for sym in ["?", "&", "|", ">", "A", "B"]:
 			leak = leak or (l as Label).text.contains(sym)
 	_check(not leak, "节点内没有任何公式/字母文字")
 	_check(mn._in_views[0].ghost and mn._out_views[0].ghost and mn._out_views[1].ghost, "新放置的仪器所有口都是幽灵")
-	_click(_center(_button_named(mn, "钉上口")), MOUSE_BUTTON_LEFT)
+	_check(mn._pin_buttons.size() == 2 and (mn._pin_buttons[0] as Button).text == "钉纹样" and (mn._pin_buttons[1] as Button).text == "钉纹样"
+			and mn.get_titlebar_hbox().get_child_count() == 1, "岔纹机两个可钉口各有一个「钉纹样」按钮,标题栏里没有按钮")
+	_check(mn._pin_buttons[0].get_parent() == mn._out_views[0].get_parent().get_parent()
+			and mn._pin_buttons[0].get_index() == mn._out_views[0].get_parent().get_index() - 1, "岔纹机钉按钮在输出纹样左侧同一行")
+	_check(mn.is_ant_frame_shown(0) and mn.is_ant_frame_shown(1), "未钉的两口都画蚂蚁线")
+	_check(mn.get_theme_constant("separation") == MachineNode.ROW_GAP and MachineNode.ROW_GAP >= 32, "纹样行距拉开到 ROW_GAP")
+	_click(_center(mn._pin_buttons[0]), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(scene._editor.visible, "点「钉上口」打开纹样编辑器")
+	_check(scene._editor.visible, "点上口的「钉纹样」打开纹样绘制弹窗")
 	var swatch_ok := true
+	var icon_btns := 0
 	for b in scene._editor._brush_row.get_children():
 		swatch_ok = swatch_ok and not (b as Button).text.contains("A") and not (b as Button).text.contains("B")
-	_check(swatch_ok, "编辑器原子笔刷是色块,不写字母")
+		if (b as Button).text == "" and b.get_child_count() > 0:
+			icon_btns += 1
+	_check(swatch_ok, "弹窗原子笔刷是色块,不写字母")
+	_check(icon_btns == 3 and _button_named(scene._editor, "挖回孔") == null, "并织/迭层/岔纹是三个图标笔刷,没有挖回孔(得 %d)" % icon_btns)
+	_check(_button_named(scene._editor, "清空") != null and _button_named(scene._editor, "取消") != null and _button_named(scene._editor, "确认") != null
+			and _button_named(scene._editor, "钉住") == null and _button_named(scene._editor, "清除钉住") == null,
+			"弹窗按钮是 清空/取消/确认")
+	_check(_labels_with(scene._editor, "斜纹处") == 0 and _labels_with(scene._editor, "点选笔刷进行绘制") == 1 and _labels_with(scene._editor, "纹样绘制") == 1,
+			"弹窗有标题「纹样绘制」与「点选笔刷进行绘制:」,旧提示删掉")
 	scene._editor.tree = FormulaParser.parse("B")
 	scene._editor._confirm.pressed.emit()
 	await _settle()
 	mn = board.get_node("n%d" % mid) as MachineNode
 	_check(s.describe_node(mid).pinned.get(0, "") == "B", "钉住后模型记录 B")
 	_check(not mn._out_views[0].ghost and mn._out_views[1].ghost, "钉住的上口实显,下口仍幽灵")
-	_check(mn.is_pinned_mark_shown(0) and not mn.is_pinned_mark_shown(1), "钉住的口下出「已钉」")
-	board._on_connection_request("n%d" % s.assumption_ids[0], 0, "n%d" % mid, 0)
+	_check(not mn.is_ant_frame_shown(0) and mn.is_ant_frame_shown(1), "钉住的口蚂蚁线消失,另一口还在")
+	s.connect_wire(s.assumption_ids[0], 0, mid, 0)
 	await _settle()
 	mn = board.get_node("n%d" % mid) as MachineNode
 	_check(not mn._in_views[0].ghost, "接上线的入口实显")
+	_check(mn.is_input_wired(0) and not mn.is_output_wired(0), "端口状态:入口有线(整圆),出口无线(插头)")
 	_check(s.get_output_pattern(mid, 0).equals(FormulaParser.parse("(A & B) | B")), "上口织出 (A∧B)∨B")
 
-	# ---- F. 连线徽章:欠定线「欠定」→ 钉住后 OK 无浮层;结构不合「冲突」;断线后无浮层 ----
+	# ---- F. 连线徽章(64 号白描边):欠定常驻 → 钉住后 OK 无浮层;接错(冲突)的线 0.5 s 自动断开,徽章冻结 1 s 后淡出 ----
 	_click(_center(_button_named(scene._palette, "并织机")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	var join: int = s.get_node_ids()[-1]
 	s.set_node_position(join, Vector2(1300, 720))   # 挪开,别压在岔纹机上
 	board.apply_positions()
 	await _settle()
-	board._on_connection_request("n%d" % mid, 1, "n%d" % join, 0)   # 下口 ?R∨(A∧B) → 并织机入口:没染完
+	s.connect_wire(mid, 1, join, 0)   # 下口 ?R∨(A∧B) → 并织机入口:没染完
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "欠定",
 			"欠定线挂「欠定」徽章(纯文字)")
-	_click(_center(_button_named(board.get_node("n%d" % mid), "钉下口")), MOUSE_BUTTON_LEFT)
+	var chip_label := (board._overlay._chips[0].ctrl as Control).get_child(0) as Label
+	_check(chip_label.get_theme_font_size("font_size") == WireOverlay.BADGE_FONT_SIZE and WireOverlay.BADGE_FONT_SIZE >= 64
+			and chip_label.get_theme_constant("outline_size") == WireOverlay.BADGE_OUTLINE and chip_label.get_theme_color("font_outline_color") == Color.WHITE,
+			"徽章 64 号字 + 白描边")
+	await _wait(WireOverlay.BADGE_HOLD_SEC + 0.6)
+	_check(s.get_wires().size() == 2 and board._overlay._chips.size() == 1, "欠定不是接错:线与徽章都留着等玩家钉")
+	_click(_center((board.get_node("n%d" % mid) as MachineNode)._pin_buttons[1]), MOUSE_BUTTON_LEFT)
 	scene._editor.tree = FormulaParser.parse("A")
 	scene._editor._confirm.pressed.emit()
 	await _settle()
 	_check(board._overlay._chips.is_empty(), "钉下口后这条线 OK,浮层消失")
-	board._on_connection_request("n%d" % mid, 1, "n%d" % s.goal_id, 0)   # A∨(A∧B) → 目标 B∧A:∨ 对 ∧
+	s.connect_wire(mid, 1, s.goal_id, 0)   # A∨(A∧B) → 目标 B∧A:∨ 对 ∧
 	await _settle()
 	_check(board._overlay._chips.size() == 1 and (board._overlay._chips[0].ctrl as Control).get_child(0).text == "冲突",
 			"连接词对不上的线挂「冲突」徽章")
-	board._on_disconnection_request("n%d" % mid, 1, "n%d" % s.goal_id, 0)
-	await _settle()
-	_check(board._overlay._chips.is_empty(), "断线后没有浮层")
+	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.CONFLICT, "冲突线暂时还在")
+	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
+	_check(s.get_wire_state(mid, 1, s.goal_id, 0) == ProofSession.WireState.OK and s.get_wires().size() == 2, "0.5 s 后接错的线自动断开")
+	_check(board._overlay._chips.size() == 1 and board._overlay._chips[0].detached, "断线后徽章冻结在原位继续显示")
+	await _wait(WireOverlay.BADGE_HOLD_SEC + WireOverlay.BADGE_FADE_SEC + 0.3)
+	_check(board._overlay._chips.is_empty(), "徽章停 1 s 后淡出释放")
 	s.remove_machine(join)
 	await _settle()
 
@@ -315,10 +348,10 @@ func _run() -> void:
 		func(m: MachineNode) -> Vector2: return _center(m._in_views[0]),
 		func(m: MachineNode) -> Vector2: return _center(m._in_views[0].get_parent().get_parent().get_child(1)),
 		func(m: MachineNode) -> Vector2: return _center(m._out_views[1]),
-		func(m: MachineNode) -> Vector2: return _center(m._pin_marks[0]),
+		func(m: MachineNode) -> Vector2: return _center(m._out_views[0]),
 		func(m: MachineNode) -> Vector2: return _center(m),
 	]
-	var spot_names := ["标题文字", "输入口纹样", "行中间 spacer", "输出口纹样", "「已钉」小字", "节点几何中心"]
+	var spot_names := ["标题文字", "输入口纹样", "行中间 spacer", "下口纹样", "上口纹样(已钉)", "节点几何中心"]
 	for k in spots_fn.size():
 		mn = board.get_node("n%d" % mid) as MachineNode
 		_click(spots_fn[k].call(mn), MOUSE_BUTTON_RIGHT)
@@ -330,10 +363,10 @@ func _run() -> void:
 		_check(s.describe_node(mid) != null and board.get_node_or_null("n%d" % mid) != null,
 				"Ctrl+Z 撤回删除(%s)" % spot_names[k])
 	mn = board.get_node("n%d" % mid) as MachineNode
-	_check(mn.is_pinned_mark_shown(0), "撤回后「已钉」仍在")
+	_check(not mn.is_ant_frame_shown(0), "撤回后仍是钉住态(无蚂蚁线)")
 
-	# ---- H. 拖动中右键不误删;右键线轴/目标不删;重做快捷键 ----
-	var c := _center(mn)
+	# ---- H. 拖动中右键不误删;右键线轴/目标不删;重做快捷键(按在纹样上 —— 节点中央现在是钉按钮,左键会开弹窗) ----
+	var c := _center(mn._in_views[0])
 	_press(c, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
 	_press(c, MOUSE_BUTTON_RIGHT, true, MOUSE_BUTTON_MASK_LEFT | MOUSE_BUTTON_MASK_RIGHT)
 	_press(c, MOUSE_BUTTON_RIGHT, false, MOUSE_BUTTON_MASK_LEFT)
@@ -351,11 +384,11 @@ func _run() -> void:
 	await _settle()
 	_check(s.get_node_ids().size() == 3, "Ctrl+Shift+Z 重做(并织机再次删除)")
 
-	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键) ----
+	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键;点在纹样上 —— 节点中央现在是钉按钮) ----
 	mn = board.get_node("n%d" % mid) as MachineNode
-	_click(_center(mn), MOUSE_BUTTON_LEFT)
+	_click(_center(mn._in_views[0]), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(mn.selected and board.has_focus(), "左键点节点选中它、板获得焦点")
+	_check(mn.selected and board.has_focus(), "左键点节点纹样选中它、板获得焦点")
 	_key(KEY_BACKSPACE)   # Mac 笔记本的"delete"就是 Backspace
 	await _settle()
 	_check(s.describe_node(mid) == null, "选中后按 Backspace 删除仪器")
@@ -363,7 +396,7 @@ func _run() -> void:
 	await _settle()
 	mn = board.get_node("n%d" % mid) as MachineNode
 	_check(mn != null, "撤回后节点回来")
-	_click(_center(mn), MOUSE_BUTTON_LEFT)
+	_click(_center(mn._in_views[0]), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_key(KEY_DELETE)
 	await _settle()
@@ -376,6 +409,89 @@ func _run() -> void:
 	_click(_center(_button_named(scene, "重置")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(s.get_node_ids().size() == 2 and s.get_wires().is_empty(), "重置回到只有线轴和目标")
+
+	# ---- U. v1.1 端口/连线/封程机/弹窗:插座·插头·整圆;拖线插头随鼠标;封程机臂内沿口位真实拖线;假设线搭载标记;清空+确认=取消钉住 ----
+	var spool_n := board.get_node("n%d" % s.assumption_ids[0]) as MachineNode
+	var goal_n := board.get_node("n%d" % s.goal_id) as MachineNode
+	_check(not spool_n.is_output_wired(0) and not goal_n.is_input_wired(0), "未接线:线轴出口画插头、目标入口画插座")
+	_check(spool_n._port_layer != null and spool_n._port_layer == spool_n.get_child(spool_n.get_child_count() - 1), "端口图层是节点最后一个子节点(画在纹样之上)")
+	_check(spool_n._out_views[0].region_borders.is_empty() and goal_n._in_views[0].region_borders.is_empty(), "线轴/目标没有区域边框(深色外框)")
+	var from_pt: Vector2 = spool_n.global_position + spool_n.port_pos(false, 0) * board.zoom
+	var to_pt: Vector2 = goal_n.global_position + goal_n.port_pos(true, 0) * board.zoom
+	_press(from_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
+	var mid_pt := (from_pt + to_pt) * 0.5
+	_motion(mid_pt, MOUSE_BUTTON_MASK_LEFT)
+	await _settle()
+	_check(board._overlay._plug_on and spool_n._drag_port == Vector2i(1, 0), "拖线中:叠加层画插头,源口藏起插头")
+	_check((board._overlay.get_global_transform_with_canvas() * board._overlay._plug_pos).distance_to(mid_pt) < 2.0, "插头跟着鼠标")
+	_motion(to_pt, MOUSE_BUTTON_MASK_LEFT)
+	_press(to_pt, MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().size() == 1 and s.get_wire_state(s.assumption_ids[0], 0, s.goal_id, 0) == ProofSession.WireState.CONFLICT,
+			"真实拖线接上(线轴 A∧B → 目标 B∧A:冲突,稍后自动断)")
+	_check(not board._overlay._plug_on and spool_n._drag_port.x < 0, "松手后鼠标处的插头消失")
+	_check(goal_n.is_input_wired(0) and spool_n.is_output_wired(0), "接上:目标入口整圆、线轴出口不再画插头")
+	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
+	_check(s.get_wires().is_empty() and not goal_n.is_input_wired(0), "接错的线自动断开,入口回到插座")
+	_click(_center(_button_named(scene._palette, "封程机")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	var imp_id: int = s.get_node_ids()[-1]
+	s.set_node_position(imp_id, Vector2(900, 900))
+	board.apply_positions()
+	await _settle()
+	var imp := board.get_node("n%d" % imp_id) as MachineNode
+	_check(imp.has_custom_ports() and imp.title == "" and imp._title_row != null and imp._title_row.text == "封程机"
+			and imp._title_row.get_index() == imp.get_child_count() - 2, "封程机:顶部标题栏为空,标题在底部")
+	_check(imp.graph_out_port(1) == 0 and imp.model_out_port(0) == 1 and imp.graph_out_port(0) == 1, "封程机假设口在第一排(图口 0 ↔ 模型口 1)")
+	var hyp_local: Vector2 = imp.port_pos(false, 0)
+	var q_local: Vector2 = imp.port_pos(true, 0)
+	var arm_l: Rect2 = imp._local_rect_of(imp._arm_l)
+	var arm_r: Rect2 = imp._local_rect_of(imp._arm_r)
+	_check(is_equal_approx(hyp_local.x, arm_l.end.x) and is_equal_approx(q_local.x, arm_r.position.x) and q_local.x - hyp_local.x >= MachineNode.IMP_NOTCH_W,
+			"假设口在左臂右沿、输入口在右臂左沿,中间是缺口(%.0f..%.0f)" % [hyp_local.x, q_local.x])
+	_check(is_equal_approx(hyp_local.y, imp._local_rect_of(imp._out_views[1]).get_center().y)
+			and is_equal_approx(q_local.y, imp._local_rect_of(imp._in_views[0]).get_center().y), "两个口的 y 都在各自纹样中心")
+	_check(imp._pin_buttons.has(1) and imp._pin_buttons[1].get_parent() == imp._arm_l, "钉纹样按钮在左臂假设纹样下方")
+	_check(imp._out_views[0].region_borders.size() == 2 and imp._out_views[0].region_borders[0].color == MachineNode.META_COLORS[&"P"]
+			and imp._out_views[0].region_borders[1].color == MachineNode.META_COLORS[&"Q"], "封程机 P>Q 口:上半金 / 下半棕两段边框")
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	scene._editor.tree = FormulaParser.parse("A")
+	scene._editor._confirm.pressed.emit()
+	await _settle()
+	imp = board.get_node("n%d" % imp_id) as MachineNode
+	var hyp_pt: Vector2 = imp.global_position + imp.port_pos(false, 0) * board.zoom
+	var q_pt: Vector2 = imp.global_position + imp.port_pos(true, 0) * board.zoom
+	_press(hyp_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
+	_motion(hyp_pt + Vector2(0, -200), MOUSE_BUTTON_MASK_LEFT)
+	await _settle()
+	_check(board._overlay._plug_on and board._overlay._plug_color == MachineNode.HYP_COLOR, "从假设口拖线:鼠标处的插头是假设色")
+	_motion(q_pt, MOUSE_BUTTON_MASK_LEFT)
+	_press(q_pt, MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().size() == 1 and s.get_wire_state(imp_id, 1, imp_id, 0) == ProofSession.WireState.OK, "从臂内沿的假设口真实拖线到臂内沿的 Q 口接上")
+	_check(s.get_wire_carries_hyp(imp_id, 1, imp_id, 0), "这条线搭载未消去的假设(整条假设色)")
+	imp = board.get_node("n%d" % imp_id) as MachineNode
+	_check(imp.is_output_wired(1) and imp.is_input_wired(0), "假设口插头插进 Q 口:出口不画插头、入口整圆")
+	s.disconnect_wire(imp_id, 1, imp_id, 0)
+	await _settle()
+	var stock_pt: Vector2 = imp.global_position + imp.stock_port_pos(false, 0) * board.zoom
+	_press(stock_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
+	_motion(q_pt, MOUSE_BUTTON_MASK_LEFT)
+	_press(q_pt, MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().is_empty(), "节点右缘(引擎默认口位)不再是假设口的热区,拖不出线")
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(scene._editor.visible and not scene._editor.is_canvas_empty() and not scene._editor._confirm.disabled, "已钉的口打开弹窗:画布是钉住的纹样")
+	scene._editor._clear_btn.pressed.emit()
+	_check(scene._editor.is_canvas_empty() and scene._editor.visible and not scene._editor._confirm.disabled, "「清空」擦回空画布、窗不关、确认可按")
+	scene._editor._confirm.pressed.emit()
+	await _settle()
+	_check(not s.describe_node(imp_id).pinned.has(1), "空画布「确认」= 取消钉住")
+	_check((board.get_node("n%d" % imp_id) as MachineNode).is_ant_frame_shown(1), "取消钉住后蚂蚁线回来")
+	s.remove_machine(imp_id)
+	await _settle()
 
 	# ---- L. 右缘笔记抽屉:点「笔记」向左划出 → 变「继续工作」;翻页循环;点「继续工作」收回 ----
 	var nbui: NotebookUI = scene._notebook_ui
@@ -641,13 +757,14 @@ func _run() -> void:
 	_check(game.save.settings.get("robot_stationary") == false, "开关状态写进 settings")
 	game.save.wipe()
 
-	# ---- S. 操作指引:按棋盘状态一行提示下一步操作,做过一次就不再显示(存档 steps 记忆,刚 wipe 过) ----
+	# ---- S. 操作指引(v1.1 后剩 钉/放/拉 三步,存档 steps 记忆,刚 wipe 过)+ 笔记自动弹出:首次上架的仪器进关自动翻到它那页 ----
 	game.start_level(game.catalog.find(&"l01"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
 		await _settle()
 	var s1 := current_scene as LevelScene
+	_check(not s1._notebook_ui.is_open(), "l01 没有新仪器:笔记不自动弹出")
 	_check(s1._step_hint.visible and s1._step_hint.text == StepGuide.TEXT[&"wire"], "l01 没有仪器架:提示拉线")
 	_check(not s1._guide_hint.visible or s1._step_hint.position.y < s1._guide_hint.position.y, "操作指引在求助提示上一行")
 	s1.session.connect_wire(s1.session.assumption_ids[0], 0, s1.session.goal_id, 0)
@@ -659,36 +776,43 @@ func _run() -> void:
 		(current_scene as StoryScene).finish()
 		await _settle()
 	var s2 := current_scene as LevelScene
+	var nb2: NotebookUI = s2._notebook_ui
+	await _wait_until(func() -> bool: return nb2.is_open() and is_equal_approx(nb2._drawer.position.x, NotebookUI.OPEN_X), 3.0)
+	_check(nb2.is_open() and is_equal_approx(nb2._drawer.position.x, NotebookUI.OPEN_X), "l02 首次上架并织机:进关笔记自动划出")
+	_check(nb2._entries.size() == 1 and nb2._page == 0 and nb2._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
+			"自动翻到并织机那页")
+	_click(_center(nb2._handle), MOUSE_BUTTON_LEFT)   # 继续工作
+	await nb2.slide_finished
+	await _settle()
+	_check(not nb2.is_open(), "点「继续工作」收起")
 	_check(s2._step_hint.visible and s2._step_hint.text == StepGuide.TEXT[&"place"], "l02 空盘:提示从仪器架放仪器")
 	_click(_center(_button_named(s2._palette, "并织机")), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(game.save.is_step_done(&"place") and s2._step_hint.text == StepGuide.TEXT[&"notebook"],
-			"放了仪器(拉线已学过)→ 本关有新仪器:提示翻笔记")
+	_check(game.save.is_step_done(&"place") and not s2._step_hint.visible, "放了仪器(拉线已学过)→ 不再提示(翻笔记/断线不再是指引)")
 	s2.session.connect_wire(s2.session.assumption_ids[0], 0, s2.session.goal_id, 0)   # 线轴 A 直接接目标 A & B:冲突
 	await _settle()
-	_check(s2._step_hint.text == StepGuide.TEXT[&"fix"], "接错的线 → 优先提示断开/拆掉")
-	s2.session.disconnect_wire(s2.session.assumption_ids[0], 0, s2.session.goal_id, 0)
-	await _settle()
-	_check(game.save.is_step_done(&"fix") and s2._step_hint.text == StepGuide.TEXT[&"notebook"], "断开后 fix 记为做过,回到翻笔记提示")
-	_click(_center(s2._notebook_ui._handle), MOUSE_BUTTON_LEFT)
-	await s2._notebook_ui.slide_finished
-	await _settle()
-	_check(game.save.is_step_done(&"notebook") and not s2._step_hint.visible, "翻过笔记 → 不再提示")
-	_click(_center(s2._notebook_ui._handle), MOUSE_BUTTON_LEFT)
-	await s2._notebook_ui.slide_finished
+	_check(not s2._step_hint.visible, "接错的线不出指引(它会自己断开)")
+	await _wait(ProofBoard.BAD_WIRE_SEC + 0.2)
+	_check(s2.session.get_wires().is_empty(), "接错的线自动断开")
 	game.start_level(game.catalog.find(&"l07"))
 	await _settle()
 	if current_scene is StoryScene:
 		(current_scene as StoryScene).finish()
 		await _settle()
 	var s3 := current_scene as LevelScene
-	_check(not s3._step_hint.visible, "l07 空盘:放仪器/翻笔记都做过 → 不提示")
+	var nb3: NotebookUI = s3._notebook_ui
+	await _wait_until(func() -> bool: return nb3.is_open() and is_equal_approx(nb3._drawer.position.x, NotebookUI.OPEN_X), 3.0)
+	_check(nb3.is_open() and nb3._entries[nb3._page].id == &"imp_intro", "l07 首次上架封程机:自动翻到封程机那页(不是第一页)")
+	_click(_center(nb3._handle), MOUSE_BUTTON_LEFT)
+	await nb3.slide_finished
+	await _settle()
+	_check(not s3._step_hint.visible, "l07 空盘:放仪器做过 → 不提示")
 	_click(_center(_button_named(s3._palette, "封程机")), MOUSE_BUTTON_LEFT)
 	await _settle()
 	_check(s3._step_hint.visible and s3._step_hint.text == StepGuide.TEXT[&"pin"], "封程机假设口没钉 → 提示钉纹样")
 	var s3_board: ProofBoard = s3._board
 	var s3_mn := s3_board.get_node("n%d" % s3.session.get_node_ids()[-1]) as MachineNode
-	_click(_center(_button_named(s3_mn, "钉纹样")), MOUSE_BUTTON_LEFT)
+	_click(_center(s3_mn._pin_buttons[1]), MOUSE_BUTTON_LEFT)
 	await _settle()
 	s3._editor.tree = FormulaParser.parse("A")
 	s3._editor.pattern_committed.emit(s3._editor.tree)
@@ -696,8 +820,8 @@ func _run() -> void:
 	await _settle()
 	_check(game.save.is_step_done(&"pin") and not s3._step_hint.visible, "钉住后 pin 记为做过,不再提示")
 	var saved_steps: Dictionary = SaveManager.open().steps
-	_check(saved_steps.has("wire") and saved_steps.has("place") and saved_steps.has("fix") and saved_steps.has("notebook") and saved_steps.has("pin"),
-			"五个操作都落进存档 steps")
+	_check(saved_steps.has("wire") and saved_steps.has("place") and saved_steps.has("pin") and not saved_steps.has("fix") and not saved_steps.has("notebook"),
+			"三个操作落进存档 steps,没有 fix/notebook")
 	game.save.wipe()
 	_check(game.save.steps.is_empty(), "重置进度清掉指引记忆")
 

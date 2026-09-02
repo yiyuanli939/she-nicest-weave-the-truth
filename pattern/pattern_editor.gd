@@ -1,96 +1,162 @@
 class_name PatternEditor
 extends PopupPanel
-## 挖孔式纹样编辑器(绑定封程机等的假设口)。
+## 「纹样绘制」弹窗(v1.1 §4.6,照 image 13):标题带 → 预览 → 「点选笔刷进行绘制:」→ 笔刷行
+## (原子色块 + 并织/迭层/岔纹线描图标 [+ 焦纹])→ [清空] … [取消] [确认]。
 ## 内部是一棵带"孔"(META 叶,渲染成未染纱)的临时 Formula 树:
-## 选笔刷 → 点纹样上的任意叶子区域 → 该处替换成 原子色/分割(裂成两孔)/孔。
-## 全部孔填满(is_ground)才允许确认;确认发 pattern_committed。
-## 界面上不出现任何原子字母/逻辑符号:原子笔刷是色块,结构笔刷是纺织词。
+## 选笔刷 → 点纹样上的任意叶子区域 → 该处替换成 原子色/分割(裂成两孔)。
+## 「清空」把画布擦回一个孔(不关窗);「确认」在全部孔填满(is_ground)时钉住(pattern_committed),
+## 画布整幅还是一个孔时 = 取消钉住(pattern_cleared);部分未染时不可按。
+## 界面上不出现任何原子字母/逻辑符号:原子笔刷是色块,结构笔刷是线描图标。
 ## 几何与 PatternView.layout 同一套切分规则,core 函数无 UI 依赖,headless 可测。
 
 signal pattern_committed(f: Formula)
-signal pattern_cleared   # "清除钉住"(unpin)
+signal pattern_cleared   # 空画布「确认」= 取消钉住(unpin)
 
 const HOLE_NAME := &"孔"
 const PREVIEW_SIZE := Vector2(720, 440)
 const SWATCH_SIZE := Vector2(110, 72)
 const FONT_SIZE := 40
-const STRUCT_BRUSHES: Array = [["并织", "and"], ["岔纹", "or"], ["迭层", "imp"], ["挖回孔", "erase"]]
+const TITLE_FONT_SIZE := 56
+const HINT_FONT_SIZE := 36
+const TITLE_TEXT := "纹样绘制"
+const HINT_TEXT := "点选笔刷进行绘制："   # 全角冒号照 image 13(站酷字库有,test_theme 盯)
+## 结构笔刷:[笔刷 id, 图标线型],顺序照 image 13(竖分 / 横分 / 对角)
+const STRUCT_BRUSHES: Array = [["and", "vertical"], ["imp", "horizontal"], ["or", "diagonal"]]
+const ICON_LINE_W := 4.0
+const ICON_COLOR := Color("3B2E1F")
+const ICON_BG := Color(1, 0.98, 0.94)
+const BUTTON_BG := Color("F0E4C8")          # 清空/取消/确认 底色(image 13)
+const TITLE_BG := Color(0.941, 0.894, 0.784)
+const FRAME_COLOR := Color(0.42, 0.23, 0.2)
+const FRAME_W := 4
+const CONTENT_MARGIN := 28.0
+const ROW_GAP := 16
 
 var tree: Formula = Formula.meta(HOLE_NAME)
-var brush: String = ""        # "atom:A" / "and" / "or" / "imp" / "bot" / "erase"
+var brush: String = ""        # "atom:A" / "and" / "or" / "imp" / "bot"
 
 var _preview: PatternView
-var _brush_row: HFlowContainer
+var _brush_row: HBoxContainer
 var _confirm: Button
 var _clear_btn: Button
 var _group := ButtonGroup.new()
 
 
+## 结构笔刷的线描图标(竖线 / 横线 / 对角线,与 PatternView 的分割方向一致)
+class BrushIcon extends Control:
+	var style := "vertical"
+
+	func _draw() -> void:
+		var w := size.x
+		var h := size.y
+		match style:
+			"vertical":
+				draw_line(Vector2(w * 0.5, 0), Vector2(w * 0.5, h), ICON_COLOR, ICON_LINE_W)
+			"horizontal":
+				draw_line(Vector2(0, h * 0.5), Vector2(w, h * 0.5), ICON_COLOR, ICON_LINE_W)
+			"diagonal":
+				draw_line(Vector2(w, 0), Vector2(0, h), ICON_COLOR, ICON_LINE_W)
+
+
 func _init() -> void:
+	# 弹窗外框:乳黄底 + 棕红描边;内容边距只留描边宽,标题带才能贴满上缘
+	var frame := StyleBoxFlat.new()
+	frame.bg_color = Color(0.957, 0.925, 0.847)
+	frame.set_border_width_all(FRAME_W)
+	frame.border_color = FRAME_COLOR
+	frame.set_corner_radius_all(12)
+	frame.set_content_margin_all(FRAME_W)
+	frame.content_margin_bottom = CONTENT_MARGIN * 0.8
+	add_theme_stylebox_override("panel", frame)
+
 	var box := VBoxContainer.new()
-	box.custom_minimum_size = Vector2(PREVIEW_SIZE.x + 40, 0)
-	box.add_theme_constant_override("separation", 16)
+	box.add_theme_constant_override("separation", ROW_GAP)
 	add_child(box)
-	var hint := Label.new()
-	hint.text = "选笔刷,点纹样;斜纹处是未染的孔"
-	hint.add_theme_font_size_override("font_size", 36)
-	box.add_child(hint)
+
+	var title_panel := PanelContainer.new()
+	var band := StyleBoxFlat.new()
+	band.bg_color = TITLE_BG
+	band.border_width_bottom = FRAME_W
+	band.border_color = FRAME_COLOR
+	band.corner_radius_top_left = 8
+	band.corner_radius_top_right = 8
+	band.content_margin_left = CONTENT_MARGIN
+	band.content_margin_right = CONTENT_MARGIN
+	band.content_margin_top = 12
+	band.content_margin_bottom = 12
+	title_panel.add_theme_stylebox_override("panel", band)
+	var title := Label.new()
+	title.text = TITLE_TEXT
+	title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
+	title_panel.add_child(title)
+	box.add_child(title_panel)
+
+	var body := MarginContainer.new()
+	body.add_theme_constant_override("margin_left", int(CONTENT_MARGIN))
+	body.add_theme_constant_override("margin_right", int(CONTENT_MARGIN))
+	body.add_theme_constant_override("margin_top", 4)
+	body.add_theme_constant_override("margin_bottom", 0)
+	box.add_child(body)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", ROW_GAP)
+	body.add_child(col)
+
 	_preview = PatternView.new()
 	_preview.min_size = PREVIEW_SIZE
 	_preview.gui_input.connect(_on_preview_input)
-	box.add_child(_preview)
-	_brush_row = HFlowContainer.new()
-	_brush_row.add_theme_constant_override("h_separation", 16)
-	_brush_row.add_theme_constant_override("v_separation", 12)
-	box.add_child(_brush_row)
+	col.add_child(_preview)
+
+	var hint := Label.new()
+	hint.text = HINT_TEXT
+	hint.add_theme_font_size_override("font_size", HINT_FONT_SIZE)
+	col.add_child(hint)
+
+	_brush_row = HBoxContainer.new()
+	_brush_row.add_theme_constant_override("separation", ROW_GAP)
+	col.add_child(_brush_row)
+
 	var actions := HBoxContainer.new()
-	_clear_btn = Button.new()
-	_clear_btn.text = "清除钉住"
-	_clear_btn.add_theme_font_size_override("font_size", FONT_SIZE)
-	_clear_btn.pressed.connect(func() -> void:
-		pattern_cleared.emit()
-		hide())
+	actions.add_theme_constant_override("separation", ROW_GAP)
+	_clear_btn = _make_action_button("清空", _clear_canvas)
 	actions.add_child(_clear_btn)
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	actions.add_child(sp)
-	var cancel := Button.new()
-	cancel.text = "取消"
-	cancel.add_theme_font_size_override("font_size", FONT_SIZE)
-	cancel.pressed.connect(hide)
-	actions.add_child(cancel)
-	_confirm = Button.new()
-	_confirm.text = "钉住"
-	_confirm.add_theme_font_size_override("font_size", FONT_SIZE)
-	_confirm.pressed.connect(func() -> void:
-		pattern_committed.emit(tree)
-		hide())
+	actions.add_child(_make_action_button("取消", hide))
+	_confirm = _make_action_button("确认", _on_confirm)
 	actions.add_child(_confirm)
-	box.add_child(actions)
+	col.add_child(actions)
 
 
 ## atoms = 本关原子;initial = 已钉住的纹样(可再编辑);allow_bot = 焦纹章节后解锁
 func open_for(atoms: Array[StringName], atom_colors: Dictionary,
-		initial: Formula = null, allow_bot: bool = false, can_clear: bool = false) -> void:
+		initial: Formula = null, allow_bot: bool = false) -> void:
 	tree = initial if initial != null else Formula.meta(HOLE_NAME)
 	_preview.atom_colors = atom_colors
-	_clear_btn.visible = can_clear
 	for c in _brush_row.get_children():
 		_brush_row.remove_child(c)   # 先摘下来:queue_free 帧末才生效,旧笔刷会把窗口最小尺寸撑大
 		c.queue_free()
 	for a in atoms:
 		_brush_row.add_child(_make_swatch(a))
 	for pair in STRUCT_BRUSHES:
-		_brush_row.add_child(_make_brush_button(pair[0], pair[1]))
+		_brush_row.add_child(_make_struct_button(pair[0], pair[1]))
 	if allow_bot:
 		_brush_row.add_child(_make_brush_button("焦纹", "bot"))
 	brush = ""
 	_sync()
 	# 旧笔刷已 remove_child,最小尺寸立即正确;reset_size 让 Window 收缩(它只涨不缩),
-	# 随后同步居中。不能 call_deferred:提交流程"打开→钉住→hide"会被迟到的弹出又顶开。
+	# 随后同步居中。不能 call_deferred:提交流程"打开→确认→hide"会被迟到的弹出又顶开。
 	reset_size()
 	popup_centered()
 
+
+func _make_action_button(text: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.add_theme_font_size_override("font_size", FONT_SIZE)
+	UiStyles.fill_button(b, BUTTON_BG)
+	b.pressed.connect(cb)
+	return b
 
 
 ## 原子笔刷 = 该原子颜色的色块(不写字母);选中态描深边
@@ -110,6 +176,28 @@ func _make_swatch(a: StringName) -> Button:
 			sb.border_color = PatternView.SPLIT_COLOR
 		b.add_theme_stylebox_override(state, sb)
 	b.pressed.connect(_set_brush.bind("atom:" + String(a)))
+	return b
+
+
+## 结构笔刷 = 线描图标(白底黑框 + 分割线);选中态描深边
+func _make_struct_button(id: String, style: String) -> Button:
+	var b := Button.new()
+	b.custom_minimum_size = SWATCH_SIZE
+	b.toggle_mode = true
+	b.button_group = _group
+	b.tooltip_text = {"and": "并织:分成左右两半", "imp": "迭层:分成上下两层", "or": "岔纹:分成两支"}[id]
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = ICON_BG.darkened(0.05) if state == "hover" else ICON_BG
+		sb.set_border_width_all(6 if state == "pressed" else int(ICON_LINE_W))
+		sb.border_color = PatternView.SPLIT_COLOR if state == "pressed" else ICON_COLOR
+		b.add_theme_stylebox_override(state, sb)
+	var icon := BrushIcon.new()
+	icon.style = style
+	icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.add_child(icon)
+	b.pressed.connect(_set_brush.bind(id))
 	return b
 
 
@@ -178,7 +266,6 @@ static func brush_formula(b: String) -> Formula:
 		"or": return Formula.disj(Formula.meta(HOLE_NAME), Formula.meta(HOLE_NAME))
 		"imp": return Formula.imp(Formula.meta(HOLE_NAME), Formula.meta(HOLE_NAME))
 		"bot": return Formula.bot()
-		"erase": return Formula.meta(HOLE_NAME)
 	return null
 
 
@@ -190,7 +277,30 @@ func apply_brush_at(point: Vector2, rect: Rect2) -> void:
 	_sync()
 
 
+## 画布整幅还是一个孔(还没落任何笔刷 / 刚清空)
+func is_canvas_empty() -> bool:
+	return tree != null and tree.kind == Formula.Kind.META
+
+
+## 「清空」:画布擦回一个孔,窗不关
+func clear_canvas() -> void:
+	tree = Formula.meta(HOLE_NAME)
+	_sync()
+
+
 # ---- UI 胶水 ----
+
+func _clear_canvas() -> void:
+	clear_canvas()
+
+
+func _on_confirm() -> void:
+	if is_canvas_empty():
+		pattern_cleared.emit()
+	else:
+		pattern_committed.emit(tree)
+	hide()
+
 
 func _set_brush(b: String) -> void:
 	brush = b
@@ -199,7 +309,7 @@ func _set_brush(b: String) -> void:
 
 func _sync() -> void:
 	_preview.formula = tree
-	_confirm.disabled = not tree.is_ground()
+	_confirm.disabled = not (tree.is_ground() or is_canvas_empty())
 
 
 func _on_preview_input(event: InputEvent) -> void:

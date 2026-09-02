@@ -1,66 +1,53 @@
 extends TestBase
 ## 关内操作指引(StepGuide):优先级与"做过就不显示"、从会话提取事实、新上架判定、存档记忆。
+## v1.1 后只剩 钉/放/拉 三步(错线自动断开、新仪器笔记自动弹出)。
 
 
 func test_next_step_priority_and_done() -> bool:
-	var f := {has_rack = true, machines = 0, wires = 0, conflict = false, unpinned = false, pinned = false, debut = true, solved = false}
+	var f := {has_rack = true, machines = 0, wires = 0, unpinned = false, pinned = false, solved = false}
 	var ok := check(StepGuide.next_step(f, {}) == &"place", "空棋盘先提示放仪器")
-	ok = check(StepGuide.next_step(f, {"place": true}) == &"notebook", "放过仪器、盘上没机可拉线 → 有新仪器就提示翻笔记") and ok
+	ok = check(StepGuide.next_step(f, {"place": true}) == &"", "放过仪器、盘上没机可拉线 → 不提示(翻笔记不再是指引,笔记自动弹出)") and ok
 	f.machines = 1
 	ok = check(StepGuide.next_step(f, {"place": true}) == &"wire", "有仪器没线 → 拉线") and ok
 	f.unpinned = true
 	ok = check(StepGuide.next_step(f, {"place": true}) == &"pin", "有未钉口 → 钉优先于拉线") and ok
-	f.conflict = true
-	ok = check(StepGuide.next_step(f, {"place": true}) == &"fix", "接错的线最优先") and ok
-	var all_done := {"fix": true, "pin": true, "place": true, "wire": true, "notebook": true}
+	var all_done := {"pin": true, "place": true, "wire": true}
 	ok = check(StepGuide.next_step(f, all_done) == &"", "全做过 → 不显示") and ok
 	f.solved = true
 	ok = check(StepGuide.next_step(f, {}) == &"", "已通关不显示") and ok
-	var l01 := {has_rack = false, machines = 0, wires = 0, conflict = false, unpinned = false, pinned = false, debut = false, solved = false}
+	var l01 := {has_rack = false, machines = 0, wires = 0, unpinned = false, pinned = false, solved = false}
 	ok = check(StepGuide.next_step(l01, {}) == &"wire", "没有仪器架的关(l01)直接提示拉线") and ok
 	ok = check(StepGuide.next_step(l01, {"wire": true}) == &"", "l01 拉过线就没了") and ok
+	ok = check(StepGuide.ORDER.size() == 3 and not StepGuide.TEXT.has(&"fix") and not StepGuide.TEXT.has(&"notebook"), "只剩三步,没有断线/翻笔记") and ok
 	for step in StepGuide.ORDER:
 		ok = check(StepGuide.TEXT.has(step) and StepGuide.TEXT[step] != "", "%s 有文案" % step) and ok
+	ok = check(not (StepGuide.TEXT[&"pin"] as String).contains("标题栏"), "钉纹样文案不再指向标题栏(按钮在纹样旁)") and ok
 	return ok
 
 
 func test_newly_done_from_facts() -> bool:
-	var prev := {conflict = true, wires = 2, machines = 1}
-	var now := {machines = 1, wires = 1, pinned = true, conflict = false}
-	var got := StepGuide.newly_done(prev, now)
-	var ok := check(got.has(&"place") and got.has(&"wire") and got.has(&"pin") and got.has(&"fix"), "放/拉/钉/断线都算做过: %s" % str(got))
-	ok = check(StepGuide.newly_done({}, {machines = 0, wires = 0}).is_empty(), "空棋盘什么都没做过") and ok
-	var stay := {conflict = true, wires = 1, machines = 1}
-	ok = check(not StepGuide.newly_done(stay, stay).has(&"fix"), "冲突还在、没断线拆机 → fix 未做") and ok
+	var got := StepGuide.newly_done({machines = 1, wires = 1, pinned = true})
+	var ok := check(got.has(&"place") and got.has(&"wire") and got.has(&"pin") and got.size() == 3, "放/拉/钉都算做过: %s" % str(got))
+	ok = check(StepGuide.newly_done({machines = 0, wires = 0}).is_empty(), "空棋盘什么都没做过") and ok
 	return ok
 
 
 func test_facts_of_session() -> bool:
 	var s := ProofSession.new()
 	var ok := check(s.setup([], "A > A") == "", "setup")
-	var f := StepGuide.facts_of(s, true, true)
-	ok = check(f.has_rack and f.debut and f.machines == 0 and f.wires == 0 and not f.unpinned and not f.solved, "空盘事实") and ok
+	var f := StepGuide.facts_of(s, true)
+	ok = check(f.has_rack and f.machines == 0 and f.wires == 0 and not f.unpinned and not f.solved, "空盘事实") and ok
 	var m := s.place_machine(&"imp_intro")
-	f = StepGuide.facts_of(s, true, true)
+	f = StepGuide.facts_of(s, true)
 	ok = check(f.machines == 1 and f.unpinned and not f.pinned, "封程机放上:假设口未钉") and ok
 	ok = check(s.pin_hypothesis(m, 1, "A") == "", "钉 A") and ok
-	f = StepGuide.facts_of(s, true, true)
+	f = StepGuide.facts_of(s, true)
 	ok = check(f.pinned and not f.unpinned, "钉住后没有未钉口") and ok
 	s.connect_wire(m, 1, m, 0)
 	s.connect_wire(m, 0, s.goal_id, 0)
-	f = StepGuide.facts_of(s, true, true)
-	ok = check(f.wires == 2 and f.solved and not f.conflict, "接线后通关、无冲突") and ok
+	f = StepGuide.facts_of(s, true)
+	ok = check(f.wires == 2 and f.solved, "接线后通关") and ok
 	s.free()
-	# 冲突:线轴 A 直接接到要 A & B 的目标
-	var c := ProofSession.new()
-	c.setup(["A", "B"], "A & B")
-	c.connect_wire(c.assumption_ids[0], 0, c.goal_id, 0)
-	var before := StepGuide.facts_of(c, true, false)
-	ok = check(before.conflict and before.wires == 1, "接错 → 冲突事实") and ok
-	c.disconnect_wire(c.assumption_ids[0], 0, c.goal_id, 0)
-	var after := StepGuide.facts_of(c, true, false)
-	ok = check(not after.conflict and StepGuide.newly_done(before, after).has(&"fix"), "断开冲突线 → fix 算做过") and ok
-	c.free()
 	return ok
 
 

@@ -36,8 +36,6 @@ var _notebook_ui: NotebookUI
 var _next_btn: Button
 var _guide_hint: Label
 var _step_hint: Label                 # 操作指引一行字(做过一次的操作不再提示)
-var _prev_facts: Dictionary = {}      # 上一次 board_updated 的棋盘事实(看出断线/拆机)
-var _debut := false                   # 本关有新上架的仪器 → 提示翻笔记
 var _steps_local: Dictionary = {}     # 无 Game(冒烟注入)时的已做操作表
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
@@ -96,7 +94,9 @@ func _ready() -> void:
 			_update_next_button()
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
-		_debut = not _game.catalog.debut_rules(lv).is_empty()
+		var debut: Array = _game.catalog.debut_rules(lv)
+		if not debut.is_empty():   # 本关首次上架的仪器:进关自动翻到它的笔记页(v1.1 §5;每次进关都弹)
+			_notebook_ui.open_at(_game.notebook, allowed_rules, debut[0])
 	session.board_updated.connect(_refresh_step_hint)
 	_refresh_step_hint()
 
@@ -186,9 +186,6 @@ func _make_tool_button(text: String, cb: Callable) -> Button:
 func _on_open_notebook() -> void:
 	var nb: NotebookCatalog = _game.notebook if _game != null else NotebookCatalog.load_default()
 	_notebook_ui.open(nb, allowed_rules)   # 只显示本关上架仪器的说明
-	if _mark_step(&"notebook") and _game != null:
-		_game.save.save()
-	_refresh_step_hint()
 
 
 # ---- 操作指引(StepGuide) ----
@@ -209,11 +206,10 @@ func _mark_step(step: StringName) -> bool:
 
 ## 每次棋盘变化:先把棋盘上已经做出来的操作记为做过,再挑下一条要提示的
 func _refresh_step_hint() -> void:
-	var facts := StepGuide.facts_of(session, not allowed_rules.is_empty(), _debut)
+	var facts := StepGuide.facts_of(session, not allowed_rules.is_empty())
 	var dirty := false
-	for step in StepGuide.newly_done(_prev_facts, facts):
+	for step in StepGuide.newly_done(facts):
 		dirty = _mark_step(step) or dirty
-	_prev_facts = facts
 	if dirty and _game != null:
 		_game.save.save()
 	var step := StepGuide.next_step(facts, _steps_done())
@@ -240,7 +236,7 @@ func _on_pin_requested(node_id: int, out_port: int) -> void:
 	var pinned := info != null and info.pinned.has(out_port)
 	if pinned:
 		initial = FormulaParser.parse(info.pinned[out_port])
-	_editor.open_for(atoms, atom_colors, initial, allow_bot, pinned)
+	_editor.open_for(atoms, atom_colors, initial, allow_bot)
 
 
 func _on_pattern_committed(f: Formula) -> void:

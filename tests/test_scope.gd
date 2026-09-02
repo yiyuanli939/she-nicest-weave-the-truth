@@ -32,6 +32,29 @@ func test_hypothesis_carried_then_discharged() -> bool:
 	return check(wired, "五条线都应接得上") and check(r.solved, "合法用假设的证明应完成")
 
 
+## v1.1 §2:每条线是否搭载未消去的假设要暴露给 UI(整条画假设色)
+func test_edge_hyps_exposed() -> bool:
+	var g := ProofGraph.new()
+	var goal := g.add_goal_node(f("(A & B) > (B & A)"))
+	var m := g.add_rule_node(&"imp_intro")
+	g.pin_hypothesis(m, 1, f("A & B"))
+	var split := g.add_rule_node(&"and_elim")
+	var join := g.add_rule_node(&"and_intro")
+	var e_hyp := Vector4i(m, 1, split, 0)
+	var e1 := Vector4i(split, 1, join, 0)
+	var e2 := Vector4i(split, 0, join, 1)
+	var e_back := Vector4i(join, 0, m, 0)
+	var e_goal := Vector4i(m, 0, goal, 0)
+	for e in [e_hyp, e1, e2, e_back, e_goal]:
+		g.add_edge(e)
+	var r := g.solve()
+	return check(r.solved, "合法证明完成") \
+		and check(r.carries_hyp(e_hyp) and r.carries_hyp(e1) and r.carries_hyp(e2) and r.carries_hyp(e_back),
+				"假设口出发、穿过拆股/并织、回到封程机 Q 口的四条线都搭载假设") \
+		and check(not r.carries_hyp(e_goal), "封程机出口的线已封存假设,不搭载") \
+		and check(not r.carries_hyp(Vector4i(99, 0, 98, 0)), "不存在的边 → false")
+
+
 ## 汇路机(∨消去)双假设各归各的散口 = 合法:A∨B ⊢ B∨A
 func test_or_elim_scopes_ok() -> bool:
 	var g := _or_swap_board(false)

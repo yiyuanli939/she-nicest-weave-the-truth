@@ -3,7 +3,8 @@ extends SceneTree
 ## 这里把各界面放进一个 3840×2160 的 SubViewport 离屏渲染再存 PNG,与窗口大小无关;不改存档。
 ##   "$GODOT" --path . --script res://tools/shot_4k.gd
 ## 出图(build/shots4k/,已 gitignore + .gdignore,编辑器不会给截图生成 .import):
-##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)。
+##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
+##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗。
 ## 对照法:与 笔记本页面补充/位置参考.png、美术预览图叠图看边,或用 Python(PIL/numpy)做模板匹配;
 ## 引擎常量与参考实测数字见 docs/ART_INTERFACE.md「参考基准与实测值」。
 
@@ -39,11 +40,43 @@ func _initialize() -> void:
 	var scene: LevelScene = load("res://ui/level_scene.tscn").instantiate()
 	_mount(scene)
 	await _wait(0.6)
+	if scene._notebook_ui.is_open():   # 首次上架仪器的关进关自动弹笔记(v1.1 §5):先收起,棋盘单独一张
+		scene._notebook_ui.close()
+		await scene._notebook_ui.slide_finished
+		await _wait(0.2)
 	_save("4k_level")
 	scene._notebook_ui.open(game.notebook, scene.allowed_rules)   # 直接开抽屉(不走 _on_open_notebook,不写存档)
 	await scene._notebook_ui.slide_finished
 	await _wait(0.3)
 	_save("4k_notebook")
+	_unmount()
+
+	# 七台仪器 + 弹窗(v1.1):用 first(无存档棋盘干扰的关)摆机,笔记若自动弹出先收起
+	game.current = first
+	var scene2: LevelScene = load("res://ui/level_scene.tscn").instantiate()
+	_mount(scene2)
+	await _wait(0.6)
+	if scene2._notebook_ui.is_open():
+		scene2._notebook_ui.close()
+		await scene2._notebook_ui.slide_finished
+	var rules: Array[StringName] = [&"and_intro", &"and_elim", &"or_intro", &"or_elim", &"imp_intro", &"imp_elim", &"false_elim"]
+	var spots: Array[Vector2] = [Vector2(520, 120), Vector2(520, 640), Vector2(520, 1160), Vector2(1100, 120),
+			Vector2(1100, 760), Vector2(1700, 120), Vector2(1700, 640)]
+	var ids: Array[int] = []
+	for i in rules.size():
+		scene2._board.place_machine_at_center(rules[i])
+		var id: int = scene2.session.get_node_ids()[-1]
+		ids.append(id)
+		scene2.session.set_node_position(id, spots[i])
+	scene2._board.apply_positions()
+	scene2.session.pin_hypothesis(ids[4], 1, "A")           # 封程机钉 A:一口钉住、其余可钉口留蚂蚁线
+	scene2.session.connect_wire(ids[4], 1, ids[1], 0)       # 假设线 → 拆股机:整条假设色
+	await _wait(0.4)
+	_save("4k_machines")
+	scene2._on_pin_requested(ids[2], 0)                     # 岔纹机上口的纹样绘制弹窗
+	await _wait(0.4)
+	_save("4k_editor")
+	scene2._editor.hide()
 	_unmount()
 	print("4K 截图已写到 %s/4k_*.png" % OUT_DIR)
 	quit(0)
@@ -61,6 +94,7 @@ func _mount(scene: Node) -> void:
 	_sv.size = SIZE
 	_sv.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	_sv.gui_disable_input = true
+	_sv.gui_embed_subwindows = true   # 弹窗(PopupPanel 是 Window)嵌进离屏视口,截图才带上它
 	if "oversampling_override" in _sv:
 		_sv.oversampling_override = 1.0   # 字体按 1:1 栅格化(4.5+ 每视口过采样)
 	root.add_child(_sv)

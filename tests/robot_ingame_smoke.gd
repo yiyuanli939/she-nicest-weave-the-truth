@@ -62,7 +62,7 @@ func _run() -> void:
 	scene = current_scene as LevelScene
 	var board: ProofBoard = scene.find_children("*", "ProofBoard", true, false)[0]
 	var s := scene.session
-	board._on_connection_request("n%d" % s.assumption_ids[0], 0, "n%d" % s.goal_id, 0)
+	s.connect_wire(s.assumption_ids[0], 0, s.goal_id, 0)
 	await _wait(1.0)
 	var conflict := false
 	for w in s.get_wires():

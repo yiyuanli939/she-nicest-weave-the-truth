@@ -31,11 +31,11 @@ func _run(scene: LevelScene) -> void:
 	var spool: int = session.assumption_ids[0]
 	await process_frame
 
-	# 接线走 view 的 connection_request 路径(与鼠标一致)
-	board._on_connection_request("n%d" % spool, 0, "n%d" % elim, 0)
-	board._on_connection_request("n%d" % elim, 0, "n%d" % intro, 1)   # 交叉:P→右口
-	board._on_connection_request("n%d" % elim, 1, "n%d" % intro, 0)   # Q→左口
-	board._on_connection_request("n%d" % intro, 0, "n%d" % session.goal_id, 0)
+	# 接线走 session(模型口号;棋盘的 connection_request 是 GraphEdit 图口号)
+	session.connect_wire(spool, 0, elim, 0)
+	session.connect_wire(elim, 0, intro, 1)   # 交叉:P→右口
+	session.connect_wire(elim, 1, intro, 0)   # Q→左口
+	session.connect_wire(intro, 0, session.goal_id, 0)
 	await process_frame
 	await process_frame
 
@@ -44,7 +44,7 @@ func _run(scene: LevelScene) -> void:
 	img.save_png(OUT_DIR + "/m1_solved.png")
 
 	# 错误路径:线轴直连目标 → 冲突徽章
-	board._on_connection_request("n%d" % spool, 0, "n%d" % session.goal_id, 0)
+	session.connect_wire(spool, 0, session.goal_id, 0)
 	await process_frame
 	await process_frame
 	root.get_viewport().get_texture().get_image().save_png(OUT_DIR + "/m1_conflict.png")

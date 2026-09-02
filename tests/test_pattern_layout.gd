@@ -17,6 +17,27 @@ func _leaf_named(entries: Array[Dictionary], n: StringName) -> Dictionary:
 	return {}
 
 
+## v1.1 §4.2:按路径取子式区域(纹样边框按子命题着色用),与 layout 同一套切分
+func test_region_of_path() -> bool:
+	var r := Rect2(0, 0, 100, 100)
+	var whole := PatternView.region_of_path(f("A & B"), r, [] as Array[int])
+	var ok := check(whole.shape == "rect" and whole.rect == r, "[] = 整幅")
+	var l := PatternView.region_of_path(f("A & B"), r, [0] as Array[int])
+	var rr := PatternView.region_of_path(f("A & B"), r, [1] as Array[int])
+	ok = check(l.rect == Rect2(0, 0, 50, 100) and rr.rect == Rect2(50, 0, 50, 100), "并织:左右两半") and ok
+	var top := PatternView.region_of_path(f("A > B"), r, [0] as Array[int])
+	var bottom := PatternView.region_of_path(f("A > B"), r, [1] as Array[int])
+	ok = check(top.rect == Rect2(0, 0, 100, 50) and bottom.rect == Rect2(0, 50, 100, 50), "迭层:上下两半") and ok
+	var tl := PatternView.region_of_path(f("A | B"), r, [0] as Array[int])
+	var br := PatternView.region_of_path(f("A | B"), r, [1] as Array[int])
+	ok = check(tl.shape == "tri" and tl.points == PackedVector2Array([Vector2(0, 0), Vector2(100, 0), Vector2(0, 100)]), "岔纹左上三角") and ok
+	ok = check(br.shape == "tri" and br.points == PackedVector2Array([Vector2(100, 0), Vector2(100, 100), Vector2(0, 100)]), "岔纹右下三角") and ok
+	var nested := PatternView.region_of_path(f("(A & B) | C"), r, [0, 1] as Array[int])
+	ok = check(nested.shape == "rect" and nested.rect == Rect2(24, 0, 24, 48), "岔纹子式退回内接矩形再切分(得 %s)" % str(nested)) and ok
+	ok = check(PatternView.region_of_path(f("A"), r, [0] as Array[int]).is_empty(), "越过叶子 → 空") and ok
+	return ok
+
+
 func test_and_splits_vertically() -> bool:
 	var es := PatternView.layout(f("A & B"), Rect2(0, 0, 100, 100))
 	var a := _leaf_named(es, &"A")

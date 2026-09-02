@@ -40,7 +40,7 @@ func _board_of(scene: LevelScene) -> ProofBoard:
 
 
 func _wire(b: ProofBoard, from_id: int, fp: int, to_id: int, tp: int) -> void:
-	b._on_connection_request("n%d" % from_id, fp, "n%d" % to_id, tp)
+	b.session.connect_wire(from_id, fp, to_id, tp)   # 模型口号(棋盘的 connection_request 是 GraphEdit 图口号)
 
 
 ## 走编辑器 UI 路径把单原子纹样钉到 (node, port)

@@ -50,13 +50,14 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `logic/rules.gd` | 七台仪器规则表(id 与 incredible.pm 规则名对应;`pinnable` 标可钉口) |
 | `logic/unifier.gd` | 一阶合一(occurs check;union-find 式 walk/resolve) |
 | `logic/proof_graph.gd` | 棋盘模型 + solve 五步管线(方程→合一→环→辖域→胜负) |
-| `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、缺口、胜负 |
+| `logic/solve_result.gd` | solve 的输出:端口纹样、边状态、每条边搭载的未消去假设(`edge_hyps`,UI 画整条假设色)、缺口、胜负 |
+| `board/machine_node.gd` `board/proof_board.gd` `board/wire_overlay.gd` | 棋盘视图(全项目仅此两处许用 GraphEdit API):节点端口自画(插头/插座/整圆)、纹样边框按模板元变量着色、钉纹样按钮进节点、封程机凹形(口位 `port_pos` + 板的热区/连线端点/曲线三个虚函数接管、图口号↔模型口号换算)、接错线 `BAD_WIRE_SEC` 自动断、假设线 `set_connection_activity` 染色、徽章与拖线插头叠加层 |
 | `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正;各场景 `_ready` 报槽位 |
-| `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(fix/pin/place/wire/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
+| `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(pin/place/wire;v1.1 删了 fix/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
-| `tests/` | headless 测试,112 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,126 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -87,6 +88,15 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 - **低功耗模式(`run/low_processor_mode`)下画面没变化就不重绘**:每帧要动的东西要么走 Tween/属性变化(渲染服务器会知道),
   要么在 `_process` 里自己改属性;新加 `_process` 必须 `set_process` 门控(空闲时关掉)并加进 `tests/test_perf_settings.gd`
   的 `PROCESS_ALLOWED` 白名单,`_process` 里禁 `queue_redraw`。`max_fps=60` 是硬上限,别删(vsync 在混合显卡笔记本上可能失效)。
+- **GraphNode 的口只能在节点左右边缘、左右缩进对称**(`port_h_offset` 一个数管全部口,y = slot 行中心),想把口挪到别处
+  (封程机臂内沿)只能靠 GraphEdit 三个虚函数:`_is_in_input/output_hotzone`(mouse = 局部坐标/zoom,矩形要自己按主题
+  inner/outer extent 算)、`_get_connection_line`(端点两种坐标:正式连线 `(position_offset+口位)*zoom`、拖线预览
+  `position+口位*zoom`;实现后贝塞尔也要自己出)。**`_draw_port` 在 C++ 绘制阶段被调、早于脚本 `_draw`**,自画端口
+  必须放在最后一个子 Node2D(`PortLayer`)上,`_draw_port` 只留空壳压掉默认圆点。
+- **GraphEdit 的口号是按 slot 顺序数的,不等于模型口号**(封程机假设口排第一排):板内所有信号进出都过
+  `MachineNode.graph_out_port/model_out_port`;脚本/测试直接连线走 `session.connect_wire`,别调 `board._on_connection_request`。
+- **节点里的 Button 要 `mouse_filter = PASS`**:STOP 会把右键也吃掉(右键删机失效),PASS 下左键仍归按钮、其余穿透到 GraphNode;
+  真实输入测试点节点"中央"前先看那里是不是按钮(`visual_smoke_ui` H/I 段改点纹样)。
 
 ## 当前进度
 
@@ -122,7 +132,13 @@ Compatibility 渲染器(删 d3d12);每帧脚本工作收敛(徽章跟随缓存�
 **像素对齐审查**(2026-09-02:用位置参考.png 模板匹配 / base.png 扫框线 / 预览图互相关量出引擎常量的错位并逐一改正——
 故事界面露灰边(垫白底 + 清屏色改乳黄)、场景插图右 8 下 3、立绘压地板线 10、莉娅严肃图矮 6 px(按遮罩画布定位)、
 笔记抽屉 (21,48)→(17,27)、翻页/夹子字号 52→82/78 且夹子按参考排成两行行距 92、收起露出 480→350、标题图与四选项、仪器架与按钮;
-翻页整页图进关时预热;`tools/shot_4k.gd` 出 1:1 截图对照,`tests/test_art_alignment.gd` 固化基准;数字在 ART_INTERFACE §3.5)✅。
+翻页整页图进关时预热;`tools/shot_4k.gd` 出 1:1 截图对照,`tests/test_art_alignment.gd` 固化基准;数字在 ART_INTERFACE §3.5)✅ →
+**v1.1 交互调整**(2026-09-02,策划说明 `v1.1交互调整说明/`:①端口图形 插头/插座/接上整圆、拖线插头随鼠标;②依赖未消去假设的线整条假设色
+(`SolveResult.edge_hyps` → `set_connection_activity`);③错误徽章 64 号白描边、接错的线 0.5 s 自动断开、徽章停 1 s 淡出(欠定保留);
+④节点内部:行距 32、纹样边框按模板元变量着色(P 金 / Q 棕 / R 青,岔纹机两口各自钉色)、汇路机两色分割线、封程机凹形(假设口/输入口在两臂内沿,
+板的三个虚函数接管口位,图口号↔模型口号换算)、「钉纹样」按钮进节点带底色 + 未钉口蚂蚁线(删「已钉」)、弹窗照 image 13 重排(纹样绘制 /
+点选笔刷进行绘制 / 三个线描结构笔刷 / 清空·取消·确认,清空 = 擦画布、空画布确认 = 取消钉住,删挖回孔);⑤首次上架仪器的笔记进关自动翻到它那页
+(每次进关都弹),操作指引删 fix/notebook 只剩 钉/放/拉。headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
