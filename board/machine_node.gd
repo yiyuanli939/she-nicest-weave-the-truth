@@ -32,9 +32,9 @@ const PIN_FONT_SIZE := 36                       # 示意图钉按钮墨高 30–
 const PIN_MARGIN_H := 12.0                      # 钉按钮左右内边距(示意图按钮 ≈ 纹样宽 + 一点)
 const PIN_MARGIN_V := 0.0
 const PIN_GAP := 22.0                           # 可钉纹样与它下方钉按钮的间距(image 9/12 实测 19–24)
-const ROW_GAP := 32                             # 行距(§4.1:image 4/5/6 间距 ≈ 纹样高 × 0.45)
+const ROW_GAP := 32                          # 行距(§4.1:image 4/5/6 间距 ≈ 纹样高 × 0.45)
 const CELL_GAP := 23                            # 行内水平间距 / 中央 spacer 最小宽(两列纹样间距 image 5–8 实测 ≈ 69 = 3 × 23)
-const PANEL_MARGIN := Vector4(16, 12, 16, 16)   # 左/上/右/下内边距(与 theme node_panel 同;凹形节点自画时也用)
+const PANEL_MARGIN := Vector4(20, 12, 20, 16)   # 左/上/右/下内边距(与 theme node_panel 同;凹形节点自画时也用)
 # §1 端口图形
 const PORT_R := 10.0                            # 圆半径(image 6–12 端口直径折算 16–24,取 20)
 const PORT_TIP := 9.0                           # 插头尖角伸出圆外的长度(image 1:尖角 ≈ 直径 × 0.45)
@@ -48,11 +48,11 @@ const PIN_BG_BY_PORT: Dictionary = {&"or_intro": {0: Color("C2CAB9"), 1: Color("
 const PIN_BUTTON_SIDE: Dictionary = {&"or_intro": &"left"}
 # 蚂蚁线:未钉的可钉口纹样外扩一圈静态虚线(image 9/11/12 采样为乳黄)
 const ANT_COLOR := Color("F0E4C8")
-const ANT_INSET := 14.0                         # image 9/11/12 实测 11–15
+const ANT_INSET := 12.0                         # image 9/11/12 实测 11–15
 const ANT_EDGE_INSET := 16.0                    # 可钉纹样再离节点边缘远一点,蚂蚁线不压到 6 px 描边(image 12:纹样距边 30)
 const ANT_W := 2.0
 const ANT_DASH := 8.0
-# §4.3 汇路机分割线(策划给的两色:金线在上、乳黄线紧贴其下)
+# §4.3 汇路机分割线(三行之间两条线:上方金色、下方乳黄色)
 const DIVIDER_GOLD := Color("C9A34F")
 const DIVIDER_CREAM := Color("F2E7CE")
 const DIVIDER_W := 3.0
@@ -524,8 +524,8 @@ func _draw_dividers() -> void:
 		var y := (_local_rect_of(_rows[i]).end.y + _local_rect_of(_rows[i + 1]).position.y) * 0.5
 		var x0 := PANEL_MARGIN.x
 		var x1 := size.x - PANEL_MARGIN.z
-		draw_line(Vector2(x0, y - DIVIDER_W * 0.5), Vector2(x1, y - DIVIDER_W * 0.5), DIVIDER_GOLD, DIVIDER_W)
-		draw_line(Vector2(x0, y + DIVIDER_W * 0.5), Vector2(x1, y + DIVIDER_W * 0.5), DIVIDER_CREAM, DIVIDER_W)
+		var color := DIVIDER_GOLD if i == 0 else DIVIDER_CREAM
+		draw_line(Vector2(x0, y), Vector2(x1, y), color, DIVIDER_W)
 
 
 func _draw_ant_frame(r: Rect2) -> void:

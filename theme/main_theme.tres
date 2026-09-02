@@ -1,21 +1,7 @@
-[gd_resource type="Theme" load_steps=19 format=3]
+[gd_resource type="Theme" format=3 uid="uid://bphv0apf4cuxd"]
 
-; 全局主题:字体 = 美术指定的站酷小薇体(assets/fonts)。缺字兜底分两层:
-; ① 打包的 Noto Sans SC 两字形子集(「回」坏字形已从站酷剥离 + 人名点「·」)—— Web 导出没有系统字体,必须打包;
-; ② 系统字体(桌面端其余极端缺字)。UI 文案已去掉字体没有的符号。
-; 配色取自美术参考图:棕红描边 #6B3B33 / 深棕文字 #4A2F2A / 红棕强调 #A0463A / 乳黄 #F4ECD8 / 黄铜 #C9A24E。
-; 纯文字按钮:无底,悬停文字变浅(美术要求);带图按钮在各自脚本里用 StyleBoxTexture 覆盖。
-; 坐标/字号全部按 3840×2160 逻辑视口。
-
-[ext_resource type="FontFile" path="res://assets/fonts/ZCOOLXiaoWei-Regular.ttf" id="1_zcool"]
-[ext_resource type="FontFile" path="res://assets/fonts/noto_fallback_subset.otf" id="2_noto_subset"]
-
-[sub_resource type="SystemFont" id="sys_fallback"]
-font_names = PackedStringArray("PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC")
-
-[sub_resource type="FontVariation" id="font_main"]
-base_font = ExtResource("1_zcool")
-fallbacks = Array[Font]([ExtResource("2_noto_subset"), SubResource("sys_fallback")])
+[ext_resource type="FontFile" uid="uid://beg0fdy27u41t" path="res://assets/fonts/ZCOOLXiaoWei-Regular.ttf" id="1_zcool"]
+[ext_resource type="FontFile" uid="uid://etg2bev6vsrl" path="res://assets/fonts/noto_fallback_subset.otf" id="2_noto_subset"]
 
 [sub_resource type="StyleBoxEmpty" id="btn_empty"]
 content_margin_left = 24.0
@@ -25,11 +11,11 @@ content_margin_bottom = 12.0
 
 [sub_resource type="StyleBoxEmpty" id="empty"]
 
-[sub_resource type="StyleBoxFlat" id="panel_cream"]
-content_margin_left = 28.0
-content_margin_top = 24.0
-content_margin_right = 28.0
-content_margin_bottom = 24.0
+[sub_resource type="StyleBoxFlat" id="graph_menu"]
+content_margin_left = 12.0
+content_margin_top = 8.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
 bg_color = Color(0.957, 0.925, 0.847, 1)
 border_width_left = 4
 border_width_top = 4
@@ -53,27 +39,38 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[sub_resource type="StyleBoxFlat" id="graph_menu"]
-content_margin_left = 12.0
-content_margin_top = 8.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
-bg_color = Color(0.957, 0.925, 0.847, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
+[sub_resource type="StyleBoxFlat" id="minimap_camera"]
+bg_color = Color(0.788, 0.635, 0.306, 0.25)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.788, 0.635, 0.306, 1)
+
+[sub_resource type="StyleBoxFlat" id="minimap_node"]
+bg_color = Color(0.54, 0.35, 0.27, 0.8)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+[sub_resource type="StyleBoxFlat" id="minimap_panel"]
+bg_color = Color(0.957, 0.925, 0.847, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
 border_color = Color(0.42, 0.23, 0.2, 1)
-corner_radius_top_left = 12
-corner_radius_top_right = 12
-corner_radius_bottom_right = 12
-corner_radius_bottom_left = 12
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="node_panel"]
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
+content_margin_left = 28.0
+content_margin_top = 28.0
+content_margin_right = 28.0
+content_margin_bottom = 28.0
 bg_color = Color(1, 0.98, 0.94, 1)
 border_width_left = 6
 border_width_right = 6
@@ -83,10 +80,10 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
 [sub_resource type="StyleBoxFlat" id="node_panel_selected"]
-content_margin_left = 16.0
-content_margin_top = 12.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
+content_margin_left = 28.0
+content_margin_top = 28.0
+content_margin_right = 28.0
+content_margin_bottom = 28.0
 bg_color = Color(1, 0.98, 0.94, 1)
 border_width_left = 6
 border_width_right = 6
@@ -121,32 +118,21 @@ border_color = Color(0.788, 0.635, 0.306, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 
-[sub_resource type="StyleBoxFlat" id="minimap_panel"]
-bg_color = Color(0.957, 0.925, 0.847, 0.92)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
+[sub_resource type="StyleBoxFlat" id="panel_cream"]
+content_margin_left = 28.0
+content_margin_top = 24.0
+content_margin_right = 28.0
+content_margin_bottom = 24.0
+bg_color = Color(0.957, 0.925, 0.847, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
 border_color = Color(0.42, 0.23, 0.2, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id="minimap_node"]
-bg_color = Color(0.54, 0.35, 0.27, 0.8)
-corner_radius_top_left = 3
-corner_radius_top_right = 3
-corner_radius_bottom_right = 3
-corner_radius_bottom_left = 3
-
-[sub_resource type="StyleBoxFlat" id="minimap_camera"]
-bg_color = Color(0.788, 0.635, 0.306, 0.25)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.788, 0.635, 0.306, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="tooltip_panel"]
 content_margin_left = 16.0
@@ -160,20 +146,27 @@ border_width_right = 3
 border_width_bottom = 3
 border_color = Color(0.42, 0.23, 0.2, 1)
 
+[sub_resource type="SystemFont" id="sys_fallback"]
+font_names = PackedStringArray("PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC")
+
+[sub_resource type="FontVariation" id="font_main"]
+fallbacks = Array[Font]([ExtResource("2_noto_subset"), SubResource("sys_fallback")])
+base_font = ExtResource("1_zcool")
+
 [resource]
 default_font = SubResource("font_main")
 default_font_size = 48
 Button/colors/font_color = Color(0.29, 0.184, 0.165, 1)
+Button/colors/font_disabled_color = Color(0.29, 0.184, 0.165, 0.35)
+Button/colors/font_focus_color = Color(0.29, 0.184, 0.165, 1)
 Button/colors/font_hover_color = Color(0.66, 0.52, 0.48, 1)
 Button/colors/font_hover_pressed_color = Color(0.66, 0.52, 0.48, 1)
 Button/colors/font_pressed_color = Color(0.545, 0.416, 0.376, 1)
-Button/colors/font_focus_color = Color(0.29, 0.184, 0.165, 1)
-Button/colors/font_disabled_color = Color(0.29, 0.184, 0.165, 0.35)
-Button/styles/normal = SubResource("btn_empty")
-Button/styles/hover = SubResource("btn_empty")
-Button/styles/pressed = SubResource("btn_empty")
 Button/styles/disabled = SubResource("btn_empty")
 Button/styles/focus = SubResource("empty")
+Button/styles/hover = SubResource("btn_empty")
+Button/styles/normal = SubResource("btn_empty")
+Button/styles/pressed = SubResource("btn_empty")
 DialoguePanel/base_type = &"PanelContainer"
 DialoguePanel/styles/panel = SubResource("empty")
 GraphEdit/colors/activity = Color(0.77, 0.42, 0.42, 1)
@@ -197,5 +190,5 @@ Label/colors/font_color = Color(0.29, 0.184, 0.165, 1)
 PanelContainer/styles/panel = SubResource("panel_cream")
 PopupPanel/styles/panel = SubResource("panel_cream")
 RichTextLabel/colors/default_color = Color(0.29, 0.184, 0.165, 1)
-TooltipPanel/styles/panel = SubResource("tooltip_panel")
 TooltipLabel/colors/font_color = Color(0.29, 0.184, 0.165, 1)
+TooltipPanel/styles/panel = SubResource("tooltip_panel")
