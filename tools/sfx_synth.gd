@@ -24,6 +24,7 @@ const NAMES: PackedStringArray = [
 	"redo", "reset_board",
 	"brush", "paint", "clear",
 	"drawer_open", "drawer_close", "page", "hint", "guide", "next", "portrait", "win",
+	"loom",
 ]
 
 const ALIASES: Dictionary = {"undo": "back", "unpin": "close", "pin_error": "error", "skip": "zoom"}
@@ -345,6 +346,12 @@ func _r_next() -> PackedFloat32Array:       # 对话推进:纸的一触
 
 func _r_portrait() -> PackedFloat32Array:   # 换人:短织物
 	return _noise(0.13, 1.0, 0.03, 0.03, 0.035, 500.0, 1000.0, 2000.0)
+
+
+func _r_loom() -> PackedFloat32Array:       # 织布机一梭:梭子滑过(织物扫)+ 打纬两下木叩 + 黄铜筘一颤(进入选关 / 选定一关)
+	var b := _add(_noise(0.16, 0.7, 0.02, 0.06, 0.04, 300.0, 900.0, 1800.0), _knock(150.0, 1.0, 0.045), 0.12)
+	b = _add(b, _knock(190.0, 0.9, 0.04), 0.21)
+	return _add(b, _brass(1100.0, 0.2, 0.025), 0.21)
 
 
 func _r_win() -> PackedFloat32Array:        # 织成:C4 低音垫 + 小铃琶音 C5 E5 G5 C6 + 收尾 E6

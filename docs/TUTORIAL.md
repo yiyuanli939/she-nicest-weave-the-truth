@@ -258,6 +258,13 @@ autoload `Sfx`(`game/sfx.gd`,`class_name SoundFx`)照 `Bgm` 的路子做**槽位
 RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这套的 GAIN_DB 建议值都在 0 附近)。`tools/gen_sfx.gd` 出
 `assets/sfx/候选/D_合成/<槽位>.wav`(34 配方 + 4 别名复制;全套 1 s;每条打印时长 / 峰值 / RMS / 峰值因子 / >4k 占比,越界退出码非零);
 噪声以槽位名做种,逐样本可重现。`tests/test_sfx_synth.gd` 三例:配方覆盖 CLIPS 全部槽位 / 每条不刺耳有界 / 可重现且磁盘文件 = 当前配方(改配方没重出就红)。
+**选定装入(2026-09-02)**:用户在试听台逐槽位挑定(33 段 freesound CC0 + 2 段 Kenney:unplug、loom = 原翻页音 `scroll_003` 挪到进入选关 / 选定一关,
+翻页改纸声),要求「保证音效声音的一致性」「保留音效的授权」→ `tools/sfx_normalize.py` 就地统一:解码成单声道 44.1 kHz,起始静音(峰值 -40 dB 以下)
+裁到 5 ms、尾部(-60 dB 以下)裁到 20 ms、2 ms 淡入 / 10 ms 淡出,软限幅(峰值包络、1 ms 前瞻、30 ms 释放,迭代到收敛)把峰值因子压到 ≤ 21 dB
+(木击 / 金属开关的攻击尖峰削 2–8 dB,音色不动;单遍不够 —— 压掉瞬态后整段 RMS 也降,所以要迭代),RMS 归 -18 dBFS 且峰值 ≤ -1 dBFS,落 16 bit WAV
+(ffmpeg 没 libvorbis,且有损再压一遍伤音质;35 个共 1.8 MB),CLIPS 后缀改 .wav、删旧 .ogg + .import;再 `sfx_apply.py <空文件> --test` 做
+`--import` + GAIN_DB 重算 + 全量测试。授权:全部 CC0 不要求署名,但每段的标题 / 作者 / 链接 / 许可都记在 `assets/sfx/音效位置.md`「现用文件与来源」表,
+换文件必须同步补表。
 坑:内嵌 `class` 里别起 `_set`(撞 Object 虚方法签名,整个脚本解析错);`floor()` 返回 Variant,`:=` 推不出类型要用 `floorf`;`SceneTree` 脚本的
 `_initialize` 里一出错就走不到 `quit()`,headless 进程永远挂着 —— 新脚本先 `--check-only`,跑的时候套个 `perl -e 'alarm 60; exec @ARGV'`。
 测试:`tests/test_sfx.gd`(表与时长 / 播放器池与同帧去重 / 静音计数与音量公式 / 按钮钩子 meta / 静态 hit 安全),`test_settings` 加 sfx_volume,
