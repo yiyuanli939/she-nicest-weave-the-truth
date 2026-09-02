@@ -24,6 +24,8 @@ const FILES: Array[String] = [
 	"res://tests/test_step_guide.gd",
 	"res://tests/test_bgm.gd",
 	"res://tests/test_sfx.gd",
+	"res://tests/test_sfx_hooks.gd",
+	"res://tests/test_sfx_synth.gd",
 	"res://tests/test_settings.gd",
 	"res://tests/test_perf_settings.gd",
 	"res://tests/test_art_alignment.gd",
