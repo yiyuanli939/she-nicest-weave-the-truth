@@ -111,8 +111,12 @@ func test_button_hook_meta_override_and_silence() -> bool:
 	var before: int = sfx.play_count
 	b3.pressed.emit()
 	ok = check(sfx.play_count == before, "meta 空串 = 该按钮不出声") and ok
-	# 悬停:普通按钮响 hover,禁用 / 静音按钮不响
+	# 悬停:鼠标刚移动过 → 普通按钮响 hover;禁用 / 静音按钮不响;没有鼠标移动的 mouse_entered(换场景 / 弹窗落在光标底下)不响
 	sfx.last_slot = &""
+	sfx._mouse_moved_frame = -1
+	b.mouse_entered.emit()
+	ok = check(sfx.last_slot == &"", "没有鼠标移动的 mouse_entered 不响 hover(得 %s)" % sfx.last_slot) and ok
+	sfx._mouse_moved_frame = Engine.get_process_frames()
 	b.mouse_entered.emit()
 	ok = check(sfx.last_slot == &"hover", "悬停 → hover") and ok
 	before = sfx.play_count

@@ -12,63 +12,65 @@ extends Node
 
 const CLIPS: Dictionary = {
 	# 通用界面
-	&"click": "res://assets/sfx/click.ogg",              # 任意按钮按下(默认)
-	&"hover": "res://assets/sfx/hover.ogg",              # 按钮悬停(轻)
-	&"back": "res://assets/sfx/back.ogg",                # 返回主界面 / 取消 / 撤销
-	&"confirm": "res://assets/sfx/confirm.ogg",          # 「继续」/ 选关 / 钉纹样确认成功
-	&"open": "res://assets/sfx/open.ogg",                # 弹窗打开(设置 / 钉纹样 / 小机维护)
-	&"close": "res://assets/sfx/close.ogg",              # 弹窗关闭
-	&"toggle": "res://assets/sfx/toggle.ogg",            # 全屏 / 小机联动等开关
-	&"slider": "res://assets/sfx/slider.ogg",            # 音量滑条松手 / 点轨道
-	&"reset_progress": "res://assets/sfx/reset_progress.ogg",
+	&"click": "res://assets/sfx/click.wav",              # 任意按钮按下(默认)
+	&"hover": "res://assets/sfx/hover.wav",              # 按钮悬停(轻)
+	&"back": "res://assets/sfx/back.wav",                # 返回主界面 / 取消 / 撤销
+	&"confirm": "res://assets/sfx/confirm.wav",          # 「继续」/ 钉纹样确认成功
+	&"open": "res://assets/sfx/open.wav",                # 弹窗打开(设置 / 钉纹样 / 小机维护)
+	&"close": "res://assets/sfx/close.wav",              # 弹窗关闭
+	&"toggle": "res://assets/sfx/toggle.wav",            # 全屏 / 小机联动等开关
+	&"slider": "res://assets/sfx/slider.wav",            # 音量滑条松手 / 点轨道
+	&"reset_progress": "res://assets/sfx/reset_progress.wav",
+	&"loom": "res://assets/sfx/loom.wav",                # 织布机声:点选关牌子选定一关(用户 2026-09-02:原翻页音挪到这里;进入选关页改响 page)
 	# 棋盘
-	&"place": "res://assets/sfx/place.ogg",              # 仪器放上棋盘
-	&"delete": "res://assets/sfx/delete.ogg",            # 删仪器
-	&"refuse": "res://assets/sfx/refuse.ogg",            # 线轴 / 目标织机拒删
-	&"pick": "res://assets/sfx/pick.ogg",                # 拿起插头(拉线开始)
-	&"drop": "res://assets/sfx/drop.ogg",                # 插头空放(没接上)
-	&"plug": "res://assets/sfx/plug.ogg",                # 接线成功
-	&"unplug": "res://assets/sfx/unplug.ogg",            # 玩家右键拔线
-	&"error": "res://assets/sfx/error.ogg",              # 冲突 / 成环 / 逃逸徽章出现
-	&"warn": "res://assets/sfx/warn.ogg",                # 欠定徽章出现
-	&"snap": "res://assets/sfx/snap.ogg",                # 接错的线 0.5 s 后自动断开
-	&"move": "res://assets/sfx/move.ogg",                # 拖动仪器松手
-	&"zoom": "res://assets/sfx/zoom.ogg",
-	&"undo": "res://assets/sfx/back.ogg",
-	&"redo": "res://assets/sfx/redo.ogg",
-	&"reset_board": "res://assets/sfx/reset_board.ogg",
+	&"place": "res://assets/sfx/place.wav",              # 仪器放上棋盘
+	&"delete": "res://assets/sfx/delete.wav",            # 删仪器
+	&"refuse": "res://assets/sfx/refuse.wav",            # 线轴 / 目标织机拒删
+	&"pick": "res://assets/sfx/pick.wav",                # 拿起插头(拉线开始)
+	&"drop": "res://assets/sfx/drop.wav",                # 插头空放(没接上)
+	&"plug": "res://assets/sfx/plug.wav",                # 接线成功
+	&"unplug": "res://assets/sfx/unplug.wav",            # 玩家右键拔线
+	&"error": "res://assets/sfx/error.wav",              # 冲突 / 成环 / 逃逸徽章出现
+	&"warn": "res://assets/sfx/warn.wav",                # 欠定徽章出现
+	&"snap": "res://assets/sfx/snap.wav",                # 接错的线 0.5 s 后自动断开
+	&"move": "res://assets/sfx/move.wav",                # 拖动仪器松手
+	&"zoom": "res://assets/sfx/zoom.wav",
+	&"undo": "res://assets/sfx/back.wav",
+	&"redo": "res://assets/sfx/redo.wav",
+	&"reset_board": "res://assets/sfx/reset_board.wav",
 	# 钉纹样弹窗
-	&"brush": "res://assets/sfx/brush.ogg",              # 选笔刷
-	&"paint": "res://assets/sfx/paint.ogg",              # 落笔
-	&"clear": "res://assets/sfx/clear.ogg",              # 清空画布
-	&"unpin": "res://assets/sfx/close.ogg",              # 空画布确认 = 取消钉住
-	&"pin_error": "res://assets/sfx/error.ogg",          # 钉被模型层拒绝
+	&"brush": "res://assets/sfx/brush.wav",              # 选笔刷
+	&"paint": "res://assets/sfx/paint.wav",              # 落笔
+	&"clear": "res://assets/sfx/clear.wav",              # 清空画布
+	&"unpin": "res://assets/sfx/close.wav",              # 空画布确认 = 取消钉住
+	&"pin_error": "res://assets/sfx/error.wav",          # 钉被模型层拒绝
 	# 笔记 / 指引 / 故事
-	&"drawer_open": "res://assets/sfx/drawer_open.ogg",
-	&"drawer_close": "res://assets/sfx/drawer_close.ogg",
-	&"page": "res://assets/sfx/page.ogg",
-	&"hint": "res://assets/sfx/hint.ogg",                # 操作指引换成新一条
-	&"guide": "res://assets/sfx/guide.ogg",              # 语音求助被接受
-	&"next": "res://assets/sfx/next.ogg",                # 对话推进到下一句
-	&"skip": "res://assets/sfx/zoom.ogg",                # 点一下先把当前句显示完
-	&"portrait": "res://assets/sfx/portrait.ogg",        # 立绘换人
-	&"win": "res://assets/sfx/win.ogg",                  # 通关(玩家自己解出)
+	&"drawer_open": "res://assets/sfx/drawer_open.wav",
+	&"drawer_close": "res://assets/sfx/drawer_close.wav",
+	&"page": "res://assets/sfx/page.wav",                # 纸翻页声:笔记翻页、进入选关页(用户要求)
+	&"hint": "res://assets/sfx/hint.wav",                # 操作指引换成新一条
+	&"guide": "res://assets/sfx/guide.wav",              # 语音求助被接受
+	&"next": "res://assets/sfx/next.wav",                # 对话推进到下一句
+	&"skip": "res://assets/sfx/zoom.wav",                # 点一下先把当前句显示完
+	&"portrait": "res://assets/sfx/portrait.wav",        # 立绘换人
+	&"win": "res://assets/sfx/win.wav",                  # 通关(玩家自己解出)
 }
 
 ## 按槽位的响度修正(dB):ffmpeg volumedetect 量 mean/peak,取 (-18 - mean) 并封顶在 -peak(不削波),见音效位置.md
 const GAIN_DB: Dictionary = {
-	&"click": -2.0, &"hover": -4.0, &"back": -1.0, &"confirm": -6.5, &"open": -5.5, &"close": -5.5,
-	&"toggle": -4.0, &"slider": -6.5, &"reset_progress": -2.0, &"place": -2.0, &"delete": -2.5, &"refuse": 1.0,
-	&"pick": -3.5, &"drop": -2.0, &"plug": -5.5, &"unplug": -0.5, &"error": -5.0, &"warn": -6.0,
-	&"snap": -1.5, &"move": -7.0, &"zoom": -6.5, &"undo": -1.0, &"redo": 1.0, &"reset_board": -3.5,
-	&"brush": -5.0, &"paint": -6.5, &"clear": -4.0, &"unpin": -5.5, &"pin_error": -5.0, &"drawer_open": -4.0,
-	&"drawer_close": -4.0, &"page": 1.0, &"hint": -8.0, &"guide": -8.0, &"next": -3.5, &"skip": -6.5,
-	&"portrait": -2.5, &"win": -7.0,
+	&"click": 0.0, &"hover": -4.0, &"back": 1.0, &"confirm": 0.0, &"open": 1.0, &"close": 0.0,
+	&"toggle": 1.0, &"slider": 1.0, &"reset_progress": 0.0, &"loom": 1.0, &"place": 0.0, &"delete": 0.5,
+	&"refuse": 0.0, &"pick": 1.0, &"drop": 1.0, &"plug": 0.0, &"unplug": 0.0, &"error": 0.0,
+	&"warn": 1.0, &"snap": 1.0, &"move": 1.0, &"zoom": 1.0, &"undo": 1.0, &"redo": 0.0,
+	&"reset_board": 0.0, &"brush": 0.0, &"paint": 1.0, &"clear": 0.0, &"unpin": 0.0, &"pin_error": 0.0,
+	&"drawer_open": 0.0, &"drawer_close": 0.5, &"page": 1.0, &"hint": 0.0, &"guide": 0.0, &"next": 1.0,
+	&"skip": 1.0, &"portrait": 1.0, &"win": -5.0,
 }
 const BASE_VOLUME := 0.5                  # 全体基准(约 -6 dB;峰值 -1 dB 的片段修正后不削波)
 const POOL_SIZE := 8                      # 同时最多几声
 const META := &"sfx"                      # 按钮上的槽位覆盖:set_meta(&"sfx", &"back");&"" = 不出声
 const BUTTON_DEFAULT := &"click"
+const HOVER_MOTION_FRAMES := 2            # 悬停音只在这几帧内有过鼠标移动才响(场景切换 / 弹窗出现在光标底下的 mouse_entered 不响)
 
 var user_volume := 1.0                    # 玩家「音效音量」(settings.sfx_volume)
 var last_slot: StringName = &""           # 最近一次真正播出的槽位 / 帧号(测试与冒烟断言用)
@@ -81,6 +83,7 @@ var _next := 0
 var _streams: Dictionary = {}             # path → AudioStream
 var _frame_played: Dictionary = {}        # slot → 上次播出的帧号
 var _mute_depth := 0
+var _mouse_moved_frame := -1              # 最近一次鼠标移动的帧号(_input 里记;autoload 在场景之前收到事件)
 
 
 func _init() -> void:
@@ -97,6 +100,11 @@ func _ready() -> void:
 	if game != null and game.save != null:
 		user_volume = clampf(float(game.save.settings.get("sfx_volume", 1.0)), 0.0, 1.0)
 	get_tree().node_added.connect(_on_node_added)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		_mouse_moved_frame = Engine.get_process_frames()
 
 
 ## 任意 Node 上都能叫:找不到 autoload(测试 / 不在树里)就静默
@@ -201,6 +209,10 @@ func _on_button_pressed(b: BaseButton) -> void:
 	play(button_slot(b))
 
 
+## 禁用 / 静音按钮不响;不是鼠标移过来的 mouse_entered(换场景 / 弹窗出现时按钮落在光标底下)也不响
 func _on_button_hover(b: BaseButton) -> void:
-	if not b.disabled and button_slot(b) != &"":
-		play(&"hover")
+	if b.disabled or button_slot(b) == &"":
+		return
+	if _mouse_moved_frame < 0 or Engine.get_process_frames() - _mouse_moved_frame > HOVER_MOTION_FRAMES:
+		return
+	play(&"hover")

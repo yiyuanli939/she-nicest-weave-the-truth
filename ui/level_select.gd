@@ -25,6 +25,7 @@ func _ready() -> void:
 	var bgm := get_node_or_null("/root/Bgm")
 	if bgm != null:
 		bgm.play(&"title")
+	SoundFx.hit(self, &"page")   # 进入选关页:纸翻页声(用户 2026-09-02「进入选关纸翻页就可以了」;织布机声只留给选定一关)
 	var bg := TextureRect.new()
 	bg.texture = load(BG_PATH)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -79,7 +80,7 @@ func _make_level_button(lv: LevelDef, unlocked: bool) -> Button:
 		elif state == "pressed":
 			sb.modulate_color = Color(0.92, 0.92, 0.92)
 		b.add_theme_stylebox_override(state, sb)
-	b.set_meta(SoundFx.META, &"confirm")
+	b.set_meta(SoundFx.META, &"loom")   # 选定一关:织布机声
 	b.pressed.connect(_game.start_level.bind(lv))
 	return b
 

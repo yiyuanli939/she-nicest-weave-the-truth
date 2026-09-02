@@ -30,11 +30,19 @@ const FLIP_RECT := Rect2(3172, 1532, 220, 144)          # 右下角折角「翻�
 														# 折角三角形(抽屉内):直角 (3195,1540),斜边 (3460,1540)→(3195,1788)
 const CONTENT_RECT := Rect2(642, 436, 2661, 1262)       # 七张整页图内容包围盒(抽屉内;屏幕 659..3319 × 463..1724 实测),仅作参考
 const PAGE_OFFSET := Vector2(-OPEN_X, -DRAWER_Y)        # 整页图按全屏导出:抽屉开位时正好与屏幕对齐
+# 「新机器!」:本关首次上架的仪器那页,纸左上角的提示(用户 2026-09-02;美术图没有 → 纯文字 + 常量留位)
+const NEW_LABEL_TEXT := "新机器!"
+const NEW_LABEL_POS := Vector2(470, 318)                # 抽屉内坐标:纸面左上角实测 (411,278)(notebook_bg 纸色包围盒)向内 (59,40);
+														# 整页图标题墨迹从屏幕 x 1451 起、夹子从抽屉 y 560 起,都不压(冒烟盯)
+const NEW_LABEL_FONT_SIZE := 82                         # 与「翻页」同号
+const NEW_LABEL_COLOR := Color("A3472E")                # 整页图正文红字的中位色(and_intro.png 量的)
 
 var _drawer: Control
 var _handle: Button
 var _flip: Button
 var _page_pic: TextureRect
+var _new_label: Label
+var _new_rules: Array[StringName] = []    # 本关首次上架的仪器 id:翻到它们的页时显示「新机器!」
 var _entries: Array[NotebookEntry] = []
 var _page := 0
 var _open := false
@@ -70,6 +78,14 @@ func _init() -> void:
 	_page_pic.stretch_mode = TextureRect.STRETCH_KEEP   # 原尺寸:不缩放、不改长宽比(美术要求)
 	_page_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_drawer.add_child(_page_pic)
+	_new_label = Label.new()
+	_new_label.text = NEW_LABEL_TEXT
+	_new_label.position = NEW_LABEL_POS
+	_new_label.add_theme_font_size_override("font_size", NEW_LABEL_FONT_SIZE)
+	_new_label.add_theme_color_override("font_color", NEW_LABEL_COLOR)
+	_new_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_new_label.visible = false
+	_drawer.add_child(_new_label)   # 在整页图之上
 	_set_handle_text(false)
 
 
@@ -148,6 +164,12 @@ func open(nb: NotebookCatalog, unlocked: Array = []) -> void:
 	SoundFx.hit(self, &"drawer_open")
 
 
+## 本关首次上架的仪器(LevelScene 进关时按 LevelCatalog.debut_rules 传入):翻到它们的页时纸左上角显示「新机器!」
+func set_new_rules(rules: Array[StringName]) -> void:
+	_new_rules = rules.duplicate()
+	_show_page()
+
+
 ## 同 open(),但翻到 rule_id 对应的条目(v1.1 §5:进关时本关首次上架的仪器自动弹出它的页);找不到就第一页
 func open_at(nb: NotebookCatalog, unlocked: Array, rule_id: StringName) -> void:
 	open(nb, unlocked)
@@ -193,9 +215,11 @@ func _show_page() -> void:
 	if _entries.is_empty():
 		_page_pic.visible = false   # 空 = 白纸(占位文字已按要求全部删除)
 		_flip.visible = false
+		_new_label.visible = false
 		return
 	_flip.visible = _entries.size() > 1
 	var e := _entries[_page]
+	_new_label.visible = _new_rules.has(e.id)
 	var tex: Texture2D = _page_cache.get(e.image)
 	if tex == null and e.image != "" and ResourceLoader.exists(e.image):
 		tex = load(e.image)

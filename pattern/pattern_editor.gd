@@ -51,6 +51,7 @@ var _brush_row: HBoxContainer
 var _confirm: Button
 var _clear_btn: Button
 var _group := ButtonGroup.new()
+var _confirming := false      # 这次关闭是「确认」引起的(结果音归 LevelScene,不响 close)
 
 
 ## 结构笔刷的线描图标(竖线 / 横线 / 对角线,与 PatternView 的分割方向一致)
@@ -70,6 +71,7 @@ class BrushIcon extends Control:
 
 
 func _init() -> void:
+	popup_hide.connect(_on_hidden)   # 取消 / Esc / 点弹窗外面 → close 音统一在这里响
 	# 弹窗外框:乳黄底 + 棕红描边;内容边距只留描边宽,标题带才能贴满上缘、预览紧贴标题带下边线
 	var frame := StyleBoxFlat.new()
 	frame.bg_color = Color(0.957, 0.925, 0.847)
@@ -137,7 +139,7 @@ func _init() -> void:
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	actions.add_child(sp)
 	var cancel := _make_action_button("取消", hide)
-	cancel.set_meta(SoundFx.META, &"close")
+	cancel.set_meta(SoundFx.META, &"")   # 关闭音统一在 _on_hidden 里响(取消 / Esc / 点弹窗外面都走 popup_hide)
 	actions.add_child(cancel)
 	_confirm = _make_action_button("确认", _on_confirm)
 	_confirm.set_meta(SoundFx.META, &"")   # 结果音由 LevelScene 按钉成功 / 拒绝 / 取消钉住分别响
@@ -171,6 +173,7 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 	# 旧笔刷已 remove_child,最小尺寸立即正确;reset_size 让 Window 收缩(它只涨不缩),
 	# 随后同步居中。不能 call_deferred:提交流程"打开→确认→hide"会被迟到的弹出又顶开。
 	reset_size()
+	_confirming = false
 	popup_centered()
 	SoundFx.hit(self, &"open")
 
@@ -341,11 +344,20 @@ func _clear_canvas() -> void:
 
 
 func _on_confirm() -> void:
+	_confirming = visible   # 结果音由 LevelScene 按钉成功 / 拒绝 / 取消钉住分别响,这次关闭不响 close(本来就没开着的不留标记)
 	if is_canvas_empty():
 		pattern_cleared.emit()
 	else:
 		pattern_committed.emit(tree)
 	hide()
+
+
+## 任何方式关掉弹窗(取消按钮 / Esc / 点弹窗外面)都响一声 close;「确认」关掉的不响
+func _on_hidden() -> void:
+	if _confirming:
+		_confirming = false
+		return
+	SoundFx.hit(self, &"close")
 
 
 func _set_brush(b: String) -> void:

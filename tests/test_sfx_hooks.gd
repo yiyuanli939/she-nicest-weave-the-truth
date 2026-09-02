@@ -137,8 +137,19 @@ func test_pattern_editor_hooks() -> bool:
 	for b in ed.find_children("*", "Button", true, false):
 		if (b as Button).text == "取消":
 			cancel = b
-	ok = check(cancel != null and SoundFx.button_slot(cancel) == &"close", "「取消」响 close") and ok
+	ok = check(cancel != null and SoundFx.button_slot(cancel) == &"", "「取消」按钮本身不响(关闭音统一在 popup_hide 里出)") and ok
+	var n_close := _count(sfx, &"close")
+	ed.hide()   # 取消 / Esc / 点弹窗外面都走这条:响一声 close
+	ok = check(_count(sfx, &"close") == n_close + 1, "弹窗以任何方式关掉响一声 close(得 +%d)" % (_count(sfx, &"close") - n_close)) and ok
+	ed.open_for([&"A", &"B"], {}, null, true)
+	n_close = _count(sfx, &"close")
+	ed._on_confirm()   # 「确认」关闭:结果音归 LevelScene,不响 close
+	ok = check(_count(sfx, &"close") == n_close and not ed.visible, "「确认」关弹窗不响 close") and ok
+	ed.open_for([&"A", &"B"], {}, null, true)
+	n_close = _count(sfx, &"close")
+	sfx._frame_played.erase(&"close")   # 同一帧里已经响过一次 close,去重会挡掉这次;测试里手动放行
 	ed.hide()
+	ok = check(_count(sfx, &"close") == n_close + 1, "确认过一次之后再取消仍响 close(标记复位)") and ok
 	tree.root.remove_child(ed)
 	ed.free()
 	return ok

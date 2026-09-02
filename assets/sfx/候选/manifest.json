@@ -3834,10 +3834,10 @@
  "K_Kenney现用": {
   "click": [
    {
-    "file": "../click.ogg",
-    "title": "click.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../click.wav",
+    "title": "Menu FX 03 (ascending).wav",
+    "author": "Nightflame",
+    "url": "https://freesound.org/people/Nightflame/sounds/422516/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3845,10 +3845,10 @@
   ],
   "hover": [
    {
-    "file": "../hover.ogg",
-    "title": "hover.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../hover.wav",
+    "title": "wood percussion 11",
+    "author": "PhonosUPF",
+    "url": "https://freesound.org/people/PhonosUPF/sounds/488913/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3856,10 +3856,10 @@
   ],
   "back": [
    {
-    "file": "../back.ogg",
-    "title": "back.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../back.wav",
+    "title": "Wood Surface Hit 2_5",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485220/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3867,10 +3867,10 @@
   ],
   "confirm": [
    {
-    "file": "../confirm.ogg",
-    "title": "confirm.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../confirm.wav",
+    "title": "Soft Two-Finger Snap",
+    "author": "jackieAZ",
+    "url": "https://freesound.org/people/jackieAZ/sounds/388958/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3878,10 +3878,10 @@
   ],
   "open": [
    {
-    "file": "../open.ogg",
-    "title": "open.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../open.wav",
+    "title": "Old_Suitcase_Latch_open.aif",
+    "author": "tmkappelt",
+    "url": "https://freesound.org/people/tmkappelt/sounds/85700/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3889,10 +3889,10 @@
   ],
   "close": [
    {
-    "file": "../close.ogg",
-    "title": "close.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../close.wav",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3900,10 +3900,10 @@
   ],
   "toggle": [
    {
-    "file": "../toggle.ogg",
-    "title": "toggle.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../toggle.wav",
+    "title": "Metal Switch Button Toggle 01.wav",
+    "author": "DustyWind",
+    "url": "https://freesound.org/people/DustyWind/sounds/697806/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3911,10 +3911,10 @@
   ],
   "slider": [
    {
-    "file": "../slider.ogg",
-    "title": "slider.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../slider.wav",
+    "title": "SingleWind2.wav",
+    "author": "BMacZero",
+    "url": "https://freesound.org/people/BMacZero/sounds/96150/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3922,8 +3922,19 @@
   ],
   "reset_progress": [
    {
-    "file": "../reset_progress.ogg",
-    "title": "reset_progress.ogg",
+    "file": "../reset_progress.wav",
+    "title": "Gong_Center_Mute.wav",
+    "author": "Q.K.",
+    "url": "https://freesound.org/people/Q.K./sounds/56241/",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "loom": [
+   {
+    "file": "../loom.wav",
+    "title": "scroll_003",
     "author": "Kenney",
     "url": "https://kenney.nl/assets",
     "license": "CC0",
@@ -3933,10 +3944,10 @@
   ],
   "place": [
    {
-    "file": "../place.ogg",
-    "title": "place.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../place.wav",
+    "title": "Metallic Scrape Slide",
+    "author": "TheWandermiles",
+    "url": "https://freesound.org/people/TheWandermiles/sounds/673329/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3944,10 +3955,10 @@
   ],
   "delete": [
    {
-    "file": "../delete.ogg",
-    "title": "delete.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../delete.wav",
+    "title": "MetalClank2",
+    "author": "Oddworld",
+    "url": "https://freesound.org/people/Oddworld/sounds/171246/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3955,10 +3966,10 @@
   ],
   "refuse": [
    {
-    "file": "../refuse.ogg",
-    "title": "refuse.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../refuse.wav",
+    "title": "Wood block hit",
+    "author": "thomasjaunism",
+    "url": "https://freesound.org/people/thomasjaunism/sounds/218460/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3966,10 +3977,10 @@
   ],
   "pick": [
    {
-    "file": "../pick.ogg",
-    "title": "pick.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../pick.wav",
+    "title": "Aluminum Can_Pick 2",
+    "author": "CAT-FOX_ALEX",
+    "url": "https://freesound.org/people/CAT-FOX_ALEX/sounds/867753/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3977,10 +3988,10 @@
   ],
   "drop": [
    {
-    "file": "../drop.ogg",
-    "title": "drop.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../drop.wav",
+    "title": "Object dropped on plastic bag",
+    "author": "Dalesome",
+    "url": "https://freesound.org/people/Dalesome/sounds/352717/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3988,10 +3999,10 @@
   ],
   "plug": [
    {
-    "file": "../plug.ogg",
-    "title": "plug.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../plug.wav",
+    "title": "Snap Layered 09.wav",
+    "author": "JoshuaPomeroy",
+    "url": "https://freesound.org/people/JoshuaPomeroy/sounds/532250/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -3999,8 +4010,8 @@
   ],
   "unplug": [
    {
-    "file": "../unplug.ogg",
-    "title": "unplug.ogg",
+    "file": "../unplug.wav",
+    "title": "unplug",
     "author": "Kenney",
     "url": "https://kenney.nl/assets",
     "license": "CC0",
@@ -4010,10 +4021,10 @@
   ],
   "error": [
    {
-    "file": "../error.ogg",
-    "title": "error.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../error.wav",
+    "title": "Long Crackle 01.wav",
+    "author": "ironcross32",
+    "url": "https://freesound.org/people/ironcross32/sounds/582634/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4021,10 +4032,10 @@
   ],
   "warn": [
    {
-    "file": "../warn.ogg",
-    "title": "warn.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../warn.wav",
+    "title": "Chuông 7E",
+    "author": "SieuAmThanh",
+    "url": "https://freesound.org/people/SieuAmThanh/sounds/542075/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4032,10 +4043,10 @@
   ],
   "snap": [
    {
-    "file": "../snap.ogg",
-    "title": "snap.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../snap.wav",
+    "title": "Rubber band twang",
+    "author": "JoMungus",
+    "url": "https://freesound.org/people/JoMungus/sounds/718596/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4043,10 +4054,10 @@
   ],
   "move": [
    {
-    "file": "../move.ogg",
-    "title": "move.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../move.wav",
+    "title": "wooden slide : drawer shutting2.wav",
+    "author": "sophiehall3535",
+    "url": "https://freesound.org/people/sophiehall3535/sounds/245925/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4054,10 +4065,21 @@
   ],
   "zoom": [
    {
-    "file": "../zoom.ogg",
-    "title": "zoom.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../zoom.wav",
+    "title": "clock_tickC_reversed-bass_trebble-boosted",
+    "author": "Mohagged",
+    "url": "https://freesound.org/people/Mohagged/sounds/810939/",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "undo": [
+   {
+    "file": "../back.wav",
+    "title": "Wood Surface Hit 2_5",
+    "author": "Joao_Janz",
+    "url": "https://freesound.org/people/Joao_Janz/sounds/485220/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4065,10 +4087,10 @@
   ],
   "redo": [
    {
-    "file": "../redo.ogg",
-    "title": "redo.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../redo.wav",
+    "title": "Page Flip",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/442858/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4076,10 +4098,10 @@
   ],
   "reset_board": [
    {
-    "file": "../reset_board.ogg",
-    "title": "reset_board.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../reset_board.wav",
+    "title": "Industrial Lever",
+    "author": "Autobot8299",
+    "url": "https://freesound.org/people/Autobot8299/sounds/835550/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4087,10 +4109,10 @@
   ],
   "brush": [
    {
-    "file": "../brush.ogg",
-    "title": "brush.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../brush.wav",
+    "title": "WOOD.wav",
+    "author": "Krokulator",
+    "url": "https://freesound.org/people/Krokulator/sounds/652615/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4098,10 +4120,10 @@
   ],
   "paint": [
    {
-    "file": "../paint.ogg",
-    "title": "paint.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../paint.wav",
+    "title": "Write/Draw with chalk on board",
+    "author": "Breviceps",
+    "url": "https://freesound.org/people/Breviceps/sounds/447925/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4109,10 +4131,32 @@
   ],
   "clear": [
    {
-    "file": "../clear.ogg",
-    "title": "clear.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../clear.wav",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "unpin": [
+   {
+    "file": "../close.wav",
+    "title": "GrabItemCloth.wav",
+    "author": "CJspellsfish",
+    "url": "https://freesound.org/people/CJspellsfish/sounds/609569/",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "pin_error": [
+   {
+    "file": "../error.wav",
+    "title": "Long Crackle 01.wav",
+    "author": "ironcross32",
+    "url": "https://freesound.org/people/ironcross32/sounds/582634/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4120,10 +4164,10 @@
   ],
   "drawer_open": [
    {
-    "file": "../drawer_open.ogg",
-    "title": "drawer_open.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../drawer_open.wav",
+    "title": "Object_Drawer_Wood_Open.wav",
+    "author": "Nox_Sound",
+    "url": "https://freesound.org/people/Nox_Sound/sounds/486081/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4131,10 +4175,10 @@
   ],
   "drawer_close": [
    {
-    "file": "../drawer_close.ogg",
-    "title": "drawer_close.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../drawer_close.wav",
+    "title": "Object_Drawer_Wood_Close.wav",
+    "author": "Nox_Sound",
+    "url": "https://freesound.org/people/Nox_Sound/sounds/486082/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4142,10 +4186,10 @@
   ],
   "page": [
    {
-    "file": "../page.ogg",
-    "title": "page.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../page.wav",
+    "title": "Page turn",
+    "author": "chungus43A",
+    "url": "https://freesound.org/people/chungus43A/sounds/705384/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4153,10 +4197,10 @@
   ],
   "hint": [
    {
-    "file": "../hint.ogg",
-    "title": "hint.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../hint.wav",
+    "title": "Tiny Dink",
+    "author": "ldsqui",
+    "url": "https://freesound.org/people/ldsqui/sounds/813182/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4164,10 +4208,10 @@
   ],
   "guide": [
    {
-    "file": "../guide.ogg",
-    "title": "guide.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../guide.wav",
+    "title": "[UI Sound] Approval - High Pitched Bell Synth",
+    "author": "GabFitzgerald",
+    "url": "https://freesound.org/people/GabFitzgerald/sounds/625174/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4175,10 +4219,21 @@
   ],
   "next": [
    {
-    "file": "../next.ogg",
-    "title": "next.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../next.wav",
+    "title": "That's Not Going Anywhere (Toilet Paper Roll on Bedside Table)",
+    "author": "qubodup",
+    "url": "https://freesound.org/people/qubodup/sounds/861327/",
+    "license": "CC0",
+    "H": null,
+    "dur": null
+   }
+  ],
+  "skip": [
+   {
+    "file": "../zoom.wav",
+    "title": "clock_tickC_reversed-bass_trebble-boosted",
+    "author": "Mohagged",
+    "url": "https://freesound.org/people/Mohagged/sounds/810939/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4186,10 +4241,10 @@
   ],
   "portrait": [
    {
-    "file": "../portrait.ogg",
-    "title": "portrait.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../portrait.wav",
+    "title": "Blanket Movement 6",
+    "author": "OwlStorm",
+    "url": "https://freesound.org/people/OwlStorm/sounds/320144/",
     "license": "CC0",
     "H": null,
     "dur": null
@@ -4197,10 +4252,10 @@
   ],
   "win": [
    {
-    "file": "../win.ogg",
-    "title": "win.ogg",
-    "author": "Kenney",
-    "url": "https://kenney.nl/assets",
+    "file": "../win.wav",
+    "title": "Ballerina Music Box",
+    "author": "JordanWoodland",
+    "url": "https://freesound.org/people/JordanWoodland/sounds/411629/",
     "license": "CC0",
     "H": null,
     "dur": null

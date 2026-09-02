@@ -72,6 +72,19 @@ func _key(keycode: Key) -> void:
 		root.push_input(ev, true)
 
 
+## 真实组合键(ctrl 同时置 meta,macOS 上 ui_undo/ui_redo 映射到 Cmd)
+func _combo(keycode: Key, ctrl: bool, shift: bool) -> void:
+	for pressed in [true, false]:
+		var ev := InputEventKey.new()
+		ev.keycode = keycode
+		ev.physical_keycode = keycode
+		ev.ctrl_pressed = ctrl
+		ev.meta_pressed = ctrl
+		ev.shift_pressed = shift
+		ev.pressed = pressed
+		root.push_input(ev, true)
+
+
 func _button_named(from: Node, text: String) -> Button:
 	for b in from.find_children("*", "Button", true, false):
 		if (b as Button).text == text:
@@ -409,6 +422,14 @@ func _run() -> void:
 	_action("ui_redo")
 	await _settle()
 	_check(s.get_node_ids().size() == 3, "Ctrl+Shift+Z 重做(并织机再次删除)")
+	_action("ui_undo")
+	await _settle()
+	var redo_n: int = sfx.counts.get(&"redo", 0)
+	var undo_n: int = sfx.counts.get(&"undo", 0)
+	_combo(KEY_Z, true, true)   # 真实按键(不是 InputEventAction):非精确匹配下 Ctrl+Shift+Z 也算 ui_undo,必须先判 ui_redo
+	await _settle()
+	_check(s.get_node_ids().size() == 3 and sfx.counts.get(&"redo", 0) == redo_n + 1 and sfx.counts.get(&"undo", 0) == undo_n,
+			"真实按键 Ctrl+Shift+Z 是重做不是撤销,响 redo 不响 undo(得 %d 节点,%s)" % [s.get_node_ids().size(), sfx.last_slot])
 
 	# ---- I. 点击选中 → 按删除键删除(真实输入;Backspace 覆盖 Mac 的 delete 键;点在纹样上 —— 节点中央现在是钉按钮) ----
 	mn = board.get_node("n%d" % mid) as MachineNode
@@ -509,8 +530,29 @@ func _run() -> void:
 	_check(s.get_wire_carries_hyp(imp_id, 1, imp_id, 0), "这条线搭载未消去的假设(整条假设色)")
 	imp = board.get_node("n%d" % imp_id) as MachineNode
 	_check(imp.is_output_wired(1) and imp.is_input_wired(0), "假设口插头插进 Q 口:出口不画插头、入口整圆")
-	s.disconnect_wire(imp_id, 1, imp_id, 0)
+	var pick_n: int = sfx.counts.get(&"pick", 0)
+	var unplug_n: int = sfx.counts.get(&"unplug", 0)
+	var drop_n: int = sfx.counts.get(&"drop", 0)
+	_press(q_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)   # 从已接的入口把线拖起来放到空处(改接)
+	_motion(q_pt + Vector2(0, 260), MOUSE_BUTTON_MASK_LEFT)
 	await _settle()
+	_press(q_pt + Vector2(0, 260), MOUSE_BUTTON_LEFT, false, 0)
+	await _settle()
+	_check(s.get_wires().is_empty(), "从已接的入口拖起线放到空处:线断开")
+	_check(sfx.counts.get(&"unplug", 0) == unplug_n + 1 and sfx.counts.get(&"drop", 0) == drop_n + 1 and sfx.counts.get(&"pick", 0) == pick_n,
+			"音效:改接响 unplug 与 drop,不再叠 pick(得 pick+%d)" % (int(sfx.counts.get(&"pick", 0)) - pick_n))
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	var close_n: int = sfx.counts.get(&"close", 0)
+	_key(KEY_ESCAPE)
+	await _settle()
+	_check(not scene._editor.visible and sfx.counts.get(&"close", 0) == close_n + 1, "钉纹样弹窗按 Esc 关闭响一声 close(得 %s)" % sfx.last_slot)
+	_click(_center(imp._pin_buttons[1]), MOUSE_BUTTON_LEFT)
+	await _settle()
+	close_n = sfx.counts.get(&"close", 0)
+	_button_named(scene._editor, "取消").pressed.emit()
+	await _settle()
+	_check(not scene._editor.visible and sfx.counts.get(&"close", 0) == close_n + 1, "弹窗「取消」只响一声 close(得 +%d)" % (int(sfx.counts.get(&"close", 0)) - close_n))
 	var stock_pt: Vector2 = imp.global_position + imp.stock_port_pos(false, 0) * board.zoom
 	_press(stock_pt, MOUSE_BUTTON_LEFT, true, MOUSE_BUTTON_MASK_LEFT)
 	_motion(q_pt, MOUSE_BUTTON_MASK_LEFT)
@@ -644,9 +686,13 @@ func _run() -> void:
 		await _settle()
 		_check(not sp.visible and current_scene == menu, "再开一次按 Esc 收起、仍在标题页")
 		_check(sfx.last_slot == &"close", "音效:Esc 收起也响 close(得 %s)" % sfx.last_slot)
+		var click_n: int = sfx.counts.get(&"click", 0)
+		var page_n: int = sfx.counts.get(&"page", 0)
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
+		_check(sfx.counts.get(&"click", 0) == click_n and sfx.counts.get(&"page", 0) == page_n + 1 and sfx.last_slot == &"page",
+				"音效:点「开始游戏」只响一声纸翻页 page、按钮本身不响 click(得 %s)" % sfx.last_slot)
 		_check(bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0, "标题到选关 BGM 不重启(同一播放器接着播)")
 		game.save.mark_solved(&"l01")
 		game.save.save()
@@ -698,6 +744,7 @@ func _run() -> void:
 	await _settle()
 	var select := current_scene as LevelSelect
 	_check(select != null, "选关页加载")
+	_check(sfx.last_slot == &"page", "音效:进入选关页响纸翻页声 page(得 %s)" % sfx.last_slot)
 	if select != null:
 		var level_btns: Array[Button] = []
 		var enabled := 0
@@ -732,9 +779,12 @@ func _run() -> void:
 			if (b as Button).text == "第一纹" and not (b as Button).disabled:
 				first = b
 		if first != null:
+			var loom_n: int = sfx.counts.get(&"loom", 0)
 			_click(_center(first), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(current_scene is StoryScene, "点第一纹 → 故事界面")
+			_check(sfx.counts.get(&"loom", 0) == loom_n + 1 and sfx.counts.get(&"confirm", 0) == 0 or sfx.last_slot != &"confirm",
+					"音效:选定一关响织布机声 loom、不响 confirm(得 %s)" % sfx.last_slot)
 			_check(bgm.slot == &"title" and bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0,
 					"进第一章故事界面 BGM 仍是标题曲、同一播放器接着播不重启")
 			if current_scene is StoryScene:
@@ -892,6 +942,7 @@ func _run() -> void:
 		await _settle()
 	var s1 := current_scene as LevelScene
 	_check(not s1._notebook_ui.is_open(), "l01 没有新仪器:笔记不自动弹出")
+	_check(not s1._notebook_ui._new_label.visible, "l01 没有仪器:笔记里没有「新机器!」")
 	_check(s1._step_hint.visible and s1._step_hint.text == StepGuide.TEXT[&"wire"], "l01 没有仪器架:提示拉线")
 	_check(not s1._guide_hint.visible or s1._step_hint.position.y < s1._guide_hint.position.y, "操作指引在求助提示上一行")
 	s1.session.connect_wire(s1.session.assumption_ids[0], 0, s1.session.goal_id, 0)
@@ -909,6 +960,12 @@ func _run() -> void:
 	_check(nb2.is_open() and is_equal_approx(nb2._drawer.position.x, NotebookUI.OPEN_X), "l02 首次上架并织机:进关笔记自动划出")
 	_check(nb2._entries.size() == 1 and nb2._page == 0 and nb2._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
 			"自动翻到并织机那页")
+	_check(nb2._new_label.visible and nb2._new_label.text == "新机器!" and nb2._new_label.position == NotebookUI.NEW_LABEL_POS
+			and nb2._new_label.get_index() > nb2._page_pic.get_index(), "并织机是本关新机器:纸左上角显示「新机器!」(在整页图之上)")
+	var lbl_rect: Rect2 = nb2._new_label.get_global_rect()
+	_check(lbl_rect.position.x > NotebookUI.OPEN_X + 411 and lbl_rect.position.y > NotebookUI.DRAWER_Y + 278
+			and lbl_rect.end.x < 1451 and lbl_rect.end.y < NotebookUI.DRAWER_Y + 560,
+			"「新机器!」在纸面左上角空白里:不出纸、不压标题墨迹(x<1451)、不压夹子(y<587)(得 %s)" % str(lbl_rect))
 	_click(_center(nb2._handle), MOUSE_BUTTON_LEFT)   # 继续工作
 	await nb2.slide_finished
 	await _settle()
@@ -931,6 +988,15 @@ func _run() -> void:
 	var nb3: NotebookUI = s3._notebook_ui
 	await _wait_until(func() -> bool: return nb3.is_open() and is_equal_approx(nb3._drawer.position.x, NotebookUI.OPEN_X), 3.0)
 	_check(nb3.is_open() and nb3._entries[nb3._page].id == &"imp_intro", "l07 首次上架封程机:自动翻到封程机那页(不是第一页)")
+	_check(nb3._new_label.visible, "封程机那页显示「新机器!」")
+	nb3._next_page()
+	await _settle()
+	_check(nb3._entries[nb3._page].id != &"imp_intro" and not nb3._new_label.visible, "翻到不是新机器的页:「新机器!」隐藏")
+	for i in nb3._entries.size():
+		if nb3._entries[nb3._page].id != &"imp_intro":
+			nb3._next_page()
+	await _settle()
+	_check(nb3._entries[nb3._page].id == &"imp_intro" and nb3._new_label.visible, "翻回封程机页:「新机器!」再出现")
 	_click(_center(nb3._handle), MOUSE_BUTTON_LEFT)
 	await nb3.slide_finished
 	await _settle()

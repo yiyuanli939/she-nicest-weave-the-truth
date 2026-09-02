@@ -66,7 +66,8 @@ Windows 下第一条用 `py -3 tools/xlsx_to_csv.py`(转换器只用 Python 标�
 目录仍 7 条全量(`narrative/data/notebook.tres`,id = rule_id,顺序同仪器架);关内只显示本关上架仪器的页
 (按 allowed_rules 过滤)。点右缘「笔记」划出,「翻页」循环。
 **进关时本关首次上架的仪器**(`LevelCatalog.debut_rules`:与上一关的 allowed_rules 之差)**自动划出并翻到它那页**
-(v1.1;每次进这一关都弹,点「继续工作」收起;`NotebookUI.open_at`)。
+(v1.1;每次进这一关都弹,点「继续工作」收起;`NotebookUI.open_at`)。这些仪器的页在本关翻到时纸左上角显示「新机器!」
+(`NotebookUI.set_new_rules`,进关时传 `debut_rules`;手动翻回去也显示,别的页不显示;位置 / 字号 / 字色常量在 `docs/ART_INTERFACE.md` §3)。
 - **改一页** = 用同规格 PNG 覆盖对应 `<rule_id>.png`(`--import` 后连 `.import` 一起提交)。
 - **新增仪器的页** = 放图 + `tools/gen_levels.gd` `NOTEBOOK_IDS` 加一行,重跑生成器。
 - **文案守则**(由美术在图里执行):只讲机器行为与操作,用纺织语汇(并纹/岔纹/迭层纹/焦纹/封单/借丝);

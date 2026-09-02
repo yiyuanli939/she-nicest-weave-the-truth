@@ -28,6 +28,7 @@ var atom_colors: Dictionary = {}
 var _overlay: WireOverlay
 var _pending_breaks: Dictionary = {}   # 边 Vector4i -> bool:已排队等待断开;值 = 断开时要不要出声
 var _wired_this_drag := false          # 本次拖线里已经接上(区分「接上」与「空放」音效)
+var _detached_frame := -1              # 玩家从已接的口把线拖起来的那一帧(同帧的拖线开始不再叠 pick,unplug 已经响过)
 var _last_zoom := 1.0
 
 
@@ -216,6 +217,7 @@ func _on_disconnection_request(from_node: StringName, from_port: int, to_node: S
 	if fn == null or tn == null:
 		return
 	session.disconnect_wire(fn.node_id, fn.model_out_port(from_port), tn.node_id, to_port)
+	_detached_frame = Engine.get_process_frames()
 	SoundFx.hit(self, &"unplug")
 
 
@@ -258,7 +260,8 @@ func _on_drag_started(from_node: StringName, from_port: int, is_output: bool) ->
 		color = MachineNode.HYP_COLOR
 	_overlay.begin_plug(color)
 	_wired_this_drag = false
-	SoundFx.hit(self, &"pick")
+	if _detached_frame != Engine.get_process_frames():
+		SoundFx.hit(self, &"pick")   # 从已接的口拖起来的改接:unplug 已响,不再叠 pick(松手仍按接上 / 空放响)
 
 
 func _on_zoom_check() -> void:

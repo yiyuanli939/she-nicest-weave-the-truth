@@ -1,0 +1,83 @@
+<title>静语纹关内曲工坊</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--ground:#ECE6D8;--panel:#F7F3EA;--panel2:#E4DCCB;--ink:#262320;--muted:#6E6558;--line:#D3C9B4;--brass:#9A7A2C;--brass-soft:#E6D6A6;--thread:#2E6F69;--thread-soft:#CFE3DF;--roll:#F1ECDF;--focus:#2E6F69;
+ --serif:"Noto Serif SC","Songti SC","STSong",serif;--sans:"Noto Sans SC","PingFang SC","Hiragino Sans GB",sans-serif;--mono:"JetBrains Mono","SF Mono",Menlo,monospace;}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ground:#1E1B17;--panel:#27231E;--panel2:#332D26;--ink:#EDE6D7;--muted:#A89E8E;--line:#3F3730;--brass:#D3AB4C;--brass-soft:#4A3C1C;--thread:#74B8B0;--thread-soft:#1F3B38;--roll:#1A1714;--focus:#74B8B0;}}
+:root[data-theme="dark"]{--ground:#1E1B17;--panel:#27231E;--panel2:#332D26;--ink:#EDE6D7;--muted:#A89E8E;--line:#3F3730;--brass:#D3AB4C;--brass-soft:#4A3C1C;--thread:#74B8B0;--thread-soft:#1F3B38;--roll:#1A1714;--focus:#74B8B0;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+header{position:sticky;top:0;z-index:5;background:var(--panel);border-bottom:1px solid var(--line);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center}
+h1{font-family:var(--serif);font-weight:700;font-size:22px;margin:0;letter-spacing:.02em}
+h1 small{font-family:var(--sans);font-weight:400;font-size:13px;color:var(--muted);margin-left:12px}
+.ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.ctl label{text-transform:uppercase;letter-spacing:.08em;font-size:11px;font-family:var(--mono)}
+input[type=range]{accent-color:var(--brass);width:140px}
+button{font:inherit;cursor:pointer;border-radius:4px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:5px 10px}
+button:hover{border-color:var(--brass)}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+button.primary{background:var(--brass);border-color:var(--brass);color:#fff;font-weight:500}
+main{padding:18px 24px 60px;max-width:1180px}
+.intro{color:var(--muted);font-size:13px;margin:0 0 16px;max-width:72ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.card.playing{border-color:var(--brass);box-shadow:0 0 0 2px var(--brass-soft)}
+.card h2{font-family:var(--serif);font-size:19px;margin:0;display:flex;align-items:baseline;gap:10px}
+.card h2 .id{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.06em}
+.mood{color:var(--muted);font-size:13px;margin:0}
+.meta{display:flex;gap:14px;font-family:var(--mono);font-size:11.5px;color:var(--muted);flex-wrap:wrap;font-variant-numeric:tabular-nums}
+canvas.roll{width:100%;height:96px;background:var(--roll);border:1px solid var(--line);border-radius:4px;display:block}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.play{min-width:84px}
+.play.on{background:var(--thread);border-color:var(--thread);color:#fff}
+.bar{flex:1;height:6px;background:var(--panel2);border-radius:3px;overflow:hidden;min-width:80px;cursor:pointer}
+.bar i{display:block;height:100%;width:0;background:var(--brass)}
+.chap{display:flex;gap:6px;flex-wrap:wrap}
+.chap button{font-size:12px;padding:3px 9px}
+.chap button.sel{background:var(--thread-soft);border-color:var(--thread);color:var(--ink)}
+.harm{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.7;word-break:break-word}
+.harm b{color:var(--brass);font-weight:600}
+.checks{font-size:12px;color:var(--muted)}
+.checks .ok{color:var(--thread)}
+#out{display:none;margin-top:16px;padding:12px 14px;background:var(--panel);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;white-space:pre-wrap}
+.toast{position:fixed;right:20px;bottom:20px;background:var(--ink);color:var(--ground);padding:8px 14px;border-radius:4px;font-size:13px;opacity:0;transition:opacity .2s}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){.toast{transition:none}}
+.summary{margin:18px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:6px;background:var(--panel);display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 18px;font-size:13px}
+.summary b{font-family:var(--mono);font-weight:600;color:var(--brass);margin-right:8px}
+</style>
+<header>
+ <h1>静语纹关内曲工坊<small>五首按乐理写的循环曲 · 真实音色渲染 · 给四章各挑一首</small></h1>
+ <div class="ctl"><label>音量</label><input id="vol" type="range" min="0" max="1" step="0.05" value="0.8"></div>
+ <div class="ctl"><button class="primary" id="copy">复制选择结果</button><button id="stopall">全部停止</button></div>
+</header>
+<main>
+ <p class="intro">每首都是 16 小节平行乐段(前句半终止、后句完全终止),四部和声按声部进行规则排好(无平行五八度、导音与七音按规解决),旋律强拍落和弦音、弱拍级进,再用 MuseScore General 音色库渲染,首尾接成无缝循环。卡片里列了逐小节和声与检查结果。点「播放」试听,用章节按钮指派给第一到第四章;没指派的章保持现在的 level.wav。选完点「复制选择结果」贴给我。</p>
+ <div class="grid" id="grid"></div>
+ <div class="summary" id="summary"></div>
+ <div id="out"></div>
+</main>
+<div class="toast" id="toast"></div>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const P=JSON.parse(document.getElementById('data').textContent);
+const CH=['第一章 并纹','第二章 叠层纹','第三章 岔纹','第四章 焦纹'];
+const KEY='she-nicest-level-music-v2';
+let assign={};try{assign=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){assign={}}
+const vol=document.getElementById('vol');const audios={};let cur=null;
+function audioOf(p){if(!audios[p.id]){const a=new Audio(p.src);a.loop=true;a.preload='auto';audios[p.id]=a}return audios[p.id]}
+vol.oninput=()=>{for(const k in audios)audios[k].volume=parseFloat(vol.value)};
+function play(id){const p=P.find(x=>x.id===id);const a=audioOf(p);if(cur&&cur!==a){cur.pause();cur.currentTime=0}if(!a.paused){a.pause();a.currentTime=0;cur=null;paint();return}a.volume=parseFloat(vol.value);a.play().catch(()=>toast('浏览器拦下了自动播放,再点一次'));cur=a;paint();anim()}
+function stop(){if(cur){cur.pause();cur.currentTime=0;cur=null}paint()}
+function paint(){document.querySelectorAll('.card').forEach(c=>{const a=audios[c.dataset.id];const on=a&&!a.paused;c.classList.toggle('playing',!!on);const b=c.querySelector('.play');b.classList.toggle('on',!!on);b.textContent=on?'■ 停止':'▶ 播放';if(!on)c.querySelector('.bar i').style.width='0'})}
+function anim(){if(!cur||cur.paused)return;const id=Object.keys(audios).find(k=>audios[k]===cur);const c=document.querySelector(`.card[data-id="${id}"] .bar i`);if(c&&cur.duration)c.style.width=(100*cur.currentTime/cur.duration)+'%';requestAnimationFrame(anim)}
+function drawRoll(cv,p){const dpr=window.devicePixelRatio||1;const W=cv.clientWidth||600,H=96;cv.width=W*dpr;cv.height=H*dpr;const g=cv.getContext('2d');g.scale(dpr,dpr);const bl=60/p.bpm;let lo=127,hi=0;for(const tr of p.tracks){if(tr.ch===9)continue;for(const n of tr.notes){lo=Math.min(lo,n[2]);hi=Math.max(hi,n[2])}}const span=Math.max(hi-lo,12);const cs=getComputedStyle(document.documentElement);g.strokeStyle=cs.getPropertyValue('--line');g.lineWidth=1;for(let b=0;b<=p.bars;b+=8){const x=b*p.beats_per_bar*bl/p.duration*W;g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}const col={'旋律':cs.getPropertyValue('--brass'),'伴奏':cs.getPropertyValue('--thread'),'铺底':cs.getPropertyValue('--thread'),'低音':cs.getPropertyValue('--ink'),'打击':cs.getPropertyValue('--muted')};for(const tr of p.tracks){g.fillStyle=col[tr.name]||'#888';g.globalAlpha=tr.name==='旋律'?0.95:(tr.ch===9?0.25:0.55);for(const [b,d,m,v] of tr.notes){const x=b*bl/p.duration*W,w=Math.max(1.5,d*bl/p.duration*W);const y=tr.ch===9?H-4:H-6-((m-lo)/span)*(H-12);g.fillRect(x,y-1.5,w-0.5,3)}}g.globalAlpha=1}
+function harmHtml(p){const per=p.beats_per_bar;const cad=p.cadences||{};let out=[];p.progression.forEach((c,i)=>{const bar=i+1;const k='bar'+bar;out.push(cad[k]?`${c}<b>·${cad[k]}</b>`:c);if(bar%8===0&&bar<p.progression.length)out.push('|')});return out.join(' ')}
+function checksHtml(p){const c=p.checks;const ok=(c.parallel_5_8_music21===0&&c.melody_tritone_leaps===0&&c.melody_leaps_over_m6===0&&c.pac_soprano_deg===1);return `<span class="${ok?'ok':''}">${ok?'✓':'!'} 平行五八 ${c.parallel_5_8_music21} · 三全音跳进 ${c.melody_tritone_leaps} · 超小六度跳进 ${c.melody_leaps_over_m6} · 半终止高音 ${c.hc_soprano_deg}̂ · 完全终止高音 ${c.pac_soprano_deg}̂ · 旋律音域 ${c.melody_range} 半音</span>`}
+function render(){const grid=document.getElementById('grid');grid.innerHTML='';for(const p of P){const card=document.createElement('div');card.className='card';card.dataset.id=p.id;card.innerHTML=`<h2>${p.name}<span class="id">${p.id}</span></h2><p class="mood">${p.mood}</p><div class="meta"><span>${p.key}</span><span>${p.meter}</span><span>${p.bpm} bpm</span><span>${p.bars} 小节 · ${p.duration.toFixed(1)} s 循环</span><span>${p.note_count} 音</span></div><canvas class="roll"></canvas><div class="row"><button class="play">▶ 播放</button><div class="bar"><i></i></div></div><div class="harm">${harmHtml(p)}</div><div class="checks">${checksHtml(p)}</div><div class="chap">${CH.map((c,i)=>`<button data-ch="${i+1}" class="${assign['level_'+(i+1)]===p.id?'sel':''}">${c.slice(0,3)}</button>`).join('')}</div>`;card.querySelector('.play').onclick=()=>play(p.id);card.querySelector('.bar').onclick=(e)=>{const a=audios[p.id];if(a&&a.duration){const r=e.currentTarget.getBoundingClientRect();a.currentTime=a.duration*(e.clientX-r.left)/r.width}};card.querySelectorAll('.chap button').forEach(b=>{b.onclick=()=>{const k='level_'+b.dataset.ch;assign[k]=assign[k]===p.id?'':p.id;try{localStorage.setItem(KEY,JSON.stringify(assign))}catch(e){}render();paint()}});grid.appendChild(card);drawRoll(card.querySelector('canvas'),p)}summary();paint()}
+function summary(){const s=document.getElementById('summary');s.innerHTML=CH.map((c,i)=>{const id=assign['level_'+(i+1)];const p=P.find(x=>x.id===id);return `<div><b>level_${i+1}</b>${c}:${p?p.name:'现用 level.wav'}</div>`}).join('')}
+document.getElementById('copy').onclick=()=>{const lines=CH.map((c,i)=>{const id=assign['level_'+(i+1)];const p=P.find(x=>x.id===id);return `level_${i+1}: ${p?p.id:'(保持 level.wav)'}   # ${c}${p?' → '+p.name:''}`});const txt=lines.join('\n');const o=document.getElementById('out');o.style.display='block';o.textContent=txt;navigator.clipboard&&navigator.clipboard.writeText(txt).then(()=>toast('已复制,贴给我即可'),()=>toast('已列在下方,手动复制'))};
+document.getElementById('stopall').onclick=stop;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)}
+render();window.addEventListener('resize',()=>{for(const p of P){const cv=document.querySelector(`.card[data-id="${p.id}"] canvas`);if(cv)drawRoll(cv,p)}});
+</script>

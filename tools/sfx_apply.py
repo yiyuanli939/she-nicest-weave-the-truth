@@ -80,8 +80,9 @@ def main(argv):
         ext = os.path.splitext(p)[1].lower()
         old_ext = os.path.splitext(res)[1].lower()
         target = os.path.join(DST, stem + ext)
-        shutil.copy(p, target)
-        changed += 1
+        if os.path.abspath(p) != os.path.abspath(target):   # 「保留现用」行:源就是目标,跳过
+            shutil.copy(p, target)
+            changed += 1
         if ext != old_ext:
             for e in EXTS:
                 if e != ext:

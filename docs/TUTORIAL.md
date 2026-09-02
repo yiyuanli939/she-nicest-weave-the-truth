@@ -197,7 +197,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | §4.4 封程机凹形 | GraphNode 的口只能在左右边缘、左右缩进对称(`port_h_offset`),做不到"臂内沿";于是:行结构 [左臂 VBox(假设 P + 钉按钮) \| 缺口 spacer \| 右臂 Q] / [spacer \| P>Q] / [标题 Label],`title=""` + 顶部标题栏字号 1 + panel/titlebar 样式覆盖为空,U 形与底部标题带在 `_draw` 自画;口位 `port_pos()`,`ProofBoard` 覆写 `_is_in_input/output_hotzone`(热区矩形按主题 inner/outer extent 自算)与 `_get_connection_line`(端点命中引擎口位就换成 `port_pos`,再按引擎同款 `Curve2D` 贝塞尔出线;正式连线端点 = `(position_offset + 口位) * zoom`,拖线预览 = `position + 口位 * zoom`,两种都试)。引擎按 slot 顺序给右口编号,假设口在第一排 → 图口号 ≠ 模型口号,`graph_out_port/model_out_port` 换算;脚本/测试连线一律走 `session.connect_wire`(模型口号) |
 | §4.5 钉纹样按钮进节点 + 蚂蚁线 | 按钮文字一律「钉纹样」,`UiStyles.fill_button` 底色(默认乳黄,岔纹机两口用各自钉色),位置 `PIN_BUTTON_SIDE`(默认纹样下方另起无口一行;岔纹机在纹样左侧同一行);`mouse_filter = PASS` 让右键穿透到节点(右键删机在按钮上也生效);未钉口 `_draw` 画静态虚线框(低功耗模式不做无限动画,`set_loops` 被测试禁止);「已钉」小字删除 |
 | §4.6 弹窗改版 | `PatternEditor` 照 image 13 重排:标题带「纹样绘制」→ 预览 → 「点选笔刷进行绘制:」→ 色块 + 并织/迭层/岔纹线描图标(`BrushIcon`)[+ 焦纹图样(v1.2)] → 清空 / 取消 / 确认(带底色);删提示行与「挖回孔」;「清空」擦回一个孔不关窗,「确认」全染时钉住、整幅还是孔时 = 取消钉住(`pattern_cleared`);外框内容边距只留描边宽、标题带贴满上缘 |
-| §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步 |
+| §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步。2026-09-02 用户加:新仪器的页纸左上角显示「新机器!」(`set_new_rules(debut)` → `_show_page` 按条目 id 显隐 `_new_label`;纯文字 + 常量 `NEW_LABEL_*`,纸面左上角 (411,278) 向内 (59,40),字号同「翻页」82、字色取整页图正文红 A3472E;`shot_4k` 的 4k_notebook 现在翻到新仪器页带标签) |
 
 用户答复的歧义:「清空」= 清空画布、空画布「确认」= 取消钉住;弹窗完全照 image 13;笔记每次进关都弹。
 自定的假设:端口/假设口颜色沿用;蚂蚁线静态;只有 冲突/成环/逃逸 自动断;提示计时从接线起;「焦纹」笔刷起初保留文字(v1.2 改成焦纹图样,见 3.8)。
@@ -258,6 +258,22 @@ autoload `Sfx`(`game/sfx.gd`,`class_name SoundFx`)照 `Bgm` 的路子做**槽位
 RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这套的 GAIN_DB 建议值都在 0 附近)。`tools/gen_sfx.gd` 出
 `assets/sfx/候选/D_合成/<槽位>.wav`(34 配方 + 4 别名复制;全套 1 s;每条打印时长 / 峰值 / RMS / 峰值因子 / >4k 占比,越界退出码非零);
 噪声以槽位名做种,逐样本可重现。`tests/test_sfx_synth.gd` 三例:配方覆盖 CLIPS 全部槽位 / 每条不刺耳有界 / 可重现且磁盘文件 = 当前配方(改配方没重出就红)。
+**选定装入(2026-09-02)**:用户在试听台逐槽位挑定(33 段 freesound CC0 + 2 段 Kenney:unplug、loom = 原翻页音 `scroll_003` 挪到选定一关,
+翻页改纸声;进入选关页先也响 loom,用户听过 Web 版后改为纸翻页 page、「开始游戏」按钮本身静音),要求「保证音效声音的一致性」「保留音效的授权」→ `tools/sfx_normalize.py` 就地统一:解码成单声道 44.1 kHz,起始静音(峰值 -40 dB 以下)
+裁到 5 ms、尾部(-60 dB 以下)裁到 20 ms、2 ms 淡入 / 10 ms 淡出,软限幅(峰值包络、1 ms 前瞻、30 ms 释放,迭代到收敛)把峰值因子压到 ≤ 21 dB
+(木击 / 金属开关的攻击尖峰削 2–8 dB,音色不动;单遍不够 —— 压掉瞬态后整段 RMS 也降,所以要迭代),RMS 归 -18 dBFS 且峰值 ≤ -1 dBFS,落 16 bit WAV
+(ffmpeg 没 libvorbis,且有损再压一遍伤音质;35 个共 1.8 MB),CLIPS 后缀改 .wav、删旧 .ogg + .import;再 `sfx_apply.py <空文件> --test` 做
+`--import` + GAIN_DB 重算 + 全量测试。授权:全部 CC0 不要求署名,但每段的标题 / 作者 / 链接 / 许可都记在 `assets/sfx/音效位置.md`「现用文件与来源」表,
+换文件必须同步补表。
+**复核(2026-09-02,用户「check 可能让人觉得奇怪的音效以及硬 bug」)**:`tools/sfx_trace.gd` 按真实输入走全流程、每步打印计数差,
+另在 Chrome 里给 Web 版打 `AudioBufferSourceNode.start` 补丁核对送进 Web Audio 的缓冲(时长 / 响度 / 过零率都与文件一致,Web 走 sample 播放、48 kHz 重采样,
+没播错文件)。查出并改掉四处:①`_unhandled_input` 先判 ui_undo —— `is_action_pressed` 默认不精确匹配修饰键,真实按 Ctrl+Shift+Z 走了撤销分支,
+重做快捷键从来按不出来(UI 冒烟原来用 `InputEventAction` 发 ui_redo 所以看不见;现在先判 ui_redo,冒烟补真实组合键);②钉纹样弹窗 Esc / 点外面关闭无声,
+只有「取消」按钮 meta 响 —— 改为 `popup_hide` 统一响 close,「确认」关的不响(`_confirming` 标记);③从已接的入口拖起线改接,引擎同帧发
+disconnection_request + connection_drag_started,连响 unplug + pick,松手再 drop —— 同帧拖线开始不再叠 pick;④换场景 / 弹窗出现时按钮正好落在光标底下,
+`mouse_entered` 也发、悬停音自己响(启动到标题页、Esc 回标题都会) —— `Sfx._input` 记鼠标移动帧,`HOVER_MOTION_FRAMES` 内没动过不响。
+核过没问题、按设计保留的:进关瞬间 hint + 首次上架的笔记 drawer_open 同时响;故事界面立绘出现响 portrait;接错线 plug → 同帧 error → 0.5 s 后 snap;
+撤销 / 重做 / 重置 / 载入 / 代解 / 示答期间静音计数进出成对(没有 await 夹在中间,换场景不会漏 pop);点节点不动鼠标不响 move。
 坑:内嵌 `class` 里别起 `_set`(撞 Object 虚方法签名,整个脚本解析错);`floor()` 返回 Variant,`:=` 推不出类型要用 `floorf`;`SceneTree` 脚本的
 `_initialize` 里一出错就走不到 `quit()`,headless 进程永远挂着 —— 新脚本先 `--check-only`,跑的时候套个 `perl -e 'alarm 60; exec @ARGV'`。
 测试:`tests/test_sfx.gd`(表与时长 / 播放器池与同帧去重 / 静音计数与音量公式 / 按钮钩子 meta / 静态 hit 安全),`test_settings` 加 sfx_volume,
@@ -315,6 +331,7 @@ RMS 归 -18 dBFS、峰值封顶 -1 dBFS(与 `sfx_audit.py` 同口径,所以这�
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
 | 操作音效 / 换音效 / 给某个操作加音 | `game/sfx.gd`(`CLIPS` 槽位表、`GAIN_DB`、`BASE_VOLUME`)+ `assets/sfx/音效位置.md`;某按钮换音 `set_meta(&"sfx", &"槽位")`;新挂点一行 `SoundFx.hit(self, &"槽位")`;不该响的区间 `push_mute/pop_mute` |
 | 音效不想用下载素材、想改合成配方 | `tools/sfx_synth.gd`(`_r_<槽位>` 配方、材质函数、`NAMES`/`ALIASES`)→ `tools/gen_sfx.gd` 重出 `assets/sfx/候选/D_合成/` → `tests/test_sfx_synth.gd` 盯文件 = 配方 |
+| 想知道某个操作实际响了几声 / 哪些槽位 | `godot --path . --script res://tools/sfx_trace.gd`(真实输入走全流程,每步打印计数差;弹窗内按钮走 `pressed.emit`) |
 | 打 Web 包 / 传 itch.io | `export_presets.cfg`「Web」预设(nothreads 免 SharedArrayBuffer;排除 hardware/tests/素材源目录;`build/` 有 `.gdignore` 防被引擎扫描)→ `"$GODOT" --headless --path . --export-release "Web" build/web/index.html` → `butler push build/web yiyuanli/textrix-veritatis:html5`。缺字兜底靠打包的 Noto 两字形子集(Web 无系统字体,见 `test_theme`) |
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
@@ -354,7 +371,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→纹样绘制弹窗(清空/取消/确认、三个图标笔刷)→确认→蚂蚁线消失;
   幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
   U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
-  假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页;笔记抽屉划出/变「继续工作」/翻页循环/收回;
+  假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页、该页纸左上角「新机器!」在整页图之上且不出纸 / 不压标题墨迹 / 不压夹子、翻到别的页隐藏、翻回再现;笔记抽屉划出/变「继续工作」/翻页循环/收回;
   标题页四项 + 「设置」弹窗(居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答 → 通关弹窗(居中原尺寸、「继续」在中下、遮罩挡「重置」、无「下一关」);焦纹图样笔刷。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写

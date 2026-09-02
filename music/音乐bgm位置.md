@@ -8,10 +8,10 @@
 | 槽位 | 用在哪 | 文件 | 曲目 / 演奏 / 授权 |
 |---|---|---|---|
 | title | 进入游戏:标题页、选关页、故事界面(开场 / 结局对话)、开发者信息页(共用,切页不重启) | `music/title.mp3` | Schubert Piano Sonata in A Major, D.664 - II. Andante;演奏 Paul Pitman;License: CCPD(公有领域) |
-| level_1 | 第一章 并纹:关内(棋盘) | `music/level.wav` | 原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
-| level_2 | 第二章 叠层纹:关内 | `music/level.wav`(同上,四章暂共用) | |
-| level_3 | 第三章 岔纹:关内 | `music/level.wav`(同上) | |
-| level_4 | 第四章 焦纹:关内 | `music/level.wav`(同上) | |
+| level_1 | 第一章 并纹:关内(棋盘) | `music/level_1.wav` | level.wav 柔和版(低通 1.8 kHz + 轻混响;`tools/level_music/level_remix.py` soft,2026-09-02 用户选定) |
+| level_2 | 第二章 叠层纹:关内 | `music/level_2.wav` | level.wav 脉动版(半拍颤音 + 合唱;pulse) |
+| level_3 | 第三章 岔纹:关内 | `music/level_3.wav` | level.wav 暗调版(降两个半音拉回原速 + 低通 + 长回声;dark) |
+| level_4 | 第四章 焦纹:关内 | `music/level.wav` | 原版:原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
 
 ## 补曲 / 换曲
 
@@ -29,4 +29,5 @@
 
 各曲响度不一时在 `game/bgm.gd` `GAIN_DB` 按文件填 dB 修正,基准是标题曲(0)。量法(macOS):
 `afconvert -f WAVE -d LEI16 x.mp3 x.wav` 后算 16-bit 样本的 RMS(dBFS)。
-现值:`title.mp3` −24.0 dBFS(基准)、`level.wav` −18.5 dBFS → 修正 −5.5 dB。
+现值:`title.mp3` −24.0 dBFS(基准)、`level.wav` −18.5 dBFS → 修正 −5.5 dB;改版 `level_1/3.wav` −20.9 → −3.0,`level_2.wav` −19.9 → −4.0
+(改版由 ffmpeg loudnorm 归一,重出后用 `ffmpeg -af volumedetect` 看 mean_volume 再填)。
