@@ -4,7 +4,7 @@ extends SceneTree
 ## 通关三例且无脚本错误 → 退出码 0;截图在 tests/screenshots/。
 
 const OUT_DIR := "res://tests/screenshots"
-const EDITOR_RECT := Rect2(0, 0, 720, 440)   # 与 PatternEditor.PREVIEW_SIZE 一致
+const EDITOR_RECT := Rect2(0, 0, 720, 420)   # 与 PatternEditor.PREVIEW_SIZE 一致
 
 var _fails := 0
 

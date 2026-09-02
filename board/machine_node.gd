@@ -28,13 +28,16 @@ const HYP_COLOR := Color(0.77, 0.42, 0.42)      # 假设口强调:红棕(搭载�
 const GOAL_COLOR := Color(0.788, 0.635, 0.306)  # 目标:黄铜
 const BIG_VIEW := Vector2(192, 108)             # 线轴/目标的单口大纹样
 const PORT_VIEW := Vector2(128, 72)             # 仪器口纹样
-const PIN_FONT_SIZE := 40
-const ROW_GAP := 32                             # 行距(§4.1:image 4 间距 ≈ 纹样高 × 0.45)
-const CELL_GAP := 24                            # 行内水平间距 / 中央 spacer 最小宽
+const PIN_FONT_SIZE := 36                       # 示意图钉按钮墨高 30–33 ≈ 36 号
+const PIN_MARGIN_H := 12.0                      # 钉按钮左右内边距(示意图按钮 ≈ 纹样宽 + 一点)
+const PIN_MARGIN_V := 0.0
+const PIN_GAP := 22.0                           # 可钉纹样与它下方钉按钮的间距(image 9/12 实测 19–24)
+const ROW_GAP := 32                             # 行距(§4.1:image 4/5/6 间距 ≈ 纹样高 × 0.45)
+const CELL_GAP := 23                            # 行内水平间距 / 中央 spacer 最小宽(两列纹样间距 image 5–8 实测 ≈ 69 = 3 × 23)
 const PANEL_MARGIN := Vector4(16, 12, 16, 16)   # 左/上/右/下内边距(与 theme node_panel 同;凹形节点自画时也用)
 # §1 端口图形
-const PORT_R := 14.0                            # 圆半径
-const PORT_TIP := 12.0                          # 插头尖角伸出圆外的长度
+const PORT_R := 10.0                            # 圆半径(image 6–12 端口直径折算 16–24,取 20)
+const PORT_TIP := 9.0                           # 插头尖角伸出圆外的长度(image 1:尖角 ≈ 直径 × 0.45)
 const PORT_NOTCH_DEG := 70.0                    # 插座缺口张角
 # §4.2 纹样边框:按仪器模板的元变量着色(策划给 C9A24E / 775241,青色从 image 8 采样)
 const META_COLORS: Dictionary = {&"P": Color("C9A24E"), &"Q": Color("775241"), &"R": Color("7B9B8B")}
@@ -45,15 +48,21 @@ const PIN_BG_BY_PORT: Dictionary = {&"or_intro": {0: Color("C2CAB9"), 1: Color("
 const PIN_BUTTON_SIDE: Dictionary = {&"or_intro": &"left"}
 # 蚂蚁线:未钉的可钉口纹样外扩一圈静态虚线(image 9/11/12 采样为乳黄)
 const ANT_COLOR := Color("F0E4C8")
-const ANT_INSET := 10.0
+const ANT_INSET := 14.0                         # image 9/11/12 实测 11–15
 const ANT_W := 2.0
-const ANT_DASH := 10.0
+const ANT_DASH := 8.0
 # §4.3 汇路机分割线(策划给的两色:金线在上、乳黄线紧贴其下)
 const DIVIDER_GOLD := Color("C9A34F")
 const DIVIDER_CREAM := Color("F2E7CE")
-const DIVIDER_W := 2.0
-# §4.4 封程机凹形
-const IMP_NOTCH_W := 96.0                       # 两臂之间缺口的最小宽
+const DIVIDER_W := 3.0
+# §4.4 封程机凹形(image 9 按纹样宽 115 → 128 折算)
+const IMP_NOTCH_W := 182.0                      # 两臂之间缺口 spacer 的最小宽(+ 两侧 CELL_GAP = 缺口 228)
+const IMP_TOP_PAD := 44.0                       # 两臂顶端到纹样的距离(image 9:41–46)
+const IMP_ARM_L_W := 160.0                      # 左臂内容宽(纹样 128 + 右侧留白;假设口落在 x = 16 + 160 = 176)
+const IMP_ARM_R_INSET := 21.0                   # 右臂纹样左右留白(右臂宽 = 128 + 2 × 21 + 16 = 186)
+const IMP_TITLE_FONT_SIZE := 52                 # 底部标题(image 9 墨高 44 → 49;标题带总高 ≈ 89)
+const IMP_BASE_PAD := 11.0                      # 缺口底与标题带上沿之间的一条底座(image 9:10 → 11)
+const IMP_BOTTOM_PAD := 8.0                     # 标题下方到节点底边(image 9:12 → 13,减去标题行自身留白)
 const NODE_BG := Color(1, 0.98, 0.94)           # 与 theme node_panel 同
 const NODE_TITLE_BG := Color(0.941, 0.894, 0.784)
 const NODE_BORDER := Color(0.42, 0.23, 0.2)
@@ -156,7 +165,11 @@ func _build_rows(info: ProofSession.NodeInfo) -> void:
 		h.add_child(_spacer())
 		for p in _pin_ports:
 			h.add_child(_make_pin_button(p))
-		add_child(h)
+		var pull := MarginContainer.new()   # 行距是整节点统一的 ROW_GAP,这一行用负上边距收到 PIN_GAP
+		pull.add_theme_constant_override("margin_top", int(PIN_GAP) - ROW_GAP)
+		pull.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		pull.add_child(h)
+		add_child(pull)
 
 
 ## 封程机凹形(image 9):第一排 左臂[假设 P 纹样 + 钉按钮] | 缺口 | 右臂[输入 Q];第二排 输出 P>Q 靠右;底部标题
@@ -167,9 +180,9 @@ func _build_concave(info: ProofSession.NodeInfo) -> void:
 		engine_title.add_theme_font_size_override("font_size", 1)   # 顶部标题栏压到几乎零高:外形与标题都自画
 	var panel := StyleBoxEmpty.new()
 	panel.content_margin_left = PANEL_MARGIN.x
-	panel.content_margin_top = PANEL_MARGIN.y
+	panel.content_margin_top = IMP_TOP_PAD
 	panel.content_margin_right = PANEL_MARGIN.z
-	panel.content_margin_bottom = PANEL_MARGIN.w
+	panel.content_margin_bottom = IMP_BOTTOM_PAD
 	add_theme_stylebox_override("panel", panel)
 	add_theme_stylebox_override("panel_selected", panel)
 	var bar := StyleBoxEmpty.new()
@@ -186,11 +199,12 @@ func _build_concave(info: ProofSession.NodeInfo) -> void:
 	_arm_l = _cell(hyp_view)
 	_arm_l.add_child(_make_pin_button(1))
 	_arm_l.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	_arm_l.custom_minimum_size.x = IMP_ARM_L_W
 	row0.add_child(_arm_l)
 	var notch := _spacer()
 	notch.custom_minimum_size.x = IMP_NOTCH_W
 	row0.add_child(notch)
-	_arm_r = _cell(in_view)
+	_arm_r = _inset(_cell(in_view))
 	_arm_r.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	row0.add_child(_arm_r)
 	add_child(row0)
@@ -198,14 +212,14 @@ func _build_concave(info: ProofSession.NodeInfo) -> void:
 	set_slot(0, true, 0, PORT_COLOR, true, 0, HYP_COLOR)
 	var row1 := _row()
 	row1.add_child(_spacer())
-	row1.add_child(_cell(out_view))
+	row1.add_child(_inset(_cell(out_view)))   # 与右臂的 Q 纹样左右对齐
 	add_child(row1)
 	_rows.append(row1)
 	set_slot(1, false, 0, PORT_COLOR, true, 0, PORT_COLOR)
 	_title_row = Label.new()
 	_title_row.text = info.title
 	_title_row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_title_row.add_theme_font_size_override("font_size", get_theme_font_size("font_size", "GraphNodeTitleLabel"))
+	_title_row.add_theme_font_size_override("font_size", IMP_TITLE_FONT_SIZE)
 	_title_row.add_theme_color_override("font_color", get_theme_color("font_color", "GraphNodeTitleLabel"))
 	_title_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_title_row)
@@ -254,8 +268,22 @@ func _cell(v: Control) -> VBoxContainer:
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	box.add_theme_constant_override("separation", int(PIN_GAP))
+	v.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN   # 纹样保持原尺寸,不被同格更宽的钉按钮撑开
 	box.add_child(v)
 	return box
+
+
+## 右臂 / 右列:纹样两侧各留 IMP_ARM_R_INSET(image 9 右臂比左臂宽,纹样居中偏右)
+func _inset(c: Control) -> MarginContainer:
+	var m := MarginContainer.new()
+	m.add_theme_constant_override("margin_left", int(IMP_ARM_R_INSET))
+	m.add_theme_constant_override("margin_right", int(IMP_ARM_R_INSET))
+	m.add_theme_constant_override("margin_top", 0)
+	m.add_theme_constant_override("margin_bottom", 0)
+	m.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	m.add_child(c)
+	return m
 
 
 func _add_cell(h: Control, big: bool, borders: Array[Dictionary]) -> PatternView:
@@ -270,9 +298,10 @@ func _make_pin_button(model_port: int) -> Button:
 	btn.add_theme_font_size_override("font_size", PIN_FONT_SIZE)
 	btn.tooltip_text = "给本口的自由纹样赋值(求解只看输入和钉住的纹样,不从下游反推)"
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	btn.mouse_filter = Control.MOUSE_FILTER_PASS   # 左键归按钮;右键穿透到节点(右键删机在按钮上也生效)
 	var by_port: Dictionary = PIN_BG_BY_PORT.get(rule_id, {})
-	UiStyles.fill_button(btn, by_port.get(model_port, PIN_BG))
+	UiStyles.fill_button(btn, by_port.get(model_port, PIN_BG), PIN_MARGIN_H, PIN_MARGIN_V)
 	btn.pressed.connect(pin_requested.emit.bind(model_port))
 	_pin_buttons[model_port] = btn
 	return btn
@@ -492,7 +521,10 @@ func _draw_concave_shape() -> void:
 	var h := size.y
 	var nx0 := _local_rect_of(_arm_l).end.x
 	var nx1 := _local_rect_of(_arm_r).position.x
-	var ny := _local_rect_of(_rows[0]).end.y + ROW_GAP * 0.5
+	var ty := _local_rect_of(_title_row).position.y - ROW_GAP * 0.5   # 底部标题带的上沿
+	var ny := ty - IMP_BASE_PAD                                         # 缺口一直挖到标题带上方(image 9:右列放 Q 与 P>Q,底座只有标题带)
+	if w < 4.0 * NODE_RADIUS or h < 4.0 * NODE_RADIUS or nx1 <= nx0 + 1.0 or ny <= NODE_RADIUS or ny >= h - NODE_RADIUS:
+		return   # 还没排版(尺寸为零)/几何退化:多边形会自交,三角化报错;排好版后会再画
 	var pts := PackedVector2Array()
 	pts.append_array(_arc(Vector2(NODE_RADIUS, NODE_RADIUS), PI, 1.5 * PI))
 	pts.append(Vector2(nx0, 0))
@@ -503,7 +535,6 @@ func _draw_concave_shape() -> void:
 	pts.append_array(_arc(Vector2(w - NODE_RADIUS, h - NODE_RADIUS), 0.0, 0.5 * PI))
 	pts.append_array(_arc(Vector2(NODE_RADIUS, h - NODE_RADIUS), 0.5 * PI, PI))
 	draw_colored_polygon(pts, NODE_BG)
-	var ty := _local_rect_of(_title_row).position.y - ROW_GAP * 0.5
 	var band := PackedVector2Array([Vector2(0, ty), Vector2(w, ty)])
 	band.append_array(_arc(Vector2(w - NODE_RADIUS, h - NODE_RADIUS), 0.0, 0.5 * PI))
 	band.append_array(_arc(Vector2(NODE_RADIUS, h - NODE_RADIUS), 0.5 * PI, PI))

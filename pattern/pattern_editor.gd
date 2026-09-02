@@ -13,11 +13,16 @@ signal pattern_committed(f: Formula)
 signal pattern_cleared   # 空画布「确认」= 取消钉住(unpin)
 
 const HOLE_NAME := &"孔"
-const PREVIEW_SIZE := Vector2(720, 440)
-const SWATCH_SIZE := Vector2(110, 72)
-const FONT_SIZE := 40
-const TITLE_FONT_SIZE := 56
-const HINT_FONT_SIZE := 36
+## 下面的尺寸全部从 image 13 按预览宽 433 → 720 折算(×1.663),见 docs/ART_INTERFACE.md §3.6
+const PREVIEW_SIZE := Vector2(720, 420)
+const SWATCH_SIZE := Vector2(110, 76)
+const FONT_SIZE := 36                       # 清空/取消/确认
+const BUTTON_MARGIN_H := 24.0
+const BUTTON_MARGIN_V := 4.0
+const TITLE_FONT_SIZE := 74                 # 标题墨高 38 → 63
+const TITLE_BAND_PAD := 33.0                # 标题带上下内边距(带高 178 含 3 px 下边线)
+const TITLE_INDENT := 37.0
+const HINT_FONT_SIZE := 33
 const TITLE_TEXT := "纹样绘制"
 const HINT_TEXT := "点选笔刷进行绘制："   # 全角冒号照 image 13(站酷字库有,test_theme 盯)
 ## 结构笔刷:[笔刷 id, 图标线型],顺序照 image 13(竖分 / 横分 / 对角)
@@ -29,8 +34,14 @@ const BUTTON_BG := Color("F0E4C8")          # 清空/取消/确认 底色(image 
 const TITLE_BG := Color(0.941, 0.894, 0.784)
 const FRAME_COLOR := Color(0.42, 0.23, 0.2)
 const FRAME_W := 4
-const CONTENT_MARGIN := 28.0
-const ROW_GAP := 16
+const FRAME_RADIUS := 6
+const BAND_LINE_W := 3
+const CONTENT_MARGIN := 20.0                # 预览/笔刷/按钮距外框(image 13:左 18 右 22)
+const GAP_PREVIEW_HINT := 58.0
+const GAP_HINT_BRUSH := 17.0
+const GAP_BRUSH_BUTTONS := 76.0
+const BOTTOM_PAD := 48.0
+const BRUSH_GAP := 15
 
 var tree: Formula = Formula.meta(HOLE_NAME)
 var brush: String = ""        # "atom:A" / "and" / "or" / "imp" / "bot"
@@ -59,31 +70,30 @@ class BrushIcon extends Control:
 
 
 func _init() -> void:
-	# 弹窗外框:乳黄底 + 棕红描边;内容边距只留描边宽,标题带才能贴满上缘
+	# 弹窗外框:乳黄底 + 棕红描边;内容边距只留描边宽,标题带才能贴满上缘、预览紧贴标题带下边线
 	var frame := StyleBoxFlat.new()
 	frame.bg_color = Color(0.957, 0.925, 0.847)
 	frame.set_border_width_all(FRAME_W)
 	frame.border_color = FRAME_COLOR
-	frame.set_corner_radius_all(12)
+	frame.set_corner_radius_all(FRAME_RADIUS)
 	frame.set_content_margin_all(FRAME_W)
-	frame.content_margin_bottom = CONTENT_MARGIN * 0.8
 	add_theme_stylebox_override("panel", frame)
 
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("separation", ROW_GAP)
+	box.add_theme_constant_override("separation", 0)
 	add_child(box)
 
 	var title_panel := PanelContainer.new()
 	var band := StyleBoxFlat.new()
 	band.bg_color = TITLE_BG
-	band.border_width_bottom = FRAME_W
+	band.border_width_bottom = BAND_LINE_W
 	band.border_color = FRAME_COLOR
-	band.corner_radius_top_left = 8
-	band.corner_radius_top_right = 8
-	band.content_margin_left = CONTENT_MARGIN
-	band.content_margin_right = CONTENT_MARGIN
-	band.content_margin_top = 12
-	band.content_margin_bottom = 12
+	band.corner_radius_top_left = FRAME_RADIUS
+	band.corner_radius_top_right = FRAME_RADIUS
+	band.content_margin_left = TITLE_INDENT
+	band.content_margin_right = TITLE_INDENT
+	band.content_margin_top = TITLE_BAND_PAD
+	band.content_margin_bottom = TITLE_BAND_PAD
 	title_panel.add_theme_stylebox_override("panel", band)
 	var title := Label.new()
 	title.text = TITLE_TEXT
@@ -94,29 +104,32 @@ func _init() -> void:
 	var body := MarginContainer.new()
 	body.add_theme_constant_override("margin_left", int(CONTENT_MARGIN))
 	body.add_theme_constant_override("margin_right", int(CONTENT_MARGIN))
-	body.add_theme_constant_override("margin_top", 4)
-	body.add_theme_constant_override("margin_bottom", 0)
+	body.add_theme_constant_override("margin_top", 0)
+	body.add_theme_constant_override("margin_bottom", int(BOTTOM_PAD))
 	box.add_child(body)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", ROW_GAP)
+	col.add_theme_constant_override("separation", 0)
 	body.add_child(col)
 
 	_preview = PatternView.new()
 	_preview.min_size = PREVIEW_SIZE
 	_preview.gui_input.connect(_on_preview_input)
 	col.add_child(_preview)
+	col.add_child(_gap(GAP_PREVIEW_HINT))
 
 	var hint := Label.new()
 	hint.text = HINT_TEXT
 	hint.add_theme_font_size_override("font_size", HINT_FONT_SIZE)
 	col.add_child(hint)
+	col.add_child(_gap(GAP_HINT_BRUSH))
 
 	_brush_row = HBoxContainer.new()
-	_brush_row.add_theme_constant_override("separation", ROW_GAP)
+	_brush_row.add_theme_constant_override("separation", BRUSH_GAP)
 	col.add_child(_brush_row)
+	col.add_child(_gap(GAP_BRUSH_BUTTONS))
 
 	var actions := HBoxContainer.new()
-	actions.add_theme_constant_override("separation", ROW_GAP)
+	actions.add_theme_constant_override("separation", BRUSH_GAP)
 	_clear_btn = _make_action_button("清空", _clear_canvas)
 	actions.add_child(_clear_btn)
 	var sp := Control.new()
@@ -126,6 +139,13 @@ func _init() -> void:
 	_confirm = _make_action_button("确认", _on_confirm)
 	actions.add_child(_confirm)
 	col.add_child(actions)
+
+
+func _gap(h: float) -> Control:
+	var c := Control.new()
+	c.custom_minimum_size.y = h
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
 
 
 ## atoms = 本关原子;initial = 已钉住的纹样(可再编辑);allow_bot = 焦纹章节后解锁
@@ -154,7 +174,7 @@ func _make_action_button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.add_theme_font_size_override("font_size", FONT_SIZE)
-	UiStyles.fill_button(b, BUTTON_BG)
+	UiStyles.fill_button(b, BUTTON_BG, BUTTON_MARGIN_H, BUTTON_MARGIN_V)
 	b.pressed.connect(cb)
 	return b
 
