@@ -42,6 +42,17 @@ def envelope(path, n=400):
     return [round(v / m, 3) for v in env]
 
 
+def crossfade_loop(wav, ms=30):
+    """循环接缝交叉淡化:把结尾 ms 毫秒淡出叠进开头淡入,再把结尾那段去掉 —— 变调/变速后接缝处样本对不齐也不会有咔哒"""
+    raw = subprocess.run(['ffmpeg', '-v', 'error', '-i', wav, '-f', 'f32le', '-ac', '2', '-ar', str(RATE), '-'], capture_output=True).stdout
+    x = np.frombuffer(raw, dtype=np.float32).reshape(-1, 2).copy()
+    n = int(RATE * ms / 1000)
+    up = np.linspace(0, 1, n, dtype=np.float32)[:, None]
+    x[:n] = x[:n] * up + x[-n:] * (1 - up)
+    y = x[:-n]
+    subprocess.run(['ffmpeg', '-y', '-v', 'error', '-f', 'f32le', '-ar', str(RATE), '-ac', '2', '-i', '-', '-c:a', 'pcm_s16le', wav], input=y.tobytes(), check=True)
+
+
 def build():
     os.makedirs(OUT, exist_ok=True)
     L = duration_of(SRC)
@@ -56,6 +67,7 @@ def build():
             graph += ',' + chain
         graph += ',atrim=start=%.5f:end=%.5f,asetpts=PTS-STARTPTS,loudnorm=I=%g:TP=-1.5:LRA=9' % (Lp, 2 * Lp, v['target'])
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', SRC, '-af', graph, '-ar', str(RATE), '-ac', '2', '-c:a', 'pcm_s16le', wav], check=True)
+        crossfade_loop(wav)
         subprocess.run(['ffmpeg', '-y', '-v', 'error', '-i', wav, '-codec:a', 'libmp3lame', '-b:a', '128k', mp3], check=True)
         d = duration_of(wav)
         vol = subprocess.run(['ffmpeg', '-i', wav, '-af', 'volumedetect', '-f', 'null', '-'], capture_output=True, text=True).stderr
