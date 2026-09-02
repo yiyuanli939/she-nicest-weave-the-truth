@@ -10,14 +10,13 @@ const TRACKS: Dictionary = {
 	&"level_1": "res://music/level_1.wav",  # 第一章 并纹:level.wav 柔和版(低通 + 轻混响;tools/level_music/level_remix.py soft)
 	&"level_2": "res://music/level_2.wav",  # 第二章 叠层纹:脉动版(半拍颤音 + 合唱;pulse)
 	&"level_3": "res://music/level_3.wav",  # 第三章 岔纹:暗调版(降两个半音拉回原速 + 长回声;dark)
-	&"level_4": "res://music/level.wav",    # 第四章 焦纹:原版
+	&"level_4": "res://music/level_1.wav",  # 第四章 焦纹:也用柔和版(用户 2026-09-02)
 }
 const VOLUME_LINEAR := 0.32   # 约 -10 dB:钢琴 BGM 压低,给实体小机的喇叭留空间
 const FADE_SEC := 1.2
 ## 按文件的响度修正(dB):不同来源响度不一,压平到标题曲(基准 0);RMS 量法见 music/音乐bgm位置.md
 const GAIN_DB: Dictionary = {
-	"res://music/level.wav": -5.5,     # RMS -18.5 dBFS,标题曲 -24.0
-	"res://music/level_1.wav": -3.0,   # RMS -20.9(loudnorm 后)
+	"res://music/level_1.wav": -3.0,   # RMS -20.9(loudnorm 后);原版 level.wav 已不在槽位表里(留档)
 	"res://music/level_2.wav": -4.0,   # RMS -19.9
 	"res://music/level_3.wav": -3.0,   # RMS -20.9
 }

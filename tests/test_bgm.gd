@@ -28,8 +28,9 @@ func test_gain_table_levels_loudness() -> bool:
 	for p in B.GAIN_DB:
 		ok = check(paths.has(p), "GAIN_DB 里的文件 %s 也在 TRACKS 里(别留死条目)" % p) and ok
 	ok = check(is_equal_approx(B.target_volume("res://music/title.mp3"), B.VOLUME_LINEAR), "标题曲 = 基准音量") and ok
-	ok = check(is_equal_approx(B.target_volume("res://music/level.wav"), B.VOLUME_LINEAR * db_to_linear(-5.5)), "关内曲压低 5.5 dB") and ok
-	for slot in [&"level_1", &"level_2", &"level_3"]:
+	ok = check(is_equal_approx(B.target_volume("res://music/level_1.wav"), B.VOLUME_LINEAR * db_to_linear(-3.0)), "柔和版压低 3 dB") and ok
+	ok = check(B.TRACKS[&"level_4"] == B.TRACKS[&"level_1"], "第四章与第一章共用柔和版") and ok
+	for slot in [&"level_1", &"level_2", &"level_3", &"level_4"]:
 		ok = check(B.GAIN_DB.has(B.TRACKS[slot]) and float(B.GAIN_DB[B.TRACKS[slot]]) <= -2.5 and float(B.GAIN_DB[B.TRACKS[slot]]) >= -4.5,
 				"%s 的改版文件有响度修正(loudnorm -18/-19 LUFS 对标题曲 -24:约 -3..-4 dB)" % slot) and ok
 	return ok

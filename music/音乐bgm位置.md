@@ -11,7 +11,7 @@
 | level_1 | 第一章 并纹:关内(棋盘) | `music/level_1.wav` | level.wav 柔和版(低通 1.8 kHz + 轻混响;`tools/level_music/level_remix.py` soft,2026-09-02 用户选定) |
 | level_2 | 第二章 叠层纹:关内 | `music/level_2.wav` | level.wav 脉动版(半拍颤音 + 合唱;pulse) |
 | level_3 | 第三章 岔纹:关内 | `music/level_3.wav` | level.wav 暗调版(降两个半音拉回原速 + 低通 + 长回声;dark) |
-| level_4 | 第四章 焦纹:关内 | `music/level.wav` | 原版:原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
+| level_4 | 第四章 焦纹:关内 | `music/level_1.wav`(与第一章共用柔和版) | 原版 `music/level.wav`(原 guanka.wav,37 秒循环,李熠远 与 ChatGPT 共同生成)留档不用,是改版的底子 |
 
 ## 补曲 / 换曲
 
