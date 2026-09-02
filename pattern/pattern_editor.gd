@@ -1,12 +1,12 @@
 class_name PatternEditor
 extends PopupPanel
 ## 「纹样绘制」弹窗(v1.1 §4.6,照 image 13):标题带 → 预览 → 「点选笔刷进行绘制:」→ 笔刷行
-## (原子色块 + 并织/迭层/岔纹线描图标 [+ 焦纹])→ [清空] … [取消] [确认]。
+## (原子色块 + 并织/迭层/岔纹线描图标 [+ 焦纹图样])→ [清空] … [取消] [确认]。
 ## 内部是一棵带"孔"(META 叶,渲染成未染纱)的临时 Formula 树:
 ## 选笔刷 → 点纹样上的任意叶子区域 → 该处替换成 原子色/分割(裂成两孔)。
 ## 「清空」把画布擦回一个孔(不关窗);「确认」在全部孔填满(is_ground)时钉住(pattern_committed),
 ## 画布整幅还是一个孔时 = 取消钉住(pattern_cleared);部分未染时不可按。
-## 界面上不出现任何原子字母/逻辑符号:原子笔刷是色块,结构笔刷是线描图标。
+## 界面上不出现任何原子字母/逻辑符号/文字笔刷:原子笔刷是色块,结构笔刷是线描图标,焦纹笔刷是焦纹图样(v1.2)。
 ## 几何与 PatternView.layout 同一套切分规则,core 函数无 UI 依赖,headless 可测。
 
 signal pattern_committed(f: Formula)
@@ -161,7 +161,7 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 	for pair in STRUCT_BRUSHES:
 		_brush_row.add_child(_make_struct_button(pair[0], pair[1]))
 	if allow_bot:
-		_brush_row.add_child(_make_brush_button("焦纹", "bot"))
+		_brush_row.add_child(_make_bot_button())
 	brush = ""
 	_sync()
 	# 旧笔刷已 remove_child,最小尺寸立即正确;reset_size 让 Window 收缩(它只涨不缩),
@@ -221,13 +221,30 @@ func _make_struct_button(id: String, style: String) -> Button:
 	return b
 
 
-func _make_brush_button(label: String, id: String) -> Button:
+## 焦纹笔刷 = 焦纹图样(与棋盘上的 ⊥ 同一画法:焦黑 + 破洞,PatternView 画),不写字(v1.2);
+## 外框/选中态同结构笔刷,图样向内缩一圈让按钮自己的描边露出来
+func _make_bot_button() -> Button:
 	var b := Button.new()
-	b.text = label
+	b.custom_minimum_size = SWATCH_SIZE
 	b.toggle_mode = true
 	b.button_group = _group
-	b.add_theme_font_size_override("font_size", FONT_SIZE)
-	b.pressed.connect(_set_brush.bind(id))
+	b.tooltip_text = "焦纹"
+	for state in ["normal", "hover", "pressed", "focus"]:
+		var sb := StyleBoxFlat.new()
+		sb.bg_color = ICON_BG.darkened(0.05) if state == "hover" else ICON_BG
+		sb.set_border_width_all(6 if state == "pressed" else int(ICON_LINE_W))
+		sb.border_color = PatternView.SPLIT_COLOR if state == "pressed" else ICON_COLOR
+		b.add_theme_stylebox_override(state, sb)
+	var pv := PatternView.new()
+	pv.formula = Formula.bot()
+	pv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	pv.set_anchors_preset(Control.PRESET_FULL_RECT)
+	pv.offset_left = 6
+	pv.offset_top = 6
+	pv.offset_right = -6
+	pv.offset_bottom = -6
+	b.add_child(pv)
+	b.pressed.connect(_set_brush.bind("bot"))
 	return b
 
 

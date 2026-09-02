@@ -375,10 +375,18 @@ func save_state() -> Dictionary:
 
 
 ## 读档(清空撤销历史)。数据可以来自 save_state 或 JSON 往返后的字典。
-func load_state(d: Dictionary) -> void:
+## detach_goal = true:载入后把接进目标织机的线拆掉(已通关关卡重开时呈「差一步完成」态,v1.2)。
+## 拆线放在快照与求解之前:不进撤销栈(Ctrl+Z 不能一键回到通关),载入时也不会重发 proof_completed;
+## 玩家自己把最后一根线接回去就是正常通关。
+func load_state(d: Dictionary, detach_goal: bool = false) -> void:
 	_undo_stack.clear()
 	_redo_stack.clear()
 	_apply_state(d)
+	if detach_goal:
+		var g := goal_id
+		for e in _graph.edges.duplicate():   # x,y,z,w = from_id, from_port, to_id, to_port
+			if e.z == g:
+				_graph.remove_edge(e)
 	_initial_state = save_state()
 	_was_solved = false
 	_notify(true)

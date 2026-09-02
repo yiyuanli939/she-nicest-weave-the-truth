@@ -49,7 +49,8 @@ func _run() -> void:
 		story.finish()
 	await _wait(1.0)
 	var scene := current_scene as LevelScene
-	_check(scene != null and scene.session.is_solved(), "l15 已通关棋盘载入(恢复不应重复庆祝)")
+	_check(scene != null and not scene.session.is_solved() and not scene._win_popup.visible,
+			"l15 已通关棋盘载入 = 目标线拆掉的差一步态(v1.2;不重复庆祝、不弹窗)")
 	await _wait(4.0)
 
 	# 2) l03:接一条冲突线 → encourage

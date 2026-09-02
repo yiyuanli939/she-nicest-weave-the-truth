@@ -1,6 +1,6 @@
 extends SceneTree
-## M3 全流程验收:清档 → 主菜单 → 逐关(16)开场对话→解题→「下一关」推进 →
-## 选关页 → 重进旧关棋盘恢复 → 关内笔记抽屉。
+## M3 全流程验收:清档 → 主菜单 → 逐关(16)开场对话→解题→通关弹窗「织成了」真实点击「继续」推进 →
+## 选关页 → 重进旧关棋盘恢复(v1.2:已通关的关重开 = 目标线拆掉的「差一步」态,接回即弹窗)→ 关内笔记抽屉。
 ##   godot --path . --script res://tests/visual_smoke_m3.gd
 ## 退出码 0 = 全部通过。截图在 tests/screenshots/。
 
@@ -50,6 +50,33 @@ func _click(at: Vector2, button: MouseButton) -> void:
 		root.push_input(ev, true)   # 坐标是 3840×2160 逻辑视口坐标(窗口比它小)
 
 
+func _button_named(from: Node, text: String) -> Button:
+	for b in from.find_children("*", "Button", true, false):
+		if (b as Button).text == text:
+			return b
+	return null
+
+
+## 目标织机的输入口是否有线
+func _goal_wired(scene: LevelScene) -> bool:
+	for w in scene.session.get_wires():
+		if w.to_id == scene.session.goal_id:
+			return true
+	return false
+
+
+## 把脚本化解法的最后一根线(每关都是 → 目标织机)接回去:恢复盘上机器 id 升序 = 摆放顺序 m0..mN
+func _reconnect_goal(scene: LevelScene, level_id: StringName) -> void:
+	var s := scene.session
+	var machines: Array[int] = []
+	for id in s.get_node_ids():
+		if s.describe_node(id).type == ProofSession.NodeType.MACHINE:
+			machines.append(id)
+	machines.sort()
+	var last: Array = LevelSolutions.DATA[level_id].w[-1]
+	s.connect_wire(LevelSolutions._resolve(last[0], s, machines), last[1], s.goal_id, last[3])
+
+
 ## 进关前的全屏开场对话:一键播完并等切入棋盘
 func _skip_story() -> void:
 	if current_scene is StoryScene:
@@ -72,7 +99,7 @@ func _run() -> void:
 	_check(current_scene is MainMenu, "主菜单加载")
 	_check(bgm.slot == &"title" and bgm.is_playing(), "主菜单 BGM = 标题曲")
 
-	# 逐关通关:第一关从菜单逻辑入口进,之后走「下一关」按钮
+	# 逐关通关:第一关从菜单逻辑入口进,之后走通关弹窗「继续」(真实点击)
 	game.start_level(game.first_unsolved())
 	await _settle()
 	for i in 16:
@@ -105,8 +132,11 @@ func _run() -> void:
 					"3-1 通关瞬间小机坏掉(乱动 + 音效,没有台词)")
 		if lv.id == &"l09":
 			_shot("m3_l09_board")
+		_check(scene._win_popup.visible and _button_named(scene, "下一关") == null, "%s 通关弹出「织成了」弹窗,工具条没有「下一关」" % lv.id)
+		if i == 0:
+			_shot("m3_win_popup")
 		if game.next_level() != null:
-			scene._on_next()
+			_click(scene._win_popup._continue_btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)   # 真实点击弹窗「继续」
 			await _settle()
 
 	_check(game.save.solved.size() == 16, "存档记录 16 关 (得 %d)" % game.save.solved.size())
@@ -139,10 +169,14 @@ func _run() -> void:
 	await _settle()
 	_check(current_scene is LevelScene, "l16(4-3 移到通关后)进关直接是棋盘")
 	var l16 := current_scene as LevelScene
-	_check(l16._next_btn.visible and l16._next_btn.text == "继续", "已通关的 l16 工具条显示「继续」")
+	_check(not l16._win_popup.visible and not l16.session.is_solved() and not _goal_wired(l16),
+			"已通关的 l16 重开:棋盘恢复但目标线拆掉(差一步),不弹通关弹窗")
 	var robot_end := root.get_node("/root/Robot")
 	_check(robot_end.broken, "结局前小机仍是坏的")
-	l16._on_next()
+	_reconnect_goal(l16, &"l16")   # 玩家把最后一根线接回去 = 通关
+	await _settle()
+	_check(l16.session.is_solved() and l16._win_popup.visible, "l16 接回目标线 → 通关 → 弹窗")
+	_click(l16._win_popup._continue_btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)   # 末关「继续」= 结局
 	await _settle()
 	var outro := current_scene as StoryScene
 	_check(outro != null and game.current.outro_dialogue != null and game.current.outro_dialogue.lines.size() > 0,
@@ -158,13 +192,14 @@ func _run() -> void:
 		_check(not robot_end.broken and robot_end.sent("say", "calm"), "结局黑屏时小机修好(calm)")
 		_shot("m3_credits")
 
-	# 棋盘恢复:重进 l04 应已是通关棋盘
+	# 棋盘恢复:重进已通关的 l04 = 记录的棋盘 + 目标线拆掉(差一步)
 	game.start_level(game.catalog.all_levels()[3])
 	await _settle()
 	await _skip_story()
 	var l04 := current_scene as LevelScene
 	_check(l04.session.get_node_ids().size() == 4, "l04(原第三纹 B & A)棋盘恢复(线轴+目标+两台仪器)")
-	_check(l04.session.is_solved(), "l04 恢复后仍通关")
+	_check(not l04.session.is_solved() and not _goal_wired(l04) and not l04._win_popup.visible,
+			"l04 已通关重开:目标线拆掉、未通关、不弹窗")
 	_shot("m3_l04_restored")
 
 	# 右键删节点回归(真实输入,点在节点正中):右键仪器 → 删;右键线轴 → 不删;Ctrl+Z 撤回
@@ -185,7 +220,7 @@ func _run() -> void:
 	_check(l04_board.get_node_or_null("n%d" % machine_id) == null, "视图节点应同步移除")
 	l04.session.undo()
 	await _settle()
-	_check(l04.session.get_node_ids().size() == 4 and l04.session.is_solved(), "撤销后节点与通关态恢复")
+	_check(l04.session.get_node_ids().size() == 4 and not l04.session.is_solved() and not _goal_wired(l04), "撤销后节点恢复(仍是差一步态)")
 
 	# 关内诺拉的笔记抽屉:只显示本关上架仪器的说明(l04 第一章 = 2 台),划出后截图
 	l04._on_open_notebook()
