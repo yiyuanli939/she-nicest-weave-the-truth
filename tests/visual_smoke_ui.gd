@@ -698,6 +698,7 @@ func _run() -> void:
 	await _settle()
 	var select := current_scene as LevelSelect
 	_check(select != null, "选关页加载")
+	_check(sfx.last_slot == &"loom", "音效:进入选关页响织布机声 loom(得 %s)" % sfx.last_slot)
 	if select != null:
 		var level_btns: Array[Button] = []
 		var enabled := 0
@@ -732,9 +733,12 @@ func _run() -> void:
 			if (b as Button).text == "第一纹" and not (b as Button).disabled:
 				first = b
 		if first != null:
+			var loom_n: int = sfx.counts.get(&"loom", 0)
 			_click(_center(first), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(current_scene is StoryScene, "点第一纹 → 故事界面")
+			_check(sfx.counts.get(&"loom", 0) == loom_n + 1 and sfx.counts.get(&"confirm", 0) == 0 or sfx.last_slot != &"confirm",
+					"音效:选定一关响织布机声 loom、不响 confirm(得 %s)" % sfx.last_slot)
 			_check(bgm.slot == &"title" and bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0,
 					"进第一章故事界面 BGM 仍是标题曲、同一播放器接着播不重启")
 			if current_scene is StoryScene:

@@ -15,12 +15,13 @@ const CLIPS: Dictionary = {
 	&"click": "res://assets/sfx/click.ogg",              # 任意按钮按下(默认)
 	&"hover": "res://assets/sfx/hover.ogg",              # 按钮悬停(轻)
 	&"back": "res://assets/sfx/back.ogg",                # 返回主界面 / 取消 / 撤销
-	&"confirm": "res://assets/sfx/confirm.ogg",          # 「继续」/ 选关 / 钉纹样确认成功
+	&"confirm": "res://assets/sfx/confirm.ogg",          # 「继续」/ 钉纹样确认成功
 	&"open": "res://assets/sfx/open.ogg",                # 弹窗打开(设置 / 钉纹样 / 小机维护)
 	&"close": "res://assets/sfx/close.ogg",              # 弹窗关闭
 	&"toggle": "res://assets/sfx/toggle.ogg",            # 全屏 / 小机联动等开关
 	&"slider": "res://assets/sfx/slider.ogg",            # 音量滑条松手 / 点轨道
 	&"reset_progress": "res://assets/sfx/reset_progress.ogg",
+	&"loom": "res://assets/sfx/loom.ogg",                # 织布机声:进入选关页、选定一关(用户 2026-09-02:原翻页音挪到这里)
 	# 棋盘
 	&"place": "res://assets/sfx/place.ogg",              # 仪器放上棋盘
 	&"delete": "res://assets/sfx/delete.ogg",            # 删仪器
@@ -46,7 +47,7 @@ const CLIPS: Dictionary = {
 	# 笔记 / 指引 / 故事
 	&"drawer_open": "res://assets/sfx/drawer_open.ogg",
 	&"drawer_close": "res://assets/sfx/drawer_close.ogg",
-	&"page": "res://assets/sfx/page.ogg",
+	&"page": "res://assets/sfx/page.ogg",                # 翻页 = 纸翻页声(用户要求)
 	&"hint": "res://assets/sfx/hint.ogg",                # 操作指引换成新一条
 	&"guide": "res://assets/sfx/guide.ogg",              # 语音求助被接受
 	&"next": "res://assets/sfx/next.ogg",                # 对话推进到下一句
@@ -57,12 +58,12 @@ const CLIPS: Dictionary = {
 
 ## 按槽位的响度修正(dB):ffmpeg volumedetect 量 mean/peak,取 (-18 - mean) 并封顶在 -peak(不削波),见音效位置.md
 const GAIN_DB: Dictionary = {
-	&"click": -2.0, &"hover": -4.0, &"back": -1.0, &"confirm": -6.5, &"open": -5.5, &"close": -5.5,
-	&"toggle": -4.0, &"slider": -6.5, &"reset_progress": -2.0, &"place": -2.0, &"delete": -2.5, &"refuse": 1.0,
+	&"hover": -4.0, &"back": -1.0, &"confirm": -6.5, &"open": -5.5, &"close": -5.5, &"toggle": -4.0,
+	&"slider": -6.5, &"reset_progress": -2.0, &"loom": 1.0, &"place": -2.0, &"delete": -2.5, &"refuse": 1.0,
 	&"pick": -3.5, &"drop": -2.0, &"plug": -5.5, &"unplug": -0.5, &"error": -5.0, &"warn": -6.0,
 	&"snap": -1.5, &"move": -7.0, &"zoom": -6.5, &"undo": -1.0, &"redo": 1.0, &"reset_board": -3.5,
 	&"brush": -5.0, &"paint": -6.5, &"clear": -4.0, &"unpin": -5.5, &"pin_error": -5.0, &"drawer_open": -4.0,
-	&"drawer_close": -4.0, &"page": 1.0, &"hint": -8.0, &"guide": -8.0, &"next": -3.5, &"skip": -6.5,
+	&"drawer_close": -4.0, &"page": 0.0, &"hint": -8.0, &"guide": -8.0, &"next": -3.5, &"skip": -6.5,
 	&"portrait": -2.5, &"win": -7.0,
 }
 const BASE_VOLUME := 0.5                  # 全体基准(约 -6 dB;峰值 -1 dB 的片段修正后不削波)
