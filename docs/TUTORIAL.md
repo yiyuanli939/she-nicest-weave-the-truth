@@ -113,7 +113,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   仪器**按关上架**:`LEVELS` 每行末列是本关新上架的仪器,之后的关累计(l01 一台都没有);解法只能用架上仪器(`test_levels` 盯)。
   重排关卡 id 时先按新编号 `git mv` .tres(降序)再重生成,对话就按路径跟着搬;`information/dialogue.csv` 的章-节要同步改,`test_tres_dialogue_matches_csv` 逐句核对。
 
-**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/开发者信息 = `title`;关内棋盘 = 该章 `level_N`;故事界面(开场 / 结局对话)`stop()` 静音,关内曲只在棋盘起)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。wav 的循环点由 `Bgm.set_looping` 运行时兜底(没有循环点就整曲循环,`.import` 不用改;只开 `loop_mode` 不设 `loop_end` 会混 1 帧即停,见 AGENTS 踩过的坑)。
+**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/故事界面(开场 / 结局对话)/开发者信息 = `title`,从选关进对话不重启;关内棋盘 = 该章 `level_N`,关内曲只在棋盘起)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。wav 的循环点由 `Bgm.set_looping` 运行时兜底(没有循环点就整曲循环,`.import` 不用改;只开 `loop_mode` 不设 `loop_end` 会混 1 帧即停,见 AGENTS 踩过的坑)。
 
 ## 3. 最近两轮改了什么(以及为什么)
 

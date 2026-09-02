@@ -629,15 +629,13 @@ func _run() -> void:
 			_click(_center(first), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(current_scene is StoryScene, "点第一纹 → 故事界面")
-			_check(bgm.slot == &"", "进第一章故事界面 BGM = 静音槽位(关内曲只在棋盘起)")
+			_check(bgm.slot == &"title" and bgm.active_player() == bgm_p0 and bgm_p0.playing and bgm_p0.get_playback_position() > 0.0,
+					"进第一章故事界面 BGM 仍是标题曲、同一播放器接着播不重启")
 			if current_scene is StoryScene:
 				(current_scene as StoryScene).finish()
 				await _settle()
 				_check(current_scene is LevelScene and game.current.id == &"l01", "播完进 l01 棋盘")
-				_check(bgm.slot == &"level_1", "故事到关内同槽位不变")
-				if bgm.TRACKS[&"level_1"] == "":
-					await _wait(bgm.FADE_SEC + 0.2)
-					_check(not bgm.is_playing(), "第一章暂无曲:标题曲淡出到静音")
+				_check(bgm.slot == &"level_1" and bgm.is_playing(), "进棋盘 BGM 槽位 = level_1,关内曲起")
 
 	# ---- N. 测试用「示答」按钮:点了自动摆出本关答案并通关 ----
 	var l01 := current_scene as LevelScene

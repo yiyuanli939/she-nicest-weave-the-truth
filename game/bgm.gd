@@ -2,12 +2,12 @@ extends Node
 ## Autoload "Bgm":背景音乐。槽位 -> 文件见 TRACKS(与 music/音乐bgm位置.md 一一对应)。
 ## 场景在 _ready 里 play(槽位):同槽位不重启(标题/选关/开发者信息互切、同章下一关),
 ## 换槽位用两个播放器交叉淡化;槽位没曲子就淡出到静音(补曲只改 TRACKS 一行)。
-## 故事界面(开场 / 结局对话)stop() 静音:关内曲只在棋盘起。
+## 故事界面(开场 / 结局对话)也报 title:从选关进来标题曲接着播不重启,从棋盘进来关内曲淡出换回标题曲;关内曲只在棋盘起。
 ## 美术文档没有音量 UI,音量是常量。
 
 const TRACKS: Dictionary = {
-	&"title": "res://music/title.mp3",   # 标题 / 选关 / 开发者信息
-	&"level_1": "res://music/level.wav",  # 第一章 并纹:关内(棋盘;故事界面静音;四章暂共用一首)
+	&"title": "res://music/title.mp3",   # 标题 / 选关 / 故事界面(开场 / 结局对话)/ 开发者信息
+	&"level_1": "res://music/level.wav",  # 第一章 并纹:关内(棋盘;四章暂共用一首)
 	&"level_2": "res://music/level.wav",  # 第二章 叠层纹
 	&"level_3": "res://music/level.wav",  # 第三章 岔纹
 	&"level_4": "res://music/level.wav",  # 第四章 焦纹
