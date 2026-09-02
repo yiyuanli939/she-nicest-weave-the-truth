@@ -1,6 +1,15 @@
-# 关内曲候选(自作)
+# 关内曲候选(按乐理自作)
 
-`compose.py` 用音符数据写死五首循环曲(梭声 / 黄铜机房 / 羊毛与雨 / 齿轮华尔兹 / 静语),输出 `compositions.json`;
-`workshop.tpl.html` 是试听台模板(Web Audio 现场合成,`__DATA__` 处嵌入 json),发布为 artifact「静语纹关内曲工坊」。
-用户在试听台里给四章指派后贴回结果,再按同一份音符数据离线渲染成 `music/level_N.wav`(渲染器待选定后补,乐器模型与页面里的 JS 一一对应)并填 `game/bgm.gd` `TRACKS`。
+- `THEORY.md`:现学的乐理笔记,每条对应代码里的一个规则(功能和声语法、终止式、乐段 / 乐句结构、四部声部进行、旋律写作、配器、循环与响度)。
+- `theory_compose.py`:作曲 + 渲染。乐句计划(16 小节平行乐段:前句 HC、后句 PAC,部分曲目重复一遍带变奏)→ music21 罗马数字取音 →
+  四部排列动态规划(禁平行 / 反向 / 隐伏五八度、导音上行解决、七音下行解决、不重复导音、音域与间距、最小位移、高潮塑形)→
+  高声部骨架 → 动机化旋律(基本乐思 + 复述 + 片段化延续 + 终止乐思;强拍和弦音、弱拍经过 / 辅助音;跳进 ≤ 小六度、无三全音、跳后反向)→
+  配器(GM 音色:音乐盒 / 大键琴 / 钢琴 / 拨弦 / 钟琴 / 弦乐 / 大提琴 / 木鱼)→ mido 写 MIDI → FluidSynth + MuseScore_General.sf3 渲染
+  → 取第二遍做无缝循环 → loudnorm -18 LUFS → `out/<id>.wav`(游戏用)+ `.mp3`(试听台)+ `.json`(逐小节和声、终止式、检查结果)。
+  独立复核:music21 `VoiceLeadingQuartet` 数平行五八度必须为 0。
+- `gen_workshop.py` + `workshop.tpl.html`:把 out/ 嵌成试听台页面(artifact「静语纹关内曲工坊」)。
+- 音色库 `sf/MuseScore_General.sf3`(40 MB,MIT,不入库):`curl -L -o tools/level_music/sf/MuseScore_General.sf3 https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/MuseScore_General.sf3`;
+  需要 `brew install fluidsynth`、venv 里 `pip install music21 mido`。
+- 跑:`hardware/.venv/bin/python tools/level_music/theory_compose.py && hardware/.venv/bin/python tools/level_music/gen_workshop.py`。
+- 用户在试听台给四章指派后贴回结果:把 `out/<id>.wav` 复制成 `music/level_N.wav`、填 `game/bgm.gd` `TRACKS`、量响度填 `GAIN_DB`。
 `tools/` 不进导出包。
