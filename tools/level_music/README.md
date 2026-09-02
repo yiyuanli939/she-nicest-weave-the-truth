@@ -13,3 +13,9 @@
 - 跑:`hardware/.venv/bin/python tools/level_music/theory_compose.py && hardware/.venv/bin/python tools/level_music/gen_workshop.py`。
 - 用户在试听台给四章指派后贴回结果:把 `out/<id>.wav` 复制成 `music/level_N.wav`、填 `game/bgm.gd` `TRACKS`、量响度填 `GAIN_DB`。
 `tools/` 不进导出包。
+
+## level.wav 改版(不改旋律,只动速度 / 音高 / 明暗 / 空间感)
+
+`level_remix.py` → `out_remix/<id>.wav` + `.mp3` + `level_remix.html`(artifact「level.wav 改版试听」)。7 个版本:原版(对照)、柔和(低通 + 轻混响)、
+明亮(快 4% + 中高频提升 + 立体声加宽)、慢速(慢 10% 不变调)、暗调(降两个半音拉回原速 + 长回声)、升调(升两个半音拉回原速)、远处(低通 900 Hz + 大混响 -23 LUFS)、
+脉动(按半拍颤音 + 合唱)。循环无缝:原曲循环三遍过滤镜后截中间一遍;响度 loudnorm 统一。用户选定后复制 `out_remix/<id>.wav` → `music/level_N.wav` 并填 `Bgm.TRACKS`。

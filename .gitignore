@@ -7,3 +7,4 @@ hardware/backup/*_board*.bin
 build/
 tools/level_music/sf/
 tools/level_music/out/
+tools/level_music/out_remix/
