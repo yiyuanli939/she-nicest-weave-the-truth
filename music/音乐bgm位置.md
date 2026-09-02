@@ -2,14 +2,15 @@
 
 引擎按槽位名读 `music/<槽位>.mp3`(也可 .ogg / .wav),自动循环;槽位在代码里的对应表是 `game/bgm.gd` 的 `TRACKS`。
 同槽位切页不重启;换槽位交叉淡化 1.2 秒;槽位没曲子 = 该处静音。
+进关前的故事界面(全屏开场对话)与结局对话**静音**(上一曲淡出),关内曲只在棋盘起;结局黑屏后进开发者信息页再起标题曲。
 
 | 槽位 | 用在哪 | 文件 | 曲目 / 演奏 / 授权 |
 |---|---|---|---|
 | title | 进入游戏:标题页、选关页、开发者信息页(三页共用,切页不重启) | `music/title.mp3` | Schubert Piano Sonata in A Major, D.664 - II. Andante;演奏 Paul Pitman;License: CCPD(公有领域) |
-| level_1 | 第一章 并纹:进关前故事界面 + 关内 | `music/level.wav` | 原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
-| level_2 | 第二章 叠层纹:故事界面 + 关内 | `music/level.wav`(同上,四章暂共用) | |
-| level_3 | 第三章 岔纹:故事界面 + 关内 | `music/level.wav`(同上) | |
-| level_4 | 第四章 焦纹:故事界面 + 关内 | `music/level.wav`(同上) | |
+| level_1 | 第一章 并纹:关内(棋盘) | `music/level.wav` | 原 guanka.wav(37 秒循环);李熠远 与 ChatGPT 共同生成(AI 生成) |
+| level_2 | 第二章 叠层纹:关内 | `music/level.wav`(同上,四章暂共用) | |
+| level_3 | 第三章 岔纹:关内 | `music/level.wav`(同上) | |
+| level_4 | 第四章 焦纹:关内 | `music/level.wav`(同上) | |
 
 ## 补曲 / 换曲
 

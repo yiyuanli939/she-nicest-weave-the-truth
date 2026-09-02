@@ -39,7 +39,7 @@ func _ready() -> void:
 		dlg = game.current.outro_dialogue if _outro else game.current.intro_dialogue
 	var bgm := get_node_or_null("/root/Bgm")
 	if bgm != null:
-		bgm.play(bgm.slot_for_chapter(game.current_chapter() if game != null else -1))
+		bgm.stop()   # 故事界面(开场 / 结局对话)静音:标题曲或关内曲淡出,关内曲只在棋盘(LevelScene)起
 	_build_ui()
 	if dlg == null or dlg.lines.is_empty():
 		_on_dialogue_finished()

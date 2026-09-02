@@ -488,7 +488,7 @@ func _run() -> void:
 			_click(_center(first), MOUSE_BUTTON_LEFT)
 			await _settle()
 			_check(current_scene is StoryScene, "点第一纹 → 故事界面")
-			_check(bgm.slot == &"level_1", "进第一章故事界面 BGM 槽位 = level_1(故事与关内共用)")
+			_check(bgm.slot == &"", "进第一章故事界面 BGM = 静音槽位(关内曲只在棋盘起)")
 			if current_scene is StoryScene:
 				(current_scene as StoryScene).finish()
 				await _settle()
