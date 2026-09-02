@@ -524,7 +524,7 @@ func _run() -> void:
 	_check(not nbui.is_open() and nbui._handle.text.contains("笔")
 			and is_equal_approx(nbui._drawer.position.x, vw - NotebookUI.CLOSED_PEEK), "点「继续工作」抽屉收回")
 
-	# ---- T. 标题页:四个选项 + 「设置」;开始游戏→选关;有进度则「继续游戏」;重置进度即清档;开发者信息 Esc 返回 ----
+	# ---- T. 标题页:右列四个选项 + 左侧「设置」;开始游戏→选关;有进度则「继续游戏」;重置进度即清档;开发者信息 Esc 返回 ----
 	game.save.wipe()
 	game.goto_menu()
 	await _settle()
@@ -537,14 +537,14 @@ func _run() -> void:
 		for b in menu.find_children("*", "Button", true, false):
 			if b.get_parent() == menu:
 				names.append((b as Button).text)
-		_check(names == ["开始游戏", "重置进度", "开发者信息", "退出游戏", "设置"], "标题页四个选项 + 第五项「设置」(得 %s)" % str(names))
-		# 「设置」弹窗:标题页本身没有控件;点「设置」弹出居中面板(遮罩挡住后面);音量滑条当场改 Bgm 并落 settings;
+		_check(names == ["开始游戏", "重置进度", "开发者信息", "退出游戏", "设置"], "标题页右列四个选项 + 「设置」(得 %s)" % str(names))
+		# 「设置」在左侧空白处(右下别再堆),弹窗:标题页本身没有控件;点「设置」弹出居中面板(遮罩挡住后面);音量滑条当场改 Bgm 并落 settings;
 		# 小机联动开关 = 无机器人模式;小机维护开面板;关闭 / Esc 收起
 		var sp: SettingsPanel = menu._settings
-		var quit_btn := _button_named(menu, "退出游戏")
 		var set_btn := _button_named(menu, "设置")
-		_check(sp != null and not sp.visible and set_btn != null and is_equal_approx(set_btn.get_global_rect().get_center().y - quit_btn.get_global_rect().get_center().y, MainMenu.MENU_PITCH)
-				and absf(set_btn.get_global_rect().get_center().x - MainMenu.MENU_CENTER_X) <= 1.0, "「设置」在「退出游戏」正下方同列同间距,弹窗默认关着")
+		var set_c: Vector2 = set_btn.get_global_rect().get_center() if set_btn != null else Vector2.ZERO
+		_check(sp != null and not sp.visible and set_btn != null and set_c.distance_to(MainMenu.SETTINGS_CENTER) <= 1.0 and set_c.x < 1920.0
+				and set_btn.get_global_rect().end.x < 630.0, "「设置」在左侧空白处(中心 %s,不压标题图),弹窗默认关着" % str(set_c))
 		var kinds: Dictionary = {}   # 标题页本身(弹窗层不算)只有两张图 + 五个文字按钮,没有滑条等设置控件
 		for child in menu.get_children():
 			kinds[child.get_class()] = int(kinds.get(child.get_class(), 0)) + 1

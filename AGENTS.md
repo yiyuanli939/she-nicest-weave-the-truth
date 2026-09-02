@@ -55,7 +55,7 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正 × 玩家音量 `user_volume`(设置模块);各场景 `_ready` 报槽位 |
-| `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量滑条 / 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
+| `ui/settings_panel.gd` | 标题页「设置」弹窗(左侧「设置」选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量滑条 / 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
 | `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(pin/place/wire;v1.1 删了 fix/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
 | `tests/` | headless 测试,126 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
@@ -141,8 +141,8 @@ Compatibility 渲染器(删 d3d12);每帧脚本工作收敛(徽章跟随缓存�
 点选笔刷进行绘制 / 三个线描结构笔刷 / 清空·取消·确认,清空 = 擦画布、空画布确认 = 取消钉住,删挖回孔);⑤首次上架仪器的笔记进关自动翻到它那页
 (每次进关都弹),操作指引删 fix/notebook 只剩 钉/放/拉。所有尺寸按示意图以纹样宽 128 / 预览宽 720 为尺折算后逐项量测定值(ART_INTERFACE §3.6);
 headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅ →
-**标题页「设置」弹窗**(2026-09-02,用户要求、美术文档没有 → 纯文字 + 常量留位:标题页第五个选项「设置」(与四项同列同间距)点开
-`ui/settings_panel.gd` 居中弹窗,标题页本身不放控件;音乐音量滑条(`Bgm.user_volume`,当场生效)/ 全屏开关(`DisplayServer` 窗口模式,启动恢复)/
+**标题页「设置」弹窗**(2026-09-02,用户要求、美术文档没有 → 纯文字 + 常量留位:标题页左侧纯文字选项「设置」(用户:右下已够密 →
+单独放左边空白 `SETTINGS_CENTER`)点开 `ui/settings_panel.gd` 居中弹窗,标题页本身不放控件;音乐音量滑条(`Bgm.user_volume`,当场生效)/ 全屏开关(`DisplayServer` 窗口模式,启动恢复)/
 小机联动开关(= 无机器人模式,Web 不显示)/ 小机维护入口 / 关闭(Esc 也关);
 全部落 `settings`;`tests/test_settings.gd` + `test_bgm` 音量例 + UI smoke T/S 节;TUTORIAL 3.7)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。

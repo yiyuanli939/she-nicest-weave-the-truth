@@ -3,8 +3,8 @@ extends Control
 ## 标题页(美术参考图 information/art_spec_20260829/image.png):
 ## 整张背景图 + 标题图(表面流光 shader)+ 右侧四个纯文字选项(悬停变浅走 theme)。
 ## 「开始游戏 / 继续游戏」都进选关页,不直接进关;「重置进度」点击即清档。
-## 第五个选项「设置」(用户要求,美术文档只有四项)在「退出游戏」下面同列同间距,点开 SettingsPanel 弹窗
-## (音乐音量 / 全屏 / 小机联动 / 小机维护),标题页本身不放任何控件。
+## 「设置」(用户要求,美术文档只有右侧四项)单独放在**左侧**空白处(右下已经够密,别再堆;SETTINGS_CENTER),
+## 同样是纯文字选项,点开 SettingsPanel 弹窗(音乐音量 / 全屏 / 小机联动 / 小机维护),标题页本身不放任何控件。
 ## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。F9 仍直接打开小机维护面板(所有构建;Web 版设置里没有小机两行,
 ## 面板照旧打得开但切不了)。
 
@@ -17,6 +17,7 @@ const MENU_Y0 := 940.0                    # 第一个选项的垂直中心(预�
 const MENU_PITCH := 197.0                 # 选项间距(预览四行中心 940/1138/1334/1530)
 const MENU_FONT_SIZE := 78                # 预览墨高 65–67 = 站酷小薇 78 号(原 64 + 字距 12 只凑到了宽度,字形小 20%)
 const MENU_GLYPH_SPACING := 0             # 预览「开始游戏」墨宽 306 = 78 号字距 0 时的 306;留常量给美术调
+const SETTINGS_CENTER := Vector2(260, 940) # 「设置」的中心:左侧空白处,与右列首项同高、离左边 260 = 右列离右边的距离(bg 该处 340×120 内无一点墨)
 
 var _cal_ui: RobotMaintUI
 var _settings: SettingsPanel
@@ -62,7 +63,7 @@ func _ready() -> void:
 			robot.cue("sleep")   # 小机道晚安
 			await get_tree().create_timer(0.2).timeout
 		get_tree().quit())
-	_add_option(4, "设置", _settings.open)
+	_add_text_button("设置", SETTINGS_CENTER, _settings.open)
 
 	if not _game.menu_greeted:
 		_game.menu_greeted = true
@@ -73,8 +74,13 @@ func _ready() -> void:
 				_game.robot_cue("greet"))
 
 
-## 纯文字选项:无底、悬停变浅(theme),以 (MENU_CENTER_X, MENU_Y0 + i*PITCH) 为中心摆放
+## 右列第 i 个选项:以 (MENU_CENTER_X, MENU_Y0 + i*PITCH) 为中心
 func _add_option(i: int, label: String, cb: Callable) -> Button:
+	return _add_text_button(label, Vector2(MENU_CENTER_X, MENU_Y0 + i * MENU_PITCH), cb)
+
+
+## 纯文字选项:无底、悬停变浅(theme),以 center 为中心摆放
+func _add_text_button(label: String, center: Vector2, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = label
 	b.add_theme_font_size_override("font_size", MENU_FONT_SIZE)
@@ -85,7 +91,7 @@ func _add_option(i: int, label: String, cb: Callable) -> Button:
 	b.pressed.connect(cb)
 	add_child(b)
 	b.reset_size()
-	b.position = Vector2(MENU_CENTER_X, MENU_Y0 + i * MENU_PITCH) - b.size * 0.5
+	b.position = center - b.size * 0.5
 	return b
 
 
