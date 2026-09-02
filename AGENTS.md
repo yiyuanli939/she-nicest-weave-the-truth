@@ -84,6 +84,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
   「Detect From WAV」+ 无 smpl 块的 wav 导入后 `loop_end=0`,只开 `loop_mode` 会让混音在第 0 帧就碰到循环末尾、
   混 1 帧即停(关内无声,`playing` 下一帧翻 false;只查 `loop_mode`/`playing` 的测试看不出来)。循环统一走
   `Bgm.set_looping`(没有循环点就整曲循环),有测试盯。
+- **低功耗模式(`run/low_processor_mode`)下画面没变化就不重绘**:每帧要动的东西要么走 Tween/属性变化(渲染服务器会知道),
+  要么在 `_process` 里自己改属性;新加 `_process` 必须 `set_process` 门控(空闲时关掉)并加进 `tests/test_perf_settings.gd`
+  的 `PROCESS_ALLOWED` 白名单,`_process` 里禁 `queue_redraw`。`max_fps=60` 是硬上限,别删(vsync 在混合显卡笔记本上可能失效)。
 
 ## 当前进度
 
@@ -105,6 +108,10 @@ M3 内容层(关卡+存档+对话+笔记本)✅ → 实体机器人联动(固件
 与打开的抽屉对齐原尺寸摆放;引擎不再渲染笔记文字,NotebookEntry 只剩 id+image;源图存档 `笔记本页面补充/`)✅ →
 **Web 发布管线**(2026-08-30:export_presets「Web」预设(nothreads、排除素材源目录、build/.gdignore)、
 Noto 两字形回退子集 回/·(Web 无系统字体,test_theme 盯)、开局最大化;`butler push` → yiyuanli.itch.io/textrix-veritatis)✅ →
+**性能/功耗整治 + 无机器人模式**(2026-09-02:Windows 导出版十分钟过热+啸叫 → `project.godot` 帧率上限 60 + 低功耗模式 + 显式 vsync +
+Compatibility 渲染器(删 d3d12);每帧脚本工作收敛(徽章跟随缓存引用、各 `_process` 用 `set_process` 门控);8 张大图补 mipmap;
+「Windows Desktop」导出预设入库;`Robot.enabled` 无机器人模式(命令行 > settings > 平台默认仅 macOS 开;求助提示/「小机维护」按钮/道晚安全消失,
+不连桥接不轮询;标题页 F9 所有构建可用作切回入口);守门 `tests/test_perf_settings.gd` + UI smoke S/T 节)✅ →
 **关卡编排调整**(2026-09-02:第一章加第三纹 `A & B ⊢ A`(裸拆股关、无剧情、直进棋盘),4 章 16 关、l03 起 id 后移一位;
 仪器**按关上架逐关累计**(`gen_levels.gd` `LEVELS` 末列 = 本关新上架:l02 并织 · l03 拆股 · l06 引渡 · l07 封程 · l11 岔纹 · l12 汇路 · l14 溃散,l01 无);
 第二章 2-2/2-3 只对调题目(2-2 = `⊢ A > A` 封程裸机)、剧情按章-节位置不动;3-1 = l11、4-3 = l16;策划 xlsx/CSV 第一章节号同步后移(原 1-3/1-4 = 现 1-4/1-5);

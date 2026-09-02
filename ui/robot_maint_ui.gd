@@ -1,6 +1,7 @@
 class_name RobotMaintUI
 extends CanvasLayer
-## 小机维护面板(开发者信息页「小机维护」按钮 / 标题页 F9):
+## 小机维护面板(开发者信息页「小机维护」按钮 / 标题页 F9,所有构建可用):
+## 「机器人:已启用 / 无机器人模式」开关(Robot.set_enabled,存 settings;无机器人模式下接入/刷入/生成语音/摄像头按钮置灰)·
 ## 状态(桥接 / 串口 / 语音助手)· 接入小机(拉起桥接 + 语音助手)· 刷入固件与语音(mpremote,日志实时显示)·
 ## 「请指导我」回头方向 · 「小机动作:照常/保持不动」(不动模式:云台/动画/校准一律不发,表情语音照常)·
 ## 小机声音(音色 / 音量 / 五句台词,保存并生成语音,可本机试听)·
@@ -22,6 +23,7 @@ const LINE_HINTS: Dictionary = {
 }
 
 var _robot: Node
+var _mode_btn: Button
 var _status: Label
 var _log: RichTextLabel
 var _connect_btn: Button
@@ -63,6 +65,8 @@ func _init() -> void:
 	add_child(_player)
 
 	box.add_child(_label("小机维护", TITLE_FONT_SIZE))
+	_mode_btn = _button("", _on_toggle_enabled)
+	box.add_child(_mode_btn)
 	_status = _label("", FONT_SIZE)
 	box.add_child(_status)
 
@@ -139,6 +143,9 @@ func _init() -> void:
 		_cal_status.text = "已请求保存…"))
 	row3.add_child(_button("关闭", func() -> void: visible = false))
 	box.add_child(row3)
+	# 只在面板打开时刷新状态(低功耗模式下关着的面板不该占每帧)
+	set_process(false)
+	visibility_changed.connect(func() -> void: set_process(visible))
 
 
 func _label(text: String, size: int) -> Label:
@@ -180,15 +187,20 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
+	_mode_btn.text = "机器人:" + ("已启用" if _robot.enabled else "无机器人模式") + "(点击切换)"
 	var lines: Array[String] = []
-	lines.append("桥接:" + ("已连" if _robot.connected else "未连(点「接入小机」,或手动 bash hardware/run_robot.sh)"))
-	lines.append("串口 / 小机:" + ("在线" if _robot.serial_open else "离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)"))
-	lines.append("语音助手:" + ("在线,说「请指导我」或「请帮帮我」" if _robot.speech_online else "离线(需要 hardware/speech/model,第一次要允许麦克风)"))
-	if _robot.serial_open:
-		lines.append("固件外设:屏幕 %s / 功放 %s" % ["正常" if _robot.oled_ok else "故障(会自动重试)", "正常" if _robot.audio_ok else "故障(静音)"])
+	if not _robot.enabled:
+		lines.append("无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」")
+	else:
+		lines.append("桥接:" + ("已连" if _robot.connected else "未连(点「接入小机」,或手动 bash hardware/run_robot.sh)"))
+		lines.append("串口 / 小机:" + ("在线" if _robot.serial_open else "离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)"))
+		lines.append("语音助手:" + ("在线,说「请指导我」或「请帮帮我」" if _robot.speech_online else "离线(需要 hardware/speech/model,第一次要允许麦克风)"))
+		if _robot.serial_open:
+			lines.append("固件外设:屏幕 %s / 功放 %s" % ["正常" if _robot.oled_ok else "故障(会自动重试)", "正常" if _robot.audio_ok else "故障(静音)"])
 	_status.text = "\n".join(lines)
 	_dir_btn.text = "回头方向:" + ("右" if _robot.turn_dir == "right" else "左") + "(点击切换)"
 	_still_btn.text = "小机动作:" + ("保持不动" if _robot.stationary else "照常") + "(点击切换)"
+	_set_busy(_busy_log != "")
 
 
 # ---- 接入 / 刷入 ----
@@ -222,11 +234,13 @@ func _run_script(which: String, log_path: String, start_msg: String) -> void:
 	_log.text = start_msg
 
 
+## 跑脚本期间、以及无机器人模式下,拉进程的四个按钮置灰
 func _set_busy(busy: bool) -> void:
-	_flash_btn.disabled = busy
-	_connect_btn.disabled = busy
-	_voices_btn.disabled = busy
-	_cam_btn.disabled = busy
+	var off: bool = busy or not bool(_robot.enabled)
+	_flash_btn.disabled = off
+	_connect_btn.disabled = off
+	_voices_btn.disabled = off
+	_cam_btn.disabled = off
 
 
 func _poll_log() -> void:
@@ -244,6 +258,14 @@ func _poll_log() -> void:
 			_log.text += "\n截图在 hardware/.run/cam/cam_report.png"
 		_busy_log = ""
 		_set_busy(false)
+
+
+# ---- 无机器人模式 ----
+
+## 存 settings(「重置进度」不清);关内提示 / 开发者信息页入口在下次进入场景时生效
+func _on_toggle_enabled() -> void:
+	_robot.set_enabled(not _robot.enabled)
+	_refresh()
 
 
 # ---- 回头方向 ----

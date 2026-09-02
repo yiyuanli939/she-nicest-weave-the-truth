@@ -5,6 +5,7 @@ extends Control
 ## 不显示当前关名/目标文字(美术要求);目标纹样只在棋盘的目标织机节点上看。
 ## 小机「请指导我」(Robot.guide_requested):坏掉前(3-1 通关前)小机回头到极限后直接代解(无鼓励无庆祝),
 ## 坏掉后(3-2 起)只会乱动(判定在 Game.robot_mode;结局 4-3 剧情播完才修好)。
+## 无机器人模式(Robot.enabled = false):求助提示不显示、发呆计时不跑、代解入口关闭(见 _robot_on)。
 ## 有 Game autoload 且设了 current 关卡时从 LevelDef 读配置(含棋盘恢复);
 ## 否则用下面的默认字段(冒烟测试直接注入)。
 ## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。
@@ -75,6 +76,7 @@ func _ready() -> void:
 	var robot := get_node_or_null("/root/Robot")
 	if robot != null:
 		robot.guide_requested.connect(_on_guide_requested)
+	set_process(_robot_on())   # 发呆计时只服务小机语音提示;无机器人模式不跑每帧
 	var err := session.setup(assumptions, goal_text)
 	assert(err == "", err)
 	_layout_endpoints()
@@ -147,7 +149,7 @@ func _build_ui() -> void:
 	_guide_hint.add_theme_font_size_override("font_size", GUIDE_HINT_FONT_SIZE)
 	_guide_hint.modulate.a = 0.85
 	_guide_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_guide_hint.visible = _game != null and _game.robot_mode() == "guide"
+	_guide_hint.visible = _game != null and _game.robot_mode() == "guide" and _robot_on()
 	add_child(_guide_hint)
 
 	# 操作指引(用户要求加;美术文档没有 → 先纯文字,位置/字号/颜色在顶部常量):按棋盘状态提示下一步操作,做过一次就不再显示
@@ -297,8 +299,14 @@ func _on_win() -> void:
 
 # ---- 小机「请指导我」 ----
 
+## 实体小机是否启用(Robot autoload 在且非无机器人模式);关掉时一切指向小机的提示/演出都不出现
+func _robot_on() -> bool:
+	var robot := get_node_or_null("/root/Robot")
+	return robot != null and bool(robot.enabled)
+
+
 func _on_guide_requested() -> void:
-	if _game == null or _guiding or session.is_solved():
+	if _game == null or _guiding or session.is_solved() or not _robot_on():
 		return
 	var robot := get_node_or_null("/root/Robot")
 	if robot == null:

@@ -23,6 +23,7 @@ const FILES: Array[String] = [
 	"res://tests/test_robot_logic.gd",
 	"res://tests/test_step_guide.gd",
 	"res://tests/test_bgm.gd",
+	"res://tests/test_perf_settings.gd",
 ]
 
 

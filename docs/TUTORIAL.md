@@ -157,6 +157,30 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 关内界面 | `board/palette_panel.gd`(固定 7 格)、`ui/level_scene.gd`(绝对布局、工具条按钮)、`narrative/notebook_ui.gd`(图片抽屉) | 删 HUD 关名/目标文字、节点端口 Label、`MachineGuidePanel`/`RuleGuide*`、`LevelDef.notebook_unlocks`、`SaveManager.notebook` |
 | 测试 | `visual_smoke_ui.gd` 重写(`push_input(ev, true)`:视口≠窗口时坐标要按视口给)、新增 `test_story_art/test_dialogue_import/test_theme` | 81/81 + 三 smoke 全绿 |
 
+### 3.5 性能与功耗 + 无机器人模式(2026-09-02)
+
+起因:Windows 笔记本跑导出的 exe,十分钟后持续过热 + 线圈啸叫。排查(全项目无循环 Tween/粒子/SubViewport,
+贴图按需加载,语音/桥接进程 macOS-only)后定位在「没有帧率上限、静止画面也每帧全量重绘、Forward+/D3D12 是脚手架默认」。改法:
+
+| 设置(`project.godot`) | 作用 |
+|---|---|
+| `application/run/max_fps=60` | 硬上限:驱动 vsync 失效(混合显卡笔记本常见)时不会飙到几千 fps 空转 |
+| `application/run/low_processor_mode=true` | 画面没变化就不重绘,棋盘静止时 GPU≈0;Tween/文字/悬停/`TIME` 着色器都会自动触发重绘,不用管 |
+| `display/window/vsync/vsync_mode=1` | 显式垂直同步(原先靠默认) |
+| `rendering/renderer/rendering_method="gl_compatibility"`(+`.mobile`) | 纯 2D 用 Compatibility;Web 版本来就只能用它,视觉已验证;不再依赖 D3D12 |
+
+低功耗模式的守则:**每帧要动的东西要么通过 Tween/属性变化让渲染服务器知道,要么用 `set_process` 门控** ——
+`board/wire_overlay.gd`(有徽章才跟随,缓存节点引用零分配)、`ui/level_scene.gd`(发呆计时只在有机器人时跑)、
+`ui/robot_maint_ui.gd`(面板打开才刷新)、`game/robot_link.gd`(无机器人模式不轮询)都已这样做;
+`_process` 只许出现在这四个文件里,`tests/test_perf_settings.gd` 扫源码盯着(还盯 project.godot 三件套、贴图全开 mipmap、Windows 预设)。
+`tests/visual_smoke_ui.gd` T 节实测:关内静止 1 s 重绘 ≤10 帧、标题页流光照常 ≥10 帧。
+
+**无机器人模式**(`Robot.enabled`,见 `docs/ROBOT_API.md`「无机器人模式」):命令行 `-- --no-robot` > `settings.robot_enabled` > 平台默认(仅 macOS 开);
+关内求助提示、开发者信息页「小机维护」按钮、退出时的道晚安都随之消失,`Robot` 不连桥接不轮询;切回入口是标题页 F9(所有构建)。
+
+Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源目录,单文件 exe),
+`"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/she_nicest.exe`(目录要先建好)。
+
 ### 3.4 审查后修掉的 bug(值得记住的坑)
 
 | 问题 | 根因 | 修法 |
@@ -201,7 +225,9 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
 | 「小机不动」模式(舵机坏/展示静音动作) | `game/robot_link.gd stationary/STILL_CMDS/set_stationary`(send 层统一拦 gimbal/anim/cal_look,其余照常);开关在维护面板「小机动作」,存 settings |
-| 小机维护面板(接入 / 刷固件 / 校准 / 回头方向) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮、标题页 F9);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
+| 小机维护面板(接入 / 刷固件 / 校准 / 回头方向 / 无机器人模式开关) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮仅有机器人时显示、标题页 F9 所有构建可用);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
+| 无机器人模式(提示/入口全消失) | `game/robot_link.gd enabled/resolve_enabled/set_enabled`;隐藏点:`ui/level_scene.gd _robot_on`、`ui/credits_scene.gd`、`ui/main_menu.gd` |
+| 帧率上限 / 低功耗 / 渲染器 | `project.godot` `[application] run/max_fps、run/low_processor_mode`、`[rendering] renderer/rendering_method`;守门 `tests/test_perf_settings.gd`(见 3.5) |
 | 语音识别 | `hardware/speech/listen.py`(Vosk 离线,语法只认两句;`get_model.sh` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
 
 ## 5. 改完怎么验证
@@ -213,7 +239,9 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 16 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
-"$GODOT" --path .                                                  # 实跑看手感
+"$GODOT" --path .                                                  # 实跑看手感(--print-fps 看帧率:标题页 ~60,关内静止个位数)
+"$GODOT" --path . -- --no-robot                                    # 无机器人模式实跑(标题 F9 面板可切换)
+"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/she_nicest.exe   # Windows 单文件 exe(先 mkdir -p build/windows)
 ```
 
 改 `logic/` 必跑 headless;改 UI 看 `tests/screenshots/` 的截图对比;改关卡数据两者都跑。

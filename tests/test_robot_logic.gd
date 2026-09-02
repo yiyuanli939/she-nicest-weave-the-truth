@@ -135,3 +135,37 @@ func test_robot_link_parses_ack_and_ready() -> bool:
 	ok = check(rl.serial_open, "serial 事件") and ok
 	rl.free()
 	return ok
+
+
+## 无机器人模式:优先级 --no-robot > --robot > settings.robot_enabled > 平台默认(仅 macOS 开);
+## 关掉后任何命令不发也不记、不拉外部进程、不轮询;切回即恢复;开关值存档往返
+func test_no_robot_mode() -> bool:
+	var rl_s := _rl()
+	var none := PackedStringArray()
+	var ok := check(rl_s.resolve_enabled(none, {}, true) and not rl_s.resolve_enabled(none, {}, false), "无设置无参数 → 平台默认")
+	ok = check(not rl_s.resolve_enabled(none, {"robot_enabled": false}, true) and rl_s.resolve_enabled(none, {"robot_enabled": true}, false), "settings 覆盖平台默认") and ok
+	ok = check(rl_s.resolve_enabled(PackedStringArray(["--robot"]), {"robot_enabled": false}, false), "--robot 覆盖 settings") and ok
+	ok = check(not rl_s.resolve_enabled(PackedStringArray(["--robot", "--no-robot"]), {"robot_enabled": true}, true), "--no-robot 最高优先") and ok
+	ok = check(rl_s.platform_default_enabled() == OS.has_feature("macos"), "平台默认 = 仅 macOS 开") and ok
+	var rl: Node = rl_s.new()
+	rl.set_enabled(false, false)
+	rl.cue("greet")
+	rl.turn_to_limit()
+	rl.nudge(6, 0)
+	rl.calibrate_look()
+	rl.send({cmd = "text", s = "hi"})
+	ok = check(rl.sent_log.is_empty(), "无机器人模式:任何命令都不发也不记") and ok
+	ok = check(rl.launch("run") == -1, "无机器人模式不拉外部进程") and ok
+	ok = check(not rl.is_processing() and not rl.connected and not rl.serial_open and not rl.speech_online, "不轮询、状态全离线") and ok
+	rl.set_enabled(true, false)
+	rl.cue("greet")
+	ok = check(rl.sent("say", "greet") and rl.is_processing(), "切回后照常发命令并轮询") and ok
+	rl.free()
+	var sm := SaveManager.new()
+	sm.settings["robot_enabled"] = false
+	sm.save()
+	var sm2 := SaveManager.open()
+	ok = check(sm2.settings.get("robot_enabled") == false and not rl_s.resolve_enabled(none, sm2.settings, true), "robot_enabled 存档往返并压过平台默认") and ok
+	sm2.settings.clear()
+	sm2.save()
+	return ok

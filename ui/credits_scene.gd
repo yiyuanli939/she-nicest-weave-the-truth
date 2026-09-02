@@ -1,8 +1,8 @@
 class_name CreditsScene
 extends Control
 ## 开发者信息页(美术:「和选关界面采用相同底图,上面只放文字」):作者、免费素材、参考作品,先写占位。
-## 底部纯文字按钮「小机维护」(接入小机 / 刷固件 / 校准 / 回头方向),左上角「返回主界面」(BackButton);
-## 其余 Esc 或点击任意处回标题。
+## 底部纯文字按钮「小机维护」(接入小机 / 刷固件 / 校准 / 回头方向;无机器人模式下不出现,切回入口是标题页 F9),
+## 左上角「返回主界面」(BackButton);其余 Esc 或点击任意处回标题。
 
 const BG_PATH := "res://assets/art/select/bg.png"
 const TITLE_FONT_SIZE := 80
@@ -59,13 +59,15 @@ func _ready() -> void:
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(lbl)
 	box.add_child(Control.new())
-	_maint_btn = Button.new()
-	_maint_btn.text = "小机维护"
-	_maint_btn.add_theme_font_size_override("font_size", MAINT_FONT_SIZE)
-	_maint_btn.pressed.connect(func() -> void: _maint.open(get_node("/root/Robot")))
-	box.add_child(_maint_btn)
-	_maint = RobotMaintUI.new()
-	add_child(_maint)
+	var robot := get_node_or_null("/root/Robot")
+	if robot != null and bool(robot.enabled):   # 无机器人模式:页面上不出现任何指向实体小机的入口
+		_maint_btn = Button.new()
+		_maint_btn.text = "小机维护"
+		_maint_btn.add_theme_font_size_override("font_size", MAINT_FONT_SIZE)
+		_maint_btn.pressed.connect(func() -> void: _maint.open(robot))
+		box.add_child(_maint_btn)
+		_maint = RobotMaintUI.new()
+		add_child(_maint)
 	_back_btn = BackButton.make(get_node("/root/Game").goto_menu)
 	add_child(_back_btn)
 	var game := get_node_or_null("/root/Game")

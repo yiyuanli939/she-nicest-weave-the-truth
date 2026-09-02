@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dl87akaylflee"
-path="res://.godot/imported/false_elim.png-1424c7e06f5f9b55c3522b964a8d2c06.ctex"
+uid="uid://comc1gv0w36an"
+path="res://.godot/imported/m3_l09_board.png-5607988c580261a278aa9751056a1f84.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/art/level/notebook/false_elim.png"
-dest_files=["res://.godot/imported/false_elim.png-1424c7e06f5f9b55c3522b964a8d2c06.ctex"]
+source_file="res://tests/screenshots/m3_l09_board.png"
+dest_files=["res://.godot/imported/m3_l09_board.png-5607988c580261a278aa9751056a1f84.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=true
+mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

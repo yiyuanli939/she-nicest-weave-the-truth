@@ -3,6 +3,7 @@ extends SceneTree
 ##   故事界面(底图/场景/立绘/遮罩 + 每个点击落点 + 任意键)/ 无对话关直接进棋盘 / 工具条按钮 /
 ##   仪器架 7 格与置灰 / 节点无公式文字 / 右键删除的每个落点 / 拖动中右键不误删 / Delete 键 / 撤销重做快捷键 /
 ##   钉按钮 → 编辑器 → 钉住 / 幽灵态 / 连线徽章 / 笔记抽屉划出收回翻页 / 标题页四选项 / 选关页锁与进关 / 示答。
+##   无机器人模式(提示/入口消失、F9 切回)/ 低功耗模式(静止棋盘不重绘、标题流光照常、帧率上限 60)。
 ##   godot --path . --script res://tests/visual_smoke_ui.gd
 ## 退出码 = 失败数。坐标一律是 3840×2160 逻辑视口坐标(push_input 的 in_local_coords = true)。
 
@@ -76,6 +77,28 @@ func _labels_with(from: Node, needle: String) -> int:
 		if (l as Label).text.contains(needle):
 			n += 1
 	return n
+
+
+## 场景里可见的 Label/Button 文本中含 needle 的(无机器人模式:任何可见文字都不许提实体小机)
+func _visible_texts_with(from: Node, needle: String) -> Array[String]:
+	var out: Array[String] = []
+	for c in from.find_children("*", "Control", true, false):
+		var text := ""
+		if c is Label:
+			text = (c as Label).text
+		elif c is Button:
+			text = (c as Button).text
+		if text.contains(needle) and (c as Control).is_visible_in_tree():
+			out.append(text)
+	return out
+
+
+func _visible_button_texts(from: Node) -> Array[String]:
+	var out: Array[String] = []
+	for b in from.find_children("*", "Button", true, false):
+		if (b as Button).is_visible_in_tree():
+			out.append((b as Button).text)
+	return out
 
 
 func _center(c: Control) -> Vector2:
@@ -677,6 +700,71 @@ func _run() -> void:
 			"五个操作都落进存档 steps")
 	game.save.wipe()
 	_check(game.save.steps.is_empty(), "重置进度清掉指引记忆")
+
+	# ---- S. 无机器人模式:一切指向实体小机的提示/入口消失;标题页 F9 是切回入口 ----
+	robot.set_enabled(false, false)   # 不落盘:别污染开发机存档
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g6 := current_scene as LevelScene
+	_check(g6 != null and not g6._guide_hint.visible and not g6.is_processing(), "无机器人模式:关内不显示求助提示、发呆计时不跑")
+	_check(g6 != null and _visible_texts_with(g6, "小机").is_empty(), "无机器人模式:关卡场景没有任何可见文字提到小机")
+	robot.sent_log.clear()
+	robot._last_guide_ms = -100000
+	robot._on_event({"evt": "speech", "text": "请 指导 我"})
+	await _wait(1.0)
+	_check(g6 != null and not g6.session.is_solved() and robot.sent_log.is_empty(), "无机器人模式:语音事件不代解、不发命令")
+	game.goto_credits()
+	await _settle()
+	var credit_texts := _visible_button_texts(current_scene)
+	_check(credit_texts == ["返回主界面"] and _visible_texts_with(current_scene, "小机").is_empty(),
+			"无机器人模式:开发者信息页没有「小机维护」(得 %s)" % str(credit_texts))
+	game.goto_menu()
+	await _settle()
+	var menu2 := current_scene as MainMenu
+	_key(KEY_F9)
+	await _settle()
+	_check(menu2 != null and menu2._cal_ui.visible and menu2._cal_ui._mode_btn.text.contains("无机器人模式"), "标题页 F9 打开维护面板,开关显示无机器人模式")
+	_check(menu2 != null and menu2._cal_ui._connect_btn.disabled and menu2._cal_ui._flash_btn.disabled, "无机器人模式:接入/刷入按钮置灰")
+	_click(_center(menu2._cal_ui._mode_btn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(robot.enabled and menu2._cal_ui._mode_btn.text.contains("已启用") and game.save.settings.get("robot_enabled") == true
+			and not menu2._cal_ui._connect_btn.disabled, "点开关 → 启用、写进 settings、按钮恢复")
+	game.save.settings.erase("robot_enabled")   # 开发机不留痕:回到平台默认(macOS 开)
+	game.save.save()
+	_click(_center(_button_named(menu2._cal_ui, "关闭")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var g7 := current_scene as LevelScene
+	_check(g7 != null and g7._guide_hint.visible and g7.is_processing(), "切回有机器人:求助提示与发呆计时恢复")
+	game.save.wipe()
+
+	# ---- T. 低功耗/帧率:静止棋盘不重绘,标题页流光照常动,帧率硬上限 60 ----
+	_check(Engine.max_fps == 60 and OS.low_processor_usage_mode, "帧率上限 60 + 低功耗模式生效")
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	await _wait(1.6)   # 让进关的 BGM 淡入等 Tween 走完
+	var drawn0 := Engine.get_frames_drawn()
+	await _wait(1.0)
+	var idle_draws := Engine.get_frames_drawn() - drawn0
+	_check(idle_draws <= 10, "关内静止 1 s 重绘 ≤10 帧(得 %d;低功耗模式下静止画面不重绘)" % idle_draws)
+	game.goto_menu()
+	await _settle()
+	await _wait(0.5)
+	drawn0 = Engine.get_frames_drawn()
+	await _wait(1.0)
+	var title_draws := Engine.get_frames_drawn() - drawn0
+	_check(title_draws >= 10 and title_draws <= 70, "标题页流光 1 s 重绘 10–70 帧(得 %d;TIME 着色器自动请求重绘,上限 60)" % title_draws)
+	game.save.wipe()
 
 	# ---- B. 回标题:BGM 淡入标题曲 ----
 	game.goto_menu()

@@ -46,7 +46,24 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 麦克风权限归"拉起进程的应用":从 Dock 开的 Godot 拉起 → macOS 向 Godot 要权限;从终端跑 → 向终端要。第一次点「允许」。
 导出正式版时导出预设要开 Audio Input 并填 microphone usage description(仓库还没有 export_presets.cfg)。
 
-## 小机维护面板(开发者信息页「小机维护」按钮;标题页调试版 F9 同一面板)
+## 无机器人模式(`Robot.enabled = false`)
+
+没有实体小机的机器(展示用 Windows 笔记本等)用这个模式:**一切指向实体小机的提示与入口都不出现** ——
+关内不显示「有困难可以对小机说…」、发呆计时不跑、语音事件不代解;开发者信息页没有「小机维护」按钮;
+退出游戏不等小机道晚安;`Robot` 不连桥接、不每帧轮询,`send/launch` 一律静默(`sent_log` 也不记)。剧情里的角色台词照常(那是剧情)。
+
+开关(`game/robot_link.gd resolve_enabled`,优先级从高到低):
+
+1. 启动参数 `--no-robot` / `--robot`(只管本次,不落盘;引擎可能吞掉 `--` 之前的未知参数,推荐写成 `she_nicest.exe -- --no-robot`);
+2. `user://save.json` 的 `settings.robot_enabled`(维护面板「机器人:已启用 / 无机器人模式」按钮写入;「重置进度」不清);
+3. 平台默认:macOS 开,其它平台关(桥接/语音脚本只在 macOS 能跑)。
+
+切回有机器人:标题页按 **F9**(所有构建可用,界面上没有可见入口)打开维护面板 → 点「机器人:无机器人模式(点击切换)」;
+关内提示 / 开发者信息页入口在下次进入场景时生效。测试:`tests/test_robot_logic.gd test_no_robot_mode`、`tests/visual_smoke_ui.gd` S 节。
+
+## 小机维护面板(开发者信息页「小机维护」按钮,仅有机器人时显示;标题页 F9 同一面板,所有构建可用)
+
+- 「机器人:已启用 / 无机器人模式(点击切换)」:见上节;无机器人模式下接入 / 刷入 / 生成语音 / 摄像头四个按钮置灰。
 
 - 状态:桥接 / 串口(小机)/ 语音助手 是否在线。
 - 「接入小机」:`run_robot.sh`。「刷入固件与语音」:`flash_robot.sh`(停桥接 → `mpremote fs cp main.py paj7620.py` + `fs cp -r sounds :` → 软复位 → 重新接入),进度日志实时显示。
@@ -86,7 +103,7 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 **坏掉时点 = 3-1(l11)通关瞬间**:l11 的 `robot_cue_on_win = "panic"`(小机代解通关也演,`Game.notify_solved` 随即置 `Robot.broken`);
 **修好时点 = 结局**:l16 通关点「继续」→ 4-3 剧情播完 → 「感谢游玩」黑屏时 `broken = false` + `calm`(`ui/story_scene.gd _play_thanks`)。
 
-关内坏掉前显示提示「有困难可以对小机说:「请指导我」或「请帮帮我」」(`ui/level_scene.gd GUIDE_HINT`)。
+关内坏掉前显示提示「有困难可以对小机说:「请指导我」或「请帮帮我」」(`ui/level_scene.gd GUIDE_HINT`);无机器人模式下不显示。
 
 ## 串口/WS 协议(行分隔 JSON)
 

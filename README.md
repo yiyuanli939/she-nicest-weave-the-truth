@@ -25,9 +25,13 @@
 
 用 [Godot 4.7](https://godotengine.org/) 打开本仓库工程直接跑(`project.godot`)。
 测试、导出与内容修改指南见 `docs/TUTORIAL.md`。
+Windows 发布版:`export_presets.cfg` 里有「Windows Desktop」预设(排除素材源目录,单文件 exe);
+工程已设帧率上限 60 + 低功耗模式 + Compatibility 渲染器,笔记本长时间运行不会因空转满载而过热。
 
 可选:游戏支持联动一台实体桌面小机器人「小织」(表情/语音/回头,对麦克风说「请指导我」还会代解),
 没有机器人时一切照常。接入方法见 `docs/ROBOT_API.md`。
+**无机器人模式**:非 macOS 平台默认就是无机器人(关内不显示求助提示,开发者信息页没有「小机维护」);
+标题页按 F9 打开维护面板可切换,也可用启动参数 `-- --no-robot` / `-- --robot` 临时覆盖。
 
 ## 团队
 

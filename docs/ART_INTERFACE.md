@@ -31,7 +31,8 @@
 | 对话界面/*遮罩.png | `assets/art/story/char_{nora,lia,arthur}_mask.png` | 非发言者 50% 遮罩 |
 
 新加立绘/场景:按上面的命名规则放进目录,再在 `narrative/story_art.gd` 的 `CHARACTERS / EXPRESSIONS / SCENES` 表补一行。
-所有 PNG 的导入都开了 mipmaps(`.import` 里 `mipmaps/generate=true`),窗口缩小显示不闪。
+所有 PNG 的导入都开了 mipmaps(`.import` 里 `mipmaps/generate=true`),窗口缩小显示不闪;**新图导入必须也开**
+(全局过滤器是 LINEAR_WITH_MIPMAPS,4K 整页图在 1080p 屏上 2× 缩小采样,没 mipmap 又抖又多读 4 倍纹理;`tests/test_perf_settings.gd` 盯着)。
 
 ## 3. 位置调参表(给美术:在引擎里哪儿手动调图片位置)
 

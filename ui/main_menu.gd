@@ -3,7 +3,8 @@ extends Control
 ## 标题页(美术参考图 information/art_spec_20260829/image.png):
 ## 整张背景图 + 标题图(表面流光 shader)+ 右侧四个纯文字选项(悬停变浅走 theme)。
 ## 「开始游戏 / 继续游戏」都进选关页,不直接进关;「重置进度」点击即清档。
-## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。小机维护不占界面:调试版按 F9(开发者信息页也有入口)。
+## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。小机维护不占界面:按 F9(所有构建都可用 —— 它也是
+## 无机器人模式切回来的唯一入口;开发者信息页的「小机维护」按钮只在有机器人时出现)。
 
 const BG_PATH := "res://assets/art/title/bg.png"
 const TITLE_PATH := "res://assets/art/title/title.png"
@@ -46,8 +47,10 @@ func _ready() -> void:
 	_add_option(1, "重置进度", _on_reset)
 	_add_option(2, "开发者信息", _game.goto_credits)
 	_add_option(3, "退出游戏", func() -> void:
-		get_node("/root/Robot").cue("sleep")   # 小机道晚安
-		await get_tree().create_timer(0.2).timeout
+		var robot := get_node_or_null("/root/Robot")
+		if robot != null and bool(robot.enabled):
+			robot.cue("sleep")   # 小机道晚安
+			await get_tree().create_timer(0.2).timeout
 		get_tree().quit())
 
 	_cal_ui = RobotMaintUI.new()
@@ -55,9 +58,11 @@ func _ready() -> void:
 
 	if not _game.menu_greeted:
 		_game.menu_greeted = true
-		# 稍等 WebSocket 连上桥接再问候(连不上则静默)
-		get_tree().create_timer(1.2).timeout.connect(func() -> void:
-			_game.robot_cue("greet"))
+		# 稍等 WebSocket 连上桥接再问候(连不上则静默;无机器人模式不挂)
+		var robot := get_node_or_null("/root/Robot")
+		if robot != null and bool(robot.enabled):
+			get_tree().create_timer(1.2).timeout.connect(func() -> void:
+				_game.robot_cue("greet"))
 
 
 ## 纯文字选项:无底、悬停变浅(theme),以 (MENU_CENTER_X, MENU_Y0 + i*PITCH) 为中心摆放
@@ -87,6 +92,6 @@ func _on_reset() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var k := event as InputEventKey
-	if k != null and k.pressed and not k.echo and k.keycode == KEY_F9 and OS.is_debug_build():
+	if k != null and k.pressed and not k.echo and k.keycode == KEY_F9:
 		_cal_ui.open(get_node("/root/Robot"))
 		get_viewport().set_input_as_handled()

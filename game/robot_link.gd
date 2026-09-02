@@ -9,6 +9,9 @@ extends Node
 ## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
+## 无机器人模式:enabled = false(优先级:命令行 --no-robot > --robot > settings.robot_enabled > 平台默认,macOS 开、其它平台关)
+## 时不连桥接、不每帧轮询,send/launch 一律静默(sent_log 也不记);UI 侧据此隐藏一切指向实体小机的提示与入口
+## (关内求助提示、开发者信息页「小机维护」)。切换在维护面板(标题页 F9),存 settings,「重置进度」不清。
 
 ## 机器人上行事件(pong / button / cal_done / cal_timeout / err / serial / speech*),已解析为 Dictionary
 signal robot_event(data: Dictionary)
@@ -32,6 +35,7 @@ const GLITCH_SFX_COUNT := 3            # sounds/glitch1..3.wav(hardware/make_sfx
 ## 不动模式下拦掉的命令:云台直控 / 云台动画 / 自动校准(要扫头);不发也不记 sent_log
 const STILL_CMDS: Array = ["gimbal", "anim", "cal_look"]
 
+var enabled: bool = true           # false = 无机器人模式(见文件头);_ready 按命令行/settings/平台解析
 var connected: bool = false        # ws 连上桥接
 var serial_open: bool = false      # 桥接报告串口(小机)在线
 var speech_online: bool = false    # 语音助手心跳在线
@@ -56,10 +60,54 @@ var _pids: Dictionary = {}
 
 func _ready() -> void:
 	var game := get_node_or_null("/root/Game")
+	var settings: Dictionary = {}
 	if game != null and game.save != null:
-		turn_dir = _norm_dir(String(game.save.settings.get("robot_turn", "right")))
-		stationary = bool(game.save.settings.get("robot_stationary", false))
-	_connect()
+		settings = game.save.settings
+		turn_dir = _norm_dir(String(settings.get("robot_turn", "right")))
+		stationary = bool(settings.get("robot_stationary", false))
+	# 引擎对 -- 之前的未知参数「可能丢弃或修改」,推荐 `游戏 -- --no-robot`;两处都认
+	var args := OS.get_cmdline_user_args()
+	args.append_array(OS.get_cmdline_args())
+	enabled = resolve_enabled(args, settings, platform_default_enabled())
+	set_process(enabled)
+	if enabled:
+		_connect()
+
+
+## 平台默认:桥接/语音脚本只在 macOS 能跑,其它平台默认无机器人
+static func platform_default_enabled() -> bool:
+	return OS.has_feature("macos")
+
+
+## 是否启用实体小机(纯函数,测试盯着):--no-robot > --robot > settings.robot_enabled > 平台默认
+static func resolve_enabled(args: PackedStringArray, settings: Dictionary, platform_default: bool) -> bool:
+	if args.has("--no-robot"):
+		return false
+	if args.has("--robot"):
+		return true
+	if settings.has("robot_enabled"):
+		return bool(settings["robot_enabled"])
+	return platform_default
+
+
+## 无机器人模式开关(维护面板);persist = false 只改运行态(命令行覆盖/测试),不落盘
+func set_enabled(on: bool, persist: bool = true) -> void:
+	if on != enabled:
+		enabled = on
+		if on:
+			_retry = 0.0
+			_connect()
+		else:
+			_ws = WebSocketPeer.new()   # 丢掉旧连接(析构即关 socket);不再轮询
+			connected = false
+			serial_open = false
+			speech_online = false
+	set_process(on)
+	if persist:
+		var game := get_node_or_null("/root/Game")
+		if game != null and game.save != null:
+			game.save.settings["robot_enabled"] = on
+			game.save.save()
 
 
 func _connect() -> void:
@@ -168,6 +216,8 @@ func cue(cue_name: String) -> void:
 
 
 func send(d: Dictionary) -> void:
+	if not enabled:
+		return   # 无机器人模式:不发也不记
 	if stationary and STILL_CMDS.has(d.get("cmd")):
 		return
 	sent_log.append(d)
@@ -284,8 +334,8 @@ static func hardware_dir() -> String:
 
 ## 跑 hardware/<脚本>(zsh),返回 pid(-1 = 失败);子进程不随游戏退出
 func launch(which: String, args: Array = []) -> int:
-	if not OS.has_feature("macos"):
-		return -1   # hardware/*.sh 是 macOS 的 zsh 脚本:其他平台直接降级(维护面板会提示手动跑)
+	if not enabled or not OS.has_feature("macos"):
+		return -1   # 无机器人模式不拉进程;hardware/*.sh 是 macOS 的 zsh 脚本:其他平台直接降级(维护面板会提示手动跑)
 	var hw := hardware_dir()
 	if hw == "" or not SCRIPTS.has(which):
 		return -1
