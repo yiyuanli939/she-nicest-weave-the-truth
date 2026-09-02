@@ -942,6 +942,7 @@ func _run() -> void:
 		await _settle()
 	var s1 := current_scene as LevelScene
 	_check(not s1._notebook_ui.is_open(), "l01 没有新仪器:笔记不自动弹出")
+	_check(not s1._notebook_ui._new_label.visible, "l01 没有仪器:笔记里没有「新机器!」")
 	_check(s1._step_hint.visible and s1._step_hint.text == StepGuide.TEXT[&"wire"], "l01 没有仪器架:提示拉线")
 	_check(not s1._guide_hint.visible or s1._step_hint.position.y < s1._guide_hint.position.y, "操作指引在求助提示上一行")
 	s1.session.connect_wire(s1.session.assumption_ids[0], 0, s1.session.goal_id, 0)
@@ -959,6 +960,12 @@ func _run() -> void:
 	_check(nb2.is_open() and is_equal_approx(nb2._drawer.position.x, NotebookUI.OPEN_X), "l02 首次上架并织机:进关笔记自动划出")
 	_check(nb2._entries.size() == 1 and nb2._page == 0 and nb2._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
 			"自动翻到并织机那页")
+	_check(nb2._new_label.visible and nb2._new_label.text == "新机器!" and nb2._new_label.position == NotebookUI.NEW_LABEL_POS
+			and nb2._new_label.get_index() > nb2._page_pic.get_index(), "并织机是本关新机器:纸左上角显示「新机器!」(在整页图之上)")
+	var lbl_rect: Rect2 = nb2._new_label.get_global_rect()
+	_check(lbl_rect.position.x > NotebookUI.OPEN_X + 411 and lbl_rect.position.y > NotebookUI.DRAWER_Y + 278
+			and lbl_rect.end.x < 1451 and lbl_rect.end.y < NotebookUI.DRAWER_Y + 560,
+			"「新机器!」在纸面左上角空白里:不出纸、不压标题墨迹(x<1451)、不压夹子(y<587)(得 %s)" % str(lbl_rect))
 	_click(_center(nb2._handle), MOUSE_BUTTON_LEFT)   # 继续工作
 	await nb2.slide_finished
 	await _settle()
@@ -981,6 +988,15 @@ func _run() -> void:
 	var nb3: NotebookUI = s3._notebook_ui
 	await _wait_until(func() -> bool: return nb3.is_open() and is_equal_approx(nb3._drawer.position.x, NotebookUI.OPEN_X), 3.0)
 	_check(nb3.is_open() and nb3._entries[nb3._page].id == &"imp_intro", "l07 首次上架封程机:自动翻到封程机那页(不是第一页)")
+	_check(nb3._new_label.visible, "封程机那页显示「新机器!」")
+	nb3._next_page()
+	await _settle()
+	_check(nb3._entries[nb3._page].id != &"imp_intro" and not nb3._new_label.visible, "翻到不是新机器的页:「新机器!」隐藏")
+	for i in nb3._entries.size():
+		if nb3._entries[nb3._page].id != &"imp_intro":
+			nb3._next_page()
+	await _settle()
+	_check(nb3._entries[nb3._page].id == &"imp_intro" and nb3._new_label.visible, "翻回封程机页:「新机器!」再出现")
 	_click(_center(nb3._handle), MOUSE_BUTTON_LEFT)
 	await nb3.slide_finished
 	await _settle()

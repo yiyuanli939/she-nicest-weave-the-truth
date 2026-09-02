@@ -96,7 +96,8 @@ func _ready() -> void:
 			_board.apply_positions()
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
-		var debut: Array = _game.catalog.debut_rules(lv)
+		var debut: Array[StringName] = _game.catalog.debut_rules(lv)
+		_notebook_ui.set_new_rules(debut)   # 这些仪器的页在本关显示「新机器!」(手动翻到也显示)
 		if not debut.is_empty():   # 本关首次上架的仪器:进关自动翻到它的笔记页(v1.1 §5;每次进关都弹)
 			_notebook_ui.open_at(_game.notebook, allowed_rules, debut[0])
 	session.board_updated.connect(_refresh_step_hint)

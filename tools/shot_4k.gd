@@ -58,7 +58,11 @@ func _initialize() -> void:
 	await _wait(0.3)
 	_save("4k_win")
 	scene._win_popup.close()
-	scene._notebook_ui.open(game.notebook, scene.allowed_rules)   # 直接开抽屉(不走 _on_open_notebook,不写存档)
+	var debut: Array[StringName] = game.catalog.debut_rules(game.current)   # 有新上架的仪器就翻到它那页(带「新机器!」)
+	if debut.is_empty():
+		scene._notebook_ui.open(game.notebook, scene.allowed_rules)   # 直接开抽屉(不走 _on_open_notebook,不写存档)
+	else:
+		scene._notebook_ui.open_at(game.notebook, scene.allowed_rules, debut[0])
 	await scene._notebook_ui.slide_finished
 	await _wait(0.3)
 	_save("4k_notebook")

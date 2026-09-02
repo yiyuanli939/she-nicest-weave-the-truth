@@ -58,6 +58,7 @@
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
 | 关内:夹子「笔 / 记」「继续 / 工作」两行字的中心 / 字号 / 行距 / 热区尺寸;「翻页」矩形与字号;整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_CENTER_CLOSED` `HANDLE_CENTER_OPEN` `HANDLE_FONT_SIZE` `HANDLE_LINE_PITCH` `HANDLE_SIZE`;`FLIP_RECT` `FLIP_FONT_SIZE`;`PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
+| 关内:笔记「新机器!」(本关首次上架的仪器那页,纸左上角;暂为纯文字,美术要换图/挪位改这里)位置(抽屉内;纸面左上角实测 (411,278))/ 字号 / 字色 / 文案 | `narrative/notebook_ui.gd` → `NEW_LABEL_POS` `NEW_LABEL_FONT_SIZE` `NEW_LABEL_COLOR` `NEW_LABEL_TEXT` |
 | 关内:通关弹窗「织成了」(v1.2;图居中原尺寸,左上角 (1333, 672))「继续」中心(图内坐标)/ 字号 / 字色 / 悬停色 / 遮罩色 / 层号;实测:标题下花纹到 y 508、底框 y 748 起,空白带 512–744,「继续」实际占 581–699 | `ui/win_popup.gd` → `CONTINUE_CENTER` `CONTINUE_FONT_SIZE` `CONTINUE_COLOR` `CONTINUE_HOVER_COLOR` `DIM_COLOR` `LAYER` |
 | 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |

@@ -171,7 +171,8 @@ headless 126/126,ui 200/200,m3 59/59,m2 3/3;做法与踩坑见 TUTORIAL 3.6)✅ 
 RMS -18 / 峰值 -1 dBFS,CLIPS 后缀改 .wav;`sfx_apply.py` 重算 GAIN_DB(全在 0 到 +1,只剩 hover -4 / win -5 意图);逐文件标题 / 作者 / 链接 / 许可表在
 `assets/sfx/音效位置.md`「现用文件与来源」;合成器补 loom 配方;headless 145/145;用户听过 itch.io 版后改:进入选关页响纸翻页 page(「开始游戏」按钮静音),织布机 loom 只留选定一关)✅ → **音效复核**(2026-09-02,用户「check 奇怪的音效与硬 bug」:`tools/sfx_trace.gd` 真实输入全流程逐步打印槽位 + Chrome 里核对 Web 版送进 Web Audio 的缓冲;
 改掉 重做快捷键走撤销分支(先判 ui_redo)/ 钉纹样弹窗 Esc·点外面关闭无声(popup_hide 统一响 close)/ 改接连响 unplug+pick(同帧不叠 pick)/ 换场景光标底下的按钮自己响 hover(要有鼠标移动);
-UI 冒烟 260/260、headless 145/145;TUTORIAL 3.9 复核段)✅。
+UI 冒烟 260/260、headless 145/145;TUTORIAL 3.9 复核段)✅ → **笔记「新机器!」**(2026-09-02,用户:新机器出现时翻到它那页(已有,复核 l02/l07 冒烟)+ 纸左上角「新机器!」字样;美术没有 → 纯文字 + 常量留位
+`NotebookUI.NEW_LABEL_*`(纸面左上角实测 (411,278) 向内、82 号、正文红 A3472E),`set_new_rules(debut_rules)` 进关传入、`_show_page` 按条目显隐;UI 冒烟 S 段 8 条新断言;ART_INTERFACE §3 / CONTENT_INTERFACE / TUTORIAL 同步)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。
