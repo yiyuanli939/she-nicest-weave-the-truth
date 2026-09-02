@@ -54,8 +54,9 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `narrative/story_art.gd` | 故事界面美术登记表:中文角色/表情/场景名 → `assets/art/story/*.png` |
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正;各场景 `_ready` 报槽位 |
+| `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(fix/pin/place/wire/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
-| `tests/` | headless 测试,107 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
+| `tests/` | headless 测试,112 例(含 `test_solver_exhaustive.gd` 穷举/随机不变量、`test_theme.gd` 字体符号扫描、`test_res_paths.gd` res:// 大小写审计);`test_base.gd` 提供 `check`/`f("A & B")` |
 
 ## 踩过的坑(改这些地方前必读)
 
@@ -107,7 +108,10 @@ Noto 两字形回退子集 回/·(Web 无系统字体,test_theme 盯)、开局�
 **关卡编排调整**(2026-09-02:第一章加第三纹 `A & B ⊢ A`(裸拆股关、无剧情、直进棋盘),4 章 16 关、l03 起 id 后移一位;
 仪器**按关上架逐关累计**(`gen_levels.gd` `LEVELS` 末列 = 本关新上架:l02 并织 · l03 拆股 · l06 引渡 · l07 封程 · l11 岔纹 · l12 汇路 · l14 溃散,l01 无);
 第二章 2-2/2-3 只对调题目(2-2 = `⊢ A > A` 封程裸机)、剧情按章-节位置不动;3-1 = l11、4-3 = l16;策划 xlsx/CSV 第一章节号同步后移(原 1-3/1-4 = 现 1-4/1-5);
-存档带 `layout` 版本、不符则丢弃旧棋盘保留通关记录;`test_levels` 新增上架表/编排/剧情表↔tres 逐句/存档版本四条)✅。
+存档带 `layout` 版本、不符则丢弃旧棋盘保留通关记录;`test_levels` 新增上架表/编排/剧情表↔tres 逐句/存档版本四条)✅ →
+**关内操作指引**(2026-09-02,用户要求、美术文档没有 → 先纯文字:`narrative/step_guide.gd` 按棋盘状态在棋盘左下(求助提示上一行,
+`STEP_HINT_*` 常量)提示下一步操作 —— 接错线断开/拆机 → 钉纹样 → 放仪器 → 拉线 → 有新仪器翻笔记;每条做过一次记进存档 `steps` 不再显示,
+重置进度清掉;`LevelCatalog.debut_rules` 判新上架;`test_step_guide` 5 例 + UI smoke S 段)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

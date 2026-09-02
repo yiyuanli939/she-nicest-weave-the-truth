@@ -55,6 +55,7 @@
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
 | 关内:夹子「笔记/继续工作」按钮矩形 / 「翻页」矩形 / 整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_RECT` `FLIP_RECT` `PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
+| 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
 | 节点区:端口颜色 / 纹样口尺寸 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` |
 

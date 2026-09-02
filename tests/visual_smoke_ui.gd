@@ -618,6 +618,66 @@ func _run() -> void:
 	_check(game.save.settings.get("robot_stationary") == false, "开关状态写进 settings")
 	game.save.wipe()
 
+	# ---- S. 操作指引:按棋盘状态一行提示下一步操作,做过一次就不再显示(存档 steps 记忆,刚 wipe 过) ----
+	game.start_level(game.catalog.find(&"l01"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var s1 := current_scene as LevelScene
+	_check(s1._step_hint.visible and s1._step_hint.text == StepGuide.TEXT[&"wire"], "l01 没有仪器架:提示拉线")
+	_check(not s1._guide_hint.visible or s1._step_hint.position.y < s1._guide_hint.position.y, "操作指引在求助提示上一行")
+	s1.session.connect_wire(s1.session.assumption_ids[0], 0, s1.session.goal_id, 0)
+	await _settle()
+	_check(not s1._step_hint.visible and game.save.is_step_done(&"wire"), "拉线通关 → 指引消失、拉线记为做过")
+	game.start_level(game.catalog.find(&"l02"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var s2 := current_scene as LevelScene
+	_check(s2._step_hint.visible and s2._step_hint.text == StepGuide.TEXT[&"place"], "l02 空盘:提示从仪器架放仪器")
+	_click(_center(_button_named(s2._palette, "并织机")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(game.save.is_step_done(&"place") and s2._step_hint.text == StepGuide.TEXT[&"notebook"],
+			"放了仪器(拉线已学过)→ 本关有新仪器:提示翻笔记")
+	s2.session.connect_wire(s2.session.assumption_ids[0], 0, s2.session.goal_id, 0)   # 线轴 A 直接接目标 A & B:冲突
+	await _settle()
+	_check(s2._step_hint.text == StepGuide.TEXT[&"fix"], "接错的线 → 优先提示断开/拆掉")
+	s2.session.disconnect_wire(s2.session.assumption_ids[0], 0, s2.session.goal_id, 0)
+	await _settle()
+	_check(game.save.is_step_done(&"fix") and s2._step_hint.text == StepGuide.TEXT[&"notebook"], "断开后 fix 记为做过,回到翻笔记提示")
+	_click(_center(s2._notebook_ui._handle), MOUSE_BUTTON_LEFT)
+	await s2._notebook_ui.slide_finished
+	await _settle()
+	_check(game.save.is_step_done(&"notebook") and not s2._step_hint.visible, "翻过笔记 → 不再提示")
+	_click(_center(s2._notebook_ui._handle), MOUSE_BUTTON_LEFT)
+	await s2._notebook_ui.slide_finished
+	game.start_level(game.catalog.find(&"l07"))
+	await _settle()
+	if current_scene is StoryScene:
+		(current_scene as StoryScene).finish()
+		await _settle()
+	var s3 := current_scene as LevelScene
+	_check(not s3._step_hint.visible, "l07 空盘:放仪器/翻笔记都做过 → 不提示")
+	_click(_center(_button_named(s3._palette, "封程机")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(s3._step_hint.visible and s3._step_hint.text == StepGuide.TEXT[&"pin"], "封程机假设口没钉 → 提示钉纹样")
+	var s3_board: ProofBoard = s3._board
+	var s3_mn := s3_board.get_node("n%d" % s3.session.get_node_ids()[-1]) as MachineNode
+	_click(_center(_button_named(s3_mn, "钉纹样")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	s3._editor.tree = FormulaParser.parse("A")
+	s3._editor.pattern_committed.emit(s3._editor.tree)
+	s3._editor.hide()
+	await _settle()
+	_check(game.save.is_step_done(&"pin") and not s3._step_hint.visible, "钉住后 pin 记为做过,不再提示")
+	var saved_steps: Dictionary = SaveManager.open().steps
+	_check(saved_steps.has("wire") and saved_steps.has("place") and saved_steps.has("fix") and saved_steps.has("notebook") and saved_steps.has("pin"),
+			"五个操作都落进存档 steps")
+	game.save.wipe()
+	_check(game.save.steps.is_empty(), "重置进度清掉指引记忆")
+
 	# ---- B. 回标题:BGM 淡入标题曲 ----
 	game.goto_menu()
 	await _settle()

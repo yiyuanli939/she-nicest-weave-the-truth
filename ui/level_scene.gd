@@ -21,6 +21,9 @@ const GUIDE_HOLD_SEC := 2.5    # 代解后小机保持回头的时间,再转回�
 const GUIDE_HINT := "有困难可以对小机说:「请指导我」或「请帮帮我」"   # 小机坏掉前(mode == "guide")才显示
 const GUIDE_HINT_FONT_SIZE := 40
 const GUIDE_HINT_POS := Vector2(920, 2090)   # 棋盘左下角外侧
+const STEP_HINT_POS := Vector2(920, 2036)    # 操作指引(StepGuide):求助提示的上一行;美术之后换图/挪位改这里
+const STEP_HINT_FONT_SIZE := 40
+const STEP_HINT_COLOR := Color(0.627, 0.275, 0.227)   # 红棕,与求助提示区分
 
 var _game: Node = null
 var _board: ProofBoard
@@ -31,6 +34,10 @@ var _editor: PatternEditor
 var _notebook_ui: NotebookUI
 var _next_btn: Button
 var _guide_hint: Label
+var _step_hint: Label                 # 操作指引一行字(做过一次的操作不再提示)
+var _prev_facts: Dictionary = {}      # 上一次 board_updated 的棋盘事实(看出断线/拆机)
+var _debut := false                   # 本关有新上架的仪器 → 提示翻笔记
+var _steps_local: Dictionary = {}     # 无 Game(冒烟注入)时的已做操作表
 var _pin_target := Vector2i(-1, -1)   # (node_id, out_port) 正在编辑的假设口
 var _fresh_state: Dictionary = {}     # setup 刚完成的快照,重置用
 var _idle_sec := 0.0                  # 发呆计时 → 小机出声引导
@@ -85,6 +92,9 @@ func _ready() -> void:
 			_update_next_button()
 		if lv.robot_cue_on_enter != "":
 			_game.robot_cue(lv.robot_cue_on_enter)
+		_debut = not _game.catalog.debut_rules(lv).is_empty()
+	session.board_updated.connect(_refresh_step_hint)
+	_refresh_step_hint()
 
 
 func _build_ui() -> void:
@@ -140,6 +150,15 @@ func _build_ui() -> void:
 	_guide_hint.visible = _game != null and _game.robot_mode() == "guide"
 	add_child(_guide_hint)
 
+	# 操作指引(用户要求加;美术文档没有 → 先纯文字,位置/字号/颜色在顶部常量):按棋盘状态提示下一步操作,做过一次就不再显示
+	_step_hint = Label.new()
+	_step_hint.position = STEP_HINT_POS
+	_step_hint.add_theme_font_size_override("font_size", STEP_HINT_FONT_SIZE)
+	_step_hint.add_theme_color_override("font_color", STEP_HINT_COLOR)
+	_step_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_step_hint.visible = false
+	add_child(_step_hint)
+
 	_editor = PatternEditor.new()
 	_editor.pattern_committed.connect(_on_pattern_committed)
 	_editor.pattern_cleared.connect(_on_pattern_cleared)
@@ -163,6 +182,39 @@ func _make_tool_button(text: String, cb: Callable) -> Button:
 func _on_open_notebook() -> void:
 	var nb: NotebookCatalog = _game.notebook if _game != null else NotebookCatalog.load_default()
 	_notebook_ui.open(nb, allowed_rules)   # 只显示本关上架仪器的说明
+	if _mark_step(&"notebook") and _game != null:
+		_game.save.save()
+	_refresh_step_hint()
+
+
+# ---- 操作指引(StepGuide) ----
+
+func _steps_done() -> Dictionary:
+	return _game.save.steps if _game != null else _steps_local
+
+
+## 记一次操作;首次记下返回 true
+func _mark_step(step: StringName) -> bool:
+	if _game != null:
+		return _game.save.mark_step_done(step)
+	if _steps_local.has(String(step)):
+		return false
+	_steps_local[String(step)] = true
+	return true
+
+
+## 每次棋盘变化:先把棋盘上已经做出来的操作记为做过,再挑下一条要提示的
+func _refresh_step_hint() -> void:
+	var facts := StepGuide.facts_of(session, not allowed_rules.is_empty(), _debut)
+	var dirty := false
+	for step in StepGuide.newly_done(_prev_facts, facts):
+		dirty = _mark_step(step) or dirty
+	_prev_facts = facts
+	if dirty and _game != null:
+		_game.save.save()
+	var step := StepGuide.next_step(facts, _steps_done())
+	_step_hint.text = StepGuide.TEXT.get(step, "")
+	_step_hint.visible = step != &""
 
 
 ## 线轴排左列、目标织机放右侧(棋盘画布坐标)

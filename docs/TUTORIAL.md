@@ -101,6 +101,11 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   (`Robot.turn_to_limit`,方向存 `SaveManager.settings.robot_turn`)→ 0.8 s 后 `LevelSolutions.apply` 代解,`notify_solved(state, false)` 不庆祝;
   **3-1(l11)通关瞬间坏掉**:win cue = `panic`(坏掉是剧情节点,代解通关也演),`notify_solved` 随即置 `Robot.broken`;
   l12 起 `broken` —— 任何 cue 都映射成故障三连(`RobotLink.commands_for`);**结局才修好**:「感谢游玩」黑屏时 `broken=false` + `calm`(`ui/story_scene.gd _play_thanks`)。
+- **关内操作指引**(`narrative/step_guide.gd`,纯函数):每次 `board_updated` 由 `StepGuide.facts_of` 从 ProofSession 查事实
+  (机器数/线数/冲突/未钉口/已钉/本关有新仪器/已通关),`newly_done` 把盘上已经做出来的操作(放/拉/钉,断线拆机看 prev)记进
+  `SaveManager.steps`,`next_step` 按 `ORDER`(fix → pin → place → wire → notebook)取第一条没做过的显示在 `LevelScene._step_hint`
+  (棋盘左下、求助提示上一行,`STEP_HINT_*` 常量);翻笔记由 `_on_open_notebook` 自己报。已通关不显示;重置进度清 `steps`。
+  文案 `StepGuide.TEXT` 只讲操作(文案守则同笔记)。用户要求加、美术文档没有 → 先纯文字,美术要换图/挪位只动常量。
 - 关卡与笔记 .tres 由 `tools/gen_levels.gd` 从表生成,重跑会覆盖(对话字段除外:重跑原样保留现有 intro/outro 台词)。
   仪器**按关上架**:`LEVELS` 每行末列是本关新上架的仪器,之后的关累计(l01 一台都没有);解法只能用架上仪器(`test_levels` 盯)。
   重排关卡 id 时先按新编号 `git mv` .tres(降序)再重生成,对话就按路径跟着搬;`information/dialogue.csv` 的章-节要同步改,`test_tres_dialogue_matches_csv` 逐句核对。
@@ -188,6 +193,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
 | 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
+| 关内操作指引(文案 / 触发条件 / 优先级 / 位置) | `narrative/step_guide.gd`(`TEXT`、`ORDER`、`_applies`、`newly_done`)+ `ui/level_scene.gd` `STEP_HINT_*`;记忆在 `SaveManager.steps`;测试 `tests/test_step_guide.gd` + `visual_smoke_ui.gd` S 段 |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
 | 改进关流程 / 结局流程 | `game/game.gd start_level/enter_board`;结局 `play_ending/finish_ending` + `ui/story_scene.gd _play_thanks`(黑屏时长/字号在 StoryScene 顶部常量)+ `ui/credits_scene.gd` 淡入 |
 | 背景音乐 / 换曲加曲 | `game/bgm.gd`(`TRACKS` 槽位表、`play(槽位)`、`VOLUME_LINEAR`/`FADE_SEC`)+ `music/音乐bgm位置.md`;场景报槽位在各 `ui/*.gd _ready` |
@@ -203,7 +209,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 ```bash
 GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --headless --path . --import                              # 新 class_name/字段后重建缓存
-"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 107 例,退出码 = 失败数
+"$GODOT" --headless --path . --script res://tests/run_tests.gd     # 112 例,退出码 = 失败数
 "$GODOT" --path . --script res://tests/visual_smoke_m3.gd          # 16 关自动通关 + 对话点击回归 + 截图
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)

@@ -29,3 +29,19 @@ func chapter_of(lv: LevelDef) -> int:
 		if chapters[i].levels.has(lv):
 			return i
 	return -1
+
+
+## 本关新上架的仪器(前一关 allowed_rules 里没有的);不在目录里的关返回空
+func debut_rules(lv: LevelDef) -> Array[StringName]:
+	var out: Array[StringName] = []
+	var all := all_levels()
+	var idx := all.find(lv)
+	if idx < 0:
+		return out
+	var prev: Array[StringName] = []
+	if idx > 0:
+		prev = all[idx - 1].allowed_rules
+	for r in lv.allowed_rules:
+		if not prev.has(r):
+			out.append(r)
+	return out
