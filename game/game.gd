@@ -17,6 +17,14 @@ func _ready() -> void:
 	catalog = LevelCatalog.load_default()
 	notebook = NotebookCatalog.load_default()
 	save = SaveManager.open()
+	_apply_window_settings()
+
+
+## 启动时按 settings 恢复全屏(标题页设置模块写 settings.fullscreen;音量由 Bgm._ready 自己读)。
+## 无头 / Web 不碰窗口:浏览器只允许在用户点击里切全屏,启动时切会被拦
+func _apply_window_settings() -> void:
+	if bool(save.settings.get("fullscreen", false)) and DisplayServer.get_name() != "headless" and not OS.has_feature("web"):
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 
 # ---- 关卡推进(全线性:第 i 关解锁条件 = 第 i-1 关已通) ----

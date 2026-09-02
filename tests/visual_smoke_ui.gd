@@ -538,6 +538,42 @@ func _run() -> void:
 			if b.get_parent() == menu:
 				names.append((b as Button).text)
 		_check(names == ["开始游戏", "重置进度", "开发者信息", "退出游戏"], "标题页恰好四个选项(得 %s)" % str(names))
+		# 设置模块:四个选项正下方同列居中,不出屏;音量滑条当场改 Bgm 并落 settings;小机联动开关 = 无机器人模式;小机维护开面板
+		var sp: SettingsPanel = menu._settings
+		var quit_btn := _button_named(menu, "退出游戏")
+		_check(sp != null and sp.visible and sp.position.y >= quit_btn.position.y + quit_btn.size.y, "设置模块在四个选项正下方")
+		_check(sp != null and absf(sp.get_global_rect().get_center().x - MainMenu.SETTINGS_CENTER_X) <= 1.0
+				and sp.get_global_rect().end.y <= 2160.0, "设置模块与选项同列居中、不出屏(底 %s)" % str(sp.get_global_rect().end.y if sp != null else -1))
+		_check(sp != null and _button_named(sp, "小机维护") != null and sp._robot_btn.visible and sp._robot_btn.text == "小机联动:开" and sp._maint_btn.visible,
+				"有机器人:「小机联动:开」+ 显示「小机维护」")
+		var want_fs := "全屏:" + ("开" if SettingsPanel.is_fullscreen_mode(DisplayServer.window_get_mode()) else "关")
+		_check(sp != null and sp._fullscreen_btn.text == want_fs, "全屏按钮文字跟随真实窗口模式(得 %s)" % (sp._fullscreen_btn.text if sp != null else ""))
+		var vol_before := float(game.save.settings.get("music_volume", 1.0))
+		_click(_center(sp._volume), MOUSE_BUTTON_LEFT)   # 点滑条正中 = 50%
+		await _settle()
+		_check(is_equal_approx(sp._volume.value, 0.5) and is_equal_approx(bgm.user_volume, 0.5) and sp._volume_lbl.text == "50%",
+				"点滑条正中 → 音量 50%%、Bgm 当场生效(得 %.2f / %s)" % [sp._volume.value, sp._volume_lbl.text])
+		_check(is_equal_approx(float(game.save.settings.get("music_volume", -1.0)), 0.5) and is_equal_approx(bgm_p0.volume_linear, bgm.target_volume("res://music/title.mp3") * 0.5),
+				"音量落进 settings,播放器音量 = 目标 x 0.5")
+		sp._volume.value = vol_before
+		await _settle()
+		_check(is_equal_approx(bgm.user_volume, vol_before) and bgm_p0.playing, "音量改回去,标题曲还在同一播放器上播")
+		var robot_t: Node = root.get_node("/root/Robot")
+		_click(_center(sp._robot_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(not robot_t.enabled and sp._robot_btn.text == "小机联动:关" and not sp._maint_btn.visible and game.save.settings.get("robot_enabled") == false,
+				"点「小机联动」→ 无机器人模式、小机维护隐藏、写 settings")
+		_click(_center(sp._robot_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(robot_t.enabled and sp._robot_btn.text == "小机联动:开" and sp._maint_btn.visible, "再点 → 联动开、小机维护回来")
+		game.save.settings.erase("robot_enabled")   # 开发机不留痕:回到平台默认
+		game.save.save()
+		_click(_center(sp._maint_btn), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(menu._cal_ui.visible, "点「小机维护」打开维护面板")
+		_click(_center(_button_named(menu._cal_ui, "关闭")), MOUSE_BUTTON_LEFT)
+		await _settle()
+		_check(not menu._cal_ui.visible and current_scene == menu, "关闭面板仍在标题页")
 		_click(_center(_button_named(menu, "开始游戏")), MOUSE_BUTTON_LEFT)
 		await _settle()
 		_check(current_scene is LevelSelect, "开始游戏 → 选关页(不直接进关)")
@@ -848,6 +884,7 @@ func _run() -> void:
 	game.goto_menu()
 	await _settle()
 	var menu2 := current_scene as MainMenu
+	_check(menu2 != null and menu2._settings._robot_btn.text == "小机联动:关" and not menu2._settings._maint_btn.visible, "无机器人模式:设置模块显示「小机联动:关」、没有小机维护")
 	_key(KEY_F9)
 	await _settle()
 	_check(menu2 != null and menu2._cal_ui.visible and menu2._cal_ui._mode_btn.text.contains("无机器人模式"), "标题页 F9 打开维护面板,开关显示无机器人模式")
@@ -860,6 +897,7 @@ func _run() -> void:
 	game.save.save()
 	_click(_center(_button_named(menu2._cal_ui, "关闭")), MOUSE_BUTTON_LEFT)
 	await _settle()
+	_check(menu2 != null and menu2._settings._robot_btn.text == "小机联动:开" and menu2._settings._maint_btn.visible, "关掉维护面板后设置模块同步为「小机联动:开」")
 	game.start_level(game.catalog.find(&"l01"))
 	await _settle()
 	if current_scene is StoryScene:

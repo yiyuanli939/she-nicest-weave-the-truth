@@ -113,7 +113,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
   仪器**按关上架**:`LEVELS` 每行末列是本关新上架的仪器,之后的关累计(l01 一台都没有);解法只能用架上仪器(`test_levels` 盯)。
   重排关卡 id 时先按新编号 `git mv` .tres(降序)再重生成,对话就按路径跟着搬;`information/dialogue.csv` 的章-节要同步改,`test_tres_dialogue_matches_csv` 逐句核对。
 
-**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/故事界面(开场 / 结局对话)/开发者信息 = `title`,从选关进对话不重启;关内棋盘 = 该章 `level_N`,关内曲只在棋盘起)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。没有音量 UI(美术文档没有),音量是常量 `VOLUME_LINEAR`;各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。wav 的循环点由 `Bgm.set_looping` 运行时兜底(没有循环点就整曲循环,`.import` 不用改;只开 `loop_mode` 不设 `loop_end` 会混 1 帧即停,见 AGENTS 踩过的坑)。
+**背景音乐**:autoload `Bgm`(`game/bgm.gd`)按槽位播:`TRACKS` 槽位 → `music/<槽位>.mp3`,各场景 `_ready` 报自己的槽位(标题/选关/故事界面(开场 / 结局对话)/开发者信息 = `title`,从选关进对话不重启;关内棋盘 = 该章 `level_N`,关内曲只在棋盘起)。同槽位不重启,换槽位两个播放器交叉淡化,槽位没曲子淡出到静音。音量 = 基准常量 `VOLUME_LINEAR` × 玩家设置 `user_volume`(标题页设置模块的滑条,存 `settings.music_volume`,`Bgm._ready` 读;见 3.7);各曲响度不一用 `GAIN_DB` 按文件填 dB 修正(量法见 `music/音乐bgm位置.md`)。槽位表与补曲步骤见 `music/音乐bgm位置.md`。wav 的循环点由 `Bgm.set_looping` 运行时兜底(没有循环点就整曲循环,`.import` 不用改;只开 `loop_mode` 不设 `loop_end` 会混 1 帧即停,见 AGENTS 踩过的坑)。
 
 ## 3. 最近两轮改了什么(以及为什么)
 
@@ -179,7 +179,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 `tests/visual_smoke_ui.gd` T 节实测:关内静止 1 s 重绘 ≤10 帧、标题页流光照常 ≥10 帧。
 
 **无机器人模式**(`Robot.enabled`,见 `docs/ROBOT_API.md`「无机器人模式」):命令行 `-- --no-robot` > `settings.robot_enabled` > 平台默认(仅 macOS 开);
-关内求助提示、开发者信息页「小机维护」按钮、退出时的道晚安都随之消失,`Robot` 不连桥接不轮询;切回入口是标题页 F9(所有构建)。
+关内求助提示、开发者信息页「小机维护」按钮、退出时的道晚安都随之消失,`Robot` 不连桥接不轮询;切回入口是标题页设置模块「小机联动」(3.7;F9 面板也行,所有构建)。
 
 Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源目录,单文件 exe),
 `"$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/she_nicest.exe`(目录要先建好)。
@@ -222,6 +222,17 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 
 教训:UI 交互回归要走 `Window.push_input` 的真实输入管线(见 `visual_smoke_m3.gd` 的 `_click`),直接调 `_on_click/_gui_input` 测不出 mouse_filter 这类问题。
 
+### 3.7 标题页设置模块(2026-09-02,用户要求;美术文档没有 → 先纯文字,常量留位)
+
+`ui/settings_panel.gd`(`SettingsPanel`,VBox)挂在标题页四个选项正下方、同列居中(`ui/main_menu.gd SETTINGS_CENTER_X / SETTINGS_TOP`):
+「设置」→ 音乐音量滑条(0–100%,`Bgm.set_user_volume` 当场生效,松手落 `settings.music_volume`)→ 「全屏:开/关」
+(`DisplayServer.window_set_mode`,关 = 回工程默认最大化;落 `settings.fullscreen`,下次启动 `Game._apply_window_settings` 恢复;无头 / Web 启动不碰窗口)
+→ 「小机联动:开/关」(= 无机器人模式开关,`Robot.set_enabled`,与维护面板同一开关;Web 版 `robot_possible()` 为假不显示)
+→ 「小机维护」(联动开着才显示,打开 `RobotMaintUI`;F9 仍直通面板)。维护面板关掉时 `refresh()` 同步文字;文字按钮沿用主题(无底、悬停变浅),
+滑条按色板自画(乳黄轨 / 黄铜已填段 / 棕红圆钮 `GradientTexture2D` 径向渐变)。「重置进度」不清 settings。
+测试:`tests/test_settings.gd`(映射 / 文案 / 往返 / 无 autoload 建面板)、`test_bgm.test_user_volume_scales_playback`、UI smoke T 节(点滑条正中 = 50%、
+联动开关、小机维护开面板)与 S 节(无机器人模式下文字同步)。
+
 ## 4. 想改 X,去哪改
 
 | 想做的事 | 去哪 |
@@ -246,7 +257,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
 | 改错误徽章文字/颜色/字号/描边/停留时长;接错的线多久断 | `board/wire_overlay.gd BADGE/BADGE_COLOR/BADGE_FONT_SIZE/BADGE_OUTLINE/BADGE_HOLD_SEC/BADGE_FADE_SEC/AUTO_BREAK`(纯文字,不用符号);`board/proof_board.gd BAD_WIRE_SEC` |
 | 改故事界面布局(底图/插图/立绘框/文字区) | `ui/story_scene.gd` 顶部常量(见 `docs/ART_INTERFACE.md` §3) |
-| 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量 |
+| 改标题页/选关页/开发者信息页布局 | `ui/main_menu.gd`、`ui/level_select.gd`、`ui/credits_scene.gd` 顶部常量;标题页设置模块 `ui/settings_panel.gd`(位置在 `main_menu.gd SETTINGS_*`) |
 | 改关卡布局/工具条按钮/快捷键/发呆提示 | `ui/level_scene.gd`(`PALETTE_POS`/`BOARD_RECT`;按钮经 `ProofBoard.add_toolbar_item`) |
 | 关内操作指引(文案 / 触发条件 / 优先级 / 位置;v1.1 起只剩 钉/放/拉 三步) | `narrative/step_guide.gd`(`TEXT`、`ORDER`、`_applies`、`newly_done`)+ `ui/level_scene.gd` `STEP_HINT_*`;记忆在 `SaveManager.steps`;测试 `tests/test_step_guide.gd` + `visual_smoke_ui.gd` S 段 |
 | 测试开答案 | 棋盘工具条「示答」按钮(`level_scene.gd _on_show_answer`):重置后按 `levels/level_solutions.gd` 自动摆出本关答案。仅 `OS.is_debug_build()` 且本关有解法数据时出现 |
@@ -256,7 +267,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 机器人动作/语音 | `game/robot_link.gd`(cue → 命令表 `commands_for`)+ `docs/ROBOT_API.md`;改台词 `hardware/make_voice.sh <名字> "<台词>"` 后用「小机维护」刷入 |
 | 「请指导我」代解 / 坏掉时点 | `ui/level_scene.gd` `_on_guide_requested/_run_guide`、`game/game.gd robot_mode/BREAK_LEVEL/notify_solved`、`game/robot_link.gd broken/turn_to_limit`;提示文案 `GUIDE_HINT` |
 | 「小机不动」模式(舵机坏/展示静音动作) | `game/robot_link.gd stationary/STILL_CMDS/set_stationary`(send 层统一拦 gimbal/anim/cal_look,其余照常);开关在维护面板「小机动作」,存 settings |
-| 小机维护面板(接入 / 刷固件 / 校准 / 回头方向 / 无机器人模式开关) | `ui/robot_maint_ui.gd`(开发者信息页「小机维护」按钮仅有机器人时显示、标题页 F9 所有构建可用);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
+| 小机维护面板(接入 / 刷固件 / 校准 / 回头方向 / 无机器人模式开关) | `ui/robot_maint_ui.gd`(标题页设置模块「小机维护」与开发者信息页「小机维护」按钮仅有机器人时显示、标题页 F9 所有构建可用);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
 | 无机器人模式(提示/入口全消失) | `game/robot_link.gd enabled/resolve_enabled/set_enabled`;隐藏点:`ui/level_scene.gd _robot_on`、`ui/credits_scene.gd`、`ui/main_menu.gd` |
 | 帧率上限 / 低功耗 / 渲染器 | `project.godot` `[application] run/max_fps、run/low_processor_mode`、`[rendering] renderer/rendering_method`;守门 `tests/test_perf_settings.gd`(见 3.5) |
 | 语音识别 | `hardware/speech/listen.py`(Vosk 离线,语法只认两句;`get_model.sh` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
@@ -271,7 +282,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 "$GODOT" --path . --script res://tests/visual_smoke_m2.gd          # 封程嵌套 / 岔纹汇路 / 溃散 三场景
 "$GODOT" --path . --script res://tests/visual_smoke_ui.gd          # UI 交互矩阵(真实输入管线)
 "$GODOT" --path .                                                  # 实跑看手感(--print-fps 看帧率:标题页 ~60,关内静止个位数)
-"$GODOT" --path . -- --no-robot                                    # 无机器人模式实跑(标题 F9 面板可切换)
+"$GODOT" --path . -- --no-robot                                    # 无机器人模式实跑(标题页设置「小机联动」/ F9 面板可切换)
 "$GODOT" --headless --path . --export-release "Windows Desktop" build/windows/she_nicest.exe   # Windows 单文件 exe(先 mkdir -p build/windows)
 ```
 
@@ -292,7 +303,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
   U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
   假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页;笔记抽屉划出/变「继续工作」/翻页循环/收回;
-  标题页恰好四项、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
+  标题页恰好四项 + 设置模块(滑条改音量当场生效并落档、小机联动开关、小机维护开面板)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写
   (mac/Windows 文件系统大小写不敏感,开发期写错不报错;导出 PCK 严格区分,一到导出版才炸)。
