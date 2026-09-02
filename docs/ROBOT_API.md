@@ -58,6 +58,8 @@ pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人�
 2. `user://save.json` 的 `settings.robot_enabled`(维护面板「机器人:已启用 / 无机器人模式」按钮写入;「重置进度」不清);
 3. 平台默认:macOS 开,其它平台关(桥接/语音脚本只在 macOS 能跑)。
 
+Web 导出(itch.io)**一律无机器人且不可切换**(`robot_possible()`):浏览器连不上 `ws://127.0.0.1`,重连循环只会刷控制台错误。
+
 切回有机器人:标题页按 **F9**(所有构建可用,界面上没有可见入口)打开维护面板 → 点「机器人:无机器人模式(点击切换)」;
 关内提示 / 开发者信息页入口在下次进入场景时生效。测试:`tests/test_robot_logic.gd test_no_robot_mode`、`tests/visual_smoke_ui.gd` S 节。
 

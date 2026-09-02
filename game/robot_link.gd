@@ -9,7 +9,7 @@ extends Node
 ## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
-## 无机器人模式:enabled = false(优先级:命令行 --no-robot > --robot > settings.robot_enabled > 平台默认,macOS 开、其它平台关)
+## 无机器人模式:enabled = false(优先级:命令行 --no-robot > --robot > settings.robot_enabled > 平台默认,macOS 开、其它平台关;Web 一律关)
 ## 时不连桥接、不每帧轮询,send/launch 一律静默(sent_log 也不记);UI 侧据此隐藏一切指向实体小机的提示与入口
 ## (关内求助提示、开发者信息页「小机维护」)。切换在维护面板(标题页 F9),存 settings,「重置进度」不清。
 
@@ -68,7 +68,7 @@ func _ready() -> void:
 	# 引擎对 -- 之前的未知参数「可能丢弃或修改」,推荐 `游戏 -- --no-robot`;两处都认
 	var args := OS.get_cmdline_user_args()
 	args.append_array(OS.get_cmdline_args())
-	enabled = resolve_enabled(args, settings, platform_default_enabled())
+	enabled = robot_possible() and resolve_enabled(args, settings, platform_default_enabled())
 	set_process(enabled)
 	if enabled:
 		_connect()
@@ -77,6 +77,11 @@ func _ready() -> void:
 ## 平台默认:桥接/语音脚本只在 macOS 能跑,其它平台默认无机器人
 static func platform_default_enabled() -> bool:
 	return OS.has_feature("macos")
+
+
+## Web 导出永远无机器人(F9 面板也切不开):浏览器连不上 ws://127.0.0.1(https 页面的混合内容被拦),重连循环只会刷控制台错误
+static func robot_possible() -> bool:
+	return not OS.has_feature("web")
 
 
 ## 是否启用实体小机(纯函数,测试盯着):--no-robot > --robot > settings.robot_enabled > 平台默认
@@ -92,6 +97,7 @@ static func resolve_enabled(args: PackedStringArray, settings: Dictionary, platf
 
 ## 无机器人模式开关(维护面板);persist = false 只改运行态(命令行覆盖/测试),不落盘
 func set_enabled(on: bool, persist: bool = true) -> void:
+	on = on and robot_possible()
 	if on != enabled:
 		enabled = on
 		if on:

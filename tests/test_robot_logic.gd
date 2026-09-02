@@ -147,6 +147,7 @@ func test_no_robot_mode() -> bool:
 	ok = check(rl_s.resolve_enabled(PackedStringArray(["--robot"]), {"robot_enabled": false}, false), "--robot 覆盖 settings") and ok
 	ok = check(not rl_s.resolve_enabled(PackedStringArray(["--robot", "--no-robot"]), {"robot_enabled": true}, true), "--no-robot 最高优先") and ok
 	ok = check(rl_s.platform_default_enabled() == OS.has_feature("macos"), "平台默认 = 仅 macOS 开") and ok
+	ok = check(rl_s.robot_possible() == not OS.has_feature("web"), "Web 导出永远无机器人") and ok
 	var rl: Node = rl_s.new()
 	rl.set_enabled(false, false)
 	rl.cue("greet")
