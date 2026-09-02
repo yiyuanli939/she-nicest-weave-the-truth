@@ -13,7 +13,7 @@ extends Control
 var session := ProofSession.new()
 
 const BG_COLOR := Color(0.957, 0.925, 0.847)           # 乳黄
-const PALETTE_POS := Vector2(50, 22)                    # 仪器架左上角(图 687×2117)
+const PALETTE_POS := Vector2(27, 20)                    # 仪器架左上角(图 687×2117;关内预览图顶/底花纹双锚点匹配实测 (27,20)±10)
 const BOARD_RECT := Rect2(884, 22, 2436, 2116)          # 棋盘区(右侧留出笔记夹子 NotebookUI.CLOSED_PEEK)
 const TOOLBAR_FONT_SIZE := 44
 const IDLE_HINT_SEC := 45.0
@@ -82,6 +82,8 @@ func _ready() -> void:
 	_layout_endpoints()
 	_fresh_state = session.save_state()
 	_palette.set_rules(allowed_rules)
+	# 本关的笔记整页图现在就读进来(每张 3840×2160 同步解码约 20 ms),翻页时不再卡一帧
+	_notebook_ui.preload_pages(_game.notebook if _game != null else NotebookCatalog.load_default(), allowed_rules)
 	if lv != null:
 		var saved: Dictionary = _game.save.board_state(lv.id)
 		if not saved.is_empty():

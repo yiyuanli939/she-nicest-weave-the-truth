@@ -9,12 +9,12 @@ extends Control
 const BG_PATH := "res://assets/art/title/bg.png"
 const TITLE_PATH := "res://assets/art/title/title.png"
 const SHEEN_PATH := "res://assets/shaders/title_sheen.gdshader"
-const TITLE_POS := Vector2(619, 1560)     # 标题图左上角
-const MENU_CENTER_X := 3575.0             # 四个选项的水平中心
-const MENU_Y0 := 948.0                    # 第一个选项的垂直中心
-const MENU_PITCH := 194.0                 # 选项间距
-const MENU_FONT_SIZE := 64
-const MENU_GLYPH_SPACING := 12            # 参考图的选项文字是疏排的
+const TITLE_POS := Vector2(630, 1551)     # 标题图左上角(预览图 bg 三锚点匹配实测;原 (619,1560) 偏左下约 10 px)
+const MENU_CENTER_X := 3580.0             # 四个选项的水平中心(预览墨迹实测 3576–3582)
+const MENU_Y0 := 940.0                    # 第一个选项的垂直中心(预览实测)
+const MENU_PITCH := 197.0                 # 选项间距(预览四行中心 940/1138/1334/1530)
+const MENU_FONT_SIZE := 78                # 预览墨高 65–67 = 站酷小薇 78 号(原 64 + 字距 12 只凑到了宽度,字形小 20%)
+const MENU_GLYPH_SPACING := 0             # 预览「开始游戏」墨宽 306 = 78 号字距 0 时的 306;留常量给美术调
 
 var _cal_ui: RobotMaintUI
 var _start_btn: Button

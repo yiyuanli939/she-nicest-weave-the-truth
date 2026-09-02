@@ -119,6 +119,10 @@ Compatibility 渲染器(删 d3d12);每帧脚本工作收敛(徽章跟随缓存�
 **关内操作指引**(2026-09-02,用户要求、美术文档没有 → 先纯文字:`narrative/step_guide.gd` 按棋盘状态在棋盘左下(求助提示上一行,
 `STEP_HINT_*` 常量)提示下一步操作 —— 接错线断开/拆机 → 钉纹样 → 放仪器 → 拉线 → 有新仪器翻笔记;每条做过一次记进存档 `steps` 不再显示,
 重置进度清掉;`LevelCatalog.debut_rules` 判新上架;`test_step_guide` 5 例 + UI smoke S 段)✅。
+**像素对齐审查**(2026-09-02:用位置参考.png 模板匹配 / base.png 扫框线 / 预览图互相关量出引擎常量的错位并逐一改正——
+故事界面露灰边(垫白底 + 清屏色改乳黄)、场景插图右 8 下 3、立绘压地板线 10、莉娅严肃图矮 6 px(按遮罩画布定位)、
+笔记抽屉 (21,48)→(17,27)、翻页/夹子字号 52→82/78 且夹子按参考排成两行行距 92、收起露出 480→350、标题图与四选项、仪器架与按钮;
+翻页整页图进关时预热;`tools/shot_4k.gd` 出 1:1 截图对照,`tests/test_art_alignment.gd` 固化基准;数字在 ART_INTERFACE §3.5)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

@@ -16,8 +16,8 @@ const SLOT_IMAGE: Dictionary = {
 	&"false_elim": "res://assets/art/level/machine_bot.png",
 }
 const SLOT_X := 80.0          # 按钮左上角 x(架内)
-const SLOT_Y0 := 262.0        # 第一个按钮的 y(架内)
-const SLOT_PITCH := 210.0     # 按钮间距(按钮图 526×182)
+const SLOT_Y0 := 248.0        # 第一个按钮的 y(架内;关内预览图 7 个按钮最小二乘实测 248,原 262 偏下 14)
+const SLOT_PITCH := 211.0     # 按钮间距(按钮图 526×182;预览实测 210.8)
 const NAME_FONT_SIZE := 56
 const NAME_COLOR := Color(0.29, 0.184, 0.165)
 

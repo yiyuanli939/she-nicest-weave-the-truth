@@ -209,7 +209,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | 改纹样画法/幽灵透明度 | `api/pattern_view.gd`(`layout()` 是纯函数,`test_pattern_layout` 盯着;`GHOST_ALPHA`) |
 | 改节点外观/钉按钮/右键行为 | `board/machine_node.gd`;连线与整板行为在 `board/proof_board.gd` |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
-| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示);位置常量见 `docs/ART_INTERFACE.md` §3。竖排 CJK 用逐字换行 |
+| 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示);位置常量见 `docs/ART_INTERFACE.md` §3(实测基准在 §3.5)。夹子两行字用 `FontVariation` 的 spacing_top/bottom 把行距垫到参考的 92(Button 自然行距 79) |
 | 笔记条目(= 仪器整页图) | 覆盖 `assets/art/level/notebook/<rule_id>.png`(3840×2160 全屏导出、透明底,标题/正文画在图里);新增仪器页改 `tools/gen_levels.gd` `NOTEBOOK_IDS` → 重跑生成器 |
 | 仪器架按钮/顺序/显隐 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外不显示,可见按钮紧凑重排 |
 | 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
@@ -245,6 +245,8 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 ```
 
 改 `logic/` 必跑 headless;改 UI 看 `tests/screenshots/` 的截图对比;改关卡数据两者都跑。
+改图片位置/字号:跑 `"$GODOT" --path . --script res://tools/shot_4k.gd` 出 3840×2160 的 1:1 截图(`build/shots4k/`)与美术参考图叠图核对,
+基准与实测数字见 `docs/ART_INTERFACE.md` §3.5;`tests/test_art_alignment.gd` 盯着抽屉开位 / 故事框线 / 立绘遮罩尺寸。
 
 **测试分层**(想知道"某种情况有没有被测到"先看这里):
 - `tests/test_solver_exhaustive.gd` — 穷举/随机:七台机器两两每个口互接、每台机自环、每个可钉口钉每种纹样;

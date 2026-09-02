@@ -9,14 +9,16 @@ extends Control
 ## 坐标为 3840×2160 逻辑像素,图片原尺寸;美术调位置改下面常量。
 
 const BASE_PATH := "res://assets/art/story/base.png"
-const BASE_POS := Vector2(2, 18)                     # 底图 3835×2123 左上角(居中)
-const SCENE_RECT := Rect2(955, 89, 1942, 1251)       # 场景插图区(图 1942×1251 原尺寸)
-const LEFT_FRAME := Rect2(79, 133, 834, 1879)        # 左立绘框(超出部分裁掉)
-const RIGHT_FRAME := Rect2(2926, 133, 834, 1879)     # 右立绘框(诺拉)
-# 立绘默认「框内水平居中、底边对齐框底」,这里按角色再微调(像素)
-const PORTRAIT_NUDGE: Dictionary = {"诺拉": Vector2.ZERO, "莉娅": Vector2.ZERO, "亚瑟": Vector2.ZERO}
+# 下面的矩形都是对 base.png 自己画出来的框线扫描实测(tests/test_art_alignment.gd 盯着),不是拍脑袋居中
+const BASE_POS := Vector2(2, 18)                     # 底图 3835×2123 左上角(居中;视口比它大 5×37 px,四边由 BG_COLOR 白底补齐)
+const BG_COLOR := Color.WHITE                        # 底图四边纯白;不垫底会露出引擎清屏色(顶 18 / 底 19 / 左 2 / 右 3 px 灰边)
+const SCENE_RECT := Rect2(946, 86, 1942, 1251)       # 场景插图区:画框内沿 x 947..2887、y 86..1336(图 1942 宽比开口多 1 px)
+const LEFT_FRAME := Rect2(88, 188, 815, 1800)        # 左立绘框(超出部分裁掉):框线内沿 x 88..902;底边 1987 = 美术预览脚底(地板线在 2001)
+const RIGHT_FRAME := Rect2(2933, 188, 815, 1800)     # 右立绘框(诺拉):内沿 x 2933..3747
+# 立绘默认「框内水平居中、底边对齐框底」,这里按角色再微调(像素):莉娅 821 宽比框 815 宽,美术预览把她贴右
+const PORTRAIT_NUDGE: Dictionary = {"诺拉": Vector2.ZERO, "莉娅": Vector2(4, 0), "亚瑟": Vector2.ZERO}
 const NAME_POS := Vector2(1040, 1490)                # 发言人名字左上角
-const TEXT_RECT := Rect2(1040, 1590, 1780, 420)      # 台词区
+const TEXT_RECT := Rect2(1040, 1590, 1756, 420)      # 台词区(台词框内沿 x 948..2887,左右边距各 92)
 const MASK_ALPHA := 0.5
 const THANKS_FADE_SEC := 0.8    # 感谢游玩黑屏淡入时长
 const THANKS_HOLD_SEC := 1.6    # 黑屏停留(此刻小机修好),随后进开发者信息页
@@ -57,6 +59,12 @@ func finish() -> void:
 
 
 func _build_ui() -> void:
+	var bg := ColorRect.new()   # 垫在底图后面的白底(底图比视口小,见 BG_COLOR)
+	bg.color = BG_COLOR
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+
 	var base := TextureRect.new()
 	base.texture = load(BASE_PATH)
 	base.position = BASE_POS
@@ -115,7 +123,9 @@ func _on_line_shown(line: DialogueLine) -> void:
 	_masks[1].visible = both and not StoryArt.is_nora(line.speaker)
 
 
-## 立绘原尺寸,框内水平居中、底边对齐框底,再加逐角色微调;遮罩与立绘同位同尺寸
+## 立绘原尺寸,框内水平居中、底边对齐框底,再加逐角色微调;遮罩与立绘同原点。
+## 定位用的画布 = 该角色遮罩的尺寸(各表情图理应同尺寸;美术裁短了某张时——如莉娅严肃 1669 < 遮罩 1675——
+## 仍按同一原点摆、内容左上对齐,切换表情不会整幅跳动,遮罩也不会多出一截)
 func _set_portrait(side: int, char_name: String, expr: String) -> void:
 	var slot := _slots[side]
 	if char_name == "":
@@ -127,14 +137,17 @@ func _set_portrait(side: int, char_name: String, expr: String) -> void:
 	if tex == null:
 		slot.visible = false
 		return
+	var mask_tex := StoryArt.mask(char_name)
+	var canvas: Vector2 = mask_tex.get_size() if mask_tex != null else tex.get_size()
+	var origin: Vector2 = Vector2(floorf((slot.size.x - canvas.x) * 0.5), slot.size.y - canvas.y) + PORTRAIT_NUDGE.get(char_name, Vector2.ZERO)
 	var pic := _portraits[side]
 	pic.texture = tex
 	pic.size = tex.get_size()
-	pic.position = Vector2((slot.size.x - pic.size.x) * 0.5, slot.size.y - pic.size.y) + PORTRAIT_NUDGE.get(char_name, Vector2.ZERO)
+	pic.position = origin
 	var mask := _masks[side]
-	mask.texture = StoryArt.mask(char_name)
-	mask.size = pic.size
-	mask.position = pic.position
+	mask.texture = mask_tex
+	mask.size = canvas
+	mask.position = origin
 	slot.visible = true
 
 
@@ -176,7 +189,7 @@ func _play_thanks() -> void:
 func _finish_ending() -> void:
 	var game := get_node_or_null("/root/Game")
 	if game != null:
-		game.finish_ending()
+		game.finish_ending.call_deferred()   # Tween 回调跑在换场刷新点之后,直接换场会先画一帧空树(清屏色闪一下)
 
 
 func _go_board() -> void:

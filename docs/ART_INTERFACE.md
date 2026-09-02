@@ -45,7 +45,7 @@
 | 标题页:流光周期 / 宽度 / 强度 | `assets/shaders/title_sheen.gdshader` → `period` `band_width` `strength` |
 | 选关页:章间距 / 章标题与按钮行间距 / 同行按钮间距 / 字号 / 颜色 | `ui/level_select.gd` → `CHAPTER_GAP` `TITLE_GAP` `ROW_GAP` `CHAPTER_FONT_SIZE` `LEVEL_FONT_SIZE` `*_COLOR` |
 | 开发者信息页:文字与行距 | `ui/credits_scene.gd` → `LINES` `TEXT_FONT_SIZE` `LINE_GAP` |
-| 故事界面:底图左上角 | `ui/story_scene.gd` → `BASE_POS` |
+| 故事界面:底图左上角 / 底图外圈的白底 | `ui/story_scene.gd` → `BASE_POS` `BG_COLOR`(底图 3835×2123 比视口小,四边垫白;换场清屏色在 `project.godot` `default_clear_color`) |
 | 故事界面:场景插图矩形 | `ui/story_scene.gd` → `SCENE_RECT` |
 | 故事界面:左 / 右立绘框(框外裁掉;立绘默认框内水平居中、底边贴框底) | `ui/story_scene.gd` → `LEFT_FRAME` `RIGHT_FRAME` |
 | 故事界面:逐角色微调立绘位置 | `ui/story_scene.gd` → `PORTRAIT_NUDGE` |
@@ -54,11 +54,47 @@
 | 关内:仪器架左上角 / 棋盘矩形 / 底色 | `ui/level_scene.gd` → `PALETTE_POS` `BOARD_RECT` `BG_COLOR` |
 | 关内:仪器架 7 个按钮的 x / 首个 y / 间距 / 机名字号 | `board/palette_panel.gd` → `SLOT_X` `SLOT_Y0` `SLOT_PITCH` `NAME_FONT_SIZE` |
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
-| 关内:夹子「笔记/继续工作」按钮矩形 / 「翻页」矩形 / 整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_RECT` `FLIP_RECT` `PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
+| 关内:夹子「笔 / 记」「继续 / 工作」两行字的中心 / 字号 / 行距 / 热区尺寸;「翻页」矩形与字号;整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_CENTER_CLOSED` `HANDLE_CENTER_OPEN` `HANDLE_FONT_SIZE` `HANDLE_LINE_PITCH` `HANDLE_SIZE`;`FLIP_RECT` `FLIP_FONT_SIZE`;`PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
 | 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
 | 节点区:端口颜色 / 纹样口尺寸 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` |
+
+## 3.5 参考基准与实测值(2026-09-02 像素对齐审查)
+
+引擎常量不是「居中」拍出来的,是对美术参考图量出来的。基准分三级,改常量前先看这一节:
+
+| 基准 | 可信度 | 量法 |
+|---|---|---|
+| `笔记本页面补充/位置参考.png`(3840×2160) | 全分辨率,像素级 | 把 `notebook_bg.png` 不透明像素在参考图上逐偏移比均差,最小值尖锐(邻点差 3 倍) |
+| `assets/art/story/base.png` 自己画的框线 | 全分辨率,像素级 | 沿多行多列扫暗线(灰度 <140),取内沿中位数 |
+| `information/art_spec_20260829/image*.png` 六张预览 | 低清(1150–1550 宽,≈0.3×),±3 px 量化 + 比例误差,合计 ±5–10 px | 素材缩到预览比例做带遮罩归一化互相关;用同一素材的两处远端花纹做双锚点定比例 |
+
+实测值(全部 4K 逻辑像素;引擎常量已按此设):
+
+| 元素 | 参考实测 | 引擎常量 |
+|---|---|---|
+| 笔记底图划出位 | 位置参考:左上角 **(17, 27)** | `OPEN_X 17` `DRAWER_Y 27` |
+| 「翻页」 | 墨迹 152×66(= 82 号),中心 (3299.5, 1631.5) | `FLIP_FONT_SIZE 82`,`FLIP_RECT` 中心抽屉内 (3282, 1604) |
+| 「继续 / 工作」 | 两行两字,墨高 64(= 78 号),行距 92,中心 (363.5, 1046) | `HANDLE_FONT_SIZE 78` `HANDLE_LINE_PITCH 92` `HANDLE_CENTER_OPEN (346, 1019)` |
+| 「笔 / 记」(收起) | 关内预览:中心 ≈(3744, 1084),夹子在 y≈63 → 相对夹子同高 | `HANDLE_CENTER_CLOSED (254, 1021)` |
+| 笔记收起露出宽度 | 关内预览:抽屉 x≈3490 → 露出 ≈350 | `CLOSED_PEEK 350` |
+| 故事:场景插图 | base.png 画框内沿 x 947..2887、y 86..1336 | `SCENE_RECT (946, 86, 1942, 1251)` |
+| 故事:立绘区 | 内沿 x 88..902 / 2933..3747;地板线 y 2001;预览脚底 ≈1986 | `LEFT_FRAME (88,188,815,1800)` `RIGHT_FRAME (2933,188,815,1800)`(底边 1987) |
+| 故事:台词框 | 内沿 x 948..2887、y 1451..2041 | `TEXT_RECT (1040,1590,1756,420)`(左右边距各 92) |
+| 标题图 | 标题预览(bg 三锚点):左上角 (630, 1551) | `TITLE_POS (630, 1551)` |
+| 标题四选项 | 墨高 65–67(= 78 号,字距 0),中心 x≈3580,首项 y≈940,间距 ≈197 | `MENU_FONT_SIZE 78` `MENU_GLYPH_SPACING 0` `MENU_CENTER_X 3580` `MENU_Y0 940` `MENU_PITCH 197` |
+| 仪器架 | 关内预览(顶/底花纹双锚点):(27, 20);7 个按钮最小二乘 架内首个 y 248、间距 210.8 | `PALETTE_POS (27, 20)` `SLOT_Y0 248` `SLOT_PITCH 211` |
+
+对照工具:`"$GODOT" --path . --script res://tools/shot_4k.gd` 在 3840×2160 的 SubViewport 里离屏渲染
+标题 / 故事 / 关内 / 关内笔记划出 四张 1:1 截图到 `build/shots4k/4k_*.png`(冒烟截图随窗口缩放,肉眼对不准),
+与参考图叠图或做模板匹配即可核对;`tests/test_art_alignment.gd` 把前两级基准固化成回归(抽屉开位、场景框、立绘区、
+立绘/遮罩尺寸、收起时整页图不进屏)。
+
+**待美术确认(两份参考互相矛盾,引擎按全分辨率的位置参考):**
+1. 关内预览里**收起**的笔记在 y≈63,位置参考里**打开**的在 y=27,引擎两态同用 27(抽屉只横向划)。
+2. 七张整页图的标题/正文比位置参考低 127 px(整页图是最终稿,引擎按屏幕对齐摆放,无需改)。
+3. `莉娅（严肃）.png` 是 821×**1669**,比遮罩和其他表情(1675)矮 6 px;引擎已按遮罩画布定位不会跳动,但请按 821×1675 重导。
 
 ## 4. 主题与配色
 

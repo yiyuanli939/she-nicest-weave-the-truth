@@ -67,3 +67,5 @@ window/vsync/vsync_mode=1
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 textures/canvas_textures/default_texture_filter=2
+; 清屏色改成关内乳黄:换场那一帧与比底图大的边(故事界面底图 3835×2123 另垫白底)不再露引擎默认的灰
+environment/defaults/default_clear_color=Color(0.957, 0.925, 0.847, 1)
