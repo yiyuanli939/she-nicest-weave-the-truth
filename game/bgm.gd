@@ -7,16 +7,19 @@ extends Node
 
 const TRACKS: Dictionary = {
 	&"title": "res://music/title.mp3",   # 标题 / 选关 / 故事界面(开场 / 结局对话)/ 开发者信息
-	&"level_1": "res://music/level.wav",  # 第一章 并纹:关内(棋盘;四章暂共用一首)
-	&"level_2": "res://music/level.wav",  # 第二章 叠层纹
-	&"level_3": "res://music/level.wav",  # 第三章 岔纹
-	&"level_4": "res://music/level.wav",  # 第四章 焦纹
+	&"level_1": "res://music/level_1.wav",  # 第一章 并纹:level.wav 柔和版(低通 + 轻混响;tools/level_music/level_remix.py soft)
+	&"level_2": "res://music/level_2.wav",  # 第二章 叠层纹:脉动版(半拍颤音 + 合唱;pulse)
+	&"level_3": "res://music/level_3.wav",  # 第三章 岔纹:暗调版(降两个半音拉回原速 + 长回声;dark)
+	&"level_4": "res://music/level.wav",    # 第四章 焦纹:原版
 }
 const VOLUME_LINEAR := 0.32   # 约 -10 dB:钢琴 BGM 压低,给实体小机的喇叭留空间
 const FADE_SEC := 1.2
 ## 按文件的响度修正(dB):不同来源响度不一,压平到标题曲(基准 0);RMS 量法见 music/音乐bgm位置.md
 const GAIN_DB: Dictionary = {
-	"res://music/level.wav": -5.5,   # RMS -18.5 dBFS,标题曲 -24.0
+	"res://music/level.wav": -5.5,     # RMS -18.5 dBFS,标题曲 -24.0
+	"res://music/level_1.wav": -3.0,   # RMS -20.9(loudnorm 后)
+	"res://music/level_2.wav": -4.0,   # RMS -19.9
+	"res://music/level_3.wav": -3.0,   # RMS -20.9
 }
 
 var slot: StringName = &""    # 当前请求的槽位(静音槽位也记着,同槽位再调才能免重启)

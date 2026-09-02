@@ -29,6 +29,9 @@ func test_gain_table_levels_loudness() -> bool:
 		ok = check(paths.has(p), "GAIN_DB 里的文件 %s 也在 TRACKS 里(别留死条目)" % p) and ok
 	ok = check(is_equal_approx(B.target_volume("res://music/title.mp3"), B.VOLUME_LINEAR), "标题曲 = 基准音量") and ok
 	ok = check(is_equal_approx(B.target_volume("res://music/level.wav"), B.VOLUME_LINEAR * db_to_linear(-5.5)), "关内曲压低 5.5 dB") and ok
+	for slot in [&"level_1", &"level_2", &"level_3"]:
+		ok = check(B.GAIN_DB.has(B.TRACKS[slot]) and float(B.GAIN_DB[B.TRACKS[slot]]) <= -2.5 and float(B.GAIN_DB[B.TRACKS[slot]]) >= -4.5,
+				"%s 的改版文件有响度修正(loudnorm -18/-19 LUFS 对标题曲 -24:约 -3..-4 dB)" % slot) and ok
 	return ok
 
 
@@ -84,9 +87,14 @@ func test_level_slots_share_one_looping_track() -> bool:
 	var frames := int(round(wav.get_length() * wav.mix_rate))
 	ok = check(wav.loop_begin == 0 and wav.loop_end == frames - 1 and frames > 44100, "关内曲 wav 循环点覆盖整曲(导入无 smpl 块时 loop_end 默认 0:只设 loop_mode 会混 1 帧即停 → 关内无声),得 %d..%d / %d 帧" % [wav.loop_begin, wav.loop_end, frames]) and ok
 	bgm.play(&"level_3")
-	ok = check(bgm.slot == &"level_3" and bgm.active_player() == p1 and p1.playing, "换章但同一首:不重启不换播放器") and ok
+	var p3: AudioStreamPlayer = bgm.active_player()
+	ok = check(bgm.slot == &"level_3" and p3 != p1 and p3.playing and p3.stream != p1.stream, "换章换曲(第三章暗调版):交叉淡化到另一个播放器") and ok
+	ok = check(p3.stream is AudioStreamWAV and p3.stream.get("loop_mode") == AudioStreamWAV.LOOP_FORWARD and (p3.stream as AudioStreamWAV).loop_end > 44100, "第三章曲也设了整曲循环") and ok
+	bgm.play(&"level_3")
+	ok = check(bgm.active_player() == p3 and p3.playing, "同槽位再报不重启") and ok
 	bgm.play(&"title")
-	ok = check(bgm.active_player() == p0 and p0.playing, "回标题换回标题曲") and ok
+	var pt: AudioStreamPlayer = bgm.active_player()
+	ok = check(pt != p3 and pt.playing and pt.stream is AudioStreamMP3, "回标题换回标题曲(两个播放器轮换)") and ok
 	tree.root.remove_child(bgm)
 	bgm.free()
 	return ok
