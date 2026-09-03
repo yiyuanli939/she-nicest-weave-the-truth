@@ -14,7 +14,30 @@ func test_guide_phrase_matching() -> bool:
 	return check(rl.matches_guide("请 指导 我"), "Vosk 带空格输出") \
 		and check(rl.matches_guide("请指导我"), "无空格") \
 		and check(rl.matches_guide("请 帮帮 我") and rl.matches_guide("请 帮 帮 我"), "「请帮帮我」(含单字退化)") \
-		and check(not rl.matches_guide("今天 天气 不错") and not rl.matches_guide(""), "无关句不命中")
+		and check(not rl.matches_guide("今天 天气 不错") and not rl.matches_guide(""), "无关句不命中") \
+		and check(rl.matches_guide("please guide me") and rl.matches_guide("PLEASE  Guide me") and rl.matches_guide("help me"), "英文唤醒:不分大小写、多空格") \
+		and check(not rl.matches_guide("please wait") and not rl.matches_guide("guide"), "英文无关句不命中")
+
+
+## 英文模式:有台词的 say 改发 <名>_en(有 wav 才换,没有退回中文);故障音效 / 其它命令不动;中文模式原样
+func test_localized_say_names() -> bool:
+	var rl := _rl()
+	var all_wavs := func(_n: String) -> bool: return true
+	var no_wavs := func(_n: String) -> bool: return false
+	var only_win := func(n: String) -> bool: return n == "win_en"
+	var cmds: Array[Dictionary] = rl.commands_for("celebrate", false)
+	var en: Array = rl.localize_commands(cmds, "en", all_wavs)
+	var ok := check(en[2].get("name") == "win_en" and en[0] == cmds[0] and en[1] == cmds[1], "en:say win → win_en,其它命令不动")
+	ok = check(cmds[2].get("name") == "win", "原数组不被改") and ok
+	ok = check(rl.localize_commands(cmds, "zh", all_wavs)[2].get("name") == "win", "zh 原样") and ok
+	ok = check(rl.localize_commands(cmds, "en", no_wavs)[2].get("name") == "win", "没有 win_en.wav 退回中文") and ok
+	var greet: Array = rl.localize_commands(rl.commands_for("greet", false), "en", only_win)
+	ok = check(greet[2].get("name") == "greet", "只有 win_en 时 greet 仍中文") and ok
+	var glitch: Array = rl.localize_commands(rl.commands_for("panic", false), "en", all_wavs)
+	ok = check(String(glitch[2].get("name")).begins_with("glitch") and not String(glitch[2].get("name")).ends_with("_en"), "故障音效 glitch 不加 _en") and ok
+	for cue in rl.VOICE_CUES:
+		ok = check(rl.has_sound(cue + "_en") == FileAccess.file_exists("res://hardware/firmware/sounds/%s_en.wav" % cue), "has_sound(%s_en) 按文件存在" % cue) and ok
+	return ok
 
 
 func test_chapter_lookup_and_robot_mode() -> bool:
@@ -82,7 +105,8 @@ func test_cues_mark_breakdown_at_l11_win() -> bool:
 	return ok
 
 
-## 台词配置 lines.json:五句都有 wav、音色/音量合法、不再出现「织者」;故障没有台词(也不许出现警告/核心之类字样),只有三段合成音效
+## 台词配置 lines.json:五句都有 wav、音色/音量合法、不再出现「织者」;故障没有台词(也不许出现警告/核心之类字样),只有三段合成音效;
+## 英文:voice_en 是英文神经语音,lines_en 五句都有、只用 ASCII、每句有 <名>_en.wav
 func test_voice_lines_config() -> bool:
 	var txt := FileAccess.get_file_as_string("res://hardware/firmware/sounds/lines.json")
 	var d: Variant = JSON.parse_string(txt)
@@ -100,6 +124,15 @@ func test_voice_lines_config() -> bool:
 		ok = check(lines.has(cue) and String(lines[cue]) != "", "台词 %s 存在" % cue) and ok
 		ok = check(ResourceLoader.exists("res://hardware/firmware/sounds/%s.wav" % cue) or FileAccess.file_exists("res://hardware/firmware/sounds/%s.wav" % cue), "%s.wav 存在" % cue) and ok
 		ok = check(not String(lines[cue]).contains("织者"), "%s 台词称呼用诺拉不用织者" % cue) and ok
+	var lines_en: Dictionary = d.get("lines_en", {})
+	ok = check(String(d.get("voice_en", "")).begins_with("en-"), "voice_en 是英文神经语音") and ok
+	for cue in ["greet", "win", "encourage", "hint", "calm"]:
+		var en := String(lines_en.get(cue, ""))
+		ok = check(en != "", "英文台词 %s 存在" % cue) and ok
+		for i in en.length():
+			ok = check(en.unicode_at(i) < 128, "英文台词 %s 只用 ASCII(edge-tts 英文音色):%s" % [cue, en]) and ok
+		ok = check(FileAccess.file_exists("res://hardware/firmware/sounds/%s_en.wav" % cue), "%s_en.wav 存在(make_voices.sh 生成)" % cue) and ok
+	ok = check(not lines_en.has("panic"), "英文也没有 panic 台词") and ok
 	var gain: float = float(d.get("gain", 0))
 	return ok and check(gain > 0.0 and gain <= 1.0, "音量 0-1") and check(String(d.get("voice", "")).begins_with("zh-CN-"), "音色是中文神经语音")
 

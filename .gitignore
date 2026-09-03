@@ -2,6 +2,7 @@
 .godot/
 /android/
 hardware/speech/model/
+hardware/speech/model_en/
 hardware/.run/
 hardware/backup/*_board*.bin
 build/

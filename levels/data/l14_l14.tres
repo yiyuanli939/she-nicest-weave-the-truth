@@ -4,49 +4,54 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_qyfhi"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_2v4km"]
 
-[sub_resource type="Resource" id="Resource_6k73p"]
+[sub_resource type="Resource" id="Resource_83lky"]
 script = ExtResource("1_6k73p")
 speaker = "亚瑟·威客利夫"
 text = "我们已经关闭大部分自动机，但停机前的记录更糟。同一扇门被要求同时开启、锁死、报警，甚至执行和门毫无关系的命令。"
+text_en = "We've shut down most of the automatons, but the records from before shutdown are worse. The same door was ordered to open, lock, and sound the alarm all at once, and even to carry out commands that had nothing to do with doors."
 scene = "伦敦街上"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_qyfhi"]
+[sub_resource type="Resource" id="Resource_koucd"]
 script = ExtResource("1_6k73p")
 speaker = "亚瑟·威客利夫"
 text = "推演记录里出现了矛盾。一旦系统得到某命题与它的否定，就会形成底部矛盾；而现行程式允许从矛盾推出任意后续命令。"
+text_en = "A contradiction appeared in the reasoning records. Once the system obtains a proposition and its negation, it forms a bottom contradiction; and the current programme allows any subsequent command to be derived from a contradiction."
 scene = "伦敦街上"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_2v4km"]
+[sub_resource type="Resource" id="Resource_cy8qg"]
 script = ExtResource("1_6k73p")
 speaker = "诺拉·拉芙蒂"
 text = "所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。"
+text_en = "So those absurd orders weren't the machine breaking the rules. Quite the opposite: every step was inside the rules."
 scene = "伦敦街上"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_5y1rg"]
+[sub_resource type="Resource" id="Resource_24q0c"]
 script = ExtResource("1_6k73p")
 speaker = "亚瑟·威客利夫"
 text = "……是。我们原以为推演器损坏了。但目前没有发现非法推演。"
+text_en = "…Yes. We assumed the reasoning engine was damaged. But so far no illegal inference has been found."
 scene = "伦敦街上"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_7lqpg"]
+[sub_resource type="Resource" id="Resource_rtuof"]
 script = ExtResource("1_6k73p")
 speaker = "诺拉·拉芙蒂"
 text = "那就不是结论出了问题。要往前找。"
+text_en = "Then the conclusions aren't the problem. We have to look further back."
 scene = "伦敦街上"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_nwmgp"]
+[sub_resource type="Resource" id="Resource_3xqql"]
 script = ExtResource("2_qyfhi")
-lines = Array[ExtResource("1_6k73p")]([SubResource("Resource_6k73p"), SubResource("Resource_qyfhi"), SubResource("Resource_2v4km"), SubResource("Resource_5y1rg"), SubResource("Resource_7lqpg")])
+lines = Array[ExtResource("1_6k73p")]([SubResource("Resource_83lky"), SubResource("Resource_koucd"), SubResource("Resource_cy8qg"), SubResource("Resource_24q0c"), SubResource("Resource_rtuof")])
 
 [resource]
 script = ExtResource("3_2v4km")
@@ -57,5 +62,5 @@ goal = "A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro", &"or_intro", &"or_elim", &"false_elim"])
 atoms = Array[StringName]([&"A"])
 allow_bot = true
-intro_dialogue = SubResource("Resource_nwmgp")
+intro_dialogue = SubResource("Resource_3xqql")
 robot_cue_on_win = "celebrate"

@@ -1086,6 +1086,94 @@ func _run() -> void:
 	_check(title_draws >= 10 and title_draws <= 70, "标题页流光 1 s 重绘 10–70 帧(得 %d;TIME 着色器自动请求重绘,上限 60)" % title_draws)
 	game.save.wipe()
 
+	# ---- V. 语言(2026-09-03):设置弹窗「语言:中文」一点 → 全游戏英文(翻译键自动换、标题五项重排、烧字的图换 .en.png、台词走 text_en);再点切回 ----
+	game.goto_menu()
+	await _settle()
+	var menu_v := current_scene as MainMenu
+	var sp_v: SettingsPanel = menu_v._settings
+	var set_v := _button_named(menu_v, "设置")
+	_click(_center(set_v), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_check(Loc.current() == "zh" and sp_v._lang_btn.visible and sp_v._lang_btn.text == "语言:中文" and sp_v._lang_btn.atr(sp_v._lang_btn.text) == "语言:中文", "起始中文,设置里有「语言:中文」一行")
+	var lang_y := sp_v._lang_btn.get_global_rect().get_center().y
+	_check(lang_y > sp_v._fullscreen_btn.get_global_rect().get_center().y and (not sp_v._robot_btn.visible or lang_y < sp_v._robot_btn.get_global_rect().get_center().y), "「语言」行在全屏之下、小机联动之上")
+	_click(_center(sp_v._lang_btn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	await _settle()   # 标题页收到 NOTIFICATION_TRANSLATION_CHANGED 后延迟一帧重排
+	_check(Loc.current() == "en" and TranslationServer.get_locale() == "en" and game.save.settings.get("language") == "en", "点「语言」→ locale=en、落 settings")
+	_check(sfx.last_slot == &"toggle", "音效:语言开关响 toggle(得 %s)" % sfx.last_slot)
+	_check(sp_v._lang_btn.text == "语言:中文" and sp_v._lang_btn.atr(sp_v._lang_btn.text) == "Language: English" and sp_v._close_btn.atr(sp_v._close_btn.text) == "Close"
+			and sp_v._fullscreen_btn.atr(sp_v._fullscreen_btn.text).begins_with("Fullscreen"), "弹窗文字显示英文,.text 仍是中文键")
+	var en_names: Array[String] = []
+	var centered := true
+	for b in menu_v._options:
+		en_names.append(b.atr(b.text))
+		var r: Rect2 = b.get_global_rect()
+		centered = centered and absf(r.get_center().x - MainMenu.MENU_CENTER_X) <= 1.0 and r.end.x <= 3840.0
+	_check(en_names == ["Start Game", "Reset Save", "Credits", "Quit", "Settings"], "标题五项英文(得 %s)" % str(en_names))
+	_check(centered, "切语言后五项按新宽度重新居中、不出右边")
+	_check(menu_v._title.texture.resource_path.ends_with("title.en.png") and menu_v._title.texture.get_image().get_pixel(1200, 80).a < 0.05 and menu_v._title.size == Vector2(2682, 497),
+			"标题图换成 title.en.png(「织理者」那条带已透明,只剩拉丁名;得 %s)" % menu_v._title.texture.resource_path)
+	_click(_center(sp_v._close_btn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	game.goto_select()
+	await _settle()
+	var sel_en := current_scene as LevelSelect
+	var ch_en := ""
+	for l in sel_en.find_children("*", "Label", true, false):
+		if (l as Label).text == "第一章 并纹":
+			ch_en = (l as Label).atr((l as Label).text)
+	var lv_btn := _button_named(sel_en, "第一纹")
+	var back_en := _button_named(sel_en, "返回主界面")
+	_check(ch_en == "Chapter 1: Plied Patterns" and lv_btn != null and lv_btn.atr(lv_btn.text) == "Pattern 1" and back_en.atr(back_en.text) == "Main Menu",
+			"选关页章名 / 关名 / 返回 显示英文(得 %s)" % ch_en)
+	var lv02: LevelDef = game.catalog.find(&"l02")
+	game.start_level(lv02)
+	await _settle()
+	var story_en := current_scene as StoryScene
+	_check(story_en != null, "l02 进故事界面")
+	if story_en != null:
+		var first_line: DialogueLine = lv02.intro_dialogue.lines[0]
+		_check(story_en._dialogue._text.text == first_line.text_en and first_line.text_en != ""
+				and story_en._dialogue._speaker.atr(story_en._dialogue._speaker.text) == "Lia Corbin", "台词显示英文 text_en,发言人 Lia Corbin")
+		_check(_texture_is_variant(story_en, StoryScene.BASE_PATH), "故事底图换成 base.en.png(Click to continue)")
+		story_en.finish()
+		await _settle()
+	var lvl_en := current_scene as LevelScene
+	_check(lvl_en != null, "进棋盘")
+	if lvl_en != null:
+		var reset_en := _button_named(lvl_en, "重置")
+		var pal_en := _button_named(lvl_en._palette, "并织机")
+		_check(reset_en.atr(reset_en.text) == "Reset" and pal_en != null and pal_en.atr(pal_en.text) == "Plying Loom", "工具条 / 仪器架文字英文")
+		_check(lvl_en._step_hint.visible and lvl_en._step_hint.atr(lvl_en._step_hint.text) != lvl_en._step_hint.text, "操作指引显示英文")
+		var nb_en := lvl_en._notebook_ui
+		await _wait_until(func() -> bool: return nb_en.is_open())   # 进关自动划出要 0.35 s
+		_check(nb_en.is_open() and _image_is_en(nb_en._page_pic.texture, "res://assets/art/level/notebook/and_intro.png"), "笔记自动翻到并织机页且是英文页 and_intro.en.png")
+		_check(nb_en._new_label.atr(nb_en._new_label.text) == "New machine!" and nb_en._flip.atr(nb_en._flip.text) == "Flip", "「新机器!」「翻页」英文")
+		_check(_texture_is_variant(lvl_en._palette, PalettePanel.BG_PATH), "仪器架底图换成 palette_bg.en.png(Rack)")
+		lvl_en._win_popup.open()
+		await _settle()
+		_check(_image_is_en(lvl_en._win_popup._panel.texture, WinPopup.IMAGE_PATH) and lvl_en._win_popup._continue_btn.atr("继续") == "Continue", "通关弹窗图换成 win_popup.en.png(Woven!),「继续」= Continue")
+		lvl_en._win_popup.close()
+	game.goto_menu()
+	await _settle()
+	menu_v = current_scene as MainMenu
+	sp_v = menu_v._settings
+	_click(_center(_button_named(menu_v, "设置")), MOUSE_BUTTON_LEFT)
+	await _settle()
+	_click(_center(sp_v._lang_btn), MOUSE_BUTTON_LEFT)
+	await _settle()
+	await _settle()
+	var zh_names: Array[String] = []
+	for b in menu_v._options:
+		zh_names.append(b.atr(b.text))
+	_check(Loc.current() == "zh" and game.save.settings.get("language") == "zh" and zh_names == ["开始游戏", "重置进度", "开发者信息", "退出游戏", "设置"]
+			and sp_v._lang_btn.atr(sp_v._lang_btn.text) == "语言:中文" and menu_v._title.texture.resource_path.ends_with("title.png"), "再点切回中文:五项中文、标题图回中文版")
+	game.save.settings.erase("language")   # 开发机不留痕:回到默认中文
+	game.save.save()
+	_click(_center(sp_v._close_btn), MOUSE_BUTTON_LEFT)
+	await _settle()
+
 	# ---- B. 回标题:BGM 淡入标题曲 ----
 	game.goto_menu()
 	await _settle()
@@ -1106,3 +1194,52 @@ func _wait_until(pred: Callable, timeout := 6.0) -> void:
 	while t < timeout and not pred.call():
 		await _wait(0.1)
 		t += 0.1
+
+
+## 换图检查:tex 的像素在「原图与 .en 图不同」的采样点上等于 .en 图(透明像素只比 alpha:导入的 fix_alpha_border 会改透明像素的 RGB)
+func _image_is_en(tex: Texture2D, orig: String) -> bool:
+	if tex == null:
+		return false
+	var a := _png(orig)
+	var b := _png(Loc.localized_path(orig, "en"))
+	var t := tex.get_image()
+	if a == null or b == null or t == null or t.get_size() != a.get_size() or b.get_size() != a.get_size():
+		return false
+	var n := 0
+	var hit := 0
+	for y in range(0, a.get_height(), 8):
+		for x in range(0, a.get_width(), 8):
+			var pb := b.get_pixel(x, y)
+			if _px_eq(a.get_pixel(x, y), pb):
+				continue
+			n += 1
+			if _px_eq(t.get_pixel(x, y), pb):
+				hit += 1
+			if n >= 200:
+				break
+		if n >= 200:
+			break
+	return n > 0 and hit >= n * 0.9   # 抗锯齿边缘像素经导入 fix_alpha_border 会变,按多数判
+
+
+static func _px_eq(p: Color, q: Color) -> bool:
+	if p.a < 0.02 and q.a < 0.02:
+		return true
+	return absf(p.r - q.r) < 0.03 and absf(p.g - q.g) < 0.03 and absf(p.b - q.b) < 0.03 and absf(p.a - q.a) < 0.03
+
+
+## from 之下尺寸等于 orig 原图的那张 TextureRect 显示的是 .en 图
+func _texture_is_variant(from: Node, orig: String) -> bool:
+	var a := _png(orig)
+	if a == null:
+		return false
+	for tr_node in from.find_children("*", "TextureRect", true, false):
+		var tex: Texture2D = (tr_node as TextureRect).texture
+		if tex != null and tex.get_size() == Vector2(a.get_size()):
+			return _image_is_en(tex, orig)
+	return false
+
+
+static func _png(path: String) -> Image:
+	var img := Image.new()
+	return img if img.load_png_from_buffer(FileAccess.get_file_as_bytes(path)) == OK else null

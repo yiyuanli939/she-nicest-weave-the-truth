@@ -7,6 +7,8 @@ extends Control
 ## (音乐音量 / 全屏 / 小机联动 / 小机维护),标题页本身不放任何控件。
 ## 坐标为 3840×2160 逻辑像素;美术调位置改下面常量。F9 仍直接打开小机维护面板(所有构建;Web 版设置里没有小机两行,
 ## 面板照旧打得开但切不了)。
+## 语言:五个选项的文字是翻译键(auto_translate 自动换),但位置是按按钮尺寸算的 → 收到 NOTIFICATION_TRANSLATION_CHANGED
+## 延迟一帧重排(子 Button 比父先收不到通知,同帧量到的还是旧尺寸);标题图按语言换 title.en.png(Loc.localized_path)。
 
 const BG_PATH := "res://assets/art/title/bg.png"
 const TITLE_PATH := "res://assets/art/title/title.png"
@@ -21,6 +23,8 @@ const MENU_GLYPH_SPACING := 0             # 预览「开始游戏」墨宽 306 =
 var _cal_ui: RobotMaintUI
 var _settings: SettingsPanel
 var _start_btn: Button
+var _title: TextureRect
+var _options: Array[Button] = []
 var _game: Node
 
 
@@ -35,15 +39,15 @@ func _ready() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 
-	var title := TextureRect.new()
-	title.texture = load(TITLE_PATH)
-	title.position = TITLE_POS
-	title.size = title.texture.get_size()
-	title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_title = TextureRect.new()
+	_title.texture = load(Loc.localized_path(TITLE_PATH))
+	_title.position = TITLE_POS
+	_title.size = _title.texture.get_size()
+	_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var mat := ShaderMaterial.new()
 	mat.shader = load(SHEEN_PATH)
-	title.material = mat
-	add_child(title)
+	_title.material = mat
+	add_child(_title)
 
 	_cal_ui = RobotMaintUI.new()
 	add_child(_cal_ui)
@@ -85,9 +89,28 @@ func _add_option(i: int, label: String, cb: Callable) -> Button:
 	b.add_theme_font_override("font", fv)
 	b.pressed.connect(cb)
 	add_child(b)
+	_options.append(b)
+	_place_option(b, i)
+	return b
+
+
+func _place_option(b: Button, i: int) -> void:
 	b.reset_size()
 	b.position = Vector2(MENU_CENTER_X, MENU_Y0 + i * MENU_PITCH) - b.size * 0.5
-	return b
+
+
+## 文字变了(切语言 / 重置)之后按新尺寸重摆五个选项,标题图换成当前语言的那张
+func _relayout() -> void:
+	for i in _options.size():
+		_place_option(_options[i], i)
+	if _title != null:
+		_title.texture = load(Loc.localized_path(TITLE_PATH))
+		_title.size = _title.texture.get_size()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_TRANSLATION_CHANGED and is_inside_tree():
+		_relayout.call_deferred()
 
 
 ## 美术:「重置进度:点击后重置玩家进度」—— 点击即清档,第一项随之变回「开始游戏」
@@ -95,8 +118,7 @@ func _on_reset() -> void:
 	_game.save.wipe()
 	_game.current = null
 	_start_btn.text = "开始游戏"
-	_start_btn.reset_size()
-	_start_btn.position = Vector2(MENU_CENTER_X, MENU_Y0) - _start_btn.size * 0.5
+	_relayout()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

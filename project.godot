@@ -57,6 +57,26 @@ window/stretch/aspect="keep"
 ; 显式开垂直同步(原先靠默认);帧率硬上限见 [application] run/max_fps
 window/vsync/vsync_mode=1
 
+[internationalization]
+
+; 语言(game/loc.gd):locale/ui.csv 导入出 ui.zh/ui.en.translation;fallback 必须是 zh —— Godot 默认回退 en,
+; 缺译的键在中文模式会漏成英文。translation_remaps:烧了中文的美术图按语言换成 <名字>.en.png(tools/gen_locale_art.gd 出)
+locale/translations=PackedStringArray("res://locale/ui.zh.translation", "res://locale/ui.en.translation")
+locale/fallback="zh"
+locale/translation_remaps={
+"res://assets/art/title/title.png": PackedStringArray("res://assets/art/title/title.en.png:en"),
+"res://assets/art/level/palette_bg.png": PackedStringArray("res://assets/art/level/palette_bg.en.png:en"),
+"res://assets/art/level/win_popup.png": PackedStringArray("res://assets/art/level/win_popup.en.png:en"),
+"res://assets/art/story/base.png": PackedStringArray("res://assets/art/story/base.en.png:en"),
+"res://assets/art/level/notebook/and_intro.png": PackedStringArray("res://assets/art/level/notebook/and_intro.en.png:en"),
+"res://assets/art/level/notebook/and_elim.png": PackedStringArray("res://assets/art/level/notebook/and_elim.en.png:en"),
+"res://assets/art/level/notebook/imp_intro.png": PackedStringArray("res://assets/art/level/notebook/imp_intro.en.png:en"),
+"res://assets/art/level/notebook/imp_elim.png": PackedStringArray("res://assets/art/level/notebook/imp_elim.en.png:en"),
+"res://assets/art/level/notebook/or_intro.png": PackedStringArray("res://assets/art/level/notebook/or_intro.en.png:en"),
+"res://assets/art/level/notebook/or_elim.png": PackedStringArray("res://assets/art/level/notebook/or_elim.en.png:en"),
+"res://assets/art/level/notebook/false_elim.png": PackedStringArray("res://assets/art/level/notebook/false_elim.en.png:en")
+}
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

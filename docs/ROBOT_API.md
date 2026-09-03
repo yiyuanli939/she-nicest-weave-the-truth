@@ -32,7 +32,7 @@ pan 改了脉宽映射后,板上存的「看电脑方向」角度含义变了,�
 ## 链路
 
 ```
-麦克风 → hardware/speech/listen.py(Vosk 离线中文,只认「请指导我 / 请帮帮我」)──┐ ws 客户端,发 {"evt":"speech"}
+麦克风 → hardware/speech/listen.py(Vosk 离线,中英各一个识别器同时听:「请指导我 / 请帮帮我」、"please guide me / please help me")──┐ ws 客户端,发 {"evt":"speech","lang":..}
 游戏(Godot autoload "Robot", game/robot_link.gd) ⇅ WebSocket ws://127.0.0.1:9800 ─┤
 桥接(hardware/bridge/bridge.js, Node)  带 evt 的客户端消息只广播给其它客户端;其余下串口 ─┘
    ⇅ USB 串口 /dev/cu.usbmodem* 115200,行分隔 JSON
@@ -42,7 +42,8 @@ pan 改了脉宽映射后,板上存的「看电脑方向」角度含义变了,�
 一键接入:游戏 **开发者信息 → 小机维护 → 「接入小机」**(= `bash hardware/run_robot.sh`,幂等拉起桥接 + 语音助手;
 pid/日志在 `hardware/.run/`;`stop_robot.sh` 停掉)。没有桥接/机器人时游戏静默降级,一切照玩。
 
-首次准备:`bash hardware/speech/get_model.sh`(下载 42MB 模型,不入库);venv 已含 vosk/sounddevice/mpremote/edge-tts。
+首次准备:`bash hardware/speech/get_model.sh`(默认 `all`:中文 42 MB → `model/`,英文 40 MB → `model_en/`,都不入库;只下一种传 `zh` / `en`,缺哪种就不听哪种);
+venv 已含 vosk/sounddevice/mpremote/edge-tts。游戏切语言不用重启助手(两边一直都在听);`SPEECH_LANG=zh|en|all bash hardware/run_robot.sh` 可只听一种。
 麦克风权限归"拉起进程的应用":从 Dock 开的 Godot 拉起 → macOS 向 Godot 要权限;从终端跑 → 向终端要。第一次点「允许」。
 导出正式版时导出预设要开 Audio Input 并填 microphone usage description(仓库还没有 export_presets.cfg)。
 
@@ -72,8 +73,9 @@ Web 导出(itch.io)**一律无机器人且不可切换**(`robot_possible()`):浏
 - 「回头方向:右/左」:「请指导我」时底部云台往哪边转到极限(存 `user://save.json` 的 settings,「重置进度」不清);「试转一下」预览。
 - 「小机动作:照常 / 保持不动」:**不动模式** —— 云台直控、云台动画、自动校准一律不发(`RobotLink.STILL_CMDS`),
   表情、语音、口型、屏幕全部照常;舵机坏了 / 展示怕动静时用。同样存 settings,「重置进度」不清。
-- 小机声音:音色(微软中文神经语音,默认小艺 = 小智同款)/ 音量(wav 峰值 20–100%)/ 六句台词可直接改 →
-  「保存并生成语音」写 `hardware/firmware/sounds/lines.json` 并跑 `make_voices.sh`(edge-tts,需联网)→ 「试听」本机播 → 「刷入固件与语音」送进小机。
+- 小机声音:音色(微软中文神经语音,默认小艺 = 小智同款)/ **英文音色**(英式,默认 Sonia)/ 音量(wav 峰值 20–100%)/ 五句台词各中文一行、英文一行可直接改 →
+  「保存并生成语音」写 `hardware/firmware/sounds/lines.json`(`voice`/`lines` 中文,`voice_en`/`lines_en` 英文)并跑 `make_voices.sh`(edge-tts,需联网;中文出 `<cue>.wav`,英文出 `<cue>_en.wav`)→ 「试听」本机播 → 「刷入固件与语音」送进小机。
+  **英文模式**(标题页设置里切)下游戏把有台词的 `say` 改发 `<cue>_en`(`RobotLink.localize_commands`;板上没有该 wav 就退回中文),固件不用改。
   故障(3-1 通关起)**没有台词、不显示任何报警文字**,只放 `hardware/make_sfx.py` 合成的三段坏掉音效(峰值 0.45,比台词的 0.9 轻;想换音效/音量改那个脚本重跑);刷入时会把板上已不用的旧文件删掉。
   **台词称呼女主一律用「诺拉」。**
 - 校准「看电脑方向」:自动(小机张望,正对屏幕时朝它挥手或按 BOOT)/ 手动微调 + 保存。结果存板上 `/look_cfg.json`。
@@ -116,7 +118,7 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 | `{"cmd":"ping"}` | 心跳,回 `{"evt":"pong"}` |
 | `{"cmd":"emote","name":N}` | 表情:`happy sad confused think glitch sleep idle` |
 | `{"cmd":"anim","name":N}` | 云台动画:`celebrate`(欢呼摇摆) `panic`(乱动+故障脸) `nod`(点头) `shake`(摇头) `look_pc`(扭头看电脑→轻点头→转回);动画结束会回到开始时的角度 |
-| `{"cmd":"say","name":N}` | 语音:播 `/sounds/N.wav`,播放中屏幕自动做**说话口型**。现有:`greet win encourage hint calm`(台词)+ `glitch1 glitch2 glitch3`(坏掉音效) |
+| `{"cmd":"say","name":N}` | 语音:播 `/sounds/N.wav`,播放中屏幕自动做**说话口型**。现有:`greet win encourage hint calm`(中文台词)+ 同名 `_en`(英文台词,英文模式发)+ `glitch1 glitch2 glitch3`(坏掉音效) |
 | `{"cmd":"gimbal","pan":P,"tilt":T}` | 云台直控(瞬时到位,无速度参数;省略的轴保持不动)。pan **5(左)~175(右)**(2026-08-30 起换标准 SG90:500–2500 µs ↔ 180°,两端留 5° 余量;原装那只怪舵机是 100–2900 µs,已烧报废),tilt 70(抬头)~110(低头),中心 90/90。空闲时固件不会自己回正 |
 | `{"cmd":"text","s":"..."}` | OLED 显示 ASCII 文本 3 秒(点阵字体不支持中文) |
 | `{"cmd":"cal_look"}` | **屏幕方向校准(自动)**:云台扫描,正对屏幕时朝它挥手(PAJ7620)或按 BOOT 锁定;30s 超时 |
@@ -131,8 +133,8 @@ hardware/.venv/bin/python hardware/cam_check.py --cam 1 --axis tilt
 `{"evt":"gimbal","pan":..,"tilt":..}`(每条 `gimbal` 命令的 ack)·
 `{"evt":"cal_done","pan":..,"tilt":..}` · `{"evt":"cal_timeout"}` · `{"evt":"err","msg":...}` ·
 `{"evt":"serial","open":true|false}`(桥接:串口连上/断开,连入时先发一次)·
-`{"evt":"speech_ready"}` / `{"evt":"speech_alive"}`(语音助手启动 / 每 5 s 心跳,10 s 没心跳游戏判离线)·
-`{"evt":"speech","text":"请指导我"}`(命中;3 s 去重)。
+`{"evt":"speech_ready","langs":["zh","en"]}` / `{"evt":"speech_alive","langs":[..]}`(语音助手启动 / 每 5 s 心跳,10 s 没心跳游戏判离线;`langs` = 在听的语言,维护面板显示)·
+`{"evt":"speech","text":"请指导我","lang":"zh"}` / `{"evt":"speech","text":"please guide me","lang":"en"}`(命中;3 s 去重;游戏两种都认,不看当前界面语言)。
 
 ## 游戏侧高层 cue(Robot.cue("...") / 策划在 .tres 里填 robot_cue)
 
@@ -158,8 +160,11 @@ bash hardware/run_robot.sh                 # 接入(桥接 + 语音助手)
 bash hardware/stop_robot.sh                # 停
 bash hardware/flash_robot.sh               # 刷固件与语音(会先停桥接;日志 hardware/.run/flash.log)
 bash hardware/make_voice.sh win "太棒了!" [音色] [音量]   # 改一句语音
-bash hardware/make_voices.sh               # 按 firmware/sounds/lines.json 整表重做
-tail -f hardware/.run/speech.log           # 语音自测:说一句,看「命中」行
+bash hardware/make_voices.sh               # 按 firmware/sounds/lines.json 整表重做(中文 lines → <名>.wav,英文 lines_en → <名>_en.wav)
+bash hardware/make_voices.sh --check-only  # 只列出要生成的句子、查 edge-tts 在不在,不联网
+bash hardware/speech/get_model.sh all      # 下载中英 Vosk 小模型(model/ 与 model_en/)
+hardware/.venv/bin/python hardware/speech/listen.py --check-only   # 只加载模型打印语法,不开麦克风
+tail -f hardware/.run/speech.log           # 语音自测:说一句,看「命中[zh]」/「命中[en]」行
 
 # 底层工具(均在 hardware/.venv)
 hardware/.venv/bin/python -m esptool --port /dev/cu.usbmodem2101 flash-id   # 探测
@@ -203,4 +208,5 @@ bash hardware/flash_robot.sh      # 灌 main.py / paj7620.py / sounds,软复位,
    `bash hardware/cam_check.sh` 用摄像头判定舵机真的转了(小机要在画面里)。
 5. 进第一纹对麦克风说「请指导我」→ 小机回头 → 关卡自动织成、小机不欢呼 → 转回;3-1(l11)打完小机当场故障演出并坏掉;
    3-2 起说话只故障、不回头;打完 l16 点「继续」看完结局,「感谢游玩」黑屏时小机修好(calm)。
+5b. 标题页设置切到 English:进关问候小机说英文(`greet_en.wav`);对麦克风说 "please guide me" 同样回头代解;通关放 `win_en.wav`。
 6. 拔掉 USB → 游戏无报错照常玩。

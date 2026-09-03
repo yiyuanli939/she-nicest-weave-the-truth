@@ -6,7 +6,10 @@ extends Node
 ## 都变成故障演出:故障脸 + 乱动 + 随机一段「坏掉」音效,没有台词。
 ## 不动模式:stationary = true(维护面板「小机动作」开关,存 settings)时云台直控/云台动画/自动校准一律不发,
 ## 表情、语音、口型、屏幕照常 —— 舵机坏了或展示怕动静时用。
-## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」→ guide_requested(LevelScene 接)。
+## 语音:桥接转来的 {"evt":"speech"} 命中「请指导我 / 请帮帮我」或英文 "please guide me / please help me" → guide_requested(LevelScene 接);
+## 语音助手(hardware/speech/listen.py)中英两个识别器同时听,speech_ready/alive 带 langs。
+## 英文语音:英文模式下有台词的 say 命令改发 <cue>_en(hardware/firmware/sounds/<cue>_en.wav,lines.json 的 lines_en 生成),
+## 没有该 wav 就退回中文;固件只按文件名找声音,协议不变(localize_commands,纯函数)。
 ## 回头:turn_to_limit() 把底部云台转到极限(turn_dir 左/右,存 SaveManager.settings),return_center() 转回。
 ## 外部进程:launch("run"/"stop"/"flash") 跑 hardware/*.sh(接入小机 / 刷固件)。协议见 docs/ROBOT_API.md。
 ## 无机器人模式:enabled = false(优先级:命令行 --no-robot > --robot > settings.robot_enabled > 平台默认,macOS 开、其它平台关;Web 一律关)
@@ -29,7 +32,11 @@ const PAN_CENTER := 90
 const TILT_CENTER := 90
 const TURN_SEC := 0.6
 const SENT_LOG_MAX := 60
-const GUIDE_PHRASES: Array[String] = ["请指导我", "指导我", "请帮帮我", "帮帮我"]
+const GUIDE_PHRASES: Dictionary = {
+	"zh": ["请指导我", "指导我", "请帮帮我", "帮帮我"],
+	"en": ["please guide me", "guide me", "please help me", "help me"],
+}
+const VOICE_CUES: Array[String] = ["greet", "win", "encourage", "hint", "calm"]   # 有台词的声音名(lines.json);英文版 <名>_en.wav
 const SCRIPTS: Dictionary = {"run": "run_robot.sh", "stop": "stop_robot.sh", "flash": "flash_robot.sh", "voices": "make_voices.sh", "cam": "cam_check.sh"}
 const GLITCH_SFX_COUNT := 3            # sounds/glitch1..3.wav(hardware/make_sfx.py 合成的纯音效)
 ## 不动模式下拦掉的命令:云台直控 / 云台动画 / 自动校准(要扫头);不发也不记 sent_log
@@ -39,6 +46,7 @@ var enabled: bool = true           # false = 无机器人模式(见文件头);_r
 var connected: bool = false        # ws 连上桥接
 var serial_open: bool = false      # 桥接报告串口(小机)在线
 var speech_online: bool = false    # 语音助手心跳在线
+var speech_langs: Array = []       # 语音助手在听的语言(speech_ready/alive 的 langs;老版助手不带 → ["zh"])
 var broken: bool = false           # 剧情故障态(Game.start_level 按章节设)
 var stationary: bool = false       # 「小机不动」:不发云台/动画/校准,其余照常(维护面板开关,存 settings)
 var turn_dir: String = "right"     # 「请指导我」时回头方向
@@ -157,6 +165,7 @@ func _on_event(d: Dictionary) -> void:
 					guide_requested.emit()
 		"speech_ready", "speech_alive":
 			speech_online = true
+			speech_langs = d.get("langs", ["zh"])
 			_speech_seen = Time.get_unix_time_from_system()
 		"serial":
 			serial_open = bool(d.get("open", false))
@@ -168,13 +177,37 @@ func _on_event(d: Dictionary) -> void:
 	robot_event.emit(d)
 
 
-## 识别文本是否「请指导我 / 请帮帮我」(Vosk 输出词间有空格,先去掉)
+## 识别文本是否「请指导我 / 请帮帮我」或 "please guide me / please help me"(Vosk 输出词间有空格,先去掉;英文不分大小写)。
+## 两种语言都认、不看当前界面语言:识别器两边同时在听,玩家用哪种都行
 static func matches_guide(text: String) -> bool:
 	var compact := text.replace(" ", "").replace("　", "")
-	for p in GUIDE_PHRASES:
+	for p in GUIDE_PHRASES["zh"]:
 		if compact.contains(p):
 			return true
+	var lower := compact.to_lower()
+	for p in GUIDE_PHRASES["en"]:
+		if lower.contains(String(p).replace(" ", "")):
+			return true
 	return false
+
+
+## 英文模式:有台词的 say 换成 <名>_en(has_wav(名_en) 为真才换,否则退回中文);其它命令与中文模式原样。纯函数,测试盯着
+static func localize_commands(cmds: Array[Dictionary], lang: String, has_wav: Callable) -> Array[Dictionary]:
+	if lang != "en":
+		return cmds
+	var out: Array[Dictionary] = []
+	for c in cmds:
+		var d: Dictionary = c.duplicate()
+		var name := String(d.get("name", ""))
+		if d.get("cmd") == "say" and VOICE_CUES.has(name) and bool(has_wav.call(name + "_en")):
+			d["name"] = name + "_en"
+		out.append(d)
+	return out
+
+
+static func has_sound(name: String) -> bool:
+	var p := sound_path(name)
+	return p != "" and FileAccess.file_exists(p)
 
 
 # ---- cue ----
@@ -217,7 +250,7 @@ func cue(cue_name: String) -> void:
 		if now - int(_last_at.get(key, -100000)) < int(THROTTLE_MS[key]):
 			return
 		_last_at[key] = now
-	for c in commands_for(cue_name, broken, randi() % GLITCH_SFX_COUNT):
+	for c in localize_commands(commands_for(cue_name, broken, randi() % GLITCH_SFX_COUNT), Loc.current(), has_sound):
 		send(c)
 
 

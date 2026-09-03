@@ -93,6 +93,22 @@ func test_outro_first_line_needs_scene() -> bool:
 			"通关后剧情首句没场景要报错(得 %s)" % str(r.errors))
 
 
+## 英文台词列(语句_en / 台词_en / 英文语句)可缺:有则进 text_en,没有则空
+func test_english_column_optional() -> bool:
+	var with_en := "关卡,发言人,场景,语句,语句_en\n1-1,莉娅·科尔宾,工坊,第一句,\"First line, with a comma\"\n1-1,诺拉·拉芙蒂,,第二句,\n"
+	var r: Dictionary = _importer().parse_csv(with_en, {"1-1": "l01"})
+	var ok := check(r.errors.is_empty(), "无错误:%s" % str(r.errors))
+	if not ok:
+		return false
+	var lines: Array = (r.levels["l01"].intro as DialogueRes).lines
+	ok = check(lines[0].text == "第一句" and lines[0].text_en == "First line, with a comma", "语句_en 进 text_en") and ok
+	ok = check(lines[1].text_en == "", "空译文 = 空串(英文模式显示中文)") and ok
+	var without := "关卡,发言人,场景,语句\n1-1,莉娅·科尔宾,工坊,第一句\n"
+	var r2: Dictionary = _importer().parse_csv(without, {"1-1": "l01"})
+	ok = check(r2.errors.is_empty() and (r2.levels["l01"].intro as DialogueRes).lines[0].text_en == "", "没有英文列也照常导入") and ok
+	return ok
+
+
 func test_unknown_episode_reported() -> bool:
 	var r: Dictionary = _importer().parse_csv("关卡,发言人,语句\n9-9,莉娅,台词\n", {"1-1": "l01"})
 	return check(not r.errors.is_empty() and r.levels.is_empty(), "目录外的「章-节」要报错且不导入")

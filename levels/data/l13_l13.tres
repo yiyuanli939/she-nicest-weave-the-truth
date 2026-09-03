@@ -4,75 +4,83 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_s6a8h"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_you30"]
 
-[sub_resource type="Resource" id="Resource_v2tng"]
+[sub_resource type="Resource" id="Resource_6k73p"]
 script = ExtResource("1_v2tng")
 speaker = "亚瑟·威客利夫"
 text = "异常已经从偶发变成连锁故障。学院封存了第一批自动机，现在要求工坊交出这批静语纹的全部生产记录。"
+text_en = "The anomalies have gone from occasional to a chain of failures. The Academy has sealed the first batch of automatons and now requires the workshop to hand over the full production records for these silent patterns."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_s6a8h"]
+[sub_resource type="Resource" id="Resource_qyfhi"]
 script = ExtResource("1_v2tng")
 speaker = "亚瑟·威客利夫"
 text = "所有出问题的机型都使用了这里生产的纹样。学院需要确认是否存在同一类织造误差。"
+text_en = "Every model that failed used patterns made here. The Academy needs to confirm whether there is a common weaving error."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_you30"]
+[sub_resource type="Resource" id="Resource_2v4km"]
 script = ExtResource("1_v2tng")
 speaker = "莉娅·科尔宾"
 text = "你们要记录？那把两年前退给我的那张也一起拿走。"
+text_en = "You want records? Then take the sheet you sent back to me two years ago as well."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "严肃"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_jl3nv"]
+[sub_resource type="Resource" id="Resource_5y1rg"]
 script = ExtResource("1_v2tng")
 speaker = "亚瑟·威客利夫"
 text = "科尔宾女士，那份记录没有进入学院档案。它没有经过合资格观察者复核。"
+text_en = "Miss Corbin, that record never entered the Academy archive. It was not reviewed by a qualified observer."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_2v3ua"]
+[sub_resource type="Resource" id="Resource_7lqpg"]
 script = ExtResource("1_v2tng")
 speaker = "莉娅·科尔宾"
 text = "湿气可没读过你们的资格条例。"
+text_en = "The damp has never read your qualification rules."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_dbv23"]
+[sub_resource type="Resource" id="Resource_nwmgp"]
 script = ExtResource("1_v2tng")
 speaker = "诺拉·拉芙蒂"
 text = "威客利夫先生，那份记录具体写了什么？"
+text_en = "Mr. Wycliffe, what exactly did that record say?"
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_voh5c"]
+[sub_resource type="Resource" id="Resource_k8bx6"]
 script = ExtResource("1_v2tng")
 speaker = "亚瑟·威客利夫"
 text = "三号静语丝在高湿环境下可能短暂保留前一状态。学院测试没有复现，因此没有采纳。"
+text_en = "That number three silent thread may briefly retain its previous state in high humidity. The Academy's tests did not reproduce it, so it was not adopted."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_5mrow"]
+[sub_resource type="Resource" id="Resource_t8r1i"]
 script = ExtResource("1_v2tng")
 speaker = "亚瑟·威客利夫"
 text = "听见警报了吗？又有一整条街区的新式自动机进入紧急停机。情况比学院预想的更快。"
+text_en = "Do you hear the alarm? Another whole block of new automatons has gone into emergency shutdown. This is moving faster than the Academy expected."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_u1nut"]
+[sub_resource type="Resource" id="Resource_pxttt"]
 script = ExtResource("2_s6a8h")
-lines = Array[ExtResource("1_v2tng")]([SubResource("Resource_v2tng"), SubResource("Resource_s6a8h"), SubResource("Resource_you30"), SubResource("Resource_jl3nv"), SubResource("Resource_2v3ua"), SubResource("Resource_dbv23"), SubResource("Resource_voh5c"), SubResource("Resource_5mrow")])
+lines = Array[ExtResource("1_v2tng")]([SubResource("Resource_6k73p"), SubResource("Resource_qyfhi"), SubResource("Resource_2v4km"), SubResource("Resource_5y1rg"), SubResource("Resource_7lqpg"), SubResource("Resource_nwmgp"), SubResource("Resource_k8bx6"), SubResource("Resource_t8r1i")])
 
 [resource]
 script = ExtResource("3_you30")
@@ -82,5 +90,5 @@ assumptions = Array[String](["(A > C) & (B > C)"])
 goal = "(A | B) > C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro", &"or_intro", &"or_elim"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_u1nut")
+intro_dialogue = SubResource("Resource_pxttt")
 robot_cue_on_win = "celebrate"

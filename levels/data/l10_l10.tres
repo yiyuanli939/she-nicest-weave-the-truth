@@ -4,16 +4,17 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_jp15r"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_6rfht"]
 
-[sub_resource type="Resource" id="Resource_7atkt"]
+[sub_resource type="Resource" id="Resource_77kt7"]
 script = ExtResource("1_7atkt")
 speaker = "诺拉·拉芙蒂"
 text = "他们把同一种规则写成符号，就说那是知识；我们把它织进机器里，却只算手艺。"
+text_en = "They write the same rule in symbols and call it knowledge; we weave it into the machines and it only counts as craft."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_jp15r"]
+[sub_resource type="Resource" id="Resource_5i2ik"]
 script = ExtResource("2_jp15r")
-lines = Array[ExtResource("1_7atkt")]([SubResource("Resource_7atkt")])
+lines = Array[ExtResource("1_7atkt")]([SubResource("Resource_77kt7")])
 
 [resource]
 script = ExtResource("3_6rfht")
@@ -23,5 +24,5 @@ assumptions = Array[String](["A & B > C"])
 goal = "A > (B > C)"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_jp15r")
+intro_dialogue = SubResource("Resource_5i2ik")
 robot_cue_on_win = "celebrate"

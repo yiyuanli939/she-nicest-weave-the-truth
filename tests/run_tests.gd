@@ -29,12 +29,15 @@ const FILES: Array[String] = [
 	"res://tests/test_settings.gd",
 	"res://tests/test_perf_settings.gd",
 	"res://tests/test_art_alignment.gd",
+	"res://tests/test_locale.gd",
+	"res://tests/test_locale_art.gd",
 ]
 
 
 func _initialize() -> void:
 	# --script 的 _initialize 跑在 root 进树之前:测试里 add_child 到 root 的节点不算在树里(播音频/建 Tween 会报错),先等一帧
 	await process_frame
+	TranslationServer.set_locale(Loc.DEFAULT)   # 测试一律中文:断言按中文键找按钮;没有 Game autoload 时 locale 会是系统语言
 	var total := 0
 	var fails := 0
 	for path in FILES:

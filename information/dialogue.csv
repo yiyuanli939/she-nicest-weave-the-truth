@@ -1,105 +1,105 @@
-1.如果“主角表情”和“左位人物表情”留空的话，就使用对应人物的默认表情 2. 4-3的剧情在玩家关卡完成之后播放，播放完毕以后淡入一个纯黑色场景，上面用稍微大一些的字号、白色颜色的字体书写“感谢游玩”，然后淡出到开发者信息界面 3.除4-3以外，所有剧情在进入关卡前播放,,,,,,
-关卡,场景,主角表情,左位人物,左位人物表情,发言人,语句
-1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。
-1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。
-1-1,工坊,惊讶,莉娅·科尔宾,,诺拉·拉芙蒂,这些就是静语织机？我以为我们做的是……布料。
-1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,普通织坊才用那种织布机。我们织的是静语纹。门锁认它，邮报机认它，契约柜和新式自动机也认它。没有这些纹样，半个伦敦都得装聋作哑。
-1-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。
-1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。
-1-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。
-1-1,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。
-1-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,科尔宾女士。今日的学院程式已经送到。新学徒？
-1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,诺拉·拉芙蒂。手还生，但眼睛不差。
-1-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,很好。静语纹允许有手工差异，但不允许偏离程式。请记住这一点，拉芙蒂小姐。
-1-1,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,是，威客利夫先生。
-1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,今天学“并织”。左路已经稳定，右路也已经稳定，就能把两路并成一个纹样；反过来，从完整并织里也能单独取出其中一路。
-1-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,也就是说，不是把两条线搅在一起，而是要保留它们各自成立的结构。
-1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,对。记住，静语丝不是越多越好，关系对了才算纹样。
-1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,哪一步没看明白，也可以问小织。墙边那个小家伙是工坊新进的小型机器人助手，基础织法和机器怎么用，它都能提醒你。
-1-2,工坊,惊讶,莉娅·科尔宾,,诺拉·拉芙蒂,机器人也能教人织静语纹？
-1-2,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,教你上路而已。别太依赖它——等纹样越来越复杂，现成的提醒就不够用了。真碰上没见过的问题，最后还是得靠你自己想。
-1-2,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,还有，机器要是出现怪响、回针、余光，都写进工坊记录。学院未必肯收，但我们自己得记。
-1-2,工坊,惊讶,莉娅·科尔宾,严肃,诺拉·拉芙蒂,学院为什么不收？
-1-2,工坊,惊讶,莉娅·科尔宾,苦恼,莉娅·科尔宾,他们管这叫“经验现象”。没有学院的人署名，就进不了正式档案。别皱眉，我都抱怨好多年了。
-1-4,伦敦街上,惊讶,无,,诺拉·拉芙蒂,以前走这条街从没注意过……门边的铜槽、邮报机的滚轮，连路口信号器背后都有静语纹。
-1-4,伦敦街上,惊讶,无,,诺拉·拉芙蒂,原来我们白天织的那一小块，真的会跑到这里来。
-1-4,伦敦街上,,亚瑟·威客利夫,,亚瑟·威客利夫,拉芙蒂小姐？这么晚还在研究市政器件？
-1-4,伦敦街上,,亚瑟·威客利夫,,诺拉·拉芙蒂,只是觉得奇怪。它们看起来都不一样，却能认同一种纹样。
-1-4,伦敦街上,,亚瑟·威客利夫,,亚瑟·威客利夫,因为外形只是载体。真正统一它们的是学院给出的程式。工坊的任务，是把程式可靠地实现出来。
-1-5,工坊,惊讶,无,,诺拉·拉芙蒂,威客利夫先生走得真急……等等，检验台下面这本黑色笔记，是他的吧？
-1-5,工坊,严肃,无,,诺拉·拉芙蒂,威客利夫先生的……我明天还给他吧。
-1-5,诺拉房间,严肃,无,,诺拉·拉芙蒂,我只是想确认扉页上的名字……这页画的结构怎么这么眼熟？
-1-5,诺拉房间,严肃,无,,诺拉·拉芙蒂,我们有A为真，也有B为真，因此可以得到“A且B”，或者说“A合取B”为真……
-1-5,诺拉房间,惊讶,无,,诺拉·拉芙蒂,把字符换成颜色，把“为真”换成“纹样”……这不就是……并织吗？
-2-1,诺拉房间,严肃,无,,诺拉·拉芙蒂,先不看太深。我把这几条最简单的符号抄下来，和工坊的织法一条条对着试。
-2-1,诺拉房间,严肃,无,,诺拉·拉芙蒂,如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,还有对于你现在来说可能最难以理解的机器——封程机。
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,我们可以直接在封程机上绕过一切规则自由钉出纹样。
-2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,那代价呢？
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。
-2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。
-2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。
-2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,学院的写法？
-2-2,工坊,严肃,莉娅·科尔宾,,诺拉·拉芙蒂,我只是……在书上见过类似的符号。
-2-2,工坊,严肃,莉娅·科尔宾,苦恼,莉娅·科尔宾,随你怎么记。只要别把线引错地方。
-2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。
-2-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,在检验台下面。我昨晚才发现是您的。给您。
-2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,谢谢。你翻过吗？
-2-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,只看见了几页。那些规则……和我们的织法很像。
-2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。
-2-3,工坊,苦恼,亚瑟·威客利夫,,诺拉·拉芙蒂,可如果规则完全一样呢？
-2-3,工坊,苦恼,亚瑟·威客利夫,,亚瑟·威客利夫,那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。
-2-4,工坊,惊讶,无,,诺拉·拉芙蒂,莉娅，刚才那台旧织机怎么同时闪了两道光？你停机也太熟练了，难道经常这样？
-2-4,工坊,惊讶,无,,诺拉·拉芙蒂,刚才那两道光是怎么回事？
-2-4,工坊,惊讶,莉娅·科尔宾,苦恼,莉娅·科尔宾,三号静语丝受潮后的“余响”。上一种状态有时候不会立刻消干净，会和下一种叠一小会儿。
-2-4,工坊,苦恼,莉娅·科尔宾,苦恼,诺拉·拉芙蒂,学院知道吗？
-2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,我两年前就写过。湿度、线批、出现次数，全记了。
-2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,他们把纸退回来，说“缺乏合资格观察者确认，不纳入公档”。后来我就把它钉在我们自己的记录册里了。
-2-4,工坊,苦恼,莉娅·科尔宾,苦恼,诺拉·拉芙蒂,可如果它真的会影响机器呢？
-2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,那就等机器出事以后，他们再派一位先生来重新发现一遍吧。
-2-5,诺拉房间,苦恼,无,,诺拉·拉芙蒂,他们把同一种规则写成符号，就说那是知识；我们把它织进机器里，却只算手艺。
-3-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,本周起，工坊要优先供应市政自动机的新式静语纹。它们会根据多个可能条件自行选择通路，因此对分路纹样的要求更严格。
-3-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,正好。诺拉，今天学“岔纹”。一条已经成立的纹样，可以结合你自己钉的任意纹样，得到一张“茬纹”，这次可是实纹哦，很方便吧。
-3-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,还有汇路机，机如其名，放进一个岔纹，它会给出两个虚纹，如果通过这两条虚纹都可以引回同一个纹样，那被引回的纹样就会被输出为可以验收的实纹。
-3-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……
-3-1,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,你最近越来越爱给织法起学院名字了。
-3-1,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,不过这批机器用的三号丝太多了。天气再闷一点，我可不喜欢它们把余响也当成一条新路。
-3-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,三号丝已经通过学院规格测试。只要纹样严格按程式制作，就不会产生未定义状态。
-3-1,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,是啊。纸上一直很干燥。
-3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,连着下了几天雨以后就不对劲了。邮报机把一封信判给两条路，清扫机来回改向，连门禁都能同时亮“允许”和“拒绝”。
-3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,它不是选错了一条路……它像是同时认出了两条互相冲突的状态。
-3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,小织也是，前几天被人不小心放在窗台旁淋了雨，现在连句完整的话都说不出来，机械厂来的维修工却说他们也找不到问题……
-3-2,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,请远离那台机器。学院已经收到异常报告。初步判断是部分工坊纹样偏离程式。
-3-2,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,如果纹样没偏呢？
-3-2,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,那么就只能是推演器本身发生了故障。
-3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,异常已经从偶发变成连锁故障。学院封存了第一批自动机，现在要求工坊交出这批静语纹的全部生产记录。
-3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,所有出问题的机型都使用了这里生产的纹样。学院需要确认是否存在同一类织造误差。
-3-3,工坊,严肃,莉娅·科尔宾,严肃,莉娅·科尔宾,你们要记录？那把两年前退给我的那张也一起拿走。
-3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,科尔宾女士，那份记录没有进入学院档案。它没有经过合资格观察者复核。
-3-3,工坊,严肃,莉娅·科尔宾,苦恼,莉娅·科尔宾,湿气可没读过你们的资格条例。
-3-3,工坊,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,威客利夫先生，那份记录具体写了什么？
-3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,三号静语丝在高湿环境下可能短暂保留前一状态。学院测试没有复现，因此没有采纳。
-3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,听见警报了吗？又有一整条街区的新式自动机进入紧急停机。情况比学院预想的更快。
-4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,我们已经关闭大部分自动机，但停机前的记录更糟。同一扇门被要求同时开启、锁死、报警，甚至执行和门毫无关系的命令。
-4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,推演记录里出现了矛盾。一旦系统得到某命题与它的否定，就会形成底部矛盾；而现行程式允许从矛盾推出任意后续命令。
-4-1,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。
-4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,……是。我们原以为推演器损坏了。但目前没有发现非法推演。
-4-1,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,那就不是结论出了问题。要往前找。
-4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。
-4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。
-4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。
-4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。
-4-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,威客利夫先生，别再检查推演步骤了。请检查这个前提：三号静语丝在高湿环境中不会保留前一状态。
-4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,那是材料规范的一部分。学院做过测试。
-4-3,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,那就再做一次。用我们工坊的湿度，用连续工作六个小时后的线，不要用实验室里刚拆封的样品。
-4-3,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,蒸汽阀已经调到工坊平时的湿度了。诺拉，先让三号丝承载“闭合”，马上切成“开启”——看读取器，两道灯同时亮了。
-4-3,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,前一状态没有消失。莉娅的记录是真的。
-4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,……那么学院写入自动机的材料前提是假的。所有依赖唯一状态的程式，都可能把余响读成矛盾。
-4-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,推理没有背叛你们。它只是忠实地接受了你们允许它接受的前提。
-4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,我会要求撤回那条材料前提，并把科尔宾女士的原始记录连同复现实验一并送入公档。
-4-3,工坊,,莉娅·科尔宾,,莉娅·科尔宾,这回记得把我的名字也写上。
-4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,当然。莉娅·科尔宾。
-4-3,诺拉房间,,无,,诺拉·拉芙蒂,威客利夫先生向学院和管理局提交了申请，随着管理局协议的变化，机器重新启动了。
-4-3,诺拉房间,,无,,诺拉·拉芙蒂,织机声和昨天没什么不同……但我似乎感觉到自己对这份工作的心情有所变化，是什么呢……
+1.如果“主角表情”和“左位人物表情”留空的话，就使用对应人物的默认表情 2. 4-3的剧情在玩家关卡完成之后播放，播放完毕以后淡入一个纯黑色场景，上面用稍微大一些的字号、白色颜色的字体书写“感谢游玩”，然后淡出到开发者信息界面 3.除4-3以外，所有剧情在进入关卡前播放,,,,,,,
+关卡,场景,主角表情,左位人物,左位人物表情,发言人,语句,语句_en
+1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。,"First time at the Silent Pattern workshop in the East End? Don't let the machines scare you. They don't weave cloth; they braid silent threads of different colors into silent patterns, and the whole city is waiting on them."
+1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。,You're the new apprentice weaver? Nora Lafferty? I'm Lia Corbin. Keep away from the machines with the brass lamps lit for now; their tempers are worse than the foreman's.
+1-1,工坊,惊讶,莉娅·科尔宾,,诺拉·拉芙蒂,这些就是静语织机？我以为我们做的是……布料。,So these are the silent looms? I thought we made… cloth.
+1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,普通织坊才用那种织布机。我们织的是静语纹。门锁认它，邮报机认它，契约柜和新式自动机也认它。没有这些纹样，半个伦敦都得装聋作哑。,"Ordinary workshops use looms for cloth. We weave silent patterns. Door locks read them, post machines read them, so do contract cabinets and the new automatons. Without these patterns, half of London would go deaf and dumb."
+1-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。,"I'll write it all down. I keep notes out of habit: new weaves, machine rules, whatever I can put on paper, I do."
+1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。,"That's a good habit. There's plenty to remember in a workshop. Once you're busy, you'll see how many times a notebook saves you."
+1-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。,But I heard that what really drives these machines are the “programmes” written by the Academy. They're so rigorous and so intricate that no ordinary person can grasp them; only the most rational gentlemen of the Academy can master them.
+1-1,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。,The Academy writes its symbols; we weave the patterns by the rules. What counts as “real learning” is the gentlemen's favorite thing to argue about. We just keep the city from grinding to a halt.
+1-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,科尔宾女士。今日的学院程式已经送到。新学徒？,Miss Corbin. Today's Academy programmes have been delivered. A new apprentice?
+1-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,诺拉·拉芙蒂。手还生，但眼睛不差。,"Nora Lafferty. Her hands are green, but her eyes are sharp."
+1-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,很好。静语纹允许有手工差异，但不允许偏离程式。请记住这一点，拉芙蒂小姐。,"Very well. Silent patterns allow for handwork variation, but never for straying from the programme. Remember that, Miss Lafferty."
+1-1,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,是，威客利夫先生。,"Yes, Mr. Wycliffe."
+1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,今天学“并织”。左路已经稳定，右路也已经稳定，就能把两路并成一个纹样；反过来，从完整并织里也能单独取出其中一路。,"Today we learn “plying”. When the left path is settled and the right path is settled too, you can ply the two into one pattern; and the other way round, from a finished plied pattern you can pull out either path on its own."
+1-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,也就是说，不是把两条线搅在一起，而是要保留它们各自成立的结构。,So it isn't tangling two threads together; it's keeping the structure that each one holds on its own.
+1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,对。记住，静语丝不是越多越好，关系对了才算纹样。,Right. And remember: more silent thread isn't better. It's only a pattern when the relations are right.
+1-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,哪一步没看明白，也可以问小织。墙边那个小家伙是工坊新进的小型机器人助手，基础织法和机器怎么用，它都能提醒你。,"If there's a step you don't follow, you can also ask Bobbin. That little fellow by the wall is the workshop's new little robot helper; it can remind you of the basic weaves and how the machines work."
+1-2,工坊,惊讶,莉娅·科尔宾,,诺拉·拉芙蒂,机器人也能教人织静语纹？,A robot can teach people to weave silent patterns?
+1-2,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,教你上路而已。别太依赖它——等纹样越来越复杂，现成的提醒就不够用了。真碰上没见过的问题，最后还是得靠你自己想。,"Only enough to get you started. Don't lean on it too much — once the patterns get complicated, ready-made reminders won't be enough. When you hit a problem nobody has seen, in the end you'll have to think it through yourself."
+1-2,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,还有，机器要是出现怪响、回针、余光，都写进工坊记录。学院未必肯收，但我们自己得记。,"Another thing: if a machine makes a strange noise, backstitches, or shows an afterglow, write it in the workshop record. The Academy may not accept it, but we keep our own."
+1-2,工坊,惊讶,莉娅·科尔宾,严肃,诺拉·拉芙蒂,学院为什么不收？,Why wouldn't the Academy accept it?
+1-2,工坊,惊讶,莉娅·科尔宾,苦恼,莉娅·科尔宾,他们管这叫“经验现象”。没有学院的人署名，就进不了正式档案。别皱眉，我都抱怨好多年了。,They call it an “empirical phenomenon”. Without an Academy man's signature it never enters the official archive. Don't frown; I've been complaining about it for years.
+1-4,伦敦街上,惊讶,无,,诺拉·拉芙蒂,以前走这条街从没注意过……门边的铜槽、邮报机的滚轮，连路口信号器背后都有静语纹。,"I never noticed on this street before… the brass grooves by the doors, the rollers of the post machine, even the back of the signal box at the crossing has silent patterns."
+1-4,伦敦街上,惊讶,无,,诺拉·拉芙蒂,原来我们白天织的那一小块，真的会跑到这里来。,So the little piece we weave by day really does end up out here.
+1-4,伦敦街上,,亚瑟·威客利夫,,亚瑟·威客利夫,拉芙蒂小姐？这么晚还在研究市政器件？,Miss Lafferty? Studying municipal fittings this late?
+1-4,伦敦街上,,亚瑟·威客利夫,,诺拉·拉芙蒂,只是觉得奇怪。它们看起来都不一样，却能认同一种纹样。,"It just seems strange. They all look different, yet they recognize the same kind of pattern."
+1-4,伦敦街上,,亚瑟·威客利夫,,亚瑟·威客利夫,因为外形只是载体。真正统一它们的是学院给出的程式。工坊的任务，是把程式可靠地实现出来。,Because the casing is only a carrier. What truly unites them is the programme the Academy sets out. The workshop's task is to realize the programme reliably.
+1-5,工坊,惊讶,无,,诺拉·拉芙蒂,威客利夫先生走得真急……等等，检验台下面这本黑色笔记，是他的吧？,"Mr. Wycliffe left in such a hurry… wait, this black notebook under the inspection bench, it's his, isn't it?"
+1-5,工坊,严肃,无,,诺拉·拉芙蒂,威客利夫先生的……我明天还给他吧。,Mr. Wycliffe's… I'll return it tomorrow.
+1-5,诺拉房间,严肃,无,,诺拉·拉芙蒂,我只是想确认扉页上的名字……这页画的结构怎么这么眼熟？,I only wanted to check the name on the flyleaf… why does the structure drawn on this page look so familiar?
+1-5,诺拉房间,严肃,无,,诺拉·拉芙蒂,我们有A为真，也有B为真，因此可以得到“A且B”，或者说“A合取B”为真……,"We have A true, and we have B true, therefore we may obtain “A and B”, or in other words “A conjoined with B”, as true…"
+1-5,诺拉房间,惊讶,无,,诺拉·拉芙蒂,把字符换成颜色，把“为真”换成“纹样”……这不就是……并织吗？,"Swap the letters for colors, swap “true” for “pattern”… isn't this just… plying?"
+2-1,诺拉房间,严肃,无,,诺拉·拉芙蒂,先不看太深。我把这几条最简单的符号抄下来，和工坊的织法一条条对着试。,Let's not go too deep yet. I'll copy out these few simplest symbols and test them one by one against the workshop's weaves.
+2-1,诺拉房间,严肃,无,,诺拉·拉芙蒂,如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。,"If A and B can be plied into A-conjoined-with-B, then at the very least these symbols aren't describing something else… they and the workshop's looms are describing the same structure."
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。,"Today we learn “redeeming”. If you have a layered pattern of red over blue, and a red thread besides, you can draw out the blue thread."
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,还有对于你现在来说可能最难以理解的机器——封程机。,And then there's the machine that may be the hardest for you to understand right now — the Sealing Loom.
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,我们可以直接在封程机上绕过一切规则自由钉出纹样。,"On the Sealing Loom we can pin any pattern we like, freely, bypassing every rule."
+2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,那代价呢？,And the price?
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。,"Good question! Such a pattern is a kind of “phantom pattern”: it can be fed into other looms, but only into looms; it can't be handed in for inspection as it is."
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。,"But a new pattern you make with the phantom can be fed back into the Sealing Loom, which produces a layered pattern with what you pinned on top and the new pattern below — and that layered pattern is a “solid pattern” that passes inspection."
+2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。,"In the Academy's notation… A, together with “if A holds, then B holds”, or “A implies B”, gives you B."
+2-2,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。,"Assume A; if you can obtain B, then you obtain “if A holds, then B holds”."
+2-2,工坊,,莉娅·科尔宾,,莉娅·科尔宾,学院的写法？,The Academy's notation?
+2-2,工坊,严肃,莉娅·科尔宾,,诺拉·拉芙蒂,我只是……在书上见过类似的符号。,I've just… seen symbols like these in a book.
+2-2,工坊,严肃,莉娅·科尔宾,苦恼,莉娅·科尔宾,随你怎么记。只要别把线引错地方。,Note it however you like. Just don't lead the thread astray.
+2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。,"Miss Lafferty, have you seen a black notebook? I may have left it here yesterday."
+2-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,在检验台下面。我昨晚才发现是您的。给您。,Under the inspection bench. I only found out last night that it was yours. Here.
+2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,谢谢。你翻过吗？,Thank you. Did you look through it?
+2-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,只看见了几页。那些规则……和我们的织法很像。,Only a few pages. Those rules… they look very much like our weaves.
+2-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。,Similar operations are not the same as the same knowledge. The workshop knows how to make stable patterns; the Academy studies why they must hold.
+2-3,工坊,苦恼,亚瑟·威客利夫,,诺拉·拉芙蒂,可如果规则完全一样呢？,But what if the rules are exactly the same?
+2-3,工坊,苦恼,亚瑟·威客利夫,,亚瑟·威客利夫,那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。,"Even then it needs definitions, proofs, and verifiable records. Without those, experience can hardly become knowledge."
+2-4,工坊,惊讶,无,,诺拉·拉芙蒂,莉娅，刚才那台旧织机怎么同时闪了两道光？你停机也太熟练了，难道经常这样？,"Lia, how did that old loom flash two lights at once just now? And you stopped it so smoothly — does this happen often?"
+2-4,工坊,惊讶,无,,诺拉·拉芙蒂,刚才那两道光是怎么回事？,What were those two lights just now?
+2-4,工坊,惊讶,莉娅·科尔宾,苦恼,莉娅·科尔宾,三号静语丝受潮后的“余响”。上一种状态有时候不会立刻消干净，会和下一种叠一小会儿。,The “afterglow” of number three silent thread after it gets damp. Sometimes the previous state doesn't clear right away and overlaps with the next one for a moment.
+2-4,工坊,苦恼,莉娅·科尔宾,苦恼,诺拉·拉芙蒂,学院知道吗？,Does the Academy know?
+2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,我两年前就写过。湿度、线批、出现次数，全记了。,"I wrote it up two years ago. Humidity, thread batch, how often it happened, all of it."
+2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,他们把纸退回来，说“缺乏合资格观察者确认，不纳入公档”。后来我就把它钉在我们自己的记录册里了。,"They sent the paper back, saying “lacks confirmation by a qualified observer; not entered into the public archive”. After that I pinned it in our own record book."
+2-4,工坊,苦恼,莉娅·科尔宾,苦恼,诺拉·拉芙蒂,可如果它真的会影响机器呢？,But what if it really does affect the machines?
+2-4,工坊,苦恼,莉娅·科尔宾,苦恼,莉娅·科尔宾,那就等机器出事以后，他们再派一位先生来重新发现一遍吧。,"Then let's wait until a machine breaks down, and they can send a gentleman to discover it all over again."
+2-5,诺拉房间,苦恼,无,,诺拉·拉芙蒂,他们把同一种规则写成符号，就说那是知识；我们把它织进机器里，却只算手艺。,They write the same rule in symbols and call it knowledge; we weave it into the machines and it only counts as craft.
+3-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,本周起，工坊要优先供应市政自动机的新式静语纹。它们会根据多个可能条件自行选择通路，因此对分路纹样的要求更严格。,"From this week the workshop is to give priority to the new silent patterns for the municipal automatons. They choose their own paths according to several possible conditions, so the demands on forked patterns are stricter."
+3-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,正好。诺拉，今天学“岔纹”。一条已经成立的纹样，可以结合你自己钉的任意纹样，得到一张“茬纹”，这次可是实纹哦，很方便吧。,"Good timing. Nora, today we learn “forking”. A pattern that already holds can be joined with any pattern you pin yourself to give a “fork pattern” — and this time it's a solid one. Handy, isn't it?"
+3-1,工坊,,莉娅·科尔宾,,莉娅·科尔宾,还有汇路机，机如其名，放进一个岔纹，它会给出两个虚纹，如果通过这两条虚纹都可以引回同一个纹样，那被引回的纹样就会被输出为可以验收的实纹。,"Then there's the Merging Loom, true to its name: feed it a fork pattern and it gives out two phantoms; if both phantoms can be led back to the same pattern, that pattern comes out as a solid one that passes inspection."
+3-1,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……,"A holds, so “A or B”, “A disjoined with B”, holds… and when A or B holds, if A implies C and B implies C, then C holds too…"
+3-1,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,你最近越来越爱给织法起学院名字了。,You've grown fond of giving the weaves Academy names lately.
+3-1,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,不过这批机器用的三号丝太多了。天气再闷一点，我可不喜欢它们把余响也当成一条新路。,"But this batch of machines uses far too much number three thread. If the weather gets any closer, I won't like them taking an afterglow for a new path."
+3-1,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,三号丝已经通过学院规格测试。只要纹样严格按程式制作，就不会产生未定义状态。,"Number three thread has passed the Academy's specification tests. As long as the patterns are made strictly to the programme, no undefined state will arise."
+3-1,工坊,,莉娅·科尔宾,苦恼,莉娅·科尔宾,是啊。纸上一直很干燥。,Right. It's always dry on paper.
+3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,连着下了几天雨以后就不对劲了。邮报机把一封信判给两条路，清扫机来回改向，连门禁都能同时亮“允许”和“拒绝”。,"After several days of rain things went wrong. The post machine sends one letter down two routes, the sweepers keep changing direction, even the door guards light “allow” and “deny” at the same time."
+3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,它不是选错了一条路……它像是同时认出了两条互相冲突的状态。,It didn't pick the wrong path… it's as if it recognized two conflicting states at once.
+3-2,伦敦街上,苦恼,无,,诺拉·拉芙蒂,小织也是，前几天被人不小心放在窗台旁淋了雨，现在连句完整的话都说不出来，机械厂来的维修工却说他们也找不到问题……,"Bobbin too. A few days ago someone left it by the window and it got rained on; now it can't get a whole sentence out, and the repairman from the machine works says they can't find the fault either…"
+3-2,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,请远离那台机器。学院已经收到异常报告。初步判断是部分工坊纹样偏离程式。,Please keep away from that machine. The Academy has received the anomaly reports. The preliminary judgment is that some workshop patterns have strayed from the programme.
+3-2,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,如果纹样没偏呢？,And if the patterns haven't strayed?
+3-2,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,那么就只能是推演器本身发生了故障。,Then the only possibility is a fault in the reasoning engine itself.
+3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,异常已经从偶发变成连锁故障。学院封存了第一批自动机，现在要求工坊交出这批静语纹的全部生产记录。,The anomalies have gone from occasional to a chain of failures. The Academy has sealed the first batch of automatons and now requires the workshop to hand over the full production records for these silent patterns.
+3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,所有出问题的机型都使用了这里生产的纹样。学院需要确认是否存在同一类织造误差。,Every model that failed used patterns made here. The Academy needs to confirm whether there is a common weaving error.
+3-3,工坊,严肃,莉娅·科尔宾,严肃,莉娅·科尔宾,你们要记录？那把两年前退给我的那张也一起拿走。,You want records? Then take the sheet you sent back to me two years ago as well.
+3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,科尔宾女士，那份记录没有进入学院档案。它没有经过合资格观察者复核。,"Miss Corbin, that record never entered the Academy archive. It was not reviewed by a qualified observer."
+3-3,工坊,严肃,莉娅·科尔宾,苦恼,莉娅·科尔宾,湿气可没读过你们的资格条例。,The damp has never read your qualification rules.
+3-3,工坊,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,威客利夫先生，那份记录具体写了什么？,"Mr. Wycliffe, what exactly did that record say?"
+3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,三号静语丝在高湿环境下可能短暂保留前一状态。学院测试没有复现，因此没有采纳。,"That number three silent thread may briefly retain its previous state in high humidity. The Academy's tests did not reproduce it, so it was not adopted."
+3-3,工坊,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,听见警报了吗？又有一整条街区的新式自动机进入紧急停机。情况比学院预想的更快。,Do you hear the alarm? Another whole block of new automatons has gone into emergency shutdown. This is moving faster than the Academy expected.
+4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,我们已经关闭大部分自动机，但停机前的记录更糟。同一扇门被要求同时开启、锁死、报警，甚至执行和门毫无关系的命令。,"We've shut down most of the automatons, but the records from before shutdown are worse. The same door was ordered to open, lock, and sound the alarm all at once, and even to carry out commands that had nothing to do with doors."
+4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,推演记录里出现了矛盾。一旦系统得到某命题与它的否定，就会形成底部矛盾；而现行程式允许从矛盾推出任意后续命令。,"A contradiction appeared in the reasoning records. Once the system obtains a proposition and its negation, it forms a bottom contradiction; and the current programme allows any subsequent command to be derived from a contradiction."
+4-1,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。,So those absurd orders weren't the machine breaking the rules. Quite the opposite: every step was inside the rules.
+4-1,伦敦街上,严肃,亚瑟·威客利夫,,亚瑟·威客利夫,……是。我们原以为推演器损坏了。但目前没有发现非法推演。,…Yes. We assumed the reasoning engine was damaged. But so far no illegal inference has been found.
+4-1,伦敦街上,严肃,亚瑟·威客利夫,,诺拉·拉芙蒂,那就不是结论出了问题。要往前找。,Then the conclusions aren't the problem. We have to look further back.
+4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。,"The Academy notebook, the production records, Lia's rejected observation sheet… wait. One thing has been assumed all along: that number three silent thread only ever holds one readable state at a time."
+4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。,"If that premise were true, the afterglow shouldn't exist. But Lia has seen it, and so have I."
+4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。,The machine didn't turn one state into two. Two physical signals were interpreted by the programme as “P” and “not P”.
+4-2,诺拉房间,苦恼,无,,诺拉·拉芙蒂,学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。,What the Academy dismissed wasn't a trivial complaint. It was the very evidence that could have told them the premise was false.
+4-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,威客利夫先生，别再检查推演步骤了。请检查这个前提：三号静语丝在高湿环境中不会保留前一状态。,"Mr. Wycliffe, stop checking the reasoning steps. Please check this premise: that number three silent thread does not retain its previous state in high humidity."
+4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,那是材料规范的一部分。学院做过测试。,That is part of the material specification. The Academy tested it.
+4-3,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,那就再做一次。用我们工坊的湿度，用连续工作六个小时后的线，不要用实验室里刚拆封的样品。,"Then test it again. With our workshop's humidity, with thread that has run for six hours straight, not a sample fresh out of its wrapping in a laboratory."
+4-3,工坊,,莉娅·科尔宾,严肃,莉娅·科尔宾,蒸汽阀已经调到工坊平时的湿度了。诺拉，先让三号丝承载“闭合”，马上切成“开启”——看读取器，两道灯同时亮了。,"The steam valve is set to the workshop's usual humidity. Nora, have number three thread carry “closed” first, then switch it straight to “open” — watch the reader: both lamps lit at once."
+4-3,工坊,,莉娅·科尔宾,,诺拉·拉芙蒂,前一状态没有消失。莉娅的记录是真的。,The previous state didn't vanish. Lia's record was true.
+4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,……那么学院写入自动机的材料前提是假的。所有依赖唯一状态的程式，都可能把余响读成矛盾。,…Then the material premise the Academy wrote into the automatons is false. Every programme that relies on a single state may read an afterglow as a contradiction.
+4-3,工坊,,亚瑟·威客利夫,,诺拉·拉芙蒂,推理没有背叛你们。它只是忠实地接受了你们允许它接受的前提。,The reasoning never betrayed you. It only faithfully accepted the premises you allowed it to accept.
+4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,我会要求撤回那条材料前提，并把科尔宾女士的原始记录连同复现实验一并送入公档。,"I will ask for that material premise to be withdrawn, and have Miss Corbin's original record entered into the public archive together with the reproduction experiment."
+4-3,工坊,,莉娅·科尔宾,,莉娅·科尔宾,这回记得把我的名字也写上。,This time remember to put my name on it too.
+4-3,工坊,,亚瑟·威客利夫,,亚瑟·威客利夫,当然。莉娅·科尔宾。,Of course. Lia Corbin.
+4-3,诺拉房间,,无,,诺拉·拉芙蒂,威客利夫先生向学院和管理局提交了申请，随着管理局协议的变化，机器重新启动了。,"Mr. Wycliffe submitted the petition to the Academy and the Authority, and as the Authority's protocols changed, the machines started up again."
+4-3,诺拉房间,,无,,诺拉·拉芙蒂,织机声和昨天没什么不同……但我似乎感觉到自己对这份工作的心情有所变化，是什么呢……,The sound of the looms is no different from yesterday… but I seem to feel that something in how I think about this work has changed. What could it be…

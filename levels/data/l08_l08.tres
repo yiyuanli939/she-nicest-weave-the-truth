@@ -4,60 +4,67 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_e2nhv"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_whgl2"]
 
-[sub_resource type="Resource" id="Resource_flmij"]
+[sub_resource type="Resource" id="Resource_1j3q3"]
 script = ExtResource("1_flmij")
 speaker = "亚瑟·威客利夫"
 text = "拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。"
+text_en = "Miss Lafferty, have you seen a black notebook? I may have left it here yesterday."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_e2nhv"]
+[sub_resource type="Resource" id="Resource_trim7"]
 script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
 text = "在检验台下面。我昨晚才发现是您的。给您。"
+text_en = "Under the inspection bench. I only found out last night that it was yours. Here."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_whgl2"]
+[sub_resource type="Resource" id="Resource_na7fi"]
 script = ExtResource("1_flmij")
 speaker = "亚瑟·威客利夫"
 text = "谢谢。你翻过吗？"
+text_en = "Thank you. Did you look through it?"
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_568a1"]
+[sub_resource type="Resource" id="Resource_1trig"]
 script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
 text = "只看见了几页。那些规则……和我们的织法很像。"
+text_en = "Only a few pages. Those rules… they look very much like our weaves."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_8tgij"]
+[sub_resource type="Resource" id="Resource_dbvdn"]
 script = ExtResource("1_flmij")
 speaker = "亚瑟·威客利夫"
 text = "相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。"
+text_en = "Similar operations are not the same as the same knowledge. The workshop knows how to make stable patterns; the Academy studies why they must hold."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_bpotd"]
+[sub_resource type="Resource" id="Resource_mn6vw"]
 script = ExtResource("1_flmij")
 speaker = "诺拉·拉芙蒂"
 text = "可如果规则完全一样呢？"
+text_en = "But what if the rules are exactly the same?"
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_hnd1j"]
+[sub_resource type="Resource" id="Resource_fq3od"]
 script = ExtResource("1_flmij")
 speaker = "亚瑟·威客利夫"
 text = "那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。"
+text_en = "Even then it needs definitions, proofs, and verifiable records. Without those, experience can hardly become knowledge."
 scene = "工坊"
 left_char = "亚瑟"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_jljsi"]
+[sub_resource type="Resource" id="Resource_r0vmd"]
 script = ExtResource("2_e2nhv")
-lines = Array[ExtResource("1_flmij")]([SubResource("Resource_flmij"), SubResource("Resource_e2nhv"), SubResource("Resource_whgl2"), SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j")])
+lines = Array[ExtResource("1_flmij")]([SubResource("Resource_1j3q3"), SubResource("Resource_trim7"), SubResource("Resource_na7fi"), SubResource("Resource_1trig"), SubResource("Resource_dbvdn"), SubResource("Resource_mn6vw"), SubResource("Resource_fq3od")])
 
 [resource]
 script = ExtResource("3_whgl2")
@@ -67,5 +74,5 @@ assumptions = Array[String](["A > B", "B > C"])
 goal = "A > C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_jljsi")
+intro_dialogue = SubResource("Resource_r0vmd")
 robot_cue_on_win = "celebrate"

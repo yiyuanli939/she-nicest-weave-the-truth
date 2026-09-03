@@ -83,7 +83,9 @@ Windows 下第一条用 `py -3 tools/xlsx_to_csv.py`(转换器只用 Python 标�
 
 ## 机器人语音台词
 
-`hardware/firmware/sounds/*.wav`(greet/win/encourage/panic/calm/hint),音色为微软 XiaoyiNeural(小智同款)。改词:
+`hardware/firmware/sounds/*.wav`(greet/win/encourage/hint/calm 中文 + 同名 `_en` 英文;英文模式下游戏发 `say <名>_en`,固件按文件名找,没有该 wav 退回中文),
+配置在 `hardware/firmware/sounds/lines.json`(`voice`/`lines` 中文,`voice_en`/`lines_en` 英文);最省事的改法是游戏「小机维护」面板里改台词 →「保存并生成语音」→「刷入固件与语音」。
+命令行改一句(中文 XiaoyiNeural = 小智同款,英文默认 en-GB-SoniaNeural):
 ```bash
 hardware/.venv/bin/edge-tts --voice zh-CN-XiaoyiNeural --text "新台词" --write-media t.mp3
 afconvert -f WAVE -d LEI16@16000 -c 1 t.mp3 hardware/firmware/sounds/win.wav && rm t.mp3
@@ -102,6 +104,23 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 槽位表、挂点与换法见 `assets/sfx/音效位置.md`:换音效 = 覆盖 `assets/sfx/<槽位>.ogg`(或 .wav);几个操作共用一个文件就在
 `game/sfx.gd` `CLIPS` 里指到同一路径;响度不一在 `GAIN_DB` 按槽位填 dB(`tools/sfx_audit.py` 给建议值并报刺耳的);
 `--import` 后把 `.import` 一起提交。候选方案在 `assets/sfx/候选/`(每套一个文件夹,`说明.md` 写了每个文件从哪来)。
+
+## 英文版 / 改翻译(2026-09-03:设置里「语言:中文 / Language: English」一点切换)
+
+机制 = Godot TranslationServer,**翻译表 `locale/ui.csv`**(三列 `keys,zh,en`,**键就是代码里的中文原串**,zh 列 = 键):
+UI 上所有 Label / Button / tooltip / 节点标题默认自动查表(auto_translate),所以代码里 `text = "继续"` 一行不改、表里加一行即换。
+- **改英文文案**:直接改 `locale/ui.csv` 的 en 列(Excel / 文本编辑器都行;含逗号或换行的格子用引号包住),然后 `godot --headless --path . --import`
+  重生成 `locale/ui.zh.translation` / `ui.en.translation`(连 `.import` 一起提交)。英文只许 ASCII + “ ” ‘ ’ – — …(站酷小薇体没有重音字母)。
+- **代码里新加了一句中文** → 表里加一行(`tests/test_locale.gd` 会扫所有含汉字的字面量,不在表里就红;内部键如角色名/表情名在它的 EXCLUDE 里)。
+  拼接出来的串查不到表:开关文字写成整串键(「全屏:开」「全屏:关」),带参数的用 `tr("台词「%s」为空") % cue`。
+- **关名 / 章名 / 仪器名 / 角色全名**:`.tres` 与 `logic/rules.gd`、`narrative/story_art.gd` 保持中文(它们同时是美术登记键),只在表里给英文。
+- **台词**:剧情表 `information/dialogue.csv` 多一列 **`语句_en`**(也认 `台词_en` / `英文语句`),`tools/import_dialogue.gd` 写进 `DialogueLine.text_en`;
+  英文模式按 `Loc.line_text` 取,某句译文空则仍显示中文。策划的 xlsx 没有这一列:`tools/xlsx_to_csv.py` 重导时会按(关卡, 发言人, 语句)把旧 CSV 的译文并回来
+  (台词改了的句子译文留空,等重译)。译文与 .tres 逐句一致由 `tests/test_levels.gd` 盯。
+- **烧了中文的美术图**(7 页笔记、`win_popup.png`「织成了!」、`palette_bg.png`「仪器架」、`story/base.png`「按任意键继续」、`title.png`「织理者」):
+  英文模式按 `project.godot` `translation_remaps` 换成同目录 `<名字>.en.png`。现在这 11 张是 `tools/gen_locale_art.gd` 生成的**程序占位图**
+  (擦掉中文墨迹、用站酷小薇体写上英文;7 页笔记的英文文案在 `locale/notebook_en.gd`);美术交英文图直接覆盖同名 `.en.png`(尺寸须与原图一致)。
+- **小机**:英文模式说 "please guide me / please help me" 也回头代解;台词 `lines.json` 的 `lines_en` → `<cue>_en.wav`(见「机器人语音台词」)。
 
 ## 验证改动
 

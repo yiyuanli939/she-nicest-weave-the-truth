@@ -4,44 +4,49 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_f8yfv"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_jjorm"]
 
-[sub_resource type="Resource" id="Resource_kjkf3"]
+[sub_resource type="Resource" id="Resource_sk1ha"]
 script = ExtResource("1_kjkf3")
 speaker = "诺拉·拉芙蒂"
 text = "以前走这条街从没注意过……门边的铜槽、邮报机的滚轮，连路口信号器背后都有静语纹。"
+text_en = "I never noticed on this street before… the brass grooves by the doors, the rollers of the post machine, even the back of the signal box at the crossing has silent patterns."
 scene = "伦敦街上"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_f8yfv"]
+[sub_resource type="Resource" id="Resource_nkml8"]
 script = ExtResource("1_kjkf3")
 speaker = "诺拉·拉芙蒂"
 text = "原来我们白天织的那一小块，真的会跑到这里来。"
+text_en = "So the little piece we weave by day really does end up out here."
 scene = "伦敦街上"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_jjorm"]
+[sub_resource type="Resource" id="Resource_lp67d"]
 script = ExtResource("1_kjkf3")
 speaker = "亚瑟·威客利夫"
 text = "拉芙蒂小姐？这么晚还在研究市政器件？"
+text_en = "Miss Lafferty? Studying municipal fittings this late?"
 scene = "伦敦街上"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_odvgm"]
+[sub_resource type="Resource" id="Resource_0wxft"]
 script = ExtResource("1_kjkf3")
 speaker = "诺拉·拉芙蒂"
 text = "只是觉得奇怪。它们看起来都不一样，却能认同一种纹样。"
+text_en = "It just seems strange. They all look different, yet they recognize the same kind of pattern."
 scene = "伦敦街上"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_8crae"]
+[sub_resource type="Resource" id="Resource_vltgm"]
 script = ExtResource("1_kjkf3")
 speaker = "亚瑟·威客利夫"
 text = "因为外形只是载体。真正统一它们的是学院给出的程式。工坊的任务，是把程式可靠地实现出来。"
+text_en = "Because the casing is only a carrier. What truly unites them is the programme the Academy sets out. The workshop's task is to realize the programme reliably."
 scene = "伦敦街上"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_xcogr"]
+[sub_resource type="Resource" id="Resource_f4nwn"]
 script = ExtResource("2_f8yfv")
-lines = Array[ExtResource("1_kjkf3")]([SubResource("Resource_kjkf3"), SubResource("Resource_f8yfv"), SubResource("Resource_jjorm"), SubResource("Resource_odvgm"), SubResource("Resource_8crae")])
+lines = Array[ExtResource("1_kjkf3")]([SubResource("Resource_sk1ha"), SubResource("Resource_nkml8"), SubResource("Resource_lp67d"), SubResource("Resource_0wxft"), SubResource("Resource_vltgm")])
 
 [resource]
 script = ExtResource("3_jjorm")
@@ -51,5 +56,5 @@ assumptions = Array[String](["A & B"])
 goal = "B & A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_xcogr")
+intro_dialogue = SubResource("Resource_f4nwn")
 robot_cue_on_win = "celebrate"

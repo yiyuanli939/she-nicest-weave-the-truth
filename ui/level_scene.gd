@@ -124,15 +124,15 @@ func _build_ui() -> void:
 	_palette.machine_requested.connect(_board.place_machine_at_center)
 
 	# 必需按钮挂在棋盘工具条上(纯文字,悬停变浅走 theme)
-	_board.add_toolbar_item(_make_tool_button("重置", _on_reset))
+	_board.add_toolbar_item(_make_tool_button("重置", _on_reset, &""))   # _on_reset 里响 reset_board
 	if _game != null:
 		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
 		if OS.is_debug_build() and _game.current != null and LevelSolutions.DATA.has(_game.current.id):
-			var answer_btn := _make_tool_button("示答", _on_show_answer)
+			var answer_btn := _make_tool_button("示答", _on_show_answer, &"click")
 			answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
 			answer_btn.modulate.a = 0.7
 			_board.add_toolbar_item(answer_btn)
-		_board.add_toolbar_item(_make_tool_button("选关", _on_back))
+		_board.add_toolbar_item(_make_tool_button("选关", _on_back, &"back"))
 	# 状态文字放在按钮之后:文字长短变化不会把按钮推来推去(通关瞬间按钮曾从鼠标下溜走)
 	_status = Label.new()
 	_status.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
@@ -180,15 +180,13 @@ func _build_ui() -> void:
 	add_child(_win_popup)
 
 
-func _make_tool_button(text: String, cb: Callable) -> Button:
+## sfx = 按钮点击音槽位(&"" 静音);按槽位传,不按文字判 —— 文字是翻译键,英文模式下也不该改行为
+func _make_tool_button(text: String, cb: Callable, sfx: StringName) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
 	b.pressed.connect(cb)
-	if text == "重置":
-		b.set_meta(SoundFx.META, &"")       # _on_reset 里响 reset_board
-	elif text == "选关":
-		b.set_meta(SoundFx.META, &"back")
+	b.set_meta(SoundFx.META, sfx)
 	return b
 
 

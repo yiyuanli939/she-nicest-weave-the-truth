@@ -1,5 +1,6 @@
 {
 	"voice": "zh-CN-XiaoyiNeural",
+	"voice_en": "en-GB-SoniaNeural",
 	"gain": 0.9,
 	"lines": {
 		"greet": "欢迎回来,诺拉!",
@@ -7,5 +8,12 @@
 		"encourage": "别灰心,换个口试试,你可以的!",
 		"hint": "要不要试试仪器架上的新机器?",
 		"calm": "谢谢你,诺拉……"
+	},
+	"lines_en": {
+		"greet": "Welcome back, Nora!",
+		"win": "Wonderful! It's woven!",
+		"encourage": "Don't lose heart, try another port. You can do it!",
+		"hint": "Why not try the new machine on the rack?",
+		"calm": "Thank you, Nora..."
 	}
 }

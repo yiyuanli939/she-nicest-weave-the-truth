@@ -4,23 +4,25 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_pogll"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_ymgb5"]
 
-[sub_resource type="Resource" id="Resource_h5fu7"]
+[sub_resource type="Resource" id="Resource_s2jwe"]
 script = ExtResource("1_h5fu7")
 speaker = "诺拉·拉芙蒂"
 text = "先不看太深。我把这几条最简单的符号抄下来，和工坊的织法一条条对着试。"
+text_en = "Let's not go too deep yet. I'll copy out these few simplest symbols and test them one by one against the workshop's weaves."
 scene = "诺拉房间"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_pogll"]
+[sub_resource type="Resource" id="Resource_bh56a"]
 script = ExtResource("1_h5fu7")
 speaker = "诺拉·拉芙蒂"
 text = "如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。"
+text_en = "If A and B can be plied into A-conjoined-with-B, then at the very least these symbols aren't describing something else… they and the workshop's looms are describing the same structure."
 scene = "诺拉房间"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_ymgb5"]
+[sub_resource type="Resource" id="Resource_vn3tj"]
 script = ExtResource("2_pogll")
-lines = Array[ExtResource("1_h5fu7")]([SubResource("Resource_h5fu7"), SubResource("Resource_pogll")])
+lines = Array[ExtResource("1_h5fu7")]([SubResource("Resource_s2jwe"), SubResource("Resource_bh56a")])
 
 [resource]
 script = ExtResource("3_ymgb5")
@@ -30,5 +32,5 @@ assumptions = Array[String](["A", "A > B"])
 goal = "B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_ymgb5")
+intro_dialogue = SubResource("Resource_vn3tj")
 robot_cue_on_win = "celebrate"

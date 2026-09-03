@@ -1,5 +1,5 @@
 #!/bin/zsh
-# 接入小机(幂等):拉起串口↔ws 桥接(node bridge.js)与语音助手(python speech/listen.py)。
+# 接入小机(幂等):拉起串口↔ws 桥接(node bridge.js)与语音助手(python speech/listen.py,中英同时听)。
 # pid/日志在 hardware/.run/。游戏「小机维护」面板的「接入小机」按钮就是跑这个脚本。
 HW="$(cd "$(dirname "$0")" && pwd)"
 RUN="$HW/.run"
@@ -21,12 +21,13 @@ fi
 
 if alive "$RUN/speech.pid"; then
 	echo "语音助手已在运行(pid $(cat "$RUN/speech.pid"))"
-elif [ ! -f "$HW/speech/model/graph/HCLr.fst" ]; then
-	echo "语音模型缺失:先跑 hardware/speech/get_model.sh(不影响桥接)"
+elif [ ! -f "$HW/speech/model/graph/HCLr.fst" ] && [ ! -f "$HW/speech/model_en/graph/HCLr.fst" ]; then
+	echo "语音模型缺失:先跑 hardware/speech/get_model.sh(中英都下;不影响桥接)"
 elif [ ! -x "$HW/.venv/bin/python" ]; then
 	echo "缺 hardware/.venv(pip install vosk sounddevice)"
 else
-	(cd "$HW" && exec nohup .venv/bin/python speech/listen.py >> "$RUN/speech.log" 2>&1) &
+	# SPEECH_LANG=zh|en|all(默认 all:有模型的语言都听,游戏切语言不用重启)
+	(cd "$HW" && exec nohup .venv/bin/python speech/listen.py --lang "${SPEECH_LANG:-all}" >> "$RUN/speech.log" 2>&1) &
 	echo $! > "$RUN/speech.pid"
 	echo "语音助手已启动(pid $(cat "$RUN/speech.pid"))"
 fi

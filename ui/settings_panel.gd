@@ -2,8 +2,11 @@ class_name SettingsPanel
 extends CanvasLayer
 ## 标题页「设置」弹窗(2026-09-02 用户要求:设置是标题页第五个选项,点进去在弹窗里改,标题页本身不放控件;
 ## 美术文档没有 → 先纯文字 + 常量留位)。半透明遮罩 + 居中乳黄面板(主题 PanelContainer 样式):
-## 「设置」→ 音乐音量(滑条)→ 音效音量(滑条)→ 全屏 开/关 → 小机联动 开/关 → 小机维护(联动开着才显示)→ 关闭(Esc 也关)。
-## 设置落 SaveManager.settings(「重置进度」不清):music_volume / sfx_volume(0..1)、fullscreen(bool);robot_enabled 由 Robot.set_enabled 写。
+## 「设置」→ 音乐音量(滑条)→ 音效音量(滑条)→ 全屏 开/关 → 语言 中文/English → 小机联动 开/关 → 小机维护(联动开着才显示)→ 关闭(Esc 也关)。
+## 设置落 SaveManager.settings(「重置进度」不清):music_volume / sfx_volume(0..1)、fullscreen(bool)、language("zh"|"en",Game.set_language 写);
+## robot_enabled 由 Robot.set_enabled 写。
+## 语言(2026-09-03):「语言:中文」整串是翻译键(en = "Language: English"),点一下 zh ⇄ en 当场全游戏切换(game/loc.gd);
+## 两个开关的文字也都是整串键(「全屏:开」「小机联动:关」),不再拼接 —— 拼出来的串查不到表。
 ## 音量当场生效(Bgm.set_user_volume / Sfx.set_user_volume,启动时各自 _ready 自己读;音效滑条动一下就响一声 slider 让玩家试听);
 ## 全屏当场切窗口模式,下次启动 Game._apply_window_settings 恢复;
 ## 小机联动 = 无机器人模式开关(与维护面板「机器人:已启用 / 无机器人模式」同一个开关),Web 版没有机器人,这两行不显示。
@@ -26,6 +29,7 @@ const KNOB_COLOR := Color(0.42, 0.23, 0.2)
 const DIM_COLOR := Color(0, 0, 0, 0.45)
 const VOLUME_STEP := 0.05
 const VOLUME_DEFAULT := 1.0
+const LANG_LABEL := "语言:中文"   # 翻译键:英文模式下自动显示 "Language: English"
 
 var _game: Node
 var _robot: Node
@@ -38,6 +42,7 @@ var _volume_lbl: Label
 var _sfx_volume: HSlider
 var _sfx_volume_lbl: Label
 var _fullscreen_btn: Button
+var _lang_btn: Button
 var _robot_btn: Button
 var _maint_btn: Button
 var _close_btn: Button
@@ -84,6 +89,10 @@ func _init() -> void:
 	_fullscreen_btn = _button(_on_toggle_fullscreen)
 	_fullscreen_btn.set_meta(SoundFx.META, &"toggle")
 	box.add_child(_fullscreen_btn)
+	_lang_btn = _button(_on_toggle_language)
+	_lang_btn.text = LANG_LABEL
+	_lang_btn.set_meta(SoundFx.META, &"toggle")
+	box.add_child(_lang_btn)
 	_robot_btn = _button(_on_toggle_robot)
 	_robot_btn.set_meta(SoundFx.META, &"toggle")
 	box.add_child(_robot_btn)
@@ -172,7 +181,7 @@ func refresh() -> void:
 	_robot_btn.visible = possible
 	_maint_btn.visible = possible and bool(_robot.enabled)
 	if possible:
-		_robot_btn.text = "小机联动:" + ("开" if bool(_robot.enabled) else "关")
+		_robot_btn.text = "小机联动:开" if bool(_robot.enabled) else "小机联动:关"
 
 
 # ---- 纯函数(测试盯) ----
@@ -250,7 +259,19 @@ func _on_toggle_fullscreen() -> void:
 
 
 func _set_fullscreen_text(on: bool) -> void:
-	_fullscreen_btn.text = "全屏:" + ("开" if on else "关")
+	_fullscreen_btn.text = "全屏:开" if on else "全屏:关"
+
+
+# ---- 语言 ----
+
+## zh ⇄ en:有 Game 走 Game.set_language(落 settings + 发 language_changed),没有(测试)只切 locale
+func _on_toggle_language() -> void:
+	var lang := Loc.next(Loc.current())
+	if _game != null and _game.has_method("set_language"):
+		_game.set_language(lang)
+	else:
+		Loc.apply(lang)
+	refresh()
 
 
 # ---- 小机 ----

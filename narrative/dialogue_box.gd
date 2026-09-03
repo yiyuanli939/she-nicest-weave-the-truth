@@ -5,12 +5,13 @@ extends Control
 ## 不用全屏捕捉 Control —— 那样面板本身会先吃掉点击,点在台词上就不推进。
 ## 只管文字,没有自己的底(底图/立绘由 StoryScene 摆,底图右下角已印「按任意键继续」);
 ## 位置由宿主调 layout()。robot_cue 逐行转发(cue 信号)。
+## 语言:台词按 Loc.line_text 取 text / text_en(台词区关掉 auto_translate,台词不是翻译键);
+## 名字是登记全名(诺拉·拉芙蒂 …),本身是翻译键,自动换英文;打字机速度按语言(Loc.chars_per_sec)。
 
 signal finished
 signal cue(cue_name: String)
 signal line_shown(line: DialogueLine)
 
-const CHARS_PER_SEC := 40.0
 const NAME_FONT_SIZE := 56
 const TEXT_FONT_SIZE := 48
 const NAME_COLOR := Color(0.627, 0.275, 0.227)   # 红棕(参考图里名字的颜色)
@@ -32,6 +33,7 @@ func _init() -> void:
 	add_child(_speaker)
 	_text = RichTextLabel.new()
 	_text.bbcode_enabled = true
+	_text.auto_translate_mode = Node.AUTO_TRANSLATE_MODE_DISABLED
 	_text.add_theme_font_size_override("normal_font_size", TEXT_FONT_SIZE)
 	_text.add_theme_color_override("default_color", TEXT_COLOR)
 	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -63,7 +65,7 @@ func _advance() -> void:
 		return
 	var line := _lines[_idx]
 	_speaker.text = StoryArt.display_name(line.speaker)
-	_text.text = line.text
+	_text.text = Loc.line_text(line)
 	line_shown.emit(line)
 	if line.robot_cue != "":
 		cue.emit(line.robot_cue)
@@ -72,7 +74,7 @@ func _advance() -> void:
 		_tween.kill()
 	var total := _text.get_total_character_count()
 	_tween = _text.create_tween()
-	_tween.tween_property(_text, "visible_characters", total, total / CHARS_PER_SEC)
+	_tween.tween_property(_text, "visible_characters", total, total / Loc.chars_per_sec())
 
 
 ## 模态截获:左键(按下与抬起都不放给下层)与任意键(按下)都推进

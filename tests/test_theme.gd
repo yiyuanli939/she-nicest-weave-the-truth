@@ -48,6 +48,15 @@ func test_all_visible_text_in_bundled_font() -> bool:
 		for fname in DirAccess.get_files_at(dir):
 			if fname.ends_with(".tres"):
 				_collect_chars(FileAccess.get_file_as_string(dir + "/" + fname), dir + "/" + fname, chars)
+	# 英文文案:翻译表 en 列 + 笔记英文页文案(locale/*.gd)—— 站酷小薇体没有重音字母,“ ” ‘ ’ – — … 有
+	var importer: GDScript = load("res://tools/import_dialogue.gd")
+	for row in importer.split_rows(FileAccess.get_file_as_string("res://locale/ui.csv")):
+		if row.size() >= 3:
+			_collect_chars(String(row[2]), "res://locale/ui.csv", chars)
+	for fname in DirAccess.get_files_at("res://locale"):
+		if fname.ends_with(".gd"):
+			for m in re.search_all(FileAccess.get_file_as_string("res://locale/" + fname)):
+				_collect_chars(m.get_string(), "res://locale/" + fname, chars)
 	var ok := true
 	for c: String in chars:
 		if c.unicode_at(0) < 128 or ALLOWED_FALLBACK.has(c):

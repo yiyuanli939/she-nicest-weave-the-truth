@@ -4,44 +4,49 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_nkml8"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_lp67d"]
 
-[sub_resource type="Resource" id="Resource_sk1ha"]
+[sub_resource type="Resource" id="Resource_h5fu7"]
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "威客利夫先生走得真急……等等，检验台下面这本黑色笔记，是他的吧？"
+text_en = "Mr. Wycliffe left in such a hurry… wait, this black notebook under the inspection bench, it's his, isn't it?"
 scene = "工坊"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_nkml8"]
+[sub_resource type="Resource" id="Resource_pogll"]
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "威客利夫先生的……我明天还给他吧。"
+text_en = "Mr. Wycliffe's… I'll return it tomorrow."
 scene = "工坊"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_lp67d"]
+[sub_resource type="Resource" id="Resource_ymgb5"]
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "我只是想确认扉页上的名字……这页画的结构怎么这么眼熟？"
+text_en = "I only wanted to check the name on the flyleaf… why does the structure drawn on this page look so familiar?"
 scene = "诺拉房间"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_0wxft"]
+[sub_resource type="Resource" id="Resource_nippd"]
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "我们有A为真，也有B为真，因此可以得到“A且B”，或者说“A合取B”为真……"
+text_en = "We have A true, and we have B true, therefore we may obtain “A and B”, or in other words “A conjoined with B”, as true…"
 scene = "诺拉房间"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_vltgm"]
+[sub_resource type="Resource" id="Resource_cura6"]
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "把字符换成颜色，把“为真”换成“纹样”……这不就是……并织吗？"
+text_en = "Swap the letters for colors, swap “true” for “pattern”… isn't this just… plying?"
 scene = "诺拉房间"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_f4nwn"]
+[sub_resource type="Resource" id="Resource_l1lxp"]
 script = ExtResource("2_nkml8")
-lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_sk1ha"), SubResource("Resource_nkml8"), SubResource("Resource_lp67d"), SubResource("Resource_0wxft"), SubResource("Resource_vltgm")])
+lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_h5fu7"), SubResource("Resource_pogll"), SubResource("Resource_ymgb5"), SubResource("Resource_nippd"), SubResource("Resource_cura6")])
 
 [resource]
 script = ExtResource("3_lp67d")
@@ -51,5 +56,5 @@ assumptions = Array[String](["A & (B & C)"])
 goal = "(A & B) & C"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim"])
 atoms = Array[StringName]([&"A", &"B", &"C"])
-intro_dialogue = SubResource("Resource_f4nwn")
+intro_dialogue = SubResource("Resource_l1lxp")
 robot_cue_on_win = "celebrate"

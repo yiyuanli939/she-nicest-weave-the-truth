@@ -3,6 +3,8 @@
 
 只做格式转换,不做任何语义处理(表头别名/关卡映射/「无」等都在 import_dialogue.gd 里,
 那边是纯函数、有 headless 测试)。零第三方依赖(标准库 zipfile + ElementTree)。
+唯一的例外:英文台词列「语句_en」只在 CSV 里(策划的 xlsx 没有)—— 若 xlsx 没有这一列而旧 CSV 有,
+按(关卡, 发言人, 语句)把旧译文并回新表(台词改了的句子译文留空,等重译),否则重导一次 xlsx 就把译文冲掉了。
 
 用法:
     python3 tools/xlsx_to_csv.py [xlsx路径] [输出csv路径]
@@ -70,10 +72,63 @@ def csv_field(s: str) -> str:
     return s
 
 
+EN_COLS = ("语句_en", "台词_en", "英文语句", "英文台词")
+KEY_COLS = (("关卡", "关卡id"), ("发言人",), ("语句", "台词"))
+
+
+def header_index(rows):
+    """表头行号(含「发言人」与「语句/台词」的第一行),找不到 -1。"""
+    for i, r in enumerate(rows):
+        if "发言人" in r and any(c in r for c in ("语句", "台词")):
+            return i
+    return -1
+
+
+def col_of(header, names):
+    for n in names:
+        if n in header:
+            return header.index(n)
+    return -1
+
+
+def merge_english(rows, old_csv: str):
+    """xlsx 没有英文列时,把旧 CSV 的英文列按(关卡, 发言人, 语句)并回来;返回新 rows(可能加了一列)。"""
+    import csv
+    h = header_index(rows)
+    if h < 0 or col_of(rows[h], EN_COLS) >= 0 or not Path(old_csv).is_file():
+        return rows
+    with open(old_csv, encoding="utf-8-sig", newline="") as f:
+        old = list(csv.reader(f))
+    oh = header_index(old)
+    if oh < 0 or col_of(old[oh], EN_COLS) < 0:
+        return rows
+    oe = col_of(old[oh], EN_COLS)
+    okeys = [col_of(old[oh], n) for n in KEY_COLS]
+    if min(okeys) < 0:
+        return rows
+    def key(r, idx):
+        return tuple(r[i].strip() if i < len(r) else "" for i in idx)
+    old_en = {key(r, okeys): (r[oe] if oe < len(r) else "") for r in old[oh + 1:] if any(x.strip() for x in r)}
+    nkeys = [col_of(rows[h], n) for n in KEY_COLS]
+    if min(nkeys) < 0:
+        return rows
+    merged = []
+    for i, r in enumerate(rows):
+        r = list(r)
+        if i < h:
+            r.append("")
+        elif i == h:
+            r.append("语句_en")
+        else:
+            r.append(old_en.get(key(r, nkeys), "") if any(x.strip() for x in r) else "")
+        merged.append(r)
+    return merged
+
+
 def main() -> int:
     xlsx = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_XLSX
     out = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_OUT
-    rows = read_rows(xlsx)
+    rows = merge_english(read_rows(xlsx), out)
     text = "\n".join(",".join(csv_field(v) for v in row) for row in rows) + "\n"
     # newline="" 关掉平台换行翻译:Windows 文本模式会把 \n 写成 \r\n(若源串用 \r\n 更会翻成 \r\r\n)。
     # 统一写 LF,git 也不再做 CRLF 归一化;importer 的 split_rows 对 \r\n / \n 都认。

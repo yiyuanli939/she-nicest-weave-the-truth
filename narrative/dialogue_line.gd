@@ -6,6 +6,7 @@ extends Resource
 
 @export var speaker: String = ""            # 发言人显示名,如 "诺拉·拉弗蒂" / "莉娅"
 @export_multiline var text: String = ""     # 台词,支持 BBCode
+@export_multiline var text_en: String = ""  # 英文台词(剧情表「语句_en」列;空 = 英文模式仍显示中文)
 @export var scene: String = ""              # 场景插图:工坊 / 宿舍 / 街景;"" = 沿用上一句
 @export var left_char: String = ""          # 左侧人物:莉娅 / 亚瑟;"" = 左侧无人
 @export var left_expr: String = "默认"      # 左侧人物表情

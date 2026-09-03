@@ -4,68 +4,76 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_5i2ik"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_065wk"]
 
-[sub_resource type="Resource" id="Resource_77kt7"]
+[sub_resource type="Resource" id="Resource_fl7da"]
 script = ExtResource("1_77kt7")
 speaker = "亚瑟·威客利夫"
 text = "本周起，工坊要优先供应市政自动机的新式静语纹。它们会根据多个可能条件自行选择通路，因此对分路纹样的要求更严格。"
+text_en = "From this week the workshop is to give priority to the new silent patterns for the municipal automatons. They choose their own paths according to several possible conditions, so the demands on forked patterns are stricter."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_5i2ik"]
+[sub_resource type="Resource" id="Resource_p7gpl"]
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "正好。诺拉，今天学“岔纹”。一条已经成立的纹样，可以结合你自己钉的任意纹样，得到一张“茬纹”，这次可是实纹哦，很方便吧。"
+text_en = "Good timing. Nora, today we learn “forking”. A pattern that already holds can be joined with any pattern you pin yourself to give a “fork pattern” — and this time it's a solid one. Handy, isn't it?"
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_065wk"]
+[sub_resource type="Resource" id="Resource_adydy"]
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "还有汇路机，机如其名，放进一个岔纹，它会给出两个虚纹，如果通过这两条虚纹都可以引回同一个纹样，那被引回的纹样就会被输出为可以验收的实纹。"
+text_en = "Then there's the Merging Loom, true to its name: feed it a fork pattern and it gives out two phantoms; if both phantoms can be led back to the same pattern, that pattern comes out as a solid one that passes inspection."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_3ptqv"]
+[sub_resource type="Resource" id="Resource_m11vx"]
 script = ExtResource("1_77kt7")
 speaker = "诺拉·拉芙蒂"
 text = "A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……"
+text_en = "A holds, so “A or B”, “A disjoined with B”, holds… and when A or B holds, if A implies C and B implies C, then C holds too…"
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_dwgyv"]
+[sub_resource type="Resource" id="Resource_m3g0s"]
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "你最近越来越爱给织法起学院名字了。"
+text_en = "You've grown fond of giving the weaves Academy names lately."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_8p1v7"]
+[sub_resource type="Resource" id="Resource_tplwd"]
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "不过这批机器用的三号丝太多了。天气再闷一点，我可不喜欢它们把余响也当成一条新路。"
+text_en = "But this batch of machines uses far too much number three thread. If the weather gets any closer, I won't like them taking an afterglow for a new path."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_54esh"]
+[sub_resource type="Resource" id="Resource_6nyhu"]
 script = ExtResource("1_77kt7")
 speaker = "亚瑟·威客利夫"
 text = "三号丝已经通过学院规格测试。只要纹样严格按程式制作，就不会产生未定义状态。"
+text_en = "Number three thread has passed the Academy's specification tests. As long as the patterns are made strictly to the programme, no undefined state will arise."
 scene = "工坊"
 left_char = "亚瑟"
 
-[sub_resource type="Resource" id="Resource_6swy5"]
+[sub_resource type="Resource" id="Resource_vovwr"]
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "是啊。纸上一直很干燥。"
+text_en = "Right. It's always dry on paper."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_sw3xs"]
+[sub_resource type="Resource" id="Resource_b2ne5"]
 script = ExtResource("2_5i2ik")
-lines = Array[ExtResource("1_77kt7")]([SubResource("Resource_77kt7"), SubResource("Resource_5i2ik"), SubResource("Resource_065wk"), SubResource("Resource_3ptqv"), SubResource("Resource_dwgyv"), SubResource("Resource_8p1v7"), SubResource("Resource_54esh"), SubResource("Resource_6swy5")])
+lines = Array[ExtResource("1_77kt7")]([SubResource("Resource_fl7da"), SubResource("Resource_p7gpl"), SubResource("Resource_adydy"), SubResource("Resource_m11vx"), SubResource("Resource_m3g0s"), SubResource("Resource_tplwd"), SubResource("Resource_6nyhu"), SubResource("Resource_vovwr")])
 
 [resource]
 script = ExtResource("3_065wk")
@@ -75,5 +83,5 @@ assumptions = Array[String](["A"])
 goal = "A | B"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro", &"or_intro"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_sw3xs")
+intro_dialogue = SubResource("Resource_b2ne5")
 robot_cue_on_win = "panic"

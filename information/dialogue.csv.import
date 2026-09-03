@@ -1,16 +1,3 @@
 [remap]
 
-importer="csv_translation"
-type="Translation"
-uid="uid://cstvo78leb8nl"
-
-[deps]
-
-source_file="res://information/dialogue.csv"
-
-[params]
-
-compress=1
-delimiter=0
-unescape_keys=false
-unescape_translations=true
+importer="keep"

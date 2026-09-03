@@ -3,7 +3,8 @@ extends SceneTree
 ##   python3 tools/xlsx_to_csv.py
 ##   godot --headless --path . --script res://tools/import_dialogue.gd [-- 路径]
 ## 默认读 res://information/dialogue.csv。表头(列顺序随意,按名字识别,支持策划表别名):
-##   关卡id|关卡, 发言人, 场景, 左侧人物|左位人物, 左侧表情|左位人物表情, 诺拉表情|主角表情, 台词|语句, 小机动作(可缺)
+##   关卡id|关卡, 发言人, 场景, 左侧人物|左位人物, 左侧表情|左位人物表情, 诺拉表情|主角表情, 台词|语句, 小机动作(可缺),
+##   台词_en|语句_en|英文语句(可缺;英文版台词 → DialogueLine.text_en,空 = 英文模式仍显示中文)
 ## 表头行之前的行(策划的注意事项)自动跳过。
 ## 关卡可写 l01…l16,也可写「章-节」(如 1-1;映射按关卡目录章节大小);OUTRO_EPISODES(4-3)写入
 ## outro_dialogue(通关后播,注意事项②),其余写入 intro_dialogue;表里出现的关两个字段都会重写(缺者清空)。
@@ -23,6 +24,7 @@ const COL_ALIASES: Dictionary = {
 	"诺拉表情": ["诺拉表情", "主角表情"],
 	"台词": ["台词", "语句"],
 	"小机动作": ["小机动作"],
+	"台词_en": ["台词_en", "语句_en", "英文语句", "英文台词"],
 }
 const REQUIRED: Array = ["关卡id", "发言人", "台词"]
 ## 表头注意事项②:这些段落在通关后播(→ outro_dialogue),其余进关前播(→ intro_dialogue)
@@ -111,6 +113,7 @@ static func parse_csv(text: String, ep_map: Dictionary = {}) -> Dictionary:
 		var line := DialogueLine.new()
 		line.speaker = get.call("发言人")
 		line.text = get.call("台词")
+		line.text_en = get.call("台词_en")
 		line.scene = get.call("场景")
 		line.left_char = _normalize_left(get.call("左侧人物"))
 		line.left_expr = get.call("左侧表情")

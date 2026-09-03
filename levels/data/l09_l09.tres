@@ -4,77 +4,85 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_trim7"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_na7fi"]
 
-[sub_resource type="Resource" id="Resource_1j3q3"]
+[sub_resource type="Resource" id="Resource_7atkt"]
 script = ExtResource("1_1j3q3")
 speaker = "诺拉·拉芙蒂"
 text = "莉娅，刚才那台旧织机怎么同时闪了两道光？你停机也太熟练了，难道经常这样？"
+text_en = "Lia, how did that old loom flash two lights at once just now? And you stopped it so smoothly — does this happen often?"
 scene = "工坊"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_trim7"]
+[sub_resource type="Resource" id="Resource_jp15r"]
 script = ExtResource("1_1j3q3")
 speaker = "诺拉·拉芙蒂"
 text = "刚才那两道光是怎么回事？"
+text_en = "What were those two lights just now?"
 scene = "工坊"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_na7fi"]
+[sub_resource type="Resource" id="Resource_6rfht"]
 script = ExtResource("1_1j3q3")
 speaker = "莉娅·科尔宾"
 text = "三号静语丝受潮后的“余响”。上一种状态有时候不会立刻消干净，会和下一种叠一小会儿。"
+text_en = "The “afterglow” of number three silent thread after it gets damp. Sometimes the previous state doesn't clear right away and overlaps with the next one for a moment."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "惊讶"
 
-[sub_resource type="Resource" id="Resource_1trig"]
+[sub_resource type="Resource" id="Resource_8tyf4"]
 script = ExtResource("1_1j3q3")
 speaker = "诺拉·拉芙蒂"
 text = "学院知道吗？"
+text_en = "Does the Academy know?"
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_dbvdn"]
+[sub_resource type="Resource" id="Resource_5o887"]
 script = ExtResource("1_1j3q3")
 speaker = "莉娅·科尔宾"
 text = "我两年前就写过。湿度、线批、出现次数，全记了。"
+text_en = "I wrote it up two years ago. Humidity, thread batch, how often it happened, all of it."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_mn6vw"]
+[sub_resource type="Resource" id="Resource_yjlyc"]
 script = ExtResource("1_1j3q3")
 speaker = "莉娅·科尔宾"
 text = "他们把纸退回来，说“缺乏合资格观察者确认，不纳入公档”。后来我就把它钉在我们自己的记录册里了。"
+text_en = "They sent the paper back, saying “lacks confirmation by a qualified observer; not entered into the public archive”. After that I pinned it in our own record book."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_fq3od"]
+[sub_resource type="Resource" id="Resource_w2h5b"]
 script = ExtResource("1_1j3q3")
 speaker = "诺拉·拉芙蒂"
 text = "可如果它真的会影响机器呢？"
+text_en = "But what if it really does affect the machines?"
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_r0vmd"]
+[sub_resource type="Resource" id="Resource_bgyei"]
 script = ExtResource("1_1j3q3")
 speaker = "莉娅·科尔宾"
 text = "那就等机器出事以后，他们再派一位先生来重新发现一遍吧。"
+text_en = "Then let's wait until a machine breaks down, and they can send a gentleman to discover it all over again."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_3gfex"]
+[sub_resource type="Resource" id="Resource_ftch8"]
 script = ExtResource("2_trim7")
-lines = Array[ExtResource("1_1j3q3")]([SubResource("Resource_1j3q3"), SubResource("Resource_trim7"), SubResource("Resource_na7fi"), SubResource("Resource_1trig"), SubResource("Resource_dbvdn"), SubResource("Resource_mn6vw"), SubResource("Resource_fq3od"), SubResource("Resource_r0vmd")])
+lines = Array[ExtResource("1_1j3q3")]([SubResource("Resource_7atkt"), SubResource("Resource_jp15r"), SubResource("Resource_6rfht"), SubResource("Resource_8tyf4"), SubResource("Resource_5o887"), SubResource("Resource_yjlyc"), SubResource("Resource_w2h5b"), SubResource("Resource_bgyei")])
 
 [resource]
 script = ExtResource("3_na7fi")
@@ -83,5 +91,5 @@ title = "第四纹"
 goal = "A > (B > A)"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro"])
 atoms = Array[StringName]([&"A", &"B"])
-intro_dialogue = SubResource("Resource_3gfex")
+intro_dialogue = SubResource("Resource_ftch8")
 robot_cue_on_win = "celebrate"

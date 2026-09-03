@@ -159,8 +159,9 @@ func test_tres_dialogue_matches_csv() -> bool:
 			var have_n: int = have.lines.size() if have != null else 0
 			ok = check(want_n == have_n, "%s %s 句数:表 %d / tres %d" % [lv.id, slot, want_n, have_n]) and ok
 			for i in mini(want_n, have_n):
-				ok = check(want.lines[i].text == have.lines[i].text and want.lines[i].speaker == have.lines[i].speaker,
-						"%s %s 第 %d 句与表不同" % [lv.id, slot, i + 1]) and ok
+				ok = check(want.lines[i].text == have.lines[i].text and want.lines[i].speaker == have.lines[i].speaker
+						and want.lines[i].text_en == have.lines[i].text_en,
+						"%s %s 第 %d 句与表不同(含英文列)" % [lv.id, slot, i + 1]) and ok
 	return ok
 
 

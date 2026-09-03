@@ -4,37 +4,41 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_koucd"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_cy8qg"]
 
-[sub_resource type="Resource" id="Resource_83lky"]
+[sub_resource type="Resource" id="Resource_l21sb"]
 script = ExtResource("1_83lky")
 speaker = "诺拉·拉芙蒂"
 text = "学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。"
+text_en = "The Academy notebook, the production records, Lia's rejected observation sheet… wait. One thing has been assumed all along: that number three silent thread only ever holds one readable state at a time."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_koucd"]
+[sub_resource type="Resource" id="Resource_rma0b"]
 script = ExtResource("1_83lky")
 speaker = "诺拉·拉芙蒂"
 text = "如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。"
+text_en = "If that premise were true, the afterglow shouldn't exist. But Lia has seen it, and so have I."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_cy8qg"]
+[sub_resource type="Resource" id="Resource_e0k1u"]
 script = ExtResource("1_83lky")
 speaker = "诺拉·拉芙蒂"
 text = "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
+text_en = "The machine didn't turn one state into two. Two physical signals were interpreted by the programme as “P” and “not P”."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_24q0c"]
+[sub_resource type="Resource" id="Resource_vg6pq"]
 script = ExtResource("1_83lky")
 speaker = "诺拉·拉芙蒂"
 text = "学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。"
+text_en = "What the Academy dismissed wasn't a trivial complaint. It was the very evidence that could have told them the premise was false."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_rtuof"]
+[sub_resource type="Resource" id="Resource_816jo"]
 script = ExtResource("2_koucd")
-lines = Array[ExtResource("1_83lky")]([SubResource("Resource_83lky"), SubResource("Resource_koucd"), SubResource("Resource_cy8qg"), SubResource("Resource_24q0c")])
+lines = Array[ExtResource("1_83lky")]([SubResource("Resource_l21sb"), SubResource("Resource_rma0b"), SubResource("Resource_e0k1u"), SubResource("Resource_vg6pq")])
 
 [resource]
 script = ExtResource("3_cy8qg")
@@ -45,5 +49,5 @@ goal = "(B > false) > (A > false)"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro", &"or_intro", &"or_elim", &"false_elim"])
 atoms = Array[StringName]([&"A", &"B"])
 allow_bot = true
-intro_dialogue = SubResource("Resource_rtuof")
+intro_dialogue = SubResource("Resource_816jo")
 robot_cue_on_win = "celebrate"

@@ -4,89 +4,100 @@
 [ext_resource type="Script" path="res://narrative/dialogue_res.gd" id="2_bh56a"]
 [ext_resource type="Script" path="res://levels/level_def.gd" id="3_vn3tj"]
 
-[sub_resource type="Resource" id="Resource_s2jwe"]
+[sub_resource type="Resource" id="Resource_flmij"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。"
+text_en = "Today we learn “redeeming”. If you have a layered pattern of red over blue, and a red thread besides, you can draw out the blue thread."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_bh56a"]
+[sub_resource type="Resource" id="Resource_e2nhv"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "还有对于你现在来说可能最难以理解的机器——封程机。"
+text_en = "And then there's the machine that may be the hardest for you to understand right now — the Sealing Loom."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_vn3tj"]
+[sub_resource type="Resource" id="Resource_whgl2"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "我们可以直接在封程机上绕过一切规则自由钉出纹样。"
+text_en = "On the Sealing Loom we can pin any pattern we like, freely, bypassing every rule."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_tmc7f"]
+[sub_resource type="Resource" id="Resource_568a1"]
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "那代价呢？"
+text_en = "And the price?"
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_arfvl"]
+[sub_resource type="Resource" id="Resource_8tgij"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。"
+text_en = "Good question! Such a pattern is a kind of “phantom pattern”: it can be fed into other looms, but only into looms; it can't be handed in for inspection as it is."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_centm"]
+[sub_resource type="Resource" id="Resource_bpotd"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。"
+text_en = "But a new pattern you make with the phantom can be fed back into the Sealing Loom, which produces a layered pattern with what you pinned on top and the new pattern below — and that layered pattern is a “solid pattern” that passes inspection."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_f46q4"]
+[sub_resource type="Resource" id="Resource_hnd1j"]
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。"
+text_en = "In the Academy's notation… A, together with “if A holds, then B holds”, or “A implies B”, gives you B."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_ymccg"]
+[sub_resource type="Resource" id="Resource_jljsi"]
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。"
+text_en = "Assume A; if you can obtain B, then you obtain “if A holds, then B holds”."
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_tpyjo"]
+[sub_resource type="Resource" id="Resource_nnnp4"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "学院的写法？"
+text_en = "The Academy's notation?"
 scene = "工坊"
 left_char = "莉娅"
 
-[sub_resource type="Resource" id="Resource_7fsxw"]
+[sub_resource type="Resource" id="Resource_7eful"]
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "我只是……在书上见过类似的符号。"
+text_en = "I've just… seen symbols like these in a book."
 scene = "工坊"
 left_char = "莉娅"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_2v882"]
+[sub_resource type="Resource" id="Resource_nxvf5"]
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "随你怎么记。只要别把线引错地方。"
+text_en = "Note it however you like. Just don't lead the thread astray."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"
 nora_expr = "严肃"
 
-[sub_resource type="Resource" id="Resource_w0d3p"]
+[sub_resource type="Resource" id="Resource_lh65x"]
 script = ExtResource("2_bh56a")
-lines = Array[ExtResource("1_s2jwe")]([SubResource("Resource_s2jwe"), SubResource("Resource_bh56a"), SubResource("Resource_vn3tj"), SubResource("Resource_tmc7f"), SubResource("Resource_arfvl"), SubResource("Resource_centm"), SubResource("Resource_f46q4"), SubResource("Resource_ymccg"), SubResource("Resource_tpyjo"), SubResource("Resource_7fsxw"), SubResource("Resource_2v882")])
+lines = Array[ExtResource("1_s2jwe")]([SubResource("Resource_flmij"), SubResource("Resource_e2nhv"), SubResource("Resource_whgl2"), SubResource("Resource_568a1"), SubResource("Resource_8tgij"), SubResource("Resource_bpotd"), SubResource("Resource_hnd1j"), SubResource("Resource_jljsi"), SubResource("Resource_nnnp4"), SubResource("Resource_7eful"), SubResource("Resource_nxvf5")])
 
 [resource]
 script = ExtResource("3_vn3tj")
@@ -95,5 +106,5 @@ title = "第二纹"
 goal = "A > A"
 allowed_rules = Array[StringName]([&"and_intro", &"and_elim", &"imp_elim", &"imp_intro"])
 atoms = Array[StringName]([&"A"])
-intro_dialogue = SubResource("Resource_w0d3p")
+intro_dialogue = SubResource("Resource_lh65x")
 robot_cue_on_win = "celebrate"

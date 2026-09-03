@@ -1,6 +1,6 @@
 extends TestBase
 ## 标题页设置模块(SettingsPanel)的纯逻辑:全屏 ↔ 窗口模式映射、音量文案/夹取、
-## settings 键(music_volume / fullscreen)往返且「重置进度」保留;无 autoload 时弹窗能建、开关、小机两行隐藏。
+## settings 键(music_volume / fullscreen / language)往返且「重置进度」保留;无 autoload 时弹窗能建、开关、小机两行隐藏、语言能切。
 
 
 func test_window_mode_mapping() -> bool:
@@ -29,14 +29,16 @@ func test_settings_keys_round_trip_and_survive_wipe() -> bool:
 	sm.settings["music_volume"] = 0.35
 	sm.settings["sfx_volume"] = 0.6
 	sm.settings["fullscreen"] = true
+	sm.settings["language"] = "en"
 	sm.save()
 	var sm2 := SaveManager.open()
 	var ok := check(is_equal_approx(float(sm2.settings.get("music_volume", -1.0)), 0.35) and is_equal_approx(float(sm2.settings.get("sfx_volume", -1.0)), 0.6)
-			and sm2.settings.get("fullscreen") == true, "音量 / 音效音量 / 全屏往返")
+			and sm2.settings.get("fullscreen") == true and sm2.settings.get("language") == "en", "音量 / 音效音量 / 全屏 / 语言往返")
 	sm2.wipe()
 	var sm3 := SaveManager.open()
 	ok = check(not sm3.is_solved(&"l01") and is_equal_approx(float(sm3.settings.get("music_volume", -1.0)), 0.35)
-			and is_equal_approx(float(sm3.settings.get("sfx_volume", -1.0)), 0.6) and sm3.settings.get("fullscreen") == true, "重置进度保留音量 / 音效音量 / 全屏") and ok
+			and is_equal_approx(float(sm3.settings.get("sfx_volume", -1.0)), 0.6) and sm3.settings.get("fullscreen") == true
+			and sm3.settings.get("language") == "en", "重置进度保留音量 / 音效音量 / 全屏 / 语言") and ok
 	sm3.settings = before
 	sm3.save()
 	return ok
@@ -60,7 +62,17 @@ func test_panel_without_autoloads() -> bool:
 			texts.append((c as Label).text)
 		elif c is Button:
 			texts.append((c as Button).text)
-	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("音效音量") and texts.has("小机维护") and texts.has("关闭"), "文字齐全(得 %s)" % str(texts)) and ok
+	ok = check(texts.has("设置") and texts.has("音乐音量") and texts.has("音效音量") and texts.has("小机维护") and texts.has("关闭")
+			and texts.has(SettingsPanel.LANG_LABEL), "文字齐全(得 %s)" % str(texts)) and ok
+	# 语言行:没有 Game 也能切(只切 locale);按钮文字是翻译键,显示文本随语言变;切回中文复原
+	ok = check(Loc.current() == "zh" and p._lang_btn.text == "语言:中文" and p._lang_btn.atr(p._lang_btn.text) == "语言:中文", "起始中文") and ok
+	p._on_toggle_language()
+	ok = check(Loc.current() == "en" and TranslationServer.get_locale() == "en" and p._lang_btn.text == "语言:中文"
+			and p._lang_btn.atr(p._lang_btn.text) == "Language: English" and p._close_btn.atr(p._close_btn.text) == "Close",
+			"切到英文:locale=en、键不变、显示英文(得 %s / %s)" % [TranslationServer.get_locale(), p._lang_btn.atr(p._lang_btn.text)]) and ok
+	p._on_toggle_language()
+	ok = check(Loc.current() == "zh" and p._close_btn.atr(p._close_btn.text) == "关闭", "再点切回中文") and ok
+	TranslationServer.set_locale(Loc.DEFAULT)
 	p.close()
 	ok = check(not p.visible, "close 关上") and ok
 	# 百分数标签按「100%」预留宽度:拖到 5% 时行宽不变(否则整行在列里来回挪)

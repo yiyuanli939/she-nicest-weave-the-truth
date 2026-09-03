@@ -6,6 +6,9 @@ extends Node
 ## 坏掉后整段故障("broken",所有 cue 变故障演出);结局(l16 通关后 4-3 剧情播完,感谢游玩黑屏)才修好。
 ## 不在目录里的关(测试注入)不触发("off")。
 
+## 语言切换(SettingsPanel「语言」行 → set_language);UI 靠 auto_translate 自己刷新,要重排/换图的场景接这个
+signal language_changed(lang: String)
+
 var catalog: LevelCatalog
 var notebook: NotebookCatalog
 var save: SaveManager
@@ -17,7 +20,22 @@ func _ready() -> void:
 	catalog = LevelCatalog.load_default()
 	notebook = NotebookCatalog.load_default()
 	save = SaveManager.open()
+	_apply_language()   # 先于任何场景:TranslationServer 默认取系统语言,英文系统上不设就会变英文
 	_apply_window_settings()
+
+
+## 启动按 settings.language 设 locale(默认 zh);见 game/loc.gd
+func _apply_language() -> void:
+	Loc.apply(String(save.settings.get("language", Loc.DEFAULT)))
+
+
+## 「设置」弹窗切语言:当场生效(全树 NOTIFICATION_TRANSLATION_CHANGED + 换图资源原地重载)并落 settings(「重置进度」不清)
+func set_language(lang: String) -> void:
+	lang = Loc.normalize(lang)
+	Loc.apply(lang)
+	save.settings["language"] = lang
+	save.save()
+	language_changed.emit(lang)
 
 
 ## 启动时按 settings 恢复全屏(标题页设置模块写 settings.fullscreen;音量由 Bgm._ready 自己读)。

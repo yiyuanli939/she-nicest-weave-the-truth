@@ -8,6 +8,7 @@
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。"
+text_en = "First time at the Silent Pattern workshop in the East End? Don't let the machines scare you. They don't weave cloth; they braid silent threads of different colors into silent patterns, and the whole city is waiting on them."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -15,6 +16,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。"
+text_en = "You're the new apprentice weaver? Nora Lafferty? I'm Lia Corbin. Keep away from the machines with the brass lamps lit for now; their tempers are worse than the foreman's."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -22,6 +24,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "诺拉·拉芙蒂"
 text = "这些就是静语织机？我以为我们做的是……布料。"
+text_en = "So these are the silent looms? I thought we made… cloth."
 scene = "工坊"
 left_char = "莉娅"
 nora_expr = "惊讶"
@@ -30,6 +33,7 @@ nora_expr = "惊讶"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "普通织坊才用那种织布机。我们织的是静语纹。门锁认它，邮报机认它，契约柜和新式自动机也认它。没有这些纹样，半个伦敦都得装聋作哑。"
+text_en = "Ordinary workshops use looms for cloth. We weave silent patterns. Door locks read them, post machines read them, so do contract cabinets and the new automatons. Without these patterns, half of London would go deaf and dumb."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -37,6 +41,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "诺拉·拉芙蒂"
 text = "我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。"
+text_en = "I'll write it all down. I keep notes out of habit: new weaves, machine rules, whatever I can put on paper, I do."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -44,6 +49,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。"
+text_en = "That's a good habit. There's plenty to remember in a workshop. Once you're busy, you'll see how many times a notebook saves you."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -51,6 +57,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "诺拉·拉芙蒂"
 text = "可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。"
+text_en = "But I heard that what really drives these machines are the “programmes” written by the Academy. They're so rigorous and so intricate that no ordinary person can grasp them; only the most rational gentlemen of the Academy can master them."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -58,6 +65,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。"
+text_en = "The Academy writes its symbols; we weave the patterns by the rules. What counts as “real learning” is the gentlemen's favorite thing to argue about. We just keep the city from grinding to a halt."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "严肃"
@@ -66,6 +74,7 @@ left_expr = "严肃"
 script = ExtResource("1_j62nj")
 speaker = "亚瑟·威客利夫"
 text = "科尔宾女士。今日的学院程式已经送到。新学徒？"
+text_en = "Miss Corbin. Today's Academy programmes have been delivered. A new apprentice?"
 scene = "工坊"
 left_char = "亚瑟"
 
@@ -73,6 +82,7 @@ left_char = "亚瑟"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "诺拉·拉芙蒂。手还生，但眼睛不差。"
+text_en = "Nora Lafferty. Her hands are green, but her eyes are sharp."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -80,6 +90,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "亚瑟·威客利夫"
 text = "很好。静语纹允许有手工差异，但不允许偏离程式。请记住这一点，拉芙蒂小姐。"
+text_en = "Very well. Silent patterns allow for handwork variation, but never for straying from the programme. Remember that, Miss Lafferty."
 scene = "工坊"
 left_char = "亚瑟"
 
@@ -87,6 +98,7 @@ left_char = "亚瑟"
 script = ExtResource("1_j62nj")
 speaker = "诺拉·拉芙蒂"
 text = "是，威客利夫先生。"
+text_en = "Yes, Mr. Wycliffe."
 scene = "工坊"
 left_char = "亚瑟"
 

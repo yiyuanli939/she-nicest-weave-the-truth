@@ -298,11 +298,35 @@ disconnection_request + connection_drag_started,连响 unplug + pick,松手再 d
   (`_reconnect_goal` 按解法表最后一根线接,机器 id 升序 = 摆放顺序);UI 冒烟 N 段(弹窗矩形 (1333,672,1174,816)、「继续」在空白带、遮罩挡「重置」、无「下一关」)、
   E 段(焦纹图样)、S 段;`tools/shot_4k.gd` 出 `4k_win.png`(直接 `open()`,不走通关以免写存档)与 `4k_editor_bot.png`(解锁焦纹的笔刷行)。
 
+### 3.10 英文版:设置里切语言(2026-09-03,用户要求「所有地方都翻译的英文版,在设置里改语言」)
+
+- **机制**:Godot `TranslationServer` + `locale/ui.csv`(`keys,zh,en`,**键 = 代码里的中文原串**)。Control 的 `text` / `tooltip_text`、GraphNode 标题、OptionButton 项
+  默认 `auto_translate_mode = INHERIT`(root 是 ALWAYS)→ 显示时查表,而 **`.text` 属性仍是中文键**:现有测试按中文找按钮全部不用改,要断言显示文本用 `node.atr(node.text)`。
+  `game/loc.gd`(`Loc`,纯静态):`current/next/apply/localized_path/line_text/chars_per_sec`。`Game._ready` 先 `Loc.apply(settings.language)` 再进场景;
+  `Game.set_language` 切 locale + 落 settings + 发 `language_changed`。
+- **几个坑(都有测试盯)**:① 缺译时 Godot 按 `internationalization/locale/fallback` 回退,**默认是 en** → 必须设 `fallback="zh"` 且 zh 列 = 键,否则中文模式会漏成英文;
+  ② TranslationServer 启动取系统语言,英文 mac 上不显式设就变英文;③ 拼接出来的串查不到表 → 开关文字改整串键(「全屏:开」),带参数的 `tr(键) % 参数`;
+  ④ 台词 RichTextLabel 与维护面板的状态/日志关掉 `auto_translate`(文本不是键);⑤ 标题页五项位置是按按钮尺寸算的,收到 `NOTIFICATION_TRANSLATION_CHANGED` 时子 Button 还没重排,
+  要 `call_deferred` 一帧再摆;⑥ `set_locale` 会把按 `translation_remaps` 加载过的贴图**原地 reload**(标题图当场换),新场景 `load()` 时自动取 `.en.png`;
+  ⑦ `information/dialogue.csv` 曾被 Godot 当 csv_translation 误导入,`.import` 改成 `importer="keep"`;⑧ `level_scene._make_tool_button` 原来按按钮文字派发音效槽位,改成传槽位。
+- **内容三处**:UI 文案 = `locale/ui.csv`;台词 = `information/dialogue.csv` 的 `语句_en` 列 → `DialogueLine.text_en`(`import_dialogue.gd` 认 `台词_en/语句_en/英文语句`;
+  `xlsx_to_csv.py` 重导 xlsx 时按(关卡, 发言人, 语句)把译文并回来);烧字的图 = `<名字>.en.png`(`tools/gen_locale_art.gd` 生成的占位:先探测中文墨迹框 ⊂ 擦除框,
+  透明页清 alpha、牌子填平底色、`imp_intro` 批注压着机器底边用左半边镜像补回,再把 Label 放进透明 3840×2160 SubViewport 离屏渲英文按墨迹包围盒贴上;
+  **必须带窗口跑**,dummy 渲染器出不了图;笔记页英文文案 `locale/notebook_en.gd`)。
+- **小机**:`RobotLink.localize_commands`(英文模式 `say <cue>` → `<cue>_en`,有 wav 才换);`GUIDE_PHRASES` 分 zh/en,`matches_guide` 两种都认;
+  `listen.py` 中英两个 `KaldiRecognizer` 喂同一段音频(`--lang zh|en|all`,`speech_ready/alive` 带 `langs`);`make_voices.sh` 按 `lines`/`lines_en` 出两套 wav。
+- **测试**:`tests/test_locale.gd`(表完整 / 每条含汉字的字面量都在表里或 EXCLUDE / 往返 / remaps / 台词英文列全填)、`tests/test_locale_art.gd`(.en 图同尺寸、
+  笔记页收起不露出、改动只在擦除框内、mipmap)、`test_theme` 扫 en 列字形、`test_settings` 语言行、`test_robot_logic` 英文唤醒与 `_en` 换名、`test_dialogue_import` 英文列、
+  UI 冒烟 V 段(点「语言」→ 标题五项英文并重新居中、标题图换 `.en`、选关/故事/棋盘/笔记/通关弹窗全英文、切回)。
+
 ## 4. 想改 X,去哪改
 
 | 想做的事 | 去哪 |
 |---|---|
 | 改台词/场景/立绘/表情 | 改剧情 xlsx(`剧情文件及美术补充/`)→ `python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue` / `outro_dialogue`(Inspector) |
+| 改 / 加英文文案(UI) | `locale/ui.csv` en 列(键 = 中文原串;新中文字面量必须加一行,`tests/test_locale.gd` 盯)→ `--import`;机制与坑见 3.10 |
+| 改英文台词 | `information/dialogue.csv` `语句_en` 列 → `tools/import_dialogue.gd`(写进 `DialogueLine.text_en`) |
+| 换英文版美术图 / 改笔记英文文案 | 覆盖 `<名字>.en.png`(同尺寸);占位图重生成 `tools/gen_locale_art.gd`(带窗口跑),笔记页文案 `locale/notebook_en.gd`;新烧字的图在 `project.godot` `translation_remaps` 加一条 |
 | 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
 | 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS` 表,末列 = 本关新上架仪器;`CH_OF_LEVEL`/`CH_TITLES`;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
 | 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(§0.5 现网 16 关编排表、旧 15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
@@ -339,7 +363,8 @@ disconnection_request + connection_drag_started,连响 unplug + pick,松手再 d
 | 小机维护面板(接入 / 刷固件 / 校准 / 回头方向 / 无机器人模式开关) | `ui/robot_maint_ui.gd`(标题页「设置」弹窗与开发者信息页的「小机维护」按钮仅有机器人时显示、标题页 F9 所有构建可用);脚本 `hardware/run_robot.sh` `stop_robot.sh` `flash_robot.sh` |
 | 无机器人模式(提示/入口全消失) | `game/robot_link.gd enabled/resolve_enabled/set_enabled`;隐藏点:`ui/level_scene.gd _robot_on`、`ui/credits_scene.gd`、`ui/main_menu.gd` |
 | 帧率上限 / 低功耗 / 渲染器 | `project.godot` `[application] run/max_fps、run/low_processor_mode`、`[rendering] renderer/rendering_method`;守门 `tests/test_perf_settings.gd`(见 3.5) |
-| 语音识别 | `hardware/speech/listen.py`(Vosk 离线,语法只认两句;`get_model.sh` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
+| 语音识别 | `hardware/speech/listen.py`(Vosk 离线,中英各一个识别器,语法只认唤醒句;`get_model.sh [zh|en|all]` 下载模型);桥接 `bridge.js` 把带 evt 的客户端消息广播给游戏 |
+| 小机英文台词 / 英文模式换声音 | `hardware/firmware/sounds/lines.json` `voice_en`/`lines_en` → `make_voices.sh` 出 `<cue>_en.wav`;换名逻辑 `game/robot_link.gd localize_commands` |
 
 ## 5. 改完怎么验证
 

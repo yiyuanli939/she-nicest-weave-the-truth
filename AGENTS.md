@@ -39,6 +39,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 6. 缩进 Tab;文件 snake_case、类 PascalCase;一个文件一个 `class_name`。
 7. **美术/策划文档严格照做**:文档没写的 UI 元素、确认步骤、规则一律不加;图片原尺寸用
    (逻辑视口 = 出图分辨率 3840×2160);所有文字用站酷小薇体,UI 字面量不得含该字体没有的符号。
+8. **中英双语**(2026-09-03 起):玩家可见的中文串一律是翻译键,新加一句就在 `locale/ui.csv` 加一行(`tests/test_locale.gd` 盯);
+   文字别拼接(整串键或 `tr(键) % 参数`);英文只用 ASCII + “ ” ‘ ’ – — …;烧字的新图要配 `<名字>.en.png` + `translation_remaps`。
 
 ## 代码地图(M0 已完成 ✅)
 
@@ -56,7 +58,8 @@ UI 只通过 `ProofGraph.solve()` 返回的 `SolveResult` 刷新。
 | `game/robot_link.gd` | autoload Robot:ws→桥接→小机;cue→命令表(`commands_for`,故障态映射)、`guide_requested`、`turn_to_limit`、`stationary` 不动模式(send 层拦云台/动画/校准)、拉起 `hardware/*.sh` |
 | `game/bgm.gd` | autoload Bgm:背景音乐槽位表 `TRACKS`(title / level_1..4 → `music/<槽位>.mp3`);`play(槽位)` 同文件不重启、换曲交叉淡化、空槽位静音;`GAIN_DB` 按文件响度修正 × 玩家音量 `user_volume`(设置模块);各场景 `_ready` 报槽位 |
 | `game/sfx.gd` | autoload Sfx(class_name SoundFx):操作音效槽位表 `CLIPS`(39 槽位 → `assets/sfx/<槽位>.wav`,"" 静音;现用 = 用户 2026-09-02 选定的 33 段 freesound CC0 + 2 段 Kenney CC0,装入时 `tools/sfx_normalize.py` 统一成单声道 44.1k / 裁静音 / 峰值因子 ≤ 21 / RMS -18,授权表在 `assets/sfx/音效位置.md`)、8 个一次性播放器池、同帧同槽位去重、`push_mute/pop_mute`(代解/示答/载入/重建静音)、`GAIN_DB` × `BASE_VOLUME` × 玩家音量 `user_volume`;`node_added` 总钩子给所有 BaseButton 接 pressed(meta "sfx" 覆盖槽位 / "" 静音)与 hover;各挂点一行 `SoundFx.hit(self, &"槽位")`;槽位表与换法见 `assets/sfx/音效位置.md`;复核工具 `tools/sfx_trace.gd`(真实输入走全流程、每步打印响了哪些槽位);合成版候选 D:`tools/sfx_synth.gd`(配方 + 材质函数,纯 AudioStreamWAV)→ `tools/gen_sfx.gd` 出 `assets/sfx/候选/D_合成/` |
-| `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量 / 音效音量滑条(同一模板 `_slider_row`)/ 全屏 / 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` / `Sfx._ready` 读音量、`Game._apply_window_settings` 恢复全屏 |
+| `ui/settings_panel.gd` | 标题页「设置」弹窗(第五个选项点开,CanvasLayer 遮罩 + 居中面板):音乐音量 / 音效音量滑条(同一模板 `_slider_row`)/ 全屏 / 语言(中文 ⇄ English)/ 小机联动(= 无机器人模式开关)/ 小机维护 / 关闭;落 `SaveManager.settings`(重置进度不清),启动时 `Bgm._ready` / `Sfx._ready` 读音量、`Game._apply_language` 设语言、`Game._apply_window_settings` 恢复全屏 |
+| `game/loc.gd` + `locale/` | 语言:`Loc`(纯静态)`current/next/apply/localized_path/line_text`;`locale/ui.csv`(键 = 中文原串,zh/en 两列,`--import` 出 `.translation`)、`locale/notebook_en.gd`(七页笔记英文文案,给占位图工具);机制 = TranslationServer + Control auto_translate(`.text` 仍是中文键),烧字的图按 `project.godot` `translation_remaps` 换 `<名字>.en.png`(`tools/gen_locale_art.gd` 生成占位);台词走 `DialogueLine.text_en`(剧情表 `语句_en` 列);见 TUTORIAL 3.10 |
 | `ui/win_popup.gd` | 通关弹窗「织成了」(v1.2,替代工具条「下一关」):CanvasLayer 遮罩 + 居中原尺寸美术图 + 纯文字「继续」(`continue_pressed` → `LevelScene._on_continue`:下一关 / 结局 / 回选关);已通关的关重开走 `ProofSession.load_state(d, detach_goal=true)` 拆目标线成「差一步」态 |
 | `narrative/step_guide.gd` | 关内操作指引(纯函数):按棋盘事实挑下一条要提示的操作(pin/place/wire;v1.1 删了 fix/notebook),做过一次记进 `SaveManager.steps`;文案表 `TEXT` |
 | `levels/level_solutions.gd` | 16 关脚本化解法(示答 / 小机代解 / 测试共用;正式版也要,别放 tests/) |
@@ -172,7 +175,12 @@ RMS -18 / 峰值 -1 dBFS,CLIPS 后缀改 .wav;`sfx_apply.py` 重算 GAIN_DB(全�
 `assets/sfx/音效位置.md`「现用文件与来源」;合成器补 loom 配方;headless 145/145;用户听过 itch.io 版后改:进入选关页响纸翻页 page(「开始游戏」按钮静音),织布机 loom 只留选定一关)✅ → **音效复核**(2026-09-02,用户「check 奇怪的音效与硬 bug」:`tools/sfx_trace.gd` 真实输入全流程逐步打印槽位 + Chrome 里核对 Web 版送进 Web Audio 的缓冲;
 改掉 重做快捷键走撤销分支(先判 ui_redo)/ 钉纹样弹窗 Esc·点外面关闭无声(popup_hide 统一响 close)/ 改接连响 unplug+pick(同帧不叠 pick)/ 换场景光标底下的按钮自己响 hover(要有鼠标移动);
 UI 冒烟 260/260、headless 145/145;TUTORIAL 3.9 复核段)✅ → **笔记「新机器!」**(2026-09-02,用户:新机器出现时翻到它那页(已有,复核 l02/l07 冒烟)+ 纸左上角「新机器!」字样;美术没有 → 纯文字 + 常量留位
-`NotebookUI.NEW_LABEL_*`(纸面左上角实测 (411,278) 向内、82 号、正文红 A3472E),`set_new_rules(debut_rules)` 进关传入、`_show_page` 按条目显隐;UI 冒烟 S 段 8 条新断言;ART_INTERFACE §3 / CONTENT_INTERFACE / TUTORIAL 同步)✅。
+`NotebookUI.NEW_LABEL_*`(纸面左上角实测 (411,278) 向内、82 号、正文红 A3472E),`set_new_rules(debut_rules)` 进关传入、`_show_page` 按条目显隐;UI 冒烟 S 段 8 条新断言;ART_INTERFACE §3 / CONTENT_INTERFACE / TUTORIAL 同步)✅ →
+**英文版**(2026-09-03,用户「所有地方都翻译的英文版,在设置里改语言」:TranslationServer + `locale/ui.csv` 146 键(键 = 中文原串,Control auto_translate,`.text` 仍中文、测试不用改;
+fallback 必须 zh)、设置弹窗「语言:中文 / Language: English」行(`settings.language`,重置不清)、标题页收到翻译通知延迟一帧重排 + 标题图换 `.en`;103 句台词英文列 `语句_en` → `DialogueLine.text_en`
+(`xlsx_to_csv.py` 重导时并回译文);11 张烧字的图由 `tools/gen_locale_art.gd` 出 `<名字>.en.png` 占位(擦墨迹 + 站酷小薇体写英文,笔记文案 `locale/notebook_en.gd`)按 `translation_remaps` 换图;
+小机英文语音 `lines_en` → `<cue>_en.wav`(`localize_commands` 英文模式换名)+ 英文唤醒 "please guide me"(`listen.py` 中英双识别器,`get_model.sh all`);
+仪器英译 Plying / Unply / Sealing / Redeem / Forking / Merging / Ruin Loom,小机 = Bobbin;headless 155/155,UI 冒烟 V 段;TUTORIAL 3.10)✅。
 更新接口见 `docs/CONTENT_INTERFACE.md`、`docs/ART_INTERFACE.md`;机器人手册见 `docs/ROBOT_API.md`;整体设计与改法教程见 `docs/TUTORIAL.md`。
 关卡逐关总结、难度曲线诊断与 25 关重设计提案见 `docs/LEVEL_DESIGN.md`(提案关卡已在引擎上验证可解)。
 全流程回归:`tests/visual_smoke_m3.gd`(16 关自动通关 + 结局到开发者页);UI 交互矩阵(真实输入):`tests/visual_smoke_ui.gd`。

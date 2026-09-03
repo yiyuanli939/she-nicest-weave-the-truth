@@ -30,6 +30,7 @@
 | 对话界面/亚瑟(默认).png(801×1778) | `assets/art/story/char_arthur_default.png` | 配角立绘 |
 | 对话界面/*遮罩.png | `assets/art/story/char_{nora,lia,arthur}_mask.png` | 非发言者 50% 遮罩 |
 | v1.2背景/image.png(1174×816,圆角透明) | `assets/art/level/win_popup.png` | 通关弹窗「织成了」(v1.2;居中原尺寸,「继续」为纯文字叠在图上) |
+| (英文版,2026-09-03)`<名字>.en.png` | 上表中烧了中文的 11 张旁边:`title.en.png`、`palette_bg.en.png`、`win_popup.en.png`、`story/base.en.png`、`notebook/<rule_id>.en.png` ×7 | 英文模式按 `project.godot` `translation_remaps` 自动换图。**现为程序占位图**(`tools/gen_locale_art.gd`:擦中文墨迹 + 站酷小薇体写英文,笔记页文案在 `locale/notebook_en.gd`);美术交英文图**直接覆盖同名 `.en.png`,尺寸须与原图一致**(`tests/test_locale_art.gd` 盯尺寸 / 笔记页收起不露出 / 改动只在中文墨迹区)。别的图(背景、立绘、按钮牌)没有文字,不用英文版 |
 
 新加立绘/场景:按上面的命名规则放进目录,再在 `narrative/story_art.gd` 的 `CHARACTERS / EXPRESSIONS / SCENES` 表补一行。
 所有 PNG 的导入都开了 mipmaps(`.import` 里 `mipmaps/generate=true`),窗口缩小显示不闪;**新图导入必须也开**
