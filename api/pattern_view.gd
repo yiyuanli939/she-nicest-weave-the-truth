@@ -16,7 +16,7 @@ const BASE_LINE_W := 8.0
 const LINEN := Color(0.91, 0.87, 0.78)      # 亚麻底
 const CHAR_BLACK := Color(0.12, 0.10, 0.09) # 焦黑
 const SPLIT_COLOR := Color(0.23, 0.18, 0.12)
-const REGION_BORDER_W := 3.0   # 按子命题着色的区域边框线宽(v1.1 §4.2)
+const REGION_BORDER_W := 4.5   # 按子命题着色的区域边框线宽(v1.1 §4.2)
 
 const GHOST_ALPHA := 0.5   # 原子色降饱和提亮后,0.4 的幽灵态在乳黄节点底上会糊
 

@@ -13,8 +13,8 @@ const BASE_PATH := "res://assets/art/story/base.png"
 const BASE_POS := Vector2(2, 18)                     # 底图 3835×2123 左上角(居中;视口比它大 5×37 px,四边由 BG_COLOR 白底补齐)
 const BG_COLOR := Color.WHITE                        # 底图四边纯白;不垫底会露出引擎清屏色(顶 18 / 底 19 / 左 2 / 右 3 px 灰边)
 const SCENE_RECT := Rect2(946, 86, 1942, 1251)       # 场景插图区:画框内沿 x 947..2887、y 86..1336(图 1942 宽比开口多 1 px)
-const LEFT_FRAME := Rect2(88, 188, 815, 1800)        # 左立绘框(超出部分裁掉):框线内沿 x 88..902;底边 1987 = 美术预览脚底(地板线在 2001)
-const RIGHT_FRAME := Rect2(2933, 188, 815, 1800)     # 右立绘框(诺拉):内沿 x 2933..3747
+const LEFT_FRAME := Rect2(88, 204, 815, 1800)        # 左立绘框(超出部分裁掉):框线内沿 x 88..902;底边 1987 = 美术预览脚底(地板线在 2001)
+const RIGHT_FRAME := Rect2(2933, 204, 815, 1800)     # 右立绘框(诺拉):内沿 x 2933..3747
 # 立绘默认「框内水平居中、底边对齐框底」,这里按角色再微调(像素):莉娅 821 宽比框 815 宽,美术预览把她贴右
 const PORTRAIT_NUDGE: Dictionary = {"诺拉": Vector2.ZERO, "莉娅": Vector2(4, 0), "亚瑟": Vector2.ZERO}
 const NAME_POS := Vector2(1040, 1490)                # 发言人名字左上角
