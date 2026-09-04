@@ -32,7 +32,7 @@ nora_expr = "严肃"
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "我们有A为真，也有B为真，因此可以得到“A且B”，或者说“A合取B”为真……"
-text_en = "We have A true, and we have B true, therefore we may obtain “A and B”, or in other words “A conjoined with B”, as true…"
+text_en = "We have A true, and we have B true, therefore we may obtain \"A and B\", or in other words \"A conjoined with B\", as true…"
 scene = "诺拉房间"
 nora_expr = "严肃"
 
@@ -40,7 +40,7 @@ nora_expr = "严肃"
 script = ExtResource("1_sk1ha")
 speaker = "诺拉·拉芙蒂"
 text = "把字符换成颜色，把“为真”换成“纹样”……这不就是……并织吗？"
-text_en = "Swap the letters for colors, swap “true” for “pattern”… isn't this just… plying?"
+text_en = "Swap the letters for colors, swap \"true\" for \"pattern\"… isn't this just… plying?"
 scene = "诺拉房间"
 nora_expr = "惊讶"
 

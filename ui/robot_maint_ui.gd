@@ -252,7 +252,7 @@ func _refresh() -> void:
 		lines.append(tr("桥接:已连") if _robot.connected else tr("桥接:未连(点「接入小机」,或手动 bash hardware/run_robot.sh)"))
 		lines.append(tr("串口 / 小机:在线") if _robot.serial_open else tr("串口 / 小机:离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)"))
 		if _robot.speech_online:
-			lines.append(tr("语音助手:在线(%s),说「请指导我」或「请帮帮我」/ “please guide me”") % ", ".join(PackedStringArray(_robot.speech_langs)))
+			lines.append(tr("语音助手:在线(%s),说「请指导我」或「请帮帮我」/ please guide me") % ", ".join(PackedStringArray(_robot.speech_langs)))
 		else:
 			lines.append(tr("语音助手:离线(需要 hardware/speech/model,第一次要允许麦克风)"))
 		if _robot.serial_open:

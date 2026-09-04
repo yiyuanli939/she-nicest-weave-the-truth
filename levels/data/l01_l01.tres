@@ -57,7 +57,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "诺拉·拉芙蒂"
 text = "可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。"
-text_en = "But I heard that what really drives these machines are the “programmes” written by the Academy. They're so rigorous and so intricate that no ordinary person can grasp them; only the most rational gentlemen of the Academy can master them."
+text_en = "But I heard that what really drives these machines are the \"programmes\" written by the Academy. They're so rigorous and so intricate that no ordinary person can grasp them; only the most rational gentlemen of the Academy can master them."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -65,7 +65,7 @@ left_char = "莉娅"
 script = ExtResource("1_j62nj")
 speaker = "莉娅·科尔宾"
 text = "学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。"
-text_en = "The Academy writes its symbols; we weave the patterns by the rules. What counts as “real learning” is the gentlemen's favorite thing to argue about. We just keep the city from grinding to a halt."
+text_en = "The Academy writes its symbols; we weave the patterns by the rules. What counts as \"real learning\" is the gentlemen's favorite thing to argue about. We just keep the city from grinding to a halt."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "严肃"

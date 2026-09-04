@@ -315,6 +315,7 @@ disconnection_request + connection_drag_started,连响 unplug + pick,松手再 d
   **必须带窗口跑**,dummy 渲染器出不了图;笔记页英文文案 `locale/notebook_en.gd`)。
 - **小机**:`RobotLink.localize_commands`(英文模式 `say <cue>` → `<cue>_en`,有 wav 才换);`GUIDE_PHRASES` 分 zh/en,`matches_guide` 两种都认;
   `listen.py` 中英两个 `KaldiRecognizer` 喂同一段音频(`--lang zh|en|all`,`speech_ready/alive` 带 `langs`);`make_voices.sh` 按 `lines`/`lines_en` 出两套 wav。
+- **字形**:英文只用 ASCII + – — …;弯引号 “ ” ‘ ’ 在站酷小薇体里是全角字形、两边留大空(试过,像「Say  “please guide me”  or」),一律直引号。
 - **测试**:`tests/test_locale.gd`(表完整 / 每条含汉字的字面量都在表里或 EXCLUDE / 往返 / remaps / 台词英文列全填)、`tests/test_locale_art.gd`(.en 图同尺寸、
   笔记页收起不露出、改动只在擦除框内、mipmap)、`test_theme` 扫 en 列字形、`test_settings` 语言行、`test_robot_logic` 英文唤醒与 `_en` 换名、`test_dialogue_import` 英文列、
   UI 冒烟 V 段(点「语言」→ 标题五项英文并重新居中、标题图换 `.en`、选关/故事/棋盘/笔记/通关弹窗全英文、切回)。

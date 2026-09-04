@@ -110,7 +110,7 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 机制 = Godot TranslationServer,**翻译表 `locale/ui.csv`**(三列 `keys,zh,en`,**键就是代码里的中文原串**,zh 列 = 键):
 UI 上所有 Label / Button / tooltip / 节点标题默认自动查表(auto_translate),所以代码里 `text = "继续"` 一行不改、表里加一行即换。
 - **改英文文案**:直接改 `locale/ui.csv` 的 en 列(Excel / 文本编辑器都行;含逗号或换行的格子用引号包住),然后 `godot --headless --path . --import`
-  重生成 `locale/ui.zh.translation` / `ui.en.translation`(连 `.import` 一起提交)。英文只许 ASCII + “ ” ‘ ’ – — …(站酷小薇体没有重音字母)。
+  重生成 `locale/ui.zh.translation` / `ui.en.translation`(连 `.import` 一起提交)。英文只许 ASCII + – — …(站酷小薇体没有重音字母;弯引号 “ ” 是全角字形、两边留大空,一律用直引号 ")。
 - **代码里新加了一句中文** → 表里加一行(`tests/test_locale.gd` 会扫所有含汉字的字面量,不在表里就红;内部键如角色名/表情名在它的 EXCLUDE 里)。
   拼接出来的串查不到表:开关文字写成整串键(「全屏:开」「全屏:关」),带参数的用 `tr("台词「%s」为空") % cue`。
 - **关名 / 章名 / 仪器名 / 角色全名**:`.tres` 与 `logic/rules.gd`、`narrative/story_art.gd` 保持中文(它们同时是美术登记键),只在表里给英文。

@@ -48,7 +48,7 @@ func test_all_visible_text_in_bundled_font() -> bool:
 		for fname in DirAccess.get_files_at(dir):
 			if fname.ends_with(".tres"):
 				_collect_chars(FileAccess.get_file_as_string(dir + "/" + fname), dir + "/" + fname, chars)
-	# 英文文案:翻译表 en 列 + 笔记英文页文案(locale/*.gd)—— 站酷小薇体没有重音字母,“ ” ‘ ’ – — … 有
+	# 英文文案:翻译表 en 列 + 笔记英文页文案(locale/*.gd)—— 站酷小薇体没有重音字母,– — … 有(弯引号是全角字形,英文不用)
 	var importer: GDScript = load("res://tools/import_dialogue.gd")
 	for row in importer.split_rows(FileAccess.get_file_as_string("res://locale/ui.csv")):
 		if row.size() >= 3:

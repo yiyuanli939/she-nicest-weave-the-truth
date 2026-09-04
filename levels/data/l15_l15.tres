@@ -24,7 +24,7 @@ nora_expr = "苦恼"
 script = ExtResource("1_83lky")
 speaker = "诺拉·拉芙蒂"
 text = "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
-text_en = "The machine didn't turn one state into two. Two physical signals were interpreted by the programme as “P” and “not P”."
+text_en = "The machine didn't turn one state into two. Two physical signals were interpreted by the programme as \"P\" and \"not P\"."
 scene = "诺拉房间"
 nora_expr = "苦恼"
 

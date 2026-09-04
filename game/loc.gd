@@ -8,7 +8,7 @@ extends RefCounted
 ## 图:烧了中文的美术图按 project.godot 的 translation_remaps 换成 <名字>.en.png(load 时自动;localized_path 给代码/测试查)。
 ## 启动:Game._ready 按 settings.language 设 locale(默认 zh;不设的话 TranslationServer 会取系统语言);
 ## 切换:SettingsPanel「语言」行 → Game.set_language → 全树 NOTIFICATION_TRANSLATION_CHANGED + 已加载的换图资源原地重载。
-## 英文文案只许 ASCII + “ ” ‘ ’ – — …(站酷小薇体没有重音字母,tests/test_locale.gd 盯)。
+## 英文文案只许 ASCII + – — …(站酷小薇体没有重音字母;弯引号 “ ” 是全角字形、两边留大空,英文一律用直引号;tests/test_locale.gd 盯)。
 
 const DEFAULT := "zh"
 const LANGUAGES: Array[String] = ["zh", "en"]

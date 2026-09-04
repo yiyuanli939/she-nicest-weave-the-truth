@@ -23,6 +23,9 @@ func _count(sfx: Node, slot: StringName) -> int:
 func test_board_and_level_hooks() -> bool:
 	var tree := Engine.get_main_loop() as SceneTree
 	var sfx := _sfx()
+	var game := tree.root.get_node_or_null(^"Game")
+	if game != null:
+		game.save.steps = {}   # 有 Game autoload 时指引记忆来自开发机存档:冒烟 / 出图工具刚记过 steps 的话进关就没有指引、hint 不响
 	var scene := LevelScene.new()
 	tree.root.add_child(scene)
 	var board: ProofBoard = scene._board

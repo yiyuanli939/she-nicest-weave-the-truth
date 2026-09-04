@@ -1170,7 +1170,7 @@ func _run() -> void:
 	_check(Loc.current() == "zh" and game.save.settings.get("language") == "zh" and zh_names == ["开始游戏", "重置进度", "开发者信息", "退出游戏", "设置"]
 			and sp_v._lang_btn.atr(sp_v._lang_btn.text) == "语言:中文" and menu_v._title.texture.resource_path.ends_with("title.png"), "再点切回中文:五项中文、标题图回中文版")
 	game.save.settings.erase("language")   # 开发机不留痕:回到默认中文
-	game.save.save()
+	game.save.wipe()                        # 进 l02 记下的操作指引 steps 也清掉(headless test_sfx_hooks 要求进关时指引出现)
 	_click(_center(sp_v._close_btn), MOUSE_BUTTON_LEFT)
 	await _settle()
 

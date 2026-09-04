@@ -8,7 +8,7 @@
 script = ExtResource("1_fl7da")
 speaker = "诺拉·拉芙蒂"
 text = "连着下了几天雨以后就不对劲了。邮报机把一封信判给两条路，清扫机来回改向，连门禁都能同时亮“允许”和“拒绝”。"
-text_en = "After several days of rain things went wrong. The post machine sends one letter down two routes, the sweepers keep changing direction, even the door guards light “allow” and “deny” at the same time."
+text_en = "After several days of rain things went wrong. The post machine sends one letter down two routes, the sweepers keep changing direction, even the door guards light \"allow\" and \"deny\" at the same time."
 scene = "伦敦街上"
 nora_expr = "苦恼"
 

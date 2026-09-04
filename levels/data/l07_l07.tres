@@ -8,7 +8,7 @@
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。"
-text_en = "Today we learn “redeeming”. If you have a layered pattern of red over blue, and a red thread besides, you can draw out the blue thread."
+text_en = "Today we learn \"redeeming\". If you have a layered pattern of red over blue, and a red thread besides, you can draw out the blue thread."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -40,7 +40,7 @@ left_char = "莉娅"
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。"
-text_en = "Good question! Such a pattern is a kind of “phantom pattern”: it can be fed into other looms, but only into looms; it can't be handed in for inspection as it is."
+text_en = "Good question! Such a pattern is a kind of \"phantom pattern\": it can be fed into other looms, but only into looms; it can't be handed in for inspection as it is."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -48,7 +48,7 @@ left_char = "莉娅"
 script = ExtResource("1_s2jwe")
 speaker = "莉娅·科尔宾"
 text = "不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。"
-text_en = "But a new pattern you make with the phantom can be fed back into the Sealing Loom, which produces a layered pattern with what you pinned on top and the new pattern below — and that layered pattern is a “solid pattern” that passes inspection."
+text_en = "But a new pattern you make with the phantom can be fed back into the Sealing Loom, which produces a layered pattern with what you pinned on top and the new pattern below — and that layered pattern is a \"solid pattern\" that passes inspection."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -56,7 +56,7 @@ left_char = "莉娅"
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。"
-text_en = "In the Academy's notation… A, together with “if A holds, then B holds”, or “A implies B”, gives you B."
+text_en = "In the Academy's notation… A, together with \"if A holds, then B holds\", or \"A implies B\", gives you B."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -64,7 +64,7 @@ left_char = "莉娅"
 script = ExtResource("1_s2jwe")
 speaker = "诺拉·拉芙蒂"
 text = "假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。"
-text_en = "Assume A; if you can obtain B, then you obtain “if A holds, then B holds”."
+text_en = "Assume A; if you can obtain B, then you obtain \"if A holds, then B holds\"."
 scene = "工坊"
 left_char = "莉娅"
 

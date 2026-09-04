@@ -16,7 +16,7 @@ left_char = "亚瑟"
 script = ExtResource("1_77kt7")
 speaker = "莉娅·科尔宾"
 text = "正好。诺拉，今天学“岔纹”。一条已经成立的纹样，可以结合你自己钉的任意纹样，得到一张“茬纹”，这次可是实纹哦，很方便吧。"
-text_en = "Good timing. Nora, today we learn “forking”. A pattern that already holds can be joined with any pattern you pin yourself to give a “fork pattern” — and this time it's a solid one. Handy, isn't it?"
+text_en = "Good timing. Nora, today we learn \"forking\". A pattern that already holds can be joined with any pattern you pin yourself to give a \"fork pattern\" — and this time it's a solid one. Handy, isn't it?"
 scene = "工坊"
 left_char = "莉娅"
 
@@ -32,7 +32,7 @@ left_char = "莉娅"
 script = ExtResource("1_77kt7")
 speaker = "诺拉·拉芙蒂"
 text = "A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……"
-text_en = "A holds, so “A or B”, “A disjoined with B”, holds… and when A or B holds, if A implies C and B implies C, then C holds too…"
+text_en = "A holds, so \"A or B\", \"A disjoined with B\", holds… and when A or B holds, if A implies C and B implies C, then C holds too…"
 scene = "工坊"
 left_char = "莉娅"
 

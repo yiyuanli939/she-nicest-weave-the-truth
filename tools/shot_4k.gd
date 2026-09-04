@@ -1,12 +1,14 @@
 extends SceneTree
 ## 1:1 全分辨率截图(3840×2160)给美术对照 —— 冒烟测试的截图随窗口缩放(Mac 上是 0.7875×),肉眼对不准像素。
-## 这里把各界面放进一个 3840×2160 的 SubViewport 离屏渲染再存 PNG,与窗口大小无关;不改存档。
+## 这里把各界面放进一个 3840×2160 的 SubViewport 离屏渲染再存 PNG,与窗口大小无关;存档先备份、出完图复原
+## (摆机 / 接线会让 LevelScene 把操作指引 steps 记进存档,headless test_sfx_hooks 要求开发机存档没有 steps)。
 ##   "$GODOT" --path . --script res://tools/shot_4k.gd
 ## 出图(build/shots4k/,已 gitignore + .gdignore,编辑器不会给截图生成 .import):
 ##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
 ##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗
 ##   4k_editor_bot.png 同弹窗解锁焦纹(第四章)时的笔刷行:第四个笔刷是焦纹图样(v1.2)
-##   4k_settings.png 标题页「设置」弹窗 / 4k_win.png 通关弹窗「织成了」(v1.2,直接弹出不走通关:通关会写存档)。
+##   4k_settings.png 标题页「设置」弹窗 / 4k_win.png 通关弹窗「织成了」(v1.2,直接弹出不走通关:通关会写存档)/ 4k_maint.png 小机维护面板。
+##   `-- en`:切到英文再出图(文件名 4k_en_*.png):翻译键换英文、烧字的图换 <名字>.en.png、台词 text_en —— 给美术对照英文版。
 ## 对照法:与 笔记本页面补充/位置参考.png、美术预览图叠图看边,或用 Python(PIL/numpy)做模板匹配;
 ## 引擎常量与参考实测数字见 docs/ART_INTERFACE.md「参考基准与实测值」。
 
@@ -14,12 +16,17 @@ const OUT_DIR := "res://build/shots4k"
 const SIZE := Vector2i(3840, 2160)
 
 var _sv: SubViewport
+var _prefix := "4k_"
 
 
 func _initialize() -> void:
 	await process_frame
 	OS.low_processor_usage_mode = false   # 项目开了低功耗模式(画面没变化不重绘),离屏渲染要每帧都画
 	var game := root.get_node("/root/Game")
+	var save_backup := FileAccess.get_file_as_bytes(SaveManager.PATH)   # 出完图原样写回
+	if OS.get_cmdline_user_args().has("en"):   # 英文版出图(只切运行态 locale,不写 settings)
+		Loc.apply("en")
+		_prefix = "4k_en_"
 	AudioServer.set_bus_mute(0, true)   # 出图别出声
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 	var first: LevelDef = game.catalog.chapters[0].levels[0]
@@ -39,6 +46,13 @@ func _initialize() -> void:
 	menu._settings.open()
 	await _wait(0.3)
 	_save("4k_settings")
+	menu._settings.close()
+	var robot := root.get_node_or_null("/root/Robot")
+	if robot != null:
+		menu._cal_ui.open(robot)
+		await _wait(0.3)
+		_save("4k_maint")
+		menu._cal_ui.visible = false
 	_unmount()
 
 	game.current = first
@@ -98,7 +112,12 @@ func _initialize() -> void:
 	_save("4k_editor_bot")
 	scene2._editor.hide()
 	_unmount()
-	print("4K 截图已写到 %s/4k_*.png" % OUT_DIR)
+	print("4K 截图已写到 %s/%s*.png" % [OUT_DIR, _prefix])
+	Loc.apply(Loc.DEFAULT)
+	var f := FileAccess.open(SaveManager.PATH, FileAccess.WRITE)
+	if f != null:
+		f.store_buffer(save_backup)
+		f.close()
 	quit(0)
 
 
@@ -134,5 +153,5 @@ func _wait(sec: float) -> void:
 
 func _save(tag: String) -> void:
 	var img := _sv.get_texture().get_image()
-	img.save_png("%s/%s.png" % [OUT_DIR, tag])
-	print("  %s.png %dx%d" % [tag, img.get_width(), img.get_height()])
+	img.save_png("%s/%s%s.png" % [OUT_DIR, _prefix, tag.trim_prefix("4k_")])
+	print("  %s%s.png %dx%d" % [_prefix, tag.trim_prefix("4k_"), img.get_width(), img.get_height()])

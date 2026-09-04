@@ -3,8 +3,8 @@ extends TestBase
 ## 代码/关卡里每条玩家可见的中文都在表里(否则英文模式漏中文)、切 locale 往返、按语言换图的表、台词英文列。
 
 const UI_CSV := "res://locale/ui.csv"
-## 英文文案只许 ASCII 加这几个排版符(站酷小薇体没有重音字母、没有「·」)
-const EN_EXTRA := ["“", "”", "‘", "’", "–", "—", "…"]
+## 英文文案只许 ASCII 加这几个排版符(站酷小薇体没有重音字母、没有「·」;弯引号 “ ” ‘ ’ 在这套字体里是全角字形、两边留大空,英文一律用直引号)
+const EN_EXTRA := ["–", "—", "…"]
 ## 扫字面量的目录(test_theme 的五个 + 逻辑/接口/关卡层)
 const SCAN_DIRS := ["res://ui", "res://board", "res://pattern", "res://narrative", "res://game", "res://api", "res://logic", "res://levels"]
 ## 含汉字但不是显示文本的字面量:美术登记键 / 表情键 / 内部名 / 量字形用的字 / 语音唤醒短语 / 只进日志的格式串
@@ -67,7 +67,7 @@ func test_ui_csv_well_formed() -> bool:
 		ok = check(String(r[1]) == key, "第 %d 行 zh 列 = 键(fallback 是 zh,zh 列缺了英文模式会漏成英文):%s" % [i + 1, key]) and ok
 		var en := String(r[2])
 		ok = check(en != "" and en != key, "第 %d 行 en 非空且已翻:%s" % [i + 1, key]) and ok
-		ok = check(en_text_ok(en) and not _has_han(en), "第 %d 行 en 只用 ASCII + “ ” ‘ ’ – — …(字体没有重音字母):%s" % [i + 1, en]) and ok
+		ok = check(en_text_ok(en) and not _has_han(en), "第 %d 行 en 只用 ASCII + – — …(字体没有重音字母;弯引号是全角,用直引号):%s" % [i + 1, en]) and ok
 		ok = check(key.count("%s") == en.count("%s") and key.count("%d") == en.count("%d"), "第 %d 行占位符个数一致:%s" % [i + 1, key]) and ok
 	return ok
 

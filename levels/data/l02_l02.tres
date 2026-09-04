@@ -8,7 +8,7 @@
 script = ExtResource("1_vrjea")
 speaker = "莉娅·科尔宾"
 text = "今天学“并织”。左路已经稳定，右路也已经稳定，就能把两路并成一个纹样；反过来，从完整并织里也能单独取出其中一路。"
-text_en = "Today we learn “plying”. When the left path is settled and the right path is settled too, you can ply the two into one pattern; and the other way round, from a finished plied pattern you can pull out either path on its own."
+text_en = "Today we learn \"plying\". When the left path is settled and the right path is settled too, you can ply the two into one pattern; and the other way round, from a finished plied pattern you can pull out either path on its own."
 scene = "工坊"
 left_char = "莉娅"
 
@@ -77,7 +77,7 @@ nora_expr = "惊讶"
 script = ExtResource("1_vrjea")
 speaker = "莉娅·科尔宾"
 text = "他们管这叫“经验现象”。没有学院的人署名，就进不了正式档案。别皱眉，我都抱怨好多年了。"
-text_en = "They call it an “empirical phenomenon”. Without an Academy man's signature it never enters the official archive. Don't frown; I've been complaining about it for years."
+text_en = "They call it an \"empirical phenomenon\". Without an Academy man's signature it never enters the official archive. Don't frown; I've been complaining about it for years."
 scene = "工坊"
 left_char = "莉娅"
 left_expr = "苦恼"

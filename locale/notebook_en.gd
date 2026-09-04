@@ -3,7 +3,7 @@ extends RefCounted
 ## 诺拉的笔记 —— 七页整页图的英文文案(中文只画在 assets/art/level/notebook/<rule_id>.png 里,这里是英文版唯一的文字源)。
 ## tools/gen_locale_art.gd 用它把英文画进 <rule_id>.en.png(程序占位图,美术交英文图后直接覆盖文件即可)。
 ## 文案守则同 docs/CONTENT_INTERFACE.md 笔记段:只用纺织词汇(pattern / ply / layered docket / fork / scorched …),
-## 不出现逻辑符号或规则名;只用 ASCII + “ ” ‘ ’ – — …(站酷小薇体没有重音字母,tests/test_theme.gd 盯)。
+## 不出现逻辑符号或规则名;只用 ASCII + – — …(站酷小薇体没有重音字母,弯引号是全角字形不用;tests/test_theme.gd 盯)。
 ## 仪器英文名与 locale/ui.csv 一致(Plying / Unply / Sealing / Redeem / Forking / Merging / Ruin Loom)。
 
 const PAGES: Dictionary = {

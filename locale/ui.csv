@@ -42,7 +42,7 @@ keys,zh,en
 测试用:重置并自动摆出本关答案(仅调试版可见),测试用:重置并自动摆出本关答案(仅调试版可见),Debug only: reset and lay out this level's answer (debug builds only)
 织成了!,织成了!,Woven!
 继续,继续,Continue
-有困难可以对小机说:「请指导我」或「请帮帮我」,有困难可以对小机说:「请指导我」或「请帮帮我」,Stuck? Say to Bobbin: “please guide me” or “please help me”
+有困难可以对小机说:「请指导我」或「请帮帮我」,有困难可以对小机说:「请指导我」或「请帮帮我」,"Stuck? Say to Bobbin: ""please guide me"" or ""please help me"""
 "有一口的纹样要你自己定:点这台仪器里纹样旁边的钉纹样按钮,画一幅钉上去","有一口的纹样要你自己定:点这台仪器里纹样旁边的钉纹样按钮,画一幅钉上去",One port's pattern is up to you: press Pin next to the pattern in that instrument and draw one to pin on
 "从左边的仪器架点一台仪器,它会落在织案中央","从左边的仪器架点一台仪器,它会落在织案中央",Pick an instrument from the rack on the left; it lands in the middle of the loom bench
 "按住线轴或仪器的出口往外拖出一条线,接到下一台仪器或目标织机的入口","按住线轴或仪器的出口往外拖出一条线,接到下一台仪器或目标织机的入口",Drag a thread out from a spool or an instrument's outlet and plug it into the next instrument or the Goal Loom
@@ -82,7 +82,8 @@ keys,zh,en
 work"
 "笔
 记","笔
-记",Notes
+记","Note
+book"
 小艺(小智同款),小艺(小智同款),Xiaoyi (Xiaozhi's voice)
 晓晓,晓晓,Xiaoxiao
 晓双(童声),晓双(童声),Xiaoshuang (child)
@@ -101,14 +102,14 @@ work"
 刷入固件与语音,刷入固件与语音,Flash firmware and voices
 试转一下,试转一下,Test turn
 摄像头验证云台,摄像头验证云台,Verify gimbal with camera
-"小机声音:改音色 / 音量 / 台词(中文一行、英文一行),先「保存并生成语音」(需联网),再「刷入固件与语音」送进小机","小机声音:改音色 / 音量 / 台词(中文一行、英文一行),先「保存并生成语音」(需联网),再「刷入固件与语音」送进小机","Bobbin's voice: change the voices, volume and lines (one Chinese row, one English row), then “Save and generate voices” (needs internet), then “Flash firmware and voices” to send them to Bobbin"
+"小机声音:改音色 / 音量 / 台词(中文一行、英文一行),先「保存并生成语音」(需联网),再「刷入固件与语音」送进小机","小机声音:改音色 / 音量 / 台词(中文一行、英文一行),先「保存并生成语音」(需联网),再「刷入固件与语音」送进小机","Bobbin's voice: change the voices, volume and lines (one Chinese row, one English row), then ""Save and generate voices"" (needs internet), then ""Flash firmware and voices"" to send them to Bobbin"
 音色,音色,Voice
 英文音色,英文音色,English voice
 音量,音量,Volume
 试听,试听,Play
 英文,英文,English
 保存并生成语音,保存并生成语音,Save and generate voices
-"校准「看电脑方向」:自动 = 小机左右张望,正对屏幕时朝它挥手(或按它的 BOOT 键);手动 = 微调后保存。","校准「看电脑方向」:自动 = 小机左右张望,正对屏幕时朝它挥手(或按它的 BOOT 键);手动 = 微调后保存。","Calibrate “facing the screen”: auto = Bobbin looks left and right, wave at it (or press its BOOT key) when it faces the screen; manual = nudge, then save."
+"校准「看电脑方向」:自动 = 小机左右张望,正对屏幕时朝它挥手(或按它的 BOOT 键);手动 = 微调后保存。","校准「看电脑方向」:自动 = 小机左右张望,正对屏幕时朝它挥手(或按它的 BOOT 键);手动 = 微调后保存。","Calibrate ""facing the screen"": auto = Bobbin looks left and right, wave at it (or press its BOOT key) when it faces the screen; manual = nudge, then save."
 开始自动校准(挥手锁定),开始自动校准(挥手锁定),Start auto calibration (wave to lock)
 左,左,Left
 右,右,Right
@@ -118,12 +119,12 @@ work"
 已请求保存…,已请求保存…,Save requested…
 机器人:已启用(点击切换),机器人:已启用(点击切换),Robot: enabled (click to toggle)
 机器人:无机器人模式(点击切换),机器人:无机器人模式(点击切换),Robot: no-robot mode (click to toggle)
-"无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」","无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」","No-robot mode: no bridge, no commands, no help hint in levels, no “Bobbin Service” on the credits page"
+"无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」","无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」","No-robot mode: no bridge, no commands, no help hint in levels, no ""Bobbin Service"" on the credits page"
 桥接:已连,桥接:已连,Bridge: connected
-"桥接:未连(点「接入小机」,或手动 bash hardware/run_robot.sh)","桥接:未连(点「接入小机」,或手动 bash hardware/run_robot.sh)","Bridge: not connected (press “Connect Bobbin”, or run bash hardware/run_robot.sh by hand)"
+"桥接:未连(点「接入小机」,或手动 bash hardware/run_robot.sh)","桥接:未连(点「接入小机」,或手动 bash hardware/run_robot.sh)","Bridge: not connected (press ""Connect Bobbin"", or run bash hardware/run_robot.sh by hand)"
 串口 / 小机:在线,串口 / 小机:在线,Serial / Bobbin: online
 "串口 / 小机:离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)","串口 / 小机:离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)","Serial / Bobbin: offline (USB not plugged in, or the bridge has not found /dev/cu.usbmodem* yet)"
-"语音助手:在线(%s),说「请指导我」或「请帮帮我」/ “please guide me”","语音助手:在线(%s),说「请指导我」或「请帮帮我」/ “please guide me”","Voice assistant: online (%s), say “please guide me” or “please help me”"
+"语音助手:在线(%s),说「请指导我」或「请帮帮我」/ please guide me","语音助手:在线(%s),说「请指导我」或「请帮帮我」/ please guide me","Voice assistant: online (%s), say ""please guide me"" or ""please help me"""
 "语音助手:离线(需要 hardware/speech/model,第一次要允许麦克风)","语音助手:离线(需要 hardware/speech/model,第一次要允许麦克风)",Voice assistant: offline (needs hardware/speech/model; allow the microphone the first time)
 固件外设:屏幕 %s / 功放 %s,固件外设:屏幕 %s / 功放 %s,Firmware peripherals: screen %s / amplifier %s
 正常,正常,OK
@@ -138,13 +139,13 @@ work"
 "刷写中(会先停桥接,完成后自动重新接入)…","刷写中(会先停桥接,完成后自动重新接入)…",Flashing (the bridge stops first and reconnects when done)…
 "摄像头验证中:先确认小机在画面里(第一次要允许摄像头),然后转 pan / tilt 各两次…","摄像头验证中:先确认小机在画面里(第一次要允许摄像头),然后转 pan / tilt 各两次…","Camera check: make sure Bobbin is in view (allow the camera the first time), then pan and tilt twice each…"
 "找不到 hardware/ 目录或脚本,请手动跑 hardware/%s","找不到 hardware/ 目录或脚本,请手动跑 hardware/%s",Cannot find the hardware/ directory or script; run hardware/%s by hand
-语音生成完毕:点「刷入固件与语音」送进小机。,语音生成完毕:点「刷入固件与语音」送进小机。,Voices generated: press “Flash firmware and voices” to send them to Bobbin.
+语音生成完毕:点「刷入固件与语音」送进小机。,语音生成完毕:点「刷入固件与语音」送进小机。,"Voices generated: press ""Flash firmware and voices"" to send them to Bobbin."
 截图在 hardware/.run/cam/cam_report.png,截图在 hardware/.run/cam/cam_report.png,Screenshot at hardware/.run/cam/cam_report.png
 找不到 hardware/firmware/sounds/lines.json,找不到 hardware/firmware/sounds/lines.json,Cannot find hardware/firmware/sounds/lines.json
-台词「%s」为空,台词「%s」为空,Line “%s” is empty
+台词「%s」为空,台词「%s」为空,"Line ""%s"" is empty"
 写不了 %s,写不了 %s,Cannot write %s
 "已保存台词,正在用微软语音生成 wav(中英各五句,需联网,约半分钟)…","已保存台词,正在用微软语音生成 wav(中英各五句,需联网,约半分钟)…","Lines saved; generating the wav files with Microsoft voices (five Chinese and five English, needs internet, about half a minute)…"
-"还没有 %s.wav,先「保存并生成语音」","还没有 %s.wav,先「保存并生成语音」",No %s.wav yet; press “Save and generate voices” first
+"还没有 %s.wav,先「保存并生成语音」","还没有 %s.wav,先「保存并生成语音」","No %s.wav yet; press ""Save and generate voices"" first"
 读不了 %s,读不了 %s,Cannot read %s
 试听 %s:%s,试听 %s:%s,Playing %s: %s
 小机张望中…正对屏幕时朝它挥手!,小机张望中…正对屏幕时朝它挥手!,Bobbin is looking around… wave when it faces the screen!
