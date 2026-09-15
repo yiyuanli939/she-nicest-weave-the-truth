@@ -1,0 +1,807 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Textrix Veritatis\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "开始游戏"
+msgstr "Start Game"
+
+msgid "继续游戏"
+msgstr "Continue"
+
+msgid "重置进度"
+msgstr "Reset Progress"
+
+msgid "开发者信息"
+msgstr "Credits"
+
+msgid "退出游戏"
+msgstr "Quit Game"
+
+msgid "设置"
+msgstr "Settings"
+
+# Core terminology and names
+
+msgid "静语丝"
+msgstr "Hush Thread"
+
+msgid "静语纹"
+msgstr "Hush Pattern"
+
+msgid "静语织机"
+msgstr "Hush Loom"
+
+msgid "并纹"
+msgstr "Joined Pattern"
+
+msgid "岔纹"
+msgstr "Forked Pattern"
+
+msgid "叠层纹"
+msgstr "Layered Pattern"
+
+msgid "迭层纹"
+msgstr "Layered Pattern"
+
+msgid "焦纹"
+msgstr "Scorched Pattern"
+
+msgid "并织机"
+msgstr "Joining Machine"
+
+msgid "拆股机"
+msgstr "Splitting Machine"
+
+msgid "封程机"
+msgstr "Binding Machine"
+
+msgid "引渡机"
+msgstr "Relay Machine"
+
+msgid "岔纹机"
+msgstr "Forking Machine"
+
+msgid "汇路机"
+msgstr "Convergence Machine"
+
+msgid "溃散机"
+msgstr "Unraveling Machine"
+
+msgid "诺拉"
+msgstr "Nora"
+
+msgid "莉娅"
+msgstr "Leah"
+
+msgid "亚瑟"
+msgstr "Arthur"
+
+msgid "诺拉·拉芙蒂"
+msgstr "Nora Lafferty"
+
+msgid "莉娅·科尔宾"
+msgstr "Leah Corbin"
+
+msgid "亚瑟·威客利夫"
+msgstr "Arthur Wycliffe"
+
+# Chapters and levels
+
+msgid "第一章 并纹"
+msgstr "Chapter I: Joined Patterns"
+
+msgid "第二章 叠层纹"
+msgstr "Chapter II: Layered Patterns"
+
+msgid "第三章 岔纹"
+msgstr "Chapter III: Forked Patterns"
+
+msgid "第四章 焦纹"
+msgstr "Chapter IV: Scorched Patterns"
+
+msgid "第一纹"
+msgstr "Pattern I"
+
+msgid "第二纹"
+msgstr "Pattern II"
+
+msgid "第三纹"
+msgstr "Pattern III"
+
+msgid "第四纹"
+msgstr "Pattern IV"
+
+msgid "第五纹"
+msgstr "Pattern V"
+
+# Main game UI
+
+msgid "返回主界面"
+msgstr "Back to Main Menu"
+
+msgid "仪器架"
+msgstr "MACHINES"
+
+msgid "重置"
+msgstr "Reset"
+
+msgid "示答"
+msgstr "Show Solution"
+
+msgid "选关"
+msgstr "Level Select"
+
+msgid "测试用:重置并自动摆出本关答案(仅调试版可见)"
+msgstr "Debug: reset and build this level's solution automatically"
+
+msgid "线轴"
+msgstr "Spool"
+
+msgid "目标织机"
+msgstr "Goal Loom"
+
+msgid "钉纹样"
+msgstr "Pin"
+
+msgid "给本口的自由纹样赋值(求解只看输入和钉住的纹样,不从下游反推)"
+msgstr "Assign the free pattern at this port. The machine uses only its inputs and pinned patterns; it never infers backward from downstream."
+
+msgid "冲突"
+msgstr "CONFLICT"
+
+msgid "欠定"
+msgstr "UNRESOLVED"
+
+msgid "成环"
+msgstr "CYCLE"
+
+msgid "逃逸"
+msgstr "OUT OF SCOPE"
+
+msgid "织成了!"
+msgstr "WEAVE COMPLETE!"
+
+msgid "继续"
+msgstr "Continue"
+
+msgid "有困难可以对小机说:「请指导我」或「请帮帮我」"
+msgstr "Need help? Say “Please guide me” or “Please help me” to the companion robot."
+
+msgid "有一口的纹样要你自己定:点这台仪器里纹样旁边的钉纹样按钮,画一幅钉上去"
+msgstr "One port needs a pattern from you: select Pin beside it, draw a pattern, and pin it in place."
+
+msgid "从左边的仪器架点一台仪器,它会落在织案中央"
+msgstr "Select a machine from the rack on the left to place it at the center of the worktable."
+
+msgid "按住线轴或仪器的出口往外拖出一条线,接到下一台仪器或目标织机的入口"
+msgstr "Drag from a spool or machine output and connect the thread to another machine or the Goal Loom."
+
+# Pattern editor
+
+msgid "纹样绘制"
+msgstr "Pattern Drafting"
+
+msgid "点选笔刷进行绘制："
+msgstr "Select a brush to draw:"
+
+msgid "清空"
+msgstr "Clear"
+
+msgid "取消"
+msgstr "Cancel"
+
+msgid "确认"
+msgstr "Confirm"
+
+msgid "染这一色"
+msgstr "Dye with this color"
+
+msgid "并织:分成左右两半"
+msgstr "Join: split into left and right halves"
+
+msgid "迭层:分成上下两层"
+msgstr "Layer: split into upper and lower layers"
+
+msgid "岔纹:分成两支"
+msgstr "Fork: split into two branches"
+
+# Story and notebook chrome
+
+msgid "按任意键继续"
+msgstr "PRESS ANY KEY TO CONTINUE"
+
+msgid "感谢游玩"
+msgstr "THANK YOU FOR PLAYING"
+
+msgid "新机器!"
+msgstr "NEW MACHINE!"
+
+msgid "翻页"
+msgstr "NEXT"
+
+msgid "继续\n工作"
+msgstr "BACK TO\nWORK"
+
+msgid "笔\n记"
+msgstr "N\nO\nT\nE\nB\nO\nO\nK"
+
+# Notebook pages
+
+msgid "左侧上下两口各收一幅纹样，织成一幅左右并排的并纹，少了任何一股，机器都不会开工。"
+msgstr "The two ports on the left each take one pattern and weave them side by side into a Joined Pattern. If either strand is missing, the machine will not run."
+
+msgid "收一幅并纹，上口吐出它的左半，下口吐出它的右半，想用哪股接哪股。"
+msgstr "Takes a Joined Pattern. The upper port yields its left half and the lower port yields its right half. Connect whichever strand you need."
+
+msgid "左上口自己钉一副纹样，机器会凭空吐出它，但吐出的只是虚纹，切不可放入最终交付，必须用它织出另一幅纹样（也可以与自身相同），接入右上口，随后右下口便可吐出一副实在的叠层纹。"
+msgstr "Pin a pattern at the upper-left port. The machine produces it from nothing, but only as a provisional pattern that must never be submitted. Use it to weave another pattern, which may be identical, and feed that into the upper-right port. The lower-right port will then yield a certified Layered Pattern."
+
+msgid "左上口收一副迭层纹，左下口收它上层的纹样，机器吐出下层的纹样。"
+msgstr "The upper-left port takes a Layered Pattern, and the lower-left port takes its upper layer. The machine yields the lower layer."
+
+msgid "收一幅纹样，织成岔纹；上口输出的纹样中它在左上，下口输出的纹样中它在右下，对角线另一侧的纹样则由你自己钉。"
+msgstr "Takes one pattern and weaves a Forked Pattern. In the upper output it occupies the upper-left branch; in the lower output it occupies the lower-right branch. You pin the pattern on the other side of the diagonal."
+
+msgid "上1口收入一副岔纹，岔纹对角线两侧的纹样分别由右2和右3口吐出，吐出的两幅纹样均为虚纹，若用他们都能织出同一副纹样分别送入左2和左3口，则汇路机可以织出这副纹样的实纹。"
+msgstr "Left port 1 takes a Forked Pattern. Right ports 2 and 3 yield the patterns from its two diagonal branches, both as provisional patterns. If each can be used to weave the same result and those results are fed into left ports 2 and 3, the Convergence Machine yields that result as a certified pattern."
+
+msgid "收进一幅焦纹以后，这台机器什么都肯织——织什么由你钉。工坊严令：慎用。"
+msgstr "Once it takes a Scorched Pattern, this machine will weave anything you pin. Workshop order: use with care."
+
+# Settings
+
+msgid "音乐音量"
+msgstr "Music Volume"
+
+msgid "音效音量"
+msgstr "Sound Volume"
+
+msgid "全屏:开"
+msgstr "Fullscreen: On"
+
+msgid "全屏:关"
+msgstr "Fullscreen: Off"
+
+msgid "小机联动:开"
+msgstr "Companion Robot: On"
+
+msgid "小机联动:关"
+msgstr "Companion Robot: Off"
+
+msgid "小机维护"
+msgstr "Robot Maintenance"
+
+msgid "关闭"
+msgstr "Close"
+
+# Credits
+
+msgid "美术与策划:焰陶"
+msgstr "Art & Design: CeramicWitch"
+
+msgid "音乐与硬件:lyy(李熠远)"
+msgstr "Music & Hardware: lyy (Yiyuan Li)"
+
+msgid "程序:LLM 与 焰陶、lyy 合作完成"
+msgstr "Programming: LLM in collaboration with CeramicWitch and lyy"
+
+msgid "字体:站酷小薇体(ZCOOL XiaoWei,免费商用授权);个别字形回退 Noto Sans SC(OFL)"
+msgstr "Font: ZCOOL XiaoWei (free commercial license); selected glyphs fall back to Noto Sans SC (OFL)"
+
+msgid "标题音乐:舒伯特 A 大调钢琴奏鸣曲 D.664 第二乐章 Andante,演奏 Paul Pitman,公有领域(CC PD)"
+msgstr "Title music: Schubert, Piano Sonata in A major, D.664, II. Andante; performed by Paul Pitman; public domain (CC PD)"
+
+msgid "关内音乐:李熠远 与 ChatGPT 共同生成"
+msgstr "Level music: created by Yiyuan Li and ChatGPT"
+
+msgid "引擎:Godot 4.7"
+msgstr "Engine: Godot 4.7"
+
+msgid "参考作品:The Incredible Proof Machine(incredible.pm)、陶哲轩 Q.E.D."
+msgstr "Inspired by: The Incredible Proof Machine (incredible.pm) and Terence Tao's Q.E.D."
+
+# Dialogue — Chapter I
+
+msgid "第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。"
+msgstr "First time in an East End Hush Pattern workshop? Don't let the machines frighten you. They don't weave cloth. They weave colored Hush Threads into Hush Patterns, and the whole city is waiting for them."
+
+msgid "你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。"
+msgstr "You're the new apprentice weaver? Nora Lafferty? I'm Leah Corbin. Don't touch the machines with the brass lamps yet. Their tempers are worse than the foreman's."
+
+msgid "这些就是静语织机？我以为我们做的是……布料。"
+msgstr "These are Hush Looms? I thought we made... cloth."
+
+msgid "普通织坊才用那种织布机。我们织的是静语纹。门锁认它，邮报机认它，契约柜和新式自动机也认它。没有这些纹样，半个伦敦都得装聋作哑。"
+msgstr "Ordinary mills use those looms. We weave Hush Patterns. Door locks read them, post machines read them, and so do contract cabinets and the new automata. Without these patterns, half of London would be struck deaf and dumb."
+
+msgid "我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。"
+msgstr "I'll write it all down. I always keep notes close at hand—new weaving methods, machine rules, anything I can put on paper."
+
+msgid "那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。"
+msgstr "A good habit. There is plenty to remember in a workshop. Once things get busy, you'll learn how often a notebook can save you."
+
+msgid "可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。"
+msgstr "But I've heard that what truly drives these machines are the Academy's “programs”—so rigorous and intricate that only its most rational gentlemen can master them."
+
+msgid "学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。"
+msgstr "The Academy writes its symbols; we follow the rules and weave the patterns. What counts as “true scholarship” is the gentlemen's favorite quarrel. Our concern is keeping the city running."
+
+msgid "科尔宾女士。今日的学院程式已经送到。新学徒？"
+msgstr "Miss Corbin. Today's Academy programs have arrived. A new apprentice?"
+
+msgid "诺拉·拉芙蒂。手还生，但眼睛不差。"
+msgstr "Nora Lafferty. Her hands are green, but her eyes are keen."
+
+msgid "很好。静语纹允许有手工差异，但不允许偏离程式。请记住这一点，拉芙蒂小姐。"
+msgstr "Good. Hush Patterns permit differences in workmanship, but no deviation from the program. Remember that, Miss Lafferty."
+
+msgid "是，威客利夫先生。"
+msgstr "Yes, Mr. Wycliffe."
+
+msgid "今天学“并织”。左路已经稳定，右路也已经稳定，就能把两路并成一个纹样；反过来，从完整并织里也能单独取出其中一路。"
+msgstr "Today you'll learn joining. When the left route and the right route are both secure, you can join them into one Joined Pattern. In reverse, either route can be taken from a complete Joined Pattern."
+
+msgid "也就是说，不是把两条线搅在一起，而是要保留它们各自成立的结构。"
+msgstr "So we do not simply tangle two threads together. We preserve the structure that makes each one hold."
+
+msgid "对。记住，静语丝不是越多越好，关系对了才算纹样。"
+msgstr "Exactly. More Hush Threads do not make a better weave. Only the right relation makes a pattern."
+
+msgid "还有，机器要是出现怪响、回针、余光，都写进工坊记录。学院未必肯收，但我们自己得记。"
+msgstr "And if a machine makes an odd sound, reverses a needle, or leaves an afterglow, put it in the workshop record. The Academy may refuse it, but we must keep our own account."
+
+msgid "学院为什么不收？"
+msgstr "Why would the Academy refuse it?"
+
+msgid "他们管这叫“经验现象”。没有学院的人署名，就进不了正式档案。别皱眉，我都抱怨好多年了。"
+msgstr "They call it an “empirical phenomenon.” Without an Academy signature, it cannot enter the official archives. Don't frown—I've been complaining about it for years."
+
+msgid "以前走这条街从没注意过……门边的铜槽、邮报机的滚轮，连路口信号器背后都有静语纹。"
+msgstr "I never noticed before... the brass channel beside the door, the rollers in the post machine—even the crossing signal has a Hush Pattern behind it."
+
+msgid "原来我们白天织的那一小块，真的会跑到这里来。"
+msgstr "So that little piece we weave by day really does find its way here."
+
+msgid "拉芙蒂小姐？这么晚还在研究市政器件？"
+msgstr "Miss Lafferty? Studying municipal apparatus at this hour?"
+
+msgid "只是觉得奇怪。它们看起来都不一样，却能认同一种纹样。"
+msgstr "I only find it strange. They all look different, yet they recognize the same kind of pattern."
+
+msgid "因为外形只是载体。真正统一它们的是学院给出的程式。工坊的任务，是把程式可靠地实现出来。"
+msgstr "Because form is merely the carrier. What unifies them is the Academy's program. The workshop's task is to realize that program reliably."
+
+msgid "威客利夫先生走得真急……等等，检验台下面这本黑色笔记，是他的吧？"
+msgstr "Mr. Wycliffe left in quite a hurry... Wait. This black notebook under the inspection bench—is it his?"
+
+msgid "威客利夫先生的……我明天还给他吧。"
+msgstr "Mr. Wycliffe's... I'll return it tomorrow."
+
+msgid "我只是想确认扉页上的名字……这页画的结构怎么这么眼熟？"
+msgstr "I only meant to check the name on the flyleaf... Why does the structure on this page look so familiar?"
+
+msgid "我们有A为真，也有B为真，因此可以得到“A且B”，或者说“A合取B”为真……"
+msgstr "We have A as true and B as true, so we may derive “A and B”—or say that the conjunction of A and B is true..."
+
+msgid "把字符换成颜色，把“为真”换成“纹样”……这不就是……并织吗？"
+msgstr "Replace the letters with colors, replace “is true” with “pattern”... Isn't this simply... joining?"
+
+# Dialogue — Chapter II
+
+msgid "先不看太深。我把这几条最简单的符号抄下来，和工坊的织法一条条对着试。"
+msgstr "I won't go too deep yet. I'll copy down the simplest symbols and compare them with the workshop's weaving methods, one by one."
+
+msgid "如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。"
+msgstr "If A and B can be joined into A conjunction B, then these symbols are not describing something else... They describe the same structure as the workshop's machines."
+
+msgid "今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。"
+msgstr "Today you'll learn relaying. Given a Layered Pattern of red over blue, together with a red thread, you can relay the blue thread out."
+
+msgid "还有对于你现在来说可能最难以理解的机器——封程机。"
+msgstr "And then there is the machine you may find hardest to understand for now—the Binding Machine."
+
+msgid "我们可以直接在封程机上绕过一切规则自由钉出纹样。"
+msgstr "On the Binding Machine, we can bypass every rule and freely pin any pattern."
+
+msgid "那代价呢？"
+msgstr "What is the cost?"
+
+msgid "问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。"
+msgstr "Good question! Such a pattern is a “provisional pattern.” It may be fed into other machines, but that is all; it cannot be submitted for inspection."
+
+msgid "不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。"
+msgstr "But you can feed the new pattern woven from that provisional pattern back into the Binding Machine. It produces a Layered Pattern with your pinned pattern above and the new pattern below. That Layered Pattern is a certified pattern fit for inspection."
+
+msgid "如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。"
+msgstr "In the Academy's notation... From A, together with “if A holds, then B holds,” or “A implies B,” we can derive B."
+
+msgid "假设A，如果能得到B成立，就能得到“如果A成立，则B成立”。"
+msgstr "Assume A. If we can derive B, then we can derive “if A holds, then B holds.”"
+
+msgid "学院的写法？"
+msgstr "The Academy's notation?"
+
+msgid "我只是……在书上见过类似的符号。"
+msgstr "I only... saw similar symbols in a book."
+
+msgid "随你怎么记。只要别把线引错地方。"
+msgstr "Call it whatever helps you remember. Just don't relay the thread to the wrong place."
+
+msgid "拉芙蒂小姐，你是否见过一本黑色笔记？昨日可能遗落在这里。"
+msgstr "Miss Lafferty, have you seen a black notebook? I may have left it here yesterday."
+
+msgid "在检验台下面。我昨晚才发现是您的。给您。"
+msgstr "It was under the inspection bench. I only realized last night that it was yours. Here."
+
+msgid "谢谢。你翻过吗？"
+msgstr "Thank you. Did you read it?"
+
+msgid "只看见了几页。那些规则……和我们的织法很像。"
+msgstr "Only a few pages. Those rules... resemble our weaving methods."
+
+msgid "相似的操作并不等于相同的知识。工坊知道怎样做出稳定纹样，学院研究的是它为何必然成立。"
+msgstr "Similar operations do not amount to the same knowledge. The workshop knows how to make stable patterns; the Academy studies why they must hold."
+
+msgid "可如果规则完全一样呢？"
+msgstr "But what if the rules are exactly the same?"
+
+msgid "那也需要定义、证明和可检验的记录。没有这些，经验很难成为知识。"
+msgstr "They would still require definitions, proofs, and verifiable records. Without those, experience can scarcely become knowledge."
+
+msgid "莉娅，刚才那台旧织机怎么同时闪了两道光？你停机也太熟练了，难道经常这样？"
+msgstr "Leah, why did that old loom flash two lights at once? You stopped it awfully quickly. Does this happen often?"
+
+msgid "刚才那两道光是怎么回事？"
+msgstr "What were those two lights just now?"
+
+msgid "三号静语丝受潮后的“余响”。上一种状态有时候不会立刻消干净，会和下一种叠一小会儿。"
+msgstr "An “after-echo” from damp Number Three Hush Thread. Sometimes the previous state does not fade at once and overlaps the next one for a moment."
+
+msgid "学院知道吗？"
+msgstr "Does the Academy know?"
+
+msgid "我两年前就写过。湿度、线批、出现次数，全记了。"
+msgstr "I wrote it up two years ago. Humidity, thread batch, number of occurrences—I recorded everything."
+
+msgid "他们把纸退回来，说“缺乏合资格观察者确认，不纳入公档”。后来我就把它钉在我们自己的记录册里了。"
+msgstr "They sent it back, saying, “Not admitted to the public archive without confirmation by a qualified observer.” So I pinned it in our own record book instead."
+
+msgid "可如果它真的会影响机器呢？"
+msgstr "But what if it really affects the machines?"
+
+msgid "那就等机器出事以后，他们再派一位先生来重新发现一遍吧。"
+msgstr "Then once a machine fails, they can send a gentleman to discover it all over again."
+
+msgid "他们把同一种规则写成符号，就说那是知识；我们把它织进机器里，却只算手艺。"
+msgstr "They write the same rules as symbols and call it knowledge. We weave them into machines, and it counts only as craft."
+
+# Dialogue — Chapter III
+
+msgid "本周起，工坊要优先供应市政自动机的新式静语纹。它们会根据多个可能条件自行选择通路，因此对分路纹样的要求更严格。"
+msgstr "Beginning this week, the workshop will give priority to new Hush Patterns for municipal automata. They choose their own routes from several possible conditions, so their branching patterns must meet stricter standards."
+
+msgid "正好。诺拉，今天学“岔纹”。一条已经成立的纹样，可以结合你自己钉的任意纹样，得到一张“茬纹”，这次可是实纹哦，很方便吧。"
+msgstr "Perfect timing. Nora, today you'll learn forking. Any established pattern can be combined with a pattern of your own choosing to make a Forked Pattern. This one is certified—handy, isn't it?"
+
+msgid "还有汇路机，机如其名，放进一个岔纹，它会给出两个虚纹，如果通过这两条虚纹都可以引回同一个纹样，那被引回的纹样就会被输出为可以验收的实纹。"
+msgstr "Then there is the Convergence Machine. Just as its name suggests, feed it a Forked Pattern and it yields two provisional patterns. If each can lead back to the same pattern, that common result is produced as a certified pattern fit for inspection."
+
+msgid "A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……"
+msgstr "A holds, so “A or B”—the disjunction of A and B—holds... And if A or B holds, while A implies C and B implies C, then C also holds..."
+
+msgid "你最近越来越爱给织法起学院名字了。"
+msgstr "Lately you have grown very fond of giving our weaving methods Academy names."
+
+msgid "不过这批机器用的三号丝太多了。天气再闷一点，我可不喜欢它们把余响也当成一条新路。"
+msgstr "Still, this batch of machines uses far too much Number Three thread. If the weather grows any more humid, I would rather they did not mistake an after-echo for a new route."
+
+msgid "三号丝已经通过学院规格测试。只要纹样严格按程式制作，就不会产生未定义状态。"
+msgstr "Number Three thread has passed the Academy's specification tests. As long as every pattern follows its program exactly, no undefined state can arise."
+
+msgid "是啊。纸上一直很干燥。"
+msgstr "Of course. Paper is always dry."
+
+msgid "连着下了几天雨以后就不对劲了。邮报机把一封信判给两条路，清扫机来回改向，连门禁都能同时亮“允许”和“拒绝”。"
+msgstr "After days of rain, everything went wrong. A post machine assigned one letter to two routes, street sweepers kept reversing direction, and even door controls showed “admit” and “deny” at the same time."
+
+msgid "它不是选错了一条路……它像是同时认出了两条互相冲突的状态。"
+msgstr "It did not choose the wrong route... It seems to have recognized two conflicting states at once."
+
+msgid "请远离那台机器。学院已经收到异常报告。初步判断是部分工坊纹样偏离程式。"
+msgstr "Please step away from that machine. The Academy has received reports of anomalies. Our preliminary judgment is that patterns from certain workshops deviated from their programs."
+
+msgid "如果纹样没偏呢？"
+msgstr "What if the patterns did not deviate?"
+
+msgid "那么就只能是推演器本身发生了故障。"
+msgstr "Then the inference engine itself must have failed."
+
+msgid "异常已经从偶发变成连锁故障。学院封存了第一批自动机，现在要求工坊交出这批静语纹的全部生产记录。"
+msgstr "The anomalies have grown from isolated incidents into cascading failures. The Academy has impounded the first batch of automata and now demands every production record for these Hush Patterns."
+
+msgid "所有出问题的机型都使用了这里生产的纹样。学院需要确认是否存在同一类织造误差。"
+msgstr "Every affected model used patterns made here. The Academy must determine whether they share the same weaving error."
+
+msgid "你们要记录？那把两年前退给我的那张也一起拿走。"
+msgstr "You want records? Then take the one you returned to me two years ago as well."
+
+msgid "科尔宾女士，那份记录没有进入学院档案。它没有经过合资格观察者复核。"
+msgstr "Miss Corbin, that report never entered the Academy archive. It was not reviewed by a qualified observer."
+
+msgid "湿气可没读过你们的资格条例。"
+msgstr "The damp has not read your qualification rules."
+
+msgid "威客利夫先生，那份记录具体写了什么？"
+msgstr "Mr. Wycliffe, what exactly did that report say?"
+
+msgid "三号静语丝在高湿环境下可能短暂保留前一状态。学院测试没有复现，因此没有采纳。"
+msgstr "Under high humidity, Number Three Hush Thread may briefly retain its previous state. Academy tests did not reproduce the effect, so the report was not accepted."
+
+msgid "听见警报了吗？又有一整条街区的新式自动机进入紧急停机。情况比学院预想的更快。"
+msgstr "Do you hear the alarm? Another entire block of new automata has entered emergency shutdown. This is spreading faster than the Academy expected."
+
+# Dialogue — Chapter IV
+
+msgid "我们已经关闭大部分自动机，但停机前的记录更糟。同一扇门被要求同时开启、锁死、报警，甚至执行和门毫无关系的命令。"
+msgstr "We have shut down most of the automata, but their final records are worse. The same door was ordered to open, lock itself, sound an alarm, and even execute commands unrelated to a door—all at once."
+
+msgid "推演记录里出现了矛盾。一旦系统得到某命题与它的否定，就会形成底部矛盾；而现行程式允许从矛盾推出任意后续命令。"
+msgstr "A contradiction appeared in the inference record. Once the system derives both a proposition and its negation, it reaches contradiction at the bottom; the current program then permits any command whatever to follow."
+
+msgid "所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。"
+msgstr "So those absurd instructions did not come from the machine breaking the rules. On the contrary, every step obeyed them."
+
+msgid "……是。我们原以为推演器损坏了。但目前没有发现非法推演。"
+msgstr "...Yes. We thought the inference engine had failed, but so far we have found no invalid inference."
+
+msgid "那就不是结论出了问题。要往前找。"
+msgstr "Then the conclusion is not where the fault began. We must look further back."
+
+msgid "学院笔记、生产记录、莉娅那张被退回的观察单……等等。这里一直默认了一件事：三号静语丝在任何时候都只会保留一个可读状态。"
+msgstr "Academy notes, production records, Leah's rejected observation report... Wait. They all assume one thing: Number Three Hush Thread can retain only one readable state at any moment."
+
+msgid "如果这个前提是真的，余响就不该存在。可莉娅看见过，我也看见过。"
+msgstr "If that premise were true, the after-echo could not exist. But Leah has seen it, and so have I."
+
+msgid "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
+msgstr "The machine did not infer two states from one. Two physical signals were interpreted by the program as “P” and “not P.”"
+
+msgid "学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。"
+msgstr "The Academy did not dismiss an irrelevant complaint. It dismissed the evidence that could have shown its premise was false."
+
+msgid "威客利夫先生，别再检查推演步骤了。请检查这个前提：三号静语丝在高湿环境中不会保留前一状态。"
+msgstr "Mr. Wycliffe, stop checking the inference steps. Check this premise instead: Number Three Hush Thread does not retain its previous state in high humidity."
+
+msgid "那是材料规范的一部分。学院做过测试。"
+msgstr "That is part of the material specification. The Academy tested it."
+
+msgid "那就再做一次。用我们工坊的湿度，用连续工作六个小时后的线，不要用实验室里刚拆封的样品。"
+msgstr "Then test it again. Use our workshop's humidity and thread that has run for six hours straight, not a freshly opened laboratory sample."
+
+msgid "蒸汽阀已经调到工坊平时的湿度了。诺拉，先让三号丝承载“闭合”，马上切成“开启”——看读取器，两道灯同时亮了。"
+msgstr "The steam valve is set to the workshop's usual humidity. Nora, put “closed” on Number Three thread, then switch it immediately to “open”—look at the reader. Both lights are on."
+
+msgid "前一状态没有消失。莉娅的记录是真的。"
+msgstr "The previous state did not disappear. Leah's report was true."
+
+msgid "……那么学院写入自动机的材料前提是假的。所有依赖唯一状态的程式，都可能把余响读成矛盾。"
+msgstr "...Then the material premise the Academy wrote into the automata is false. Every program that assumes a unique state may read the after-echo as a contradiction."
+
+msgid "推理没有背叛你们。它只是忠实地接受了你们允许它接受的前提。"
+msgstr "Reasoning did not betray you. It merely accepted, faithfully, the premises you allowed it to accept."
+
+msgid "我会要求撤回那条材料前提，并把科尔宾女士的原始记录连同复现实验一并送入公档。"
+msgstr "I will request the withdrawal of that material premise and submit Miss Corbin's original report, together with the reproduced experiment, to the public archive."
+
+msgid "这回记得把我的名字也写上。"
+msgstr "This time, remember to put my name on it."
+
+msgid "当然。莉娅·科尔宾。"
+msgstr "Of course. Leah Corbin."
+
+msgid "威客利夫先生向学院和管理局提交了申请，随着管理局协议的变化，机器重新启动了。"
+msgstr "Mr. Wycliffe submitted a petition to the Academy and the Administration. As the Administration's protocols changed, the machines started again."
+
+msgid "织机声和昨天没什么不同……但我似乎感觉到自己对这份工作的心情有所变化，是什么呢……"
+msgstr "The looms sound no different from yesterday... Yet something in how I feel about this work seems to have changed. What is it...?"
+
+# Robot maintenance
+
+msgid "接入小机(拉起桥接与语音助手)"
+msgstr "Connect Robot (start bridge and voice assistant)"
+
+msgid "刷入固件与语音"
+msgstr "Flash Firmware and Voices"
+
+msgid "试转一下"
+msgstr "Test Turn"
+
+msgid "摄像头验证云台"
+msgstr "Verify Gimbal with Camera"
+
+msgid "小机声音:改音色 / 音量 / 台词,先「保存并生成语音」(需联网),再「刷入固件与语音」送进小机"
+msgstr "Robot Voice: edit voice, volume, and lines. First select Save and Generate Voices (internet required), then Flash Firmware and Voices to send them to the robot."
+
+msgid "音色"
+msgstr "Voice"
+
+msgid "音量"
+msgstr "Volume"
+
+msgid "试听"
+msgstr "Preview"
+
+msgid "保存并生成语音"
+msgstr "Save and Generate Voices"
+
+msgid "校准「看电脑方向」:自动 = 小机左右张望,正对屏幕时朝它挥手(或按它的 BOOT 键);手动 = 微调后保存。"
+msgstr "Calibrate the screen direction: Automatic makes the robot scan left and right; wave when it faces the screen (or press its BOOT button). Manual lets you fine-tune and save."
+
+msgid "开始自动校准(挥手锁定)"
+msgstr "Start Auto Calibration (wave to lock)"
+
+msgid "左"
+msgstr "Left"
+
+msgid "右"
+msgstr "Right"
+
+msgid "上"
+msgstr "Up"
+
+msgid "下"
+msgstr "Down"
+
+msgid "保存为屏幕方向"
+msgstr "Save as Screen Direction"
+
+msgid "已请求保存…"
+msgstr "Save requested..."
+
+msgid "小艺(小智同款)"
+msgstr "Xiaoyi (same as Xiaozhi)"
+
+msgid "晓晓"
+msgstr "Xiaoxiao"
+
+msgid "晓双(童声)"
+msgstr "Xiaoshuang (child voice)"
+
+msgid "云希(男)"
+msgstr "Yunxi (male)"
+
+msgid "云扬(男)"
+msgstr "Yunyang (male)"
+
+msgid "进关问候"
+msgstr "level greeting"
+
+msgid "通关庆祝"
+msgstr "completion celebration"
+
+msgid "接错线鼓励"
+msgstr "wrong-connection encouragement"
+
+msgid "发呆提示"
+msgstr "idle hint"
+
+msgid "修好(第四章)"
+msgstr "repaired (Chapter IV)"
+
+msgid "机器人:%s(点击切换)"
+msgstr "Robot: %s (click to switch)"
+
+msgid "已启用"
+msgstr "Enabled"
+
+msgid "无机器人模式"
+msgstr "No Robot Mode"
+
+msgid "无机器人模式:不连桥接也不发命令,关内不显示求助提示,开发者信息页不显示「小机维护」"
+msgstr "No Robot Mode: the bridge stays disconnected and no commands are sent. Help prompts and Robot Maintenance are hidden in the game."
+
+msgid "桥接:%s"
+msgstr "Bridge: %s"
+
+msgid "已连"
+msgstr "Connected"
+
+msgid "未连(点「接入小机」,或手动 bash hardware/run_robot.sh)"
+msgstr "Disconnected (select Connect Robot or run bash hardware/run_robot.sh manually)"
+
+msgid "串口 / 小机:%s"
+msgstr "Serial / Robot: %s"
+
+msgid "在线"
+msgstr "Online"
+
+msgid "离线(没插 USB,或桥接还没找到 /dev/cu.usbmodem*)"
+msgstr "Offline (USB unplugged, or the bridge has not found /dev/cu.usbmodem*)"
+
+msgid "语音助手:%s"
+msgstr "Voice Assistant: %s"
+
+msgid "在线,说「请指导我」或「请帮帮我」"
+msgstr "Online; say “Please guide me” or “Please help me”"
+
+msgid "离线(需要 hardware/speech/model,第一次要允许麦克风)"
+msgstr "Offline (requires hardware/speech/model and microphone permission on first use)"
+
+msgid "固件外设:屏幕 %s / 功放 %s"
+msgstr "Firmware Devices: Display %s / Amplifier %s"
+
+msgid "正常"
+msgstr "OK"
+
+msgid "故障(会自动重试)"
+msgstr "Fault (will retry automatically)"
+
+msgid "故障(静音)"
+msgstr "Fault (muted)"
+
+msgid "回头方向:%s(点击切换)"
+msgstr "Turn Direction: %s (click to switch)"
+
+msgid "小机动作:%s(点击切换)"
+msgstr "Robot Motion: %s (click to switch)"
+
+msgid "保持不动"
+msgstr "Stationary"
+
+msgid "照常"
+msgstr "Normal"
+
+msgid "已拉起 hardware/run_robot.sh(pid %d),几秒后看上面状态。"
+msgstr "Started hardware/run_robot.sh (PID %d). Check the status above in a few seconds."
+
+msgid "找不到 hardware/ 目录或脚本,请手动:bash hardware/run_robot.sh"
+msgstr "Could not find the hardware directory or script. Run bash hardware/run_robot.sh manually."
+
+msgid "刷写中(会先停桥接,完成后自动重新接入)…"
+msgstr "Flashing... The bridge will stop first and reconnect automatically when complete."
+
+msgid "摄像头验证中:先确认小机在画面里(第一次要允许摄像头),然后转 pan / tilt 各两次…"
+msgstr "Camera verification in progress. Make sure the robot is visible (camera permission is required on first use), then move pan and tilt twice each..."
+
+msgid "找不到 hardware/ 目录或脚本,请手动跑 hardware/%s"
+msgstr "Could not find the hardware directory or script. Run hardware/%s manually."
+
+msgid "语音生成完毕:点「刷入固件与语音」送进小机。"
+msgstr "Voice generation complete. Select Flash Firmware and Voices to send them to the robot."
+
+msgid "截图在 hardware/.run/cam/cam_report.png"
+msgstr "Screenshot saved to hardware/.run/cam/cam_report.png"
+
+msgid "找不到 hardware/firmware/sounds/lines.json"
+msgstr "Could not find hardware/firmware/sounds/lines.json"
+
+msgid "台词「%s」为空"
+msgstr "Line “%s” is empty"
+
+msgid "写不了 %s"
+msgstr "Could not write %s"
+
+msgid "已保存台词,正在用微软语音生成五句 wav(需联网,约十几秒)…"
+msgstr "Lines saved. Generating five WAV files with Microsoft speech (internet required; about a few seconds)..."
+
+msgid "还没有 %s.wav,先「保存并生成语音」"
+msgstr "%s.wav does not exist yet. Select Save and Generate Voices first."
+
+msgid "读不了 %s"
+msgstr "Could not read %s"
+
+msgid "试听 %s:%s"
+msgstr "Preview %s: %s"
+
+msgid "小机张望中…正对屏幕时朝它挥手!"
+msgstr "The robot is scanning... Wave when it faces the screen!"
+
+msgid "已锁定屏幕方向 pan=%s tilt=%s"
+msgstr "Screen direction locked: pan=%s tilt=%s"
+
+msgid "超时了,再试一次?"
+msgstr "Timed out. Try again?"

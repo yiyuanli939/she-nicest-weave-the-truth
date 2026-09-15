@@ -17,10 +17,21 @@ const MENU_Y0 := 940.0                    # 第一个选项的垂直中心(预�
 const MENU_PITCH := 197.0                 # 选项间距(预览四行中心 940/1138/1334/1530)
 const MENU_FONT_SIZE := 78                # 预览墨高 65–67 = 站酷小薇 78 号(原 64 + 字距 12 只凑到了宽度,字形小 20%)
 const MENU_GLYPH_SPACING := 0             # 预览「开始游戏」墨宽 306 = 78 号字距 0 时的 306;留常量给美术调
+const MENU_CENTER_X_EN := 3580.0          # 英文选项与中文共用同一列中心
+const MENU_FONT_SIZE_EN := 68             # 英文比旧版更醒目，最长项仍完整留在画面内
+const LANG_SIZE := Vector2(180, 84)
+const LANG_MARGIN := Vector2(64, 56)
+const LANG_FONT_SIZE := 48
+const LANG_RADIUS := 24
+const LANG_BG := Color(0.20, 0.12, 0.10, 0.42)
+const LANG_BG_HOVER := Color(0.20, 0.12, 0.10, 0.58)
+const LANG_BG_PRESSED := Color(0.20, 0.12, 0.10, 0.68)
+const LANG_TEXT_COLOR := Color(0.96, 0.91, 0.80)
 
 var _cal_ui: RobotMaintUI
 var _settings: SettingsPanel
 var _start_btn: Button
+var _lang_btn: Button
 var _game: Node
 
 
@@ -44,6 +55,7 @@ func _ready() -> void:
 	mat.shader = load(SHEEN_PATH)
 	title.material = mat
 	add_child(title)
+	_add_language_button()
 
 	_cal_ui = RobotMaintUI.new()
 	add_child(_cal_ui)
@@ -77,8 +89,8 @@ func _ready() -> void:
 ## 纯文字选项:无底、悬停变浅(theme),以 (MENU_CENTER_X, MENU_Y0 + i*PITCH) 为中心摆放
 func _add_option(i: int, label: String, cb: Callable) -> Button:
 	var b := Button.new()
-	b.text = label
-	b.add_theme_font_size_override("font_size", MENU_FONT_SIZE)
+	b.text = tr(label)
+	b.add_theme_font_size_override("font_size", _menu_font_size())
 	var fv := FontVariation.new()
 	fv.base_font = get_theme_default_font()
 	fv.spacing_glyph = MENU_GLYPH_SPACING
@@ -86,17 +98,59 @@ func _add_option(i: int, label: String, cb: Callable) -> Button:
 	b.pressed.connect(cb)
 	add_child(b)
 	b.reset_size()
-	b.position = Vector2(MENU_CENTER_X, MENU_Y0 + i * MENU_PITCH) - b.size * 0.5
+	b.position = Vector2(_menu_center_x(), MENU_Y0 + i * MENU_PITCH) - b.size * 0.5
 	return b
+
+
+func _menu_center_x() -> float:
+	return MENU_CENTER_X_EN if TranslationServer.get_locale().to_lower().begins_with("en") else MENU_CENTER_X
+
+
+func _menu_font_size() -> int:
+	return MENU_FONT_SIZE_EN if TranslationServer.get_locale().to_lower().begins_with("en") else MENU_FONT_SIZE
+
+
+## 右上角语言切换：中文界面显示 EN，英文界面显示 中文。
+func _add_language_button() -> void:
+	_lang_btn = Button.new()
+	_lang_btn.text = _l10n().switch_label()
+	_lang_btn.position = Vector2(3840.0 - LANG_MARGIN.x - LANG_SIZE.x, LANG_MARGIN.y)
+	_lang_btn.size = LANG_SIZE
+	_lang_btn.add_theme_font_size_override("font_size", LANG_FONT_SIZE)
+	_lang_btn.add_theme_color_override("font_color", LANG_TEXT_COLOR)
+	_lang_btn.add_theme_color_override("font_hover_color", LANG_TEXT_COLOR)
+	_lang_btn.add_theme_color_override("font_pressed_color", LANG_TEXT_COLOR)
+	_lang_btn.add_theme_stylebox_override("normal", _language_style(LANG_BG))
+	_lang_btn.add_theme_stylebox_override("hover", _language_style(LANG_BG_HOVER))
+	_lang_btn.add_theme_stylebox_override("pressed", _language_style(LANG_BG_PRESSED))
+	_lang_btn.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_lang_btn.pressed.connect(_on_toggle_language)
+	add_child(_lang_btn)
+
+
+func _on_toggle_language() -> void:
+	_l10n().toggle()
+	get_tree().reload_current_scene()
+
+
+func _l10n() -> Node:
+	return (Engine.get_main_loop() as SceneTree).root.get_node("L10n")
+
+
+static func _language_style(color: Color) -> StyleBoxFlat:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = color
+	sb.set_corner_radius_all(LANG_RADIUS)
+	return sb
 
 
 ## 美术:「重置进度:点击后重置玩家进度」—— 点击即清档,第一项随之变回「开始游戏」
 func _on_reset() -> void:
 	_game.save.wipe()
 	_game.current = null
-	_start_btn.text = "开始游戏"
+	_start_btn.text = tr("开始游戏")
 	_start_btn.reset_size()
-	_start_btn.position = Vector2(MENU_CENTER_X, MENU_Y0) - _start_btn.size * 0.5
+	_start_btn.position = Vector2(_menu_center_x(), MENU_Y0) - _start_btn.size * 0.5
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

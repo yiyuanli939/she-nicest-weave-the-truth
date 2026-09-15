@@ -7,14 +7,17 @@ extends RefCounted
 
 const RECT := Rect2(232, 262, 340, 92)
 const FONT_SIZE := 52
+const RECT_EN := Rect2(232, 262, 520, 92)
+const FONT_SIZE_EN := 42
 
 
 static func make(on_pressed: Callable) -> Button:
 	var b := Button.new()
-	b.text = "返回主界面"
-	b.position = RECT.position
-	b.size = RECT.size
-	b.add_theme_font_size_override("font_size", FONT_SIZE)
+	b.text = TranslationServer.translate("返回主界面")
+	var english := TranslationServer.get_locale().to_lower().begins_with("en")
+	b.position = (RECT_EN if english else RECT).position
+	b.size = (RECT_EN if english else RECT).size
+	b.add_theme_font_size_override("font_size", FONT_SIZE_EN if english else FONT_SIZE)
 	b.set_meta(SoundFx.META, &"back")
 	b.pressed.connect(on_pressed)
 	return b

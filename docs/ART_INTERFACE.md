@@ -19,21 +19,21 @@
 | 标题界面/标题.png(2682×497) | `assets/art/title/title.png` | 标题图(挂流光 shader) |
 | 选关界面/选关&开发者信息底图.png(3840×2160) | `assets/art/select/bg.png` | 选关页 + 开发者信息页底图 |
 | 选关界面/选关按钮(已解锁/未解锁).png(391×155) | `assets/art/select/level_unlocked.png` / `level_locked.png` | 关卡按钮 |
-| 关卡与笔记/仪器架底图.png(687×2117) | `assets/art/level/palette_bg.png` | 关内左侧仪器架 |
+| 关卡与笔记/仪器架底图.png(687×2117,无字) | `assets/art/level/palette_bg.png` | 关内左侧仪器架;「仪器架」由代码叠字 |
 | 关卡与笔记/仪器按钮(合取/蕴含/析取/矛盾类).png(526×182) | `assets/art/level/machine_{and,imp,or,bot}.png` | 并织/拆股 · 封程/引渡 · 岔纹/汇路 · 溃散 |
 | 关卡与笔记/笔记底图.png(3798×2065) | `assets/art/level/notebook_bg.png` | 右缘笔记抽屉 |
-| 笔记本页面补充/<机名>.png(3840×2160,透明底) | `assets/art/level/notebook/<rule_id>.png` | 笔记条目整页图(标题/正文画在图里);**按全屏导出**,抽屉划出到位时与屏幕对齐,引擎原尺寸摆放 |
-| 对话界面/对话界面底图.png(3835×2123) | `assets/art/story/base.png` | 故事界面固定底图 |
+| 笔记内容调整/图示素材/<机名>.png(透明底,尺寸随图示) | `assets/art/level/notebook/<rule_id>.png` | 笔记条目的独立图示;不带文字,引擎在纸张安全区内原尺寸居中摆放 |
+| 对话界面/对话界面底图.png(3835×2123,无字) | `assets/art/story/base.png` | 故事界面固定底图;「按任意键继续」由代码叠字 |
 | 对话界面/场景(工坊/宿舍/街景).png(1942×1251) | `assets/art/story/scene_{workshop,dorm,street}.png` | 场景插图 |
 | 对话界面/诺拉(默认/苦恼/严肃/惊讶).png(761×1721) | `assets/art/story/char_nora_{default,worried,serious,surprised}.png` | 主角立绘(恒右) |
 | 对话界面/莉娅(默认/苦恼).png(821×1675) | `assets/art/story/char_lia_{default,worried}.png` | 配角立绘 |
 | 对话界面/亚瑟(默认).png(801×1778) | `assets/art/story/char_arthur_default.png` | 配角立绘 |
 | 对话界面/*遮罩.png | `assets/art/story/char_{nora,lia,arthur}_mask.png` | 非发言者 50% 遮罩 |
-| v1.2背景/image.png(1174×816,圆角透明) | `assets/art/level/win_popup.png` | 通关弹窗「织成了」(v1.2;居中原尺寸,「继续」为纯文字叠在图上) |
+| v1.2背景/image.png(1174×816,圆角透明,无字) | `assets/art/level/win_popup.png` | 通关弹窗(v1.2;居中原尺寸,「织成了!」「继续」均为代码叠字) |
 
 新加立绘/场景:按上面的命名规则放进目录,再在 `narrative/story_art.gd` 的 `CHARACTERS / EXPRESSIONS / SCENES` 表补一行。
 所有 PNG 的导入都开了 mipmaps(`.import` 里 `mipmaps/generate=true`),窗口缩小显示不闪;**新图导入必须也开**
-(全局过滤器是 LINEAR_WITH_MIPMAPS,4K 整页图在 1080p 屏上 2× 缩小采样,没 mipmap 又抖又多读 4 倍纹理;`tests/test_perf_settings.gd` 盯着)。
+(全局过滤器是 LINEAR_WITH_MIPMAPS,大图在小窗口中缩小采样时没有 mipmap 会抖;`tests/test_perf_settings.gd` 盯着)。
 
 ## 3. 位置调参表(给美术:在引擎里哪儿手动调图片位置)
 
@@ -44,6 +44,8 @@
 | 标题页:标题图左上角 | `ui/main_menu.gd` → `TITLE_POS` |
 | 标题页:五个选项(美术四项 + 用户要求的「设置」排第五)的水平中心 / 首项垂直中心 / 间距 / 字号 / 字距 | `ui/main_menu.gd` → `MENU_CENTER_X` `MENU_Y0` `MENU_PITCH` `MENU_FONT_SIZE` `MENU_GLYPH_SPACING` |
 | 标题页:流光周期 / 宽度 / 强度 | `assets/shaders/title_sheen.gdshader` → `period` `band_width` `strength` |
+| 标题页:右上角语言按钮尺寸 / 边距 / 字号 / 圆角 / 三态深色半透明底色 | `ui/main_menu.gd` → `LANG_SIZE` `LANG_MARGIN` `LANG_FONT_SIZE` `LANG_RADIUS` `LANG_BG*`;浅色文字，中文显示 `EN`,英文显示 `中文` |
+| 英文长文本适配 | `ui/main_menu.gd` → `MENU_CENTER_X_EN` `MENU_FONT_SIZE_EN`;`ui/story_scene.gd` → `CONTINUE_HINT_RIGHT_EN`;`narrative/notebook_ui.gd` → `HANDLE_FONT_SIZE_EN_CLOSED` `HANDLE_LINE_PITCH_EN_CLOSED` `FLIP_RECT_EN` `FLIP_FONT_SIZE_EN` `OR_ELIM_IMAGE_SCALE_EN`;`ui/win_popup.gd` → `TITLE_FONT_SIZE_EN`;`board/palette_panel.gd` → `NAME_FONT_SIZE_EN` |
 | 标题页「设置」弹窗(点第五项弹出,居中;用户要求,美术文档没有 → 先纯文字 + 主题乳黄面板):面板最小宽 / 内边距 / 遮罩色 / 「设置」字号 / 项字号 / 行距 / 标题下空隙 / 滑条宽·间距·轨厚·圆钮直径 / 轨色·已填色·钮色 | `ui/settings_panel.gd` → `PANEL_MIN_W` `PAD` `DIM_COLOR` `TITLE_FONT_SIZE` `FONT_SIZE` `ROW_GAP` `TITLE_GAP` `SLIDER_W` `SLIDER_GAP` `TRACK_H` `KNOB_D` `TRACK_BG` `TRACK_FILL` `KNOB_COLOR`(截图 `build/shots4k/4k_settings.png`) |
 | 选关页:章间距 / 章标题与按钮行间距 / 同行按钮间距 / 字号 / 颜色 | `ui/level_select.gd` → `CHAPTER_GAP` `TITLE_GAP` `ROW_GAP` `CHAPTER_FONT_SIZE` `LEVEL_FONT_SIZE` `*_COLOR` |
 | 开发者信息页:文字与行距 | `ui/credits_scene.gd` → `LINES` `TEXT_FONT_SIZE` `LINE_GAP` |
@@ -52,14 +54,16 @@
 | 故事界面:左 / 右立绘框(框外裁掉;立绘默认框内水平居中、底边贴框底) | `ui/story_scene.gd` → `LEFT_FRAME` `RIGHT_FRAME` |
 | 故事界面:逐角色微调立绘位置 | `ui/story_scene.gd` → `PORTRAIT_NUDGE` |
 | 故事界面:发言人名字位置 / 台词区矩形 | `ui/story_scene.gd` → `NAME_POS` `TEXT_RECT`;字号颜色在 `narrative/dialogue_box.gd` 顶部 |
+| 故事界面:「按任意键继续」中心 / 字号 / 字色 / 文案 | `ui/story_scene.gd` → `CONTINUE_HINT_CENTER` `CONTINUE_HINT_FONT_SIZE` `CONTINUE_HINT_COLOR` `CONTINUE_HINT_TEXT` |
 | 故事界面:遮罩透明度 | `ui/story_scene.gd` → `MASK_ALPHA` |
 | 关内:仪器架左上角 / 棋盘矩形 / 底色 | `ui/level_scene.gd` → `PALETTE_POS` `BOARD_RECT` `BG_COLOR` |
-| 关内:仪器架 7 个按钮的 x / 首个 y / 间距 / 机名字号 | `board/palette_panel.gd` → `SLOT_X` `SLOT_Y0` `SLOT_PITCH` `NAME_FONT_SIZE` |
+| 关内:仪器架标题中心 / 字号 / 字色 / 文案;7 个按钮的 x / 首个 y / 间距 / 机名字号 | `board/palette_panel.gd` → `TITLE_CENTER` `TITLE_FONT_SIZE` `TITLE_COLOR` `TITLE_TEXT`;`SLOT_X` `SLOT_Y0` `SLOT_PITCH` `NAME_FONT_SIZE` |
 | 关内:笔记抽屉纵向位置 / 划出后 x / 收起时露出宽度 / 动画时长 | `narrative/notebook_ui.gd` → `DRAWER_Y` `OPEN_X` `CLOSED_PEEK` `SLIDE_SEC` |
-| 关内:夹子「笔 / 记」「继续 / 工作」两行字的中心 / 字号 / 行距 / 热区尺寸;「翻页」矩形与字号;整页图偏移 | `narrative/notebook_ui.gd` → `HANDLE_CENTER_CLOSED` `HANDLE_CENTER_OPEN` `HANDLE_FONT_SIZE` `HANDLE_LINE_PITCH` `HANDLE_SIZE`;`FLIP_RECT` `FLIP_FONT_SIZE`;`PAGE_OFFSET`(整页图全屏导出,默认负抽屉开位即对齐,不用动) |
+| 关内:夹子「笔 / 记」「继续 / 工作」两行字的中心 / 字号 / 行距 / 热区尺寸;「翻页」矩形与字号 | `narrative/notebook_ui.gd` → `HANDLE_CENTER_CLOSED` `HANDLE_CENTER_OPEN` `HANDLE_FONT_SIZE` `HANDLE_LINE_PITCH` `HANDLE_SIZE`;`FLIP_RECT` `FLIP_FONT_SIZE` |
+| 关内:笔记纸张安全区 / 居中标题字号与颜色 / 左对齐正文字号、颜色、行距 / 标题正文图示间距 | `narrative/notebook_ui.gd` → `CONTENT_RECT`;`TITLE_FONT_SIZE` `TITLE_COLOR`;`BODY_FONT_SIZE` `BODY_COLOR` `BODY_LINE_SPACING`;`CONTENT_GAP` |
 | 关内:线轴列 / 目标织机的初始摆位 | `ui/level_scene.gd` → `_layout_endpoints()` |
 | 关内:笔记「新机器!」(本关首次上架的仪器那页,纸左上角;暂为纯文字,美术要换图/挪位改这里)位置(抽屉内;纸面左上角实测 (411,278))/ 字号 / 字色 / 文案 | `narrative/notebook_ui.gd` → `NEW_LABEL_POS` `NEW_LABEL_FONT_SIZE` `NEW_LABEL_COLOR` `NEW_LABEL_TEXT` |
-| 关内:通关弹窗「织成了」(v1.2;图居中原尺寸,左上角 (1333, 672))「继续」中心(图内坐标)/ 字号 / 字色 / 悬停色 / 遮罩色 / 层号;实测:标题下花纹到 y 508、底框 y 748 起,空白带 512–744,「继续」实际占 581–699 | `ui/win_popup.gd` → `CONTINUE_CENTER` `CONTINUE_FONT_SIZE` `CONTINUE_COLOR` `CONTINUE_HOVER_COLOR` `DIM_COLOR` `LAYER` |
+| 关内:通关弹窗(v1.2;图居中原尺寸,左上角 (1333, 672))「织成了!」中心 / 字号 / 字色 / 文案;「继续」中心(图内坐标)/ 字号 / 字色 / 悬停色 / 遮罩色 / 层号 | `ui/win_popup.gd` → `TITLE_CENTER` `TITLE_FONT_SIZE` `TITLE_COLOR` `TITLE_TEXT`;`CONTINUE_CENTER` `CONTINUE_FONT_SIZE` `CONTINUE_COLOR` `CONTINUE_HOVER_COLOR` `DIM_COLOR` `LAYER` |
 | 关内:操作指引一行字(棋盘左下,求助提示上一行;暂为纯文字,美术要换图/挪位改这里)位置 / 字号 / 颜色 | `ui/level_scene.gd` → `STEP_HINT_POS` `STEP_HINT_FONT_SIZE` `STEP_HINT_COLOR`(求助提示同处 `GUIDE_HINT_POS` `GUIDE_HINT_FONT_SIZE`) |
 | 节点区:乳黄底 / 棕红描边 / 标题字 | `theme/main_theme.tres` → `GraphEdit/*` `GraphNode/*` `GraphNodeTitleLabel/*` |
 | 节点区:端口颜色 / 纹样口尺寸 / 行距 / 行内间距 | `board/machine_node.gd` → `PORT_COLOR` `HYP_COLOR` `GOAL_COLOR` `BIG_VIEW` `PORT_VIEW` `ROW_GAP` `CELL_GAP` |
@@ -98,16 +102,19 @@
 | 标题图 | 标题预览(bg 三锚点):左上角 (630, 1551) | `TITLE_POS (630, 1551)` |
 | 标题四选项 | 墨高 65–67(= 78 号,字距 0),中心 x≈3580,首项 y≈940,间距 ≈197 | `MENU_FONT_SIZE 78` `MENU_GLYPH_SPACING 0` `MENU_CENTER_X 3580` `MENU_Y0 940` `MENU_PITCH 197` |
 | 仪器架 | 关内预览(顶/底花纹双锚点):(27, 20);7 个按钮最小二乘 架内首个 y 248、间距 210.8 | `PALETTE_POS (27, 20)` `SLOT_Y0 248` `SLOT_PITCH 211` |
+| 仪器架标题 | 原带字底图减无字底图:字迹 (248,65)..(426,119),主色 C89A2F;站酷小薇 64 号最吻合 | `TITLE_CENTER (337.5,92.5)` `TITLE_FONT_SIZE 64` `TITLE_COLOR C89A2F` |
+| 故事继续提示 | 原带字底图减无字底图:字迹 (3467,2052)..(3788,2100),主色 654238;站酷小薇 54 号最吻合 | `CONTINUE_HINT_CENTER (3630,2094.5)`(含 `BASE_POS`) `CONTINUE_HINT_FONT_SIZE 54` |
+| 通关标题 | 原带字图减无字图:字迹 (360,284)..(855,407),主色 D1A94D;站酷小薇 156 号最吻合 | `TITLE_CENTER (608,346)` `TITLE_FONT_SIZE 156` `TITLE_COLOR D1A94D` |
 
 对照工具:`"$GODOT" --path . --script res://tools/shot_4k.gd` 在 3840×2160 的 SubViewport 里离屏渲染
-标题 / 故事 / 关内 / 关内笔记划出 四张 1:1 截图到 `build/shots4k/4k_*.png`(冒烟截图随窗口缩放,肉眼对不准),
+标题 / 选关 / 开发者信息 / 故事 / 关内 / 笔记 / 设置 / 通关弹窗等 1:1 截图到 `build/shots4k/4k_*.png`(冒烟截图随窗口缩放,肉眼对不准),
+传 `-- en` 会切到英文并输出 `4k_*_en.png`，用于检查英文长文本边界与重叠；
 与参考图叠图或做模板匹配即可核对;`tests/test_art_alignment.gd` 把前两级基准固化成回归(抽屉开位、场景框、立绘区、
-立绘/遮罩尺寸、收起时整页图不进屏)。
+立绘/遮罩尺寸、笔记图示能放入纸张安全区)。
 
 **待美术确认(两份参考互相矛盾,引擎按全分辨率的位置参考):**
 1. 关内预览里**收起**的笔记在 y≈63,位置参考里**打开**的在 y=27,引擎两态同用 27(抽屉只横向划)。
-2. 七张整页图的标题/正文比位置参考低 127 px(整页图是最终稿,引擎按屏幕对齐摆放,无需改)。
-3. `莉娅（严肃）.png` 是 821×**1669**,比遮罩和其他表情(1675)矮 6 px;引擎已按遮罩画布定位不会跳动,但请按 821×1675 重导。
+2. `莉娅（严肃）.png` 是 821×**1669**,比遮罩和其他表情(1675)矮 6 px;引擎已按遮罩画布定位不会跳动,但请按 821×1675 重导。
 
 ### 3.6 v1.1 示意图折算基准(2026-09-02)
 
@@ -151,6 +158,6 @@
 | 连线错误徽章(纯文字:冲突 / 欠定 / 成环 / 逃逸;64 号白描边,接错的线 0.5 s 自动断、徽章停 1 s 淡出) | `board/wire_overlay.gd` BADGE / BADGE_COLOR / BADGE_FONT_SIZE / BADGE_OUTLINE / BADGE_HOLD_SEC / BADGE_FADE_SEC;`board/proof_board.gd` BAD_WIRE_SEC |
 | 纹样绘制弹窗(标题带 / 预览 / 「点选笔刷进行绘制:」/ 色块 + 三个线描结构笔刷 + 焦纹图样笔刷(v1.2,`PatternView` 画 ⊥,不写字)/ 清空·取消·确认) | `pattern/pattern_editor.gd`(PREVIEW_SIZE / SWATCH_SIZE / TITLE_* / HINT_* / BUTTON_BG / ICON_*) |
 | 节点端口图形 / 纹样区域边框 / 钉按钮 / 蚂蚁线 / 汇路机分割线 / 封程机凹形 | `board/machine_node.gd` 顶部常量(§3 表);策划说明与示意图在 `v1.1交互调整说明/` |
-| 胜利绿光 | `ui/level_scene.gd _on_win()` |
-| 通关弹窗上的「继续」(纯文字,金色;弹窗图本身是美术图) | `ui/win_popup.gd`(§3 表) |
+| 胜利白光 | `ui/level_scene.gd _on_win()` |
+| 仪器架标题 / 故事界面「按任意键继续」 / 通关弹窗「织成了!」「继续」(均为可本地化文字) | `board/palette_panel.gd` `ui/story_scene.gd` `ui/win_popup.gd`(§3 表) |
 | 机器人 OLED 表情 | `hardware/firmware/main.py draw_face()` |

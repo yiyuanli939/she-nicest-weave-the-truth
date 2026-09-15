@@ -1,6 +1,6 @@
 class_name PalettePanel
 extends Control
-## 仪器架(美术参考图 information/art_spec_20260829/image 4.png 左栏):底图 + 固定 7 个仪器按钮,
+## 仪器架(美术参考图 information/art_spec_20260829/image 4.png 左栏):无字底图 + 可本地化标题 + 固定 7 个仪器按钮,
 ## 顺序与按钮图的分配严格按图(合取类 = 并织/拆股,蕴含类 = 封程/引渡,析取类 = 岔纹/汇路,矛盾类 = 溃散)。
 ## 本关未上架的仪器(不在 allowed_rules)不显示,可见按钮按图顺序紧凑排列;点击请求放置。只发信号,不碰 GraphEdit。
 ## 坐标为架内 / 3840×2160 逻辑像素,图片原尺寸;美术调位置改下面常量。
@@ -18,10 +18,17 @@ const SLOT_IMAGE: Dictionary = {
 const SLOT_X := 80.0          # 按钮左上角 x(架内)
 const SLOT_Y0 := 248.0        # 第一个按钮的 y(架内;关内预览图 7 个按钮最小二乘实测 248,原 262 偏下 14)
 const SLOT_PITCH := 211.0     # 按钮间距(按钮图 526×182;预览实测 210.8)
+const TITLE_TEXT := "仪器架"
+const TITLE_CENTER := Vector2(337.5, 92.5)   # 原图字迹包围框 (248,65)..(426,119) 的中心
+const TITLE_FONT_SIZE := 64
+const TITLE_GLYPH_SPACING := -1
+const TITLE_COLOR := Color("C89A2F")         # 原图标题主色
 const NAME_FONT_SIZE := 56
+const NAME_FONT_SIZE_EN := 42
 const NAME_COLOR := Color(0.29, 0.184, 0.165)
 
 var _buttons: Dictionary = {}   # rule_id -> Button
+var _title: Label
 
 
 func _ready() -> void:
@@ -32,15 +39,27 @@ func _ready() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	custom_minimum_size = bg.size
+	_title = Label.new()
+	_title.text = tr(TITLE_TEXT)
+	_title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
+	_title.add_theme_color_override("font_color", TITLE_COLOR)
+	var title_font := FontVariation.new()
+	title_font.base_font = get_theme_default_font()
+	title_font.spacing_glyph = TITLE_GLYPH_SPACING
+	_title.add_theme_font_override("font", title_font)
+	_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_title)
+	_title.reset_size()
+	_title.position = TITLE_CENTER - _title.size * 0.5
 	for i in SLOT_ORDER.size():
 		var rule_id := SLOT_ORDER[i]
 		var info := ProofSession.describe_rule(rule_id)
 		var tex: Texture2D = load(SLOT_IMAGE[rule_id])
 		var btn := Button.new()
-		btn.text = info.cn_name if info != null else String(rule_id)
+		btn.text = tr(info.cn_name) if info != null else String(rule_id)
 		btn.position = Vector2(SLOT_X, SLOT_Y0 + i * SLOT_PITCH)
 		btn.size = tex.get_size()
-		btn.add_theme_font_size_override("font_size", NAME_FONT_SIZE)
+		btn.add_theme_font_size_override("font_size", NAME_FONT_SIZE_EN if TranslationServer.get_locale().to_lower().begins_with("en") else NAME_FONT_SIZE)
 		btn.add_theme_color_override("font_color", NAME_COLOR)
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var sb := StyleBoxTexture.new()

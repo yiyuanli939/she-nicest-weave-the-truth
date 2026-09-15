@@ -131,7 +131,7 @@ func build_from(info: ProofSession.NodeInfo) -> void:
 	if _concave:
 		_build_concave(info)
 	else:
-		title = info.title
+		title = tr(info.title)
 		_build_rows(info)
 	_port_layer = PortLayer.new()
 	_port_layer.owner_node = self
@@ -230,7 +230,7 @@ func _build_concave(info: ProofSession.NodeInfo) -> void:
 	_rows.append(row1)
 	set_slot(1, false, 0, PORT_COLOR, true, 0, PORT_COLOR)
 	_title_row = Label.new()
-	_title_row.text = info.title
+	_title_row.text = tr(info.title)
 	_title_row.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_row.add_theme_font_size_override("font_size", IMP_TITLE_FONT_SIZE)
 	_title_row.add_theme_color_override("font_color", get_theme_color("font_color", "GraphNodeTitleLabel"))
@@ -320,9 +320,8 @@ func _add_cell(h: Control, big: bool, borders: Array[Dictionary]) -> PatternView
 
 func _make_pin_button(model_port: int) -> Button:
 	var btn := Button.new()
-	btn.text = "钉纹样"
+	btn.text = tr("钉纹样")
 	btn.add_theme_font_size_override("font_size", PIN_FONT_SIZE)
-	btn.tooltip_text = "给本口的自由纹样赋值(求解只看输入和钉住的纹样,不从下游反推)"
 	btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	btn.mouse_filter = Control.MOUSE_FILTER_PASS   # 左键归按钮;右键穿透到节点(右键删机在按钮上也生效)

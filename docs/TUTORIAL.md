@@ -96,7 +96,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 - 每句台词自带 `scene / left_char / left_expr / nora_expr`(中文名),`StoryArt` 登记表把中文名换成 `assets/art/story/` 的 PNG;
   主角诺拉恒在右侧,两人同在时非发言者叠 50% 遮罩;不显示场景名。正式台词从策划 xlsx 灌
   (`python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`;4-3 段写进 l16 的 `outro_dialogue`)。
-- 诺拉的笔记 = 七台仪器整页图(`notebook.tres`,由 `gen_levels.gd` 的 `NOTEBOOK_IDS` 生成),关内按本关 allowed_rules 过滤显示;
+- 诺拉的笔记 = 七台仪器的运行时标题/正文 + 独立图示(`notebook.tres`,由 `gen_levels.gd` 的 `NOTEBOOK_PAGES` 生成),关内按本关 allowed_rules 过滤显示;
   关内右缘抽屉划出/收回(`NotebookUI`,Tween),「翻页」循环。
 - 小机剧情弧(`Game.robot_mode()` 按关卡序,分界 `Game.BREAK_LEVEL = l11`):坏掉前(l01–l11)`guide` —— 玩家对麦克风说
   「请指导我 / 请帮帮我」(`hardware/speech/listen.py` 识别 → 桥接 → `Robot.guide_requested`)→ `LevelScene._run_guide`:小机回头到极限
@@ -123,7 +123,7 @@ CreditsScene(开发者信息,纯文字,Esc/点击返回)
 |---|---|---|
 | 进关前全屏开场对话 | `ui/story_scene.gd`、`game.gd start_level/enter_board`、`DialogueRes.location_title/background`、`DialogueLine.portrait` | 关内 `DialogueBox` 保留给关内剧情 |
 | 删撤销/重做按钮,右键删节点 | `ui/level_scene.gd`、`board/machine_node.gd _gui_input`、`board/proof_board.gd _remove_machine` | 快捷键 Ctrl+Z/Ctrl+Shift+Z 保留;拖线中右键仍是"取消拖线"(`wire_dragging` 标志) |
-| 对话去跳过键、点击推进 | `narrative/dialogue_box.gd` | 卡死根因:`visible_characters = -1` 哨兵值让"打字中"判断永真 |
+| 对话去跳过键、点击推进 | `narrative/dialogue_box.gd` | 短句至少播放 0.45 s，并过滤双击的第二次按下；卡死根因:`visible_characters = -1` 哨兵值让"打字中"判断永真 |
 | 连线只留错误徽章 | `board/wire_overlay.gd` | 端口内已有纹样预览,线上不再重复 |
 | 未连线口幽灵纹样 | `SolveResult.connected_ports`、`PatternView.ghost`、`MachineNode.refresh` | 区分"推导出的期望"与"实际连入" |
 
@@ -197,7 +197,7 @@ Windows 发布:`export_presets.cfg`「Windows Desktop」预设(排除素材源�
 | §4.4 封程机凹形 | GraphNode 的口只能在左右边缘、左右缩进对称(`port_h_offset`),做不到"臂内沿";于是:行结构 [左臂 VBox(假设 P + 钉按钮) \| 缺口 spacer \| 右臂 Q] / [spacer \| P>Q] / [标题 Label],`title=""` + 顶部标题栏字号 1 + panel/titlebar 样式覆盖为空,U 形与底部标题带在 `_draw` 自画;口位 `port_pos()`,`ProofBoard` 覆写 `_is_in_input/output_hotzone`(热区矩形按主题 inner/outer extent 自算)与 `_get_connection_line`(端点命中引擎口位就换成 `port_pos`,再按引擎同款 `Curve2D` 贝塞尔出线;正式连线端点 = `(position_offset + 口位) * zoom`,拖线预览 = `position + 口位 * zoom`,两种都试)。引擎按 slot 顺序给右口编号,假设口在第一排 → 图口号 ≠ 模型口号,`graph_out_port/model_out_port` 换算;脚本/测试连线一律走 `session.connect_wire`(模型口号) |
 | §4.5 钉纹样按钮进节点 + 蚂蚁线 | 按钮文字一律「钉纹样」,`UiStyles.fill_button` 底色(默认乳黄,岔纹机两口用各自钉色),位置 `PIN_BUTTON_SIDE`(默认纹样下方另起无口一行;岔纹机在纹样左侧同一行);`mouse_filter = PASS` 让右键穿透到节点(右键删机在按钮上也生效);未钉口 `_draw` 画静态虚线框(低功耗模式不做无限动画,`set_loops` 被测试禁止);「已钉」小字删除 |
 | §4.6 弹窗改版 | `PatternEditor` 照 image 13 重排:标题带「纹样绘制」→ 预览 → 「点选笔刷进行绘制:」→ 色块 + 并织/迭层/岔纹线描图标(`BrushIcon`)[+ 焦纹图样(v1.2)] → 清空 / 取消 / 确认(带底色);删提示行与「挖回孔」;「清空」擦回一个孔不关窗,「确认」全染时钉住、整幅还是孔时 = 取消钉住(`pattern_cleared`);外框内容边距只留描边宽、标题带贴满上缘 |
-| §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步。2026-09-02 用户加:新仪器的页纸左上角显示「新机器!」(`set_new_rules(debut)` → `_show_page` 按条目 id 显隐 `_new_label`;纯文字 + 常量 `NEW_LABEL_*`,纸面左上角 (411,278) 向内 (59,40),字号同「翻页」82、字色取整页图正文红 A3472E;`shot_4k` 的 4k_notebook 现在翻到新仪器页带标签) |
+| §5 笔记自动弹出 | `LevelScene._ready`:`debut_rules(lv)` 非空 → `NotebookUI.open_at(nb, allowed_rules, 首个新仪器)`(每次进关都弹);`StepGuide` 删 fix/notebook 两步。2026-09-02 用户加:新仪器的页纸左上角显示「新机器!」(`set_new_rules(debut)` → `_show_page` 按条目 id 显隐 `_new_label`;纯文字 + 常量 `NEW_LABEL_*`,纸面左上角 (411,278) 向内 (59,40),字号同「翻页」82、字色与正文同为 A3472E;`shot_4k` 的 4k_notebook 现在翻到新仪器页带标签) |
 
 用户答复的歧义:「清空」= 清空画布、空画布「确认」= 取消钉住;弹窗完全照 image 13;笔记每次进关都弹。
 自定的假设:端口/假设口颜色沿用;蚂蚁线静态;只有 冲突/成环/逃逸 自动断;提示计时从接线起;「焦纹」笔刷起初保留文字(v1.2 改成焦纹图样,见 3.8)。
@@ -298,11 +298,21 @@ disconnection_request + connection_drag_started,连响 unplug + pick,松手再 d
   (`_reconnect_goal` 按解法表最后一根线接,机器 id 升序 = 摆放顺序);UI 冒烟 N 段(弹窗矩形 (1333,672,1174,816)、「继续」在空白带、遮罩挡「重置」、无「下一关」)、
   E 段(焦纹图样)、S 段;`tools/shot_4k.gd` 出 `4k_win.png`(直接 `open()`,不走通关以免写存档)与 `4k_editor_bot.png`(解锁焦纹的笔刷行)。
 
+### 3.10 中英本地化(2026-09-15)
+
+- `game/localization.gd` 作为 Autoload `L10n` 保存当前语言并调用 `TranslationServer.set_locale()`；中文是源语言和回退语言，英文资源在 `localization/game.en.po`。
+- 标题页右上角是文字语言按钮，带圆角半透明 `StyleBoxFlat`：中文时显示 `EN`，英文时显示 `中文`。点击写入 `SaveManager.settings.language` 并重载标题场景，让英文菜单重新计算字号和位置。
+- 固定译名集中在 `localization/GLOSSARY.md`。翻译键只使用玩家看见的中文；场景名、人物短名、表情名、rule id 继续作为内部资源键，不参与翻译。
+- 对话、笔记、章节/关名和动态状态在赋值时显式 `tr()`。这使 `DialogueBox.get_total_character_count()` 按英文实际长度播放打字机，笔记的 `ScrollContainer` 也按英文正文实际高度滚动。
+- 英文长文本有独立布局常量，但中文 3840×2160 像素基准不变。`tools/shot_4k.gd -- en` 输出 `build/shots4k/4k_*_en.png`，已覆盖标题、选关、开发者信息、剧情、关内、笔记、设置、通关弹窗和纹样编辑器。
+- `tests/test_localization.gd` 固定术语、人名、四章/关名、七页笔记、99 句剧情、打字机长度、语言按钮样式与英文菜单边界。
+
 ## 4. 想改 X,去哪改
 
 | 想做的事 | 去哪 |
 |---|---|
 | 改台词/场景/立绘/表情 | 改剧情 xlsx(`剧情文件及美术补充/`)→ `python3 tools/xlsx_to_csv.py` → `tools/import_dialogue.gd`(列定义见 `docs/CONTENT_INTERFACE.md`);或关卡 .tres 的 `intro_dialogue` / `outro_dialogue`(Inspector) |
+| 改英文翻译 / 固定译名 / 语言按钮 | `localization/game.en.po` / `localization/GLOSSARY.md` / `game/localization.gd` + `ui/main_menu.gd`;动态文字用 `tr()` 模板，内部中文美术键不能翻译 |
 | 加角色/表情/场景图 | PNG 按命名规则放 `assets/art/story/` + `narrative/story_art.gd` 表补一行(`tests/test_story_art.gd` 会查文件存在) |
 | 加/删关卡或章节 | `tools/gen_levels.gd`(`LEVELS` 表,末列 = 本关新上架仪器;`CH_OF_LEVEL`/`CH_TITLES`;关名自动「第N纹」)→ 重跑生成器 → 删孤儿 .tres → 改 `tests/test_levels.gd`、`visual_smoke_m3.gd` 计数 → 在 `levels/level_solutions.gd` 加脚本化解法(含 `p` 钉) |
 | 调关卡顺序/难度、加新关选题 | 先看 `docs/LEVEL_DESIGN.md`(§0.5 现网 16 关编排表、旧 15 关逐关总结、难度曲线诊断、25 关重设计表 + 已验证解法附录),再按上一行改数据 |
@@ -317,7 +327,7 @@ disconnection_request + connection_drag_started,连响 unplug + pick,松手再 d
 | 笔记自动弹出的时机 | `ui/level_scene.gd _ready` 末尾(`debut_rules` → `NotebookUI.open_at`) |
 | 删除机器 | 左键点节点选中 → 按删除键(`ui_graph_delete`,GraphEdit 内置);也可右键点节点体(`machine_node.gd _gui_input`)。**Mac 坑**:笔记本的"delete"是 Backspace,`project.godot [input]` 已把 KEY_BACKSPACE 一并绑进 `ui_graph_delete`,否则点选后按 delete 删不掉 |
 | 诺拉的笔记抽屉 | `narrative/notebook_ui.gd`(夹子「笔记/继续工作」切换 + Tween 划出收回 / 「翻页」循环);`open(nb, unlocked)` 严格过滤(`unlocked` = 本关 allowed_rules,条目 id = rule_id,传空则一条不显示),`open_at(nb, unlocked, rule_id)` 翻到指定仪器(进关自动弹出用);位置常量见 `docs/ART_INTERFACE.md` §3(实测基准在 §3.5)。夹子两行字用 `FontVariation` 的 spacing_top/bottom 把行距垫到参考的 92(Button 自然行距 79) |
-| 笔记条目(= 仪器整页图) | 覆盖 `assets/art/level/notebook/<rule_id>.png`(3840×2160 全屏导出、透明底,标题/正文画在图里);新增仪器页改 `tools/gen_levels.gd` `NOTEBOOK_IDS` → 重跑生成器 |
+| 笔记条目 | 标题/正文改 `narrative/data/notebook.tres` 与 `tools/gen_levels.gd` `NOTEBOOK_PAGES`;透明图示覆盖 `assets/art/level/notebook/<rule_id>.png`。`NotebookUI` 用 `ScrollContainer + VBoxContainer` 在 `CONTENT_RECT` 内自动排列，图示保持原尺寸，长译文只在纸内滚动 |
 | 仪器架按钮/顺序/显隐 | `board/palette_panel.gd`(`SLOT_ORDER`、`SLOT_IMAGE`、位置常量);本关 `allowed_rules` 之外不显示,可见按钮紧凑重排 |
 | 棋盘滚动条/画布大小 | `board/proof_board.gd _ready`(滚动条 modulate 隐形 + 两个角标 GraphElement 撑画布;中键拖动是引擎内置) |
 | 改错误徽章文字/颜色/字号/描边/停留时长;接错的线多久断 | `board/wire_overlay.gd BADGE/BADGE_COLOR/BADGE_FONT_SIZE/BADGE_OUTLINE/BADGE_HOLD_SEC/BADGE_FADE_SEC/AUTO_BREAK`(纯文字,不用符号);`board/proof_board.gd BAD_WIRE_SEC` |
@@ -356,7 +366,8 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
 ```
 
 改 `logic/` 必跑 headless;改 UI 看 `tests/screenshots/` 的截图对比;改关卡数据两者都跑。
-改图片位置/字号:跑 `"$GODOT" --path . --script res://tools/shot_4k.gd` 出 3840×2160 的 1:1 截图(`build/shots4k/`)与美术参考图叠图核对,
+改图片位置/字号:跑 `"$GODOT" --path . --script res://tools/shot_4k.gd` 出 3840×2160 的 1:1 截图(`build/shots4k/`)与美术参考图叠图核对；
+本地化布局用 `"$GODOT" --path . --script res://tools/shot_4k.gd -- en` 输出带 `_en` 后缀的英文截图，
 基准与实测数字见 `docs/ART_INTERFACE.md` §3.5;`tests/test_art_alignment.gd` 盯着抽屉开位 / 故事框线 / 立绘遮罩尺寸。
 
 **测试分层**(想知道"某种情况有没有被测到"先看这里):
@@ -371,7 +382,7 @@ GODOT="/Applications/Godot.app/Contents/MacOS/Godot"
   拖动中右键不删,线轴/目标不删,Delete 键、Ctrl+Z/Ctrl+Shift+Z;钉按钮→纹样绘制弹窗(清空/取消/确认、三个图标笔刷)→确认→蚂蚁线消失;
   幽灵态切换;欠定徽章常驻、冲突线 0.5 s 自动断 + 徽章冻结淡出(64 号白描边);重置;
   U 段(v1.1):插座/插头/整圆端口状态,真实拖线中鼠标处的插头,封程机从臂内沿口位真实拖线接上、引擎默认口位拖不出线,
-  假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页、该页纸左上角「新机器!」在整页图之上且不出纸 / 不压标题墨迹 / 不压夹子、翻到别的页隐藏、翻回再现;笔记抽屉划出/变「继续工作」/翻页循环/收回;
+  假设线 `carries_hyp`,弹窗「清空」+「确认」= 取消钉住;S 段:l02/l07 进关笔记自动翻到新仪器那页、该页纸左上角「新机器!」在页面内容之上且不出纸 / 不压标题 / 不压夹子、翻到别的页隐藏、翻回再现;笔记运行时标题/正文与原尺寸图示、抽屉划出/变「继续工作」/翻页循环/收回;
   标题页四项 + 「设置」弹窗(居中、遮罩挡点击、滑条改音量当场生效并落档、小机联动开关、小机维护开面板、关闭/Esc)、开始→选关、继续游戏、重置即清档、开发者信息 Esc/点击返回;选关页全显示只一关可点、Esc 返回、点「第一纹」进关;示答 → 通关弹窗(居中原尺寸、「继续」在中下、遮罩挡「重置」、无「下一关」);焦纹图样笔刷。
 - `tests/test_story_art.gd` / `test_dialogue_import.gd` / `test_theme.gd` — 立绘登记表文件存在、CSV 导入解析与校验、主题字体与 UI 字面量符号扫描。
 - `tests/test_res_paths.gd` — Windows/导出包可移植性:所有 res:// 字面量与动态拼接路径(StoryArt/Bgm)逐段核对磁盘精确大小写

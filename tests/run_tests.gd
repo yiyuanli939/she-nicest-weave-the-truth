@@ -18,6 +18,7 @@ const FILES: Array[String] = [
 	"res://tests/test_solver_exhaustive.gd",
 	"res://tests/test_story_art.gd",
 	"res://tests/test_dialogue_import.gd",
+	"res://tests/test_localization.gd",
 	"res://tests/test_theme.gd",
 	"res://tests/test_res_paths.gd",
 	"res://tests/test_robot_logic.gd",
@@ -35,6 +36,9 @@ const FILES: Array[String] = [
 func _initialize() -> void:
 	# --script 的 _initialize 跑在 root 进树之前:测试里 add_child 到 root 的节点不算在树里(播音频/建 Tween 会报错),先等一帧
 	await process_frame
+	var l10n := root.get_node_or_null("L10n")
+	if l10n != null:
+		l10n.set_locale("zh_CN", false)   # 测试断言以中文源文案为基准，不受开发机当前语言偏好影响
 	var total := 0
 	var fails := 0
 	for path in FILES:

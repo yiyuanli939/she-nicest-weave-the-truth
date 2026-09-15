@@ -45,7 +45,7 @@ func _ready() -> void:
 		var block := VBoxContainer.new()
 		block.add_theme_constant_override("separation", TITLE_GAP)
 		var ch_lbl := Label.new()
-		ch_lbl.text = ch.title
+		ch_lbl.text = tr(ch.title)
 		ch_lbl.add_theme_font_size_override("font_size", CHAPTER_FONT_SIZE)
 		ch_lbl.add_theme_color_override("font_color", CHAPTER_COLOR)
 		ch_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -66,7 +66,7 @@ func _ready() -> void:
 func _make_level_button(lv: LevelDef, unlocked: bool) -> Button:
 	var tex: Texture2D = load(BTN_UNLOCKED if unlocked else BTN_LOCKED)
 	var b := Button.new()
-	b.text = lv.title
+	b.text = tr(lv.title)
 	b.custom_minimum_size = tex.get_size()
 	b.disabled = not unlocked
 	b.add_theme_font_size_override("font_size", LEVEL_FONT_SIZE)

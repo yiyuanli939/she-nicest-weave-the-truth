@@ -33,7 +33,7 @@ var _status: Label
 var _win_flash: ColorRect
 var _editor: PatternEditor
 var _notebook_ui: NotebookUI
-var _win_popup: WinPopup              # 通关弹窗「织成了」(v1.2):「继续」推进下一关/结局
+var _win_popup: WinPopup              # 通关弹窗(v1.2):文字标题「织成了!」,「继续」推进下一关/结局
 var _guide_hint: Label
 var _step_hint: Label                 # 操作指引一行字(做过一次的操作不再提示)
 var _steps_local: Dictionary = {}     # 无 Game(冒烟注入)时的已做操作表
@@ -129,7 +129,6 @@ func _build_ui() -> void:
 		# 测试用「示答」:仅调试版、且本关有脚本化解法时出现;点了重置后自动摆出答案
 		if OS.is_debug_build() and _game.current != null and LevelSolutions.DATA.has(_game.current.id):
 			var answer_btn := _make_tool_button("示答", _on_show_answer)
-			answer_btn.tooltip_text = "测试用:重置并自动摆出本关答案(仅调试版可见)"
 			answer_btn.modulate.a = 0.7
 			_board.add_toolbar_item(answer_btn)
 		_board.add_toolbar_item(_make_tool_button("选关", _on_back))
@@ -139,14 +138,14 @@ func _build_ui() -> void:
 	_board.add_toolbar_item(_status)
 
 	_win_flash = ColorRect.new()
-	_win_flash.color = Color(0.2, 0.85, 0.35, 0.0)
+	_win_flash.color = Color(1.0, 1.0, 1.0, 0.0)
 	_win_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_win_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_win_flash)
 
 	# 「请指导我 / 请帮帮我」提示(用户要求要提示出来);第三四章不代解就不显示
 	_guide_hint = Label.new()
-	_guide_hint.text = GUIDE_HINT
+	_guide_hint.text = tr(GUIDE_HINT)
 	_guide_hint.position = GUIDE_HINT_POS
 	_guide_hint.add_theme_font_size_override("font_size", GUIDE_HINT_FONT_SIZE)
 	_guide_hint.modulate.a = 0.85
@@ -182,7 +181,7 @@ func _build_ui() -> void:
 
 func _make_tool_button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = tr(text)
 	b.add_theme_font_size_override("font_size", TOOLBAR_FONT_SIZE)
 	b.pressed.connect(cb)
 	if text == "重置":
@@ -222,7 +221,7 @@ func _refresh_step_hint() -> void:
 	if dirty and _game != null:
 		_game.save.save()
 	var step := StepGuide.next_step(facts, _steps_done())
-	_step_hint.text = StepGuide.TEXT.get(step, "")
+	_step_hint.text = tr(StepGuide.TEXT.get(step, ""))
 	_step_hint.visible = step != &""
 	if step != &"" and step != _last_hint_step and not _restoring:
 		SoundFx.hit(self, &"hint")
@@ -254,7 +253,7 @@ func _on_pin_requested(node_id: int, out_port: int) -> void:
 func _on_pattern_committed(f: Formula) -> void:
 	var err := session.pin_hypothesis(_pin_target.x, _pin_target.y, FormulaParser.to_text(f))
 	if err != "":
-		_status.text = err
+		_status.text = tr(err)
 		SoundFx.hit(self, &"pin_error")
 	else:
 		SoundFx.hit(self, &"confirm")
@@ -307,7 +306,7 @@ func _on_conflict_check() -> void:
 # ---- 胜负与流程 ----
 
 func _on_win() -> void:
-	_status.text = "织成了!"
+	_status.text = tr("织成了!")
 	if _restoring:
 		return   # 记档未通关却载入了通关盘(不该发生的旧档):不闪光、不叫小机、不记档、不弹
 	var tw := create_tween()

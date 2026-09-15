@@ -134,28 +134,28 @@ func test_portraits_match_mask_canvas() -> bool:
 	return check(n >= 7, "扫到 7+ 张立绘(得 %d)" % n) and ok
 
 
-func test_notebook_pages_stay_offscreen_when_closed() -> bool:
-	# 收起时抽屉 x = 3840 − CLOSED_PEEK,整页图原点再左移 OPEN_X:整页图里 x < CLOSED_PEEK + OPEN_X 的内容会露在夹子上
-	var limit := int(NotebookUI.CLOSED_PEEK + NotebookUI.OPEN_X)
+func test_notebook_illustrations_fit_paper_safe_area() -> bool:
+	# 页面文字与图示都由 CONTENT_RECT 裁切；图示保持原尺寸，因此源图本身必须放得进纸张安全区。
+	var bg := _png(NotebookUI.BG_PATH)
+	var safe := NotebookUI.CONTENT_RECT
+	var ok := check(bg != null, "读到 notebook_bg.png")
+	if bg != null:
+		ok = check(safe.position.x >= 0.0 and safe.position.y >= 0.0
+				and safe.end.x <= bg.get_width() and safe.end.y <= bg.get_height(),
+				"CONTENT_RECT 完整位于笔记底图内") and ok
 	var nb := NotebookCatalog.load_default()
-	var ok := true
 	var n := 0
 	for e in nb.entries:
 		if e.image == "":
 			continue
 		var img := _png(e.image)
-		if not check(img != null and img.get_size() == Vector2i(3840, 2160), "%s 是 3840×2160 整页图" % e.image):
+		if not check(img != null, "读到图示 %s" % e.image):
 			ok = false
 			continue
 		n += 1
-		var min_x := 99999
-		for y in range(0, img.get_height(), 4):
-			for x in range(0, limit, 2):
-				if img.get_pixel(x, y).a > 0.04:
-					min_x = mini(min_x, x)
-					break
-		ok = check(min_x >= limit, "%s 内容最左 x=%s ≥ %d,收起时不会露在夹子上" % [e.image.get_file(), ("无" if min_x == 99999 else str(min_x)), limit]) and ok
-	return check(n >= 7, "扫到 7 张整页图(得 %d)" % n) and ok
+		ok = check(img.get_width() <= safe.size.x and img.get_height() <= safe.size.y,
+				"%s 原尺寸 %s 放得进纸张安全区 %s" % [e.image.get_file(), str(img.get_size()), str(safe.size)]) and ok
+	return check(n >= 7, "扫到 7 张独立图示(得 %d)" % n) and ok
 
 
 # ---- helpers ----

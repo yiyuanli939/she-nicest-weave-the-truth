@@ -1,7 +1,7 @@
 class_name StoryScene
 extends Control
 ## 全屏故事界面(美术参考图 information/art_spec_20260829/image 2.png、image 3.png):
-## 固定底图 + 场景插图 + 左右立绘(主角诺拉恒右,左侧人物可空)+ 对话文字区。
+## 无字底图 + 场景插图 + 左右立绘(主角诺拉恒右,左侧人物可空)+ 对话文字区 + 可本地化继续提示。
 ## 两人同在时,没在说话的人叠一张 50% 透明遮罩(与立绘完全重合)。不显示场景/地点名。
 ## 进关前播 intro_dialogue,播完(或对话为空)切入棋盘;推进由 DialogueBox 在 _input 层截获左键/任意键。
 ## 结局(Game.ending_pending):改播 outro_dialogue,播完淡入纯黑 + 白色大字「感谢游玩」(剧情表注意事项②),
@@ -19,6 +19,11 @@ const RIGHT_FRAME := Rect2(2933, 204, 815, 1800)     # 右立绘框(诺拉):内�
 const PORTRAIT_NUDGE: Dictionary = {"诺拉": Vector2.ZERO, "莉娅": Vector2(4, 0), "亚瑟": Vector2.ZERO}
 const NAME_POS := Vector2(1040, 1490)                # 发言人名字左上角
 const TEXT_RECT := Rect2(1040, 1590, 1756, 420)      # 台词区(台词框内沿 x 948..2887,左右边距各 92)
+const CONTINUE_HINT_TEXT := "按任意键继续"
+const CONTINUE_HINT_CENTER := BASE_POS + Vector2(3628, 2076.5)   # 原底图字迹包围框中心
+const CONTINUE_HINT_RIGHT_EN := 3780.0                            # 英文较长，沿用右下角但改为右边缘对齐
+const CONTINUE_HINT_FONT_SIZE := 54
+const CONTINUE_HINT_COLOR := Color("654238")                    # 原底图文字主色
 const MASK_ALPHA := 0.5
 const THANKS_FADE_SEC := 0.8    # 感谢游玩黑屏淡入时长
 const THANKS_HOLD_SEC := 1.6    # 黑屏停留(此刻小机修好),随后进开发者信息页
@@ -29,8 +34,8 @@ var _scene_pic: TextureRect
 var _slots: Array[Control] = [null, null]            # [左, 右] 裁剪框
 var _portraits: Array[TextureRect] = [null, null]
 var _masks: Array[TextureRect] = [null, null]
+var _continue_hint: Label
 var _leaving := false
-var _shown_chars: Array[String] = ["", ""]   # 两侧当前立绘的角色名(换人才响)
 var _outro := false
 
 
@@ -108,6 +113,19 @@ func _build_ui() -> void:
 	_dialogue.layout(NAME_POS, TEXT_RECT)
 	add_child(_dialogue)
 
+	_continue_hint = Label.new()
+	_continue_hint.text = tr(CONTINUE_HINT_TEXT)
+	_continue_hint.add_theme_font_size_override("font_size", CONTINUE_HINT_FONT_SIZE)
+	_continue_hint.add_theme_color_override("font_color", CONTINUE_HINT_COLOR)
+	_continue_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_continue_hint)
+	_continue_hint.reset_size()
+	if TranslationServer.get_locale().to_lower().begins_with("en"):
+		_continue_hint.position = Vector2(CONTINUE_HINT_RIGHT_EN - _continue_hint.size.x,
+				CONTINUE_HINT_CENTER.y - _continue_hint.size.y * 0.5)
+	else:
+		_continue_hint.position = CONTINUE_HINT_CENTER - _continue_hint.size * 0.5
+
 
 func _on_line_shown(line: DialogueLine) -> void:
 	if line.scene != "":
@@ -138,9 +156,6 @@ func _set_portrait(side: int, char_name: String, expr: String) -> void:
 	if tex == null:
 		slot.visible = false
 		return
-	if _shown_chars[side] != char_name:
-		_shown_chars[side] = char_name
-		SoundFx.hit(self, &"portrait")
 	var mask_tex := StoryArt.mask(char_name)
 	var canvas: Vector2 = mask_tex.get_size() if mask_tex != null else tex.get_size()
 	var origin: Vector2 = Vector2(floorf((slot.size.x - canvas.x) * 0.5), slot.size.y - canvas.y) + PORTRAIT_NUDGE.get(char_name, Vector2.ZERO)
@@ -173,7 +188,7 @@ func _play_thanks() -> void:
 	overlay.modulate.a = 0.0
 	add_child(overlay)
 	var lbl := Label.new()
-	lbl.text = "感谢游玩"
+	lbl.text = tr("感谢游玩")
 	lbl.add_theme_font_size_override("font_size", THANKS_FONT_SIZE)
 	lbl.add_theme_color_override("font_color", Color.WHITE)
 	lbl.set_anchors_preset(Control.PRESET_FULL_RECT)

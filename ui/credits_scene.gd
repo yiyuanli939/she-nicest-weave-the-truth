@@ -46,7 +46,7 @@ func _ready() -> void:
 	box.add_theme_constant_override("separation", LINE_GAP)
 	center.add_child(box)
 	var title := Label.new()
-	title.text = "开发者信息"
+	title.text = tr("开发者信息")
 	title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
 	title.add_theme_color_override("font_color", TITLE_COLOR)
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -54,7 +54,7 @@ func _ready() -> void:
 	box.add_child(Control.new())
 	for line in LINES:
 		var lbl := Label.new()
-		lbl.text = line
+		lbl.text = tr(line)
 		lbl.add_theme_font_size_override("font_size", TEXT_FONT_SIZE)
 		lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		box.add_child(lbl)
@@ -62,7 +62,7 @@ func _ready() -> void:
 	var robot := get_node_or_null("/root/Robot")
 	if robot != null and bool(robot.enabled):   # 无机器人模式:页面上不出现任何指向实体小机的入口
 		_maint_btn = Button.new()
-		_maint_btn.text = "小机维护"
+		_maint_btn.text = tr("小机维护")
 		_maint_btn.add_theme_font_size_override("font_size", MAINT_FONT_SIZE)
 		_maint_btn.pressed.connect(func() -> void: _maint.open(robot))
 		box.add_child(_maint_btn)

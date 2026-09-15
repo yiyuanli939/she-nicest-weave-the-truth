@@ -29,14 +29,16 @@ func test_settings_keys_round_trip_and_survive_wipe() -> bool:
 	sm.settings["music_volume"] = 0.35
 	sm.settings["sfx_volume"] = 0.6
 	sm.settings["fullscreen"] = true
+	sm.settings["language"] = "en"
 	sm.save()
 	var sm2 := SaveManager.open()
 	var ok := check(is_equal_approx(float(sm2.settings.get("music_volume", -1.0)), 0.35) and is_equal_approx(float(sm2.settings.get("sfx_volume", -1.0)), 0.6)
-			and sm2.settings.get("fullscreen") == true, "音量 / 音效音量 / 全屏往返")
+			and sm2.settings.get("fullscreen") == true and sm2.settings.get("language") == "en", "音量 / 音效音量 / 全屏 / 语言往返")
 	sm2.wipe()
 	var sm3 := SaveManager.open()
 	ok = check(not sm3.is_solved(&"l01") and is_equal_approx(float(sm3.settings.get("music_volume", -1.0)), 0.35)
-			and is_equal_approx(float(sm3.settings.get("sfx_volume", -1.0)), 0.6) and sm3.settings.get("fullscreen") == true, "重置进度保留音量 / 音效音量 / 全屏") and ok
+			and is_equal_approx(float(sm3.settings.get("sfx_volume", -1.0)), 0.6) and sm3.settings.get("fullscreen") == true
+			and sm3.settings.get("language") == "en", "重置进度保留音量 / 音效音量 / 全屏 / 语言") and ok
 	sm3.settings = before
 	sm3.save()
 	return ok

@@ -59,18 +59,18 @@ Windows 下第一条用 `py -3 tools/xlsx_to_csv.py`(转换器只用 Python 标�
   策划表与 `information/dialogue.csv` 里第一章的节号已同步后移(原 1-3/1-4 = 现 1-4/1-5,现 1-3 无剧情);
   全局关卡 id 从 l03 起后移一位(3-1 = l11、4-3 = l16),`tests/test_levels.gd` 会逐句核对表与 .tres。
 
-## 诺拉的笔记(= 七台仪器的整页图)
+## 诺拉的笔记(= 七台仪器的文字说明 + 图示)
 
-每台仪器一页整图 `assets/art/level/notebook/<rule_id>.png`(**3840×2160 全屏导出、透明底**,与打开的抽屉对齐,
-内容画在纸面区;标题/正文全部在图里,引擎不再渲染任何条目文字;源中文命名图存档在 `笔记本页面补充/`)。
-目录仍 7 条全量(`narrative/data/notebook.tres`,id = rule_id,顺序同仪器架);关内只显示本关上架仪器的页
+每台仪器一条 `NotebookEntry`：`title` / `description` 是运行时文字，`image` 指向
+`assets/art/level/notebook/<rule_id>.png` 的独立透明图示。`NotebookUI` 用纵向排列组件把标题、正文和原尺寸图示放在固定纸张安全区；
+译文过长时只在纸内滚动，不会和图示重叠或超出纸面。目录共 7 条(`narrative/data/notebook.tres`,id = rule_id,顺序同仪器架);关内只显示本关上架仪器的页
 (按 allowed_rules 过滤)。点右缘「笔记」划出,「翻页」循环。
 **进关时本关首次上架的仪器**(`LevelCatalog.debut_rules`:与上一关的 allowed_rules 之差)**自动划出并翻到它那页**
 (v1.1;每次进这一关都弹,点「继续工作」收起;`NotebookUI.open_at`)。这些仪器的页在本关翻到时纸左上角显示「新机器!」
 (`NotebookUI.set_new_rules`,进关时传 `debut_rules`;手动翻回去也显示,别的页不显示;位置 / 字号 / 字色常量在 `docs/ART_INTERFACE.md` §3)。
-- **改一页** = 用同规格 PNG 覆盖对应 `<rule_id>.png`(`--import` 后连 `.import` 一起提交)。
-- **新增仪器的页** = 放图 + `tools/gen_levels.gd` `NOTEBOOK_IDS` 加一行,重跑生成器。
-- **文案守则**(由美术在图里执行):只讲机器行为与操作,用纺织语汇(并纹/岔纹/迭层纹/焦纹/封单/借丝);
+- **改一页** = 在 `narrative/data/notebook.tres` 与 `tools/gen_levels.gd` `NOTEBOOK_PAGES` 同步改标题/正文；图示则覆盖对应 `<rule_id>.png`(`--import` 后连 `.import` 一起提交)。
+- **新增仪器的页** = 放透明图示 + 在 `NOTEBOOK_PAGES` 加 `[rule_id, 标题, 正文]`,重跑生成器。
+- **文案守则**:只讲机器行为与操作,用纺织语汇(并纹/岔纹/迭层纹/焦纹/封单/借丝);
   不得出现直接的逻辑提示——逻辑符号(∧ ∨ → ⊥)、逻辑术语、规则陈述、解法提示一律不写。
 
 ## 关内操作指引(一行字,做过一次就不再显示)
@@ -102,6 +102,15 @@ hardware/.venv/bin/mpremote connect /dev/cu.usbmodem2101 reset   # 传完必须 
 槽位表、挂点与换法见 `assets/sfx/音效位置.md`:换音效 = 覆盖 `assets/sfx/<槽位>.ogg`(或 .wav);几个操作共用一个文件就在
 `game/sfx.gd` `CLIPS` 里指到同一路径;响度不一在 `GAIN_DB` 按槽位填 dB(`tools/sfx_audit.py` 给建议值并报刺耳的);
 `--import` 后把 `.import` 一起提交。候选方案在 `assets/sfx/候选/`(每套一个文件夹,`说明.md` 写了每个文件从哪来)。
+
+## 中英本地化
+
+- 中文原文同时是稳定的翻译键，英文集中在 `localization/game.en.po`；固定译名见 `localization/GLOSSARY.md`。
+- 改台词、笔记或 UI 文案后，在 PO 里补同一条 `msgid` / `msgstr`。专有名词、人名必须先查术语表。
+- 运行时拼出来的文字要先翻译模板再代入，例如 `tr("机器人:%s(点击切换)") % tr("已启用")`；对话和笔记由界面脚本显式 `tr()`，英文长度会参与打字机与滚动布局。
+- `工坊`、`诺拉房间`、`伦敦街上`、人物短名、表情名和 rule id 是美术/规则查找键，必须继续保留中文，不能拿翻译后的文字查资源。
+- 语言按钮只在标题页右上角。中文界面显示 `EN`，英文界面显示 `中文`；选择写入 `SaveManager.settings.language`，重置进度不会清除。
+- `tests/test_localization.gd` 会检查固定术语、三个人名、四章/关名、七页笔记和全部 99 句剧情都有英文。
 
 ## 验证改动
 

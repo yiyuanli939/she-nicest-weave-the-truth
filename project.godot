@@ -13,29 +13,34 @@ config_version=5
 config/name="She Nicest"
 run/main_scene="res://ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
-; 性能/功耗(Windows 笔记本导出版十分钟过热+啸叫的修法,tests/test_perf_settings.gd 盯着):
-;   max_fps=60 硬上限 —— 驱动 vsync 失效(混合显卡笔记本常见)时不会飙到几千 fps;
-;   low_processor_mode —— 画面没变化就不重绘(棋盘静止时 GPU≈0;Tween/文字/悬停/TIME 着色器都会自动触发重绘)
 run/max_fps=60
 run/low_processor_mode=true
+config/icon="res://icon.svg"
 
 [autoload]
 
 Game="*res://game/game.gd"
+L10n="*res://game/localization.gd"
 Robot="*res://game/robot_link.gd"
 Bgm="*res://game/bgm.gd"
 Sfx="*res://game/sfx.gd"
 
+[display]
+
+window/size/viewport_width=3840
+window/size/viewport_height=2160
+window/size/mode=2
+window/size/window_width_override=1440
+window/size/window_height_override=810
+window/stretch/mode="canvas_items"
+
 [gui]
 
-theme/custom="res://theme/main_theme.tres"
 theme/default_theme_scale=2.0
+theme/custom="res://theme/main_theme.tres"
 
 [input]
 
-; 覆盖内置 ui_graph_delete:补上 Backspace —— Mac 笔记本没有正向 Delete 键,
-; 其"delete"是 Backspace,否则选中节点后按 delete 删不掉。
 ui_graph_delete={
 "deadzone": 0.5,
 "events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":4194312,"physical_keycode":0,"key_label":0,"unicode":0,"location":0,"echo":false,"script":null)
@@ -43,19 +48,10 @@ ui_graph_delete={
 ]
 }
 
-[display]
+[internationalization]
 
-; 逻辑视口 = 美术出图分辨率(3840×2160),所有 PNG 1:1 摆放不缩放,由 stretch 整体缩放;
-; 开局最大化(mode=2)铺满任意屏幕(用户屏 1920×1080),取消最大化后还原成 1440×810
-window/size/viewport_width=3840
-window/size/viewport_height=2160
-window/size/mode=2
-window/size/window_width_override=1440
-window/size/window_height_override=810
-window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
-; 显式开垂直同步(原先靠默认);帧率硬上限见 [application] run/max_fps
-window/vsync/vsync_mode=1
+locale/fallback="zh_CN"
+locale/translations=PackedStringArray("res://localization/game.en.po")
 
 [physics]
 
@@ -63,10 +59,7 @@ window/vsync/vsync_mode=1
 
 [rendering]
 
-; 纯 2D Control 游戏用 Compatibility 渲染器(Web 版本来就只能用它,视觉已验证):
-; 没有 Forward+ 的 3D/簇光照每帧固定开销,也绕开 D3D12 后端;原来的 Forward+/d3d12 是脚手架默认,从未有人选过
+textures/canvas_textures/default_texture_filter=2
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-textures/canvas_textures/default_texture_filter=2
-; 清屏色改成关内乳黄:换场那一帧与比底图大的边(故事界面底图 3835×2123 另垫白底)不再露引擎默认的灰
 environment/defaults/default_clear_color=Color(0.957, 0.925, 0.847, 1)

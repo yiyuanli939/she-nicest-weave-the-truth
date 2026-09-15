@@ -100,7 +100,7 @@ func _make_chip(w: ProofSession.WireInfo) -> Control:
 	var box := VBoxContainer.new()
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var b := Label.new()
-	b.text = BADGE[w.state]
+	b.text = tr(BADGE[w.state])
 	b.add_theme_font_size_override("font_size", BADGE_FONT_SIZE)
 	b.add_theme_color_override("font_color", BADGE_COLOR[w.state])
 	b.add_theme_color_override("font_outline_color", BADGE_OUTLINE_COLOR)

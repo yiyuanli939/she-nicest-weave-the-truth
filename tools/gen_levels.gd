@@ -1,5 +1,5 @@
 extends SceneTree
-## 一次性生成 16 关 .tres + catalog + 诺拉的笔记(七台仪器各一张整页图)。
+## 一次性生成 16 关 .tres + catalog + 诺拉的笔记(七台仪器的可本地化文字与独立图示)。
 ##   godot --headless --path . --script res://tools/gen_levels.gd
 ## 生成后策划直接在 Inspector 改 .tres;本脚本仅在想整表重生成时再跑
 ## (会覆盖 levels/data/ 与 narrative/data/ 下的同名文件)。
@@ -35,10 +35,17 @@ const CH_TITLES: Array[String] = ["第一章 并纹", "第二章 叠层纹", "�
 const CN_NUM: Array[String] = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
 const CH_OF_LEVEL: Array[int] = [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3]
 
-# 诺拉的笔记 = 七台仪器各一张整页图(assets/art/level/notebook/<rule_id>.png,3840×2160 全屏导出、
-# 透明底,标题/正文全画在图里,引擎不渲染文字;源中文命名图存档在 笔记本页面补充/)。
-# 顺序 = 仪器架顺序(美术图)。文案守则(由美术在图里执行):只讲机器行为与操作,用纺织语汇,不出现直接逻辑提示。
-const NOTEBOOK_IDS: Array = ["and_intro", "and_elim", "imp_intro", "imp_elim", "or_intro", "or_elim", "false_elim"]
+# 诺拉的笔记 = [rule_id, 标题, 正文]；图示固定取 assets/art/level/notebook/<rule_id>.png。
+# 顺序 = 仪器架顺序。文字由 NotebookUI 在纸张安全区自动排列，不能再烘焙进图示。
+const NOTEBOOK_PAGES: Array = [
+	["and_intro", "并织机", "左侧上下两口各收一幅纹样，织成一幅左右并排的并纹，少了任何一股，机器都不会开工。"],
+	["and_elim", "拆股机", "收一幅并纹，上口吐出它的左半，下口吐出它的右半，想用哪股接哪股。"],
+	["imp_intro", "封程机", "左上口自己钉一副纹样，机器会凭空吐出它，但吐出的只是虚纹，切不可放入最终交付，必须用它织出另一幅纹样（也可以与自身相同），接入右上口，随后右下口便可吐出一副实在的叠层纹。"],
+	["imp_elim", "引渡机", "左上口收一副迭层纹，左下口收它上层的纹样，机器吐出下层的纹样。"],
+	["or_intro", "岔纹机", "收一幅纹样，织成岔纹；上口输出的纹样中它在左上，下口输出的纹样中它在右下，对角线另一侧的纹样则由你自己钉。"],
+	["or_elim", "汇路机", "上1口收入一副岔纹，岔纹对角线两侧的纹样分别由右2和右3口吐出，吐出的两幅纹样均为虚纹，若用他们都能织出同一副纹样分别送入左2和左3口，则汇路机可以织出这副纹样的实纹。"],
+	["false_elim", "溃散机", "收进一幅焦纹以后，这台机器什么都肯织——织什么由你钉。工坊严令：慎用。"],
+]
 
 
 func _initialize() -> void:
@@ -67,14 +74,16 @@ func _initialize() -> void:
 	_save(catalog, "res://levels/data/catalog.tres")
 
 	var nb := NotebookCatalog.new()
-	for id: String in NOTEBOOK_IDS:
+	for row: Array in NOTEBOOK_PAGES:
 		var e := NotebookEntry.new()
-		e.id = StringName(id)
-		e.image = "res://assets/art/level/notebook/%s.png" % id
+		e.id = StringName(row[0])
+		e.title = row[1]
+		e.description = row[2]
+		e.image = "res://assets/art/level/notebook/%s.png" % row[0]
 		nb.entries.append(e)
 	_save(nb, "res://narrative/data/notebook.tres")
 
-	print("生成完毕: %d 关 + catalog + 诺拉的笔记 %d 条" % [LEVELS.size(), NOTEBOOK_IDS.size()])
+	print("生成完毕: %d 关 + catalog + 诺拉的笔记 %d 条" % [LEVELS.size(), NOTEBOOK_PAGES.size()])
 	quit(0)
 
 

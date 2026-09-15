@@ -59,7 +59,7 @@ func _run() -> void:
 	await _settle(4)
 	_snapshot("通关弹窗点「继续」→ 第二纹故事")
 	await _click_through_story("第二纹")
-	# 第二纹棋盘(进关自动弹出的笔记先收回,不然整页图挡住棋盘)
+	# 第二纹棋盘(进关自动弹出的笔记先收回,不然抽屉挡住棋盘)
 	scene = current_scene as LevelScene
 	board = scene._board
 	s = scene.session

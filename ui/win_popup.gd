@@ -1,7 +1,7 @@
 class_name WinPopup
 extends CanvasLayer
-## 通关弹窗「织成了」(v1.2 策划说明 `v1.2背景/`):过关时居中弹出美术图(原尺寸 1174×816,不缩放不改长宽),
-## 图的中下一个纯文字「继续」按钮 —— 有下一关进下一关,末关进结局(由 LevelScene 接 continue_pressed 决定)。
+## 通关弹窗(v1.2 策划说明 `v1.2背景/`):过关时居中弹出无字美术图(原尺寸 1174×816,不缩放不改长宽),
+## 叠加可本地化的「织成了!」标题与「继续」按钮 —— 有下一关进下一关,末关进结局(由 LevelScene 接 continue_pressed 决定)。
 ## 只有「继续」一个出口:不吃 Esc、没有关闭键(说明只写了这一个按钮)。
 ## 骨架同 SettingsPanel:遮罩 ColorRect(默认 STOP,挡住后面的棋盘)+ CenterContainer 真居中。
 ## 美术文档没写的部分先按常量留位(遮罩色 / 按钮位置 / 字号 / 字色),要改只动下面的常量:
@@ -13,12 +13,18 @@ signal continue_pressed
 const IMAGE_PATH := "res://assets/art/level/win_popup.png"
 const LAYER := 70                                  # 压过笔记抽屉(NotebookUI 60):通关瞬间抽屉可能开着
 const DIM_COLOR := Color(0, 0, 0, 0.45)            # 与标题页「设置」弹窗同值
+const TITLE_TEXT := "织成了!"
+const TITLE_CENTER := Vector2(608, 346)             # 原图字迹包围框 (360,284)..(855,407) 的中心
+const TITLE_FONT_SIZE := 156
+const TITLE_FONT_SIZE_EN := 86
+const TITLE_COLOR := Color("D1A94D")                # 原图标题主色
 const CONTINUE_CENTER := Vector2(587, 640)         # 「继续」中心(图内坐标,图 1174×816)
 const CONTINUE_FONT_SIZE := 64
-const CONTINUE_COLOR := Color("D1A94D")            # 图内「织成了!」的金
+const CONTINUE_COLOR := TITLE_COLOR
 const CONTINUE_HOVER_COLOR := Color("EBD08A")      # 悬停更浅(主题文字按钮的「悬停变浅」惯例)
 
 var _panel: TextureRect
+var _title: Label
 var _continue_btn: Button
 
 
@@ -38,16 +44,31 @@ func _init() -> void:
 	_panel.texture = load(IMAGE_PATH)
 	_panel.stretch_mode = TextureRect.STRETCH_KEEP
 	center.add_child(_panel)
+	# 标题与原图字迹同中心、同字号和主色;用锚点保持父图完成容器布局后仍精确落位。
+	_title = Label.new()
+	_title.text = tr(TITLE_TEXT)
+	_title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE_EN if TranslationServer.get_locale().to_lower().begins_with("en") else TITLE_FONT_SIZE)
+	_title.add_theme_color_override("font_color", TITLE_COLOR)
+	_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var img_size: Vector2 = _panel.texture.get_size()
+	var tx := TITLE_CENTER.x / img_size.x
+	var ty := TITLE_CENTER.y / img_size.y
+	_title.anchor_left = tx
+	_title.anchor_right = tx
+	_title.anchor_top = ty
+	_title.anchor_bottom = ty
+	_title.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_title.grow_vertical = Control.GROW_DIRECTION_BOTH
+	_panel.add_child(_title)
 	# 「继续」用锚点钉在图内坐标上,不用量尺寸(GROW_DIRECTION_BOTH 让它以锚点为中心向两边长)
 	_continue_btn = Button.new()
-	_continue_btn.text = "继续"
+	_continue_btn.text = tr("继续")
 	_continue_btn.focus_mode = Control.FOCUS_NONE
 	_continue_btn.add_theme_font_size_override("font_size", CONTINUE_FONT_SIZE)
 	for name in ["font_color", "font_pressed_color", "font_focus_color"]:
 		_continue_btn.add_theme_color_override(name, CONTINUE_COLOR)
 	for name in ["font_hover_color", "font_hover_pressed_color"]:
 		_continue_btn.add_theme_color_override(name, CONTINUE_HOVER_COLOR)
-	var img_size: Vector2 = _panel.texture.get_size()
 	var ax := CONTINUE_CENTER.x / img_size.x
 	var ay := CONTINUE_CENTER.y / img_size.y
 	_continue_btn.anchor_left = ax

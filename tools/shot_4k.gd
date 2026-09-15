@@ -2,8 +2,10 @@ extends SceneTree
 ## 1:1 全分辨率截图(3840×2160)给美术对照 —— 冒烟测试的截图随窗口缩放(Mac 上是 0.7875×),肉眼对不准像素。
 ## 这里把各界面放进一个 3840×2160 的 SubViewport 离屏渲染再存 PNG,与窗口大小无关;不改存档。
 ##   "$GODOT" --path . --script res://tools/shot_4k.gd
+##   "$GODOT" --path . --script res://tools/shot_4k.gd -- en   # 英文版，文件名加 _en
 ## 出图(build/shots4k/,已 gitignore + .gdignore,编辑器不会给截图生成 .import):
-##   4k_title.png 标题页 / 4k_story.png 第一关开场对话第一句 / 4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
+##   4k_title.png 标题页 / 4k_select.png 选关 / 4k_credits.png 开发者信息 / 4k_story.png 第一关开场对话第一句
+##   4k_level.png 第一个上架 ≥2 台仪器的关 / 4k_notebook.png 同关笔记划出(有「翻页」)
 ##   4k_machines.png 七台仪器全摆上棋盘(v1.1 端口/边框/钉按钮/封程机凹形/汇路机分割线)/ 4k_editor.png 纹样绘制弹窗
 ##   4k_editor_bot.png 同弹窗解锁焦纹(第四章)时的笔刷行:第四个笔刷是焦纹图样(v1.2)
 ##   4k_settings.png 标题页「设置」弹窗 / 4k_win.png 通关弹窗「织成了」(v1.2,直接弹出不走通关:通关会写存档)。
@@ -14,16 +16,21 @@ const OUT_DIR := "res://build/shots4k"
 const SIZE := Vector2i(3840, 2160)
 
 var _sv: SubViewport
+var _suffix := ""
 
 
 func _initialize() -> void:
 	await process_frame
 	OS.low_processor_usage_mode = false   # 项目开了低功耗模式(画面没变化不重绘),离屏渲染要每帧都画
 	var game := root.get_node("/root/Game")
+	var args := OS.get_cmdline_user_args()
+	if not args.is_empty() and String(args[0]).to_lower().begins_with("en"):
+		root.get_node("/root/L10n").set_locale("en", false)
+		_suffix = "_en"
 	AudioServer.set_bus_mute(0, true)   # 出图别出声
 	DirAccess.make_dir_recursive_absolute(OUT_DIR)
 	var first: LevelDef = game.catalog.chapters[0].levels[0]
-	var with_machines: LevelDef = first   # 关内/笔记截图要有仪器架按钮、整页图和「翻页」:取第一个上架 ≥2 台仪器的关
+	var with_machines: LevelDef = first   # 关内/笔记截图要有仪器架按钮、笔记内容和「翻页」:取第一个上架 ≥2 台仪器的关
 	for ch in game.catalog.chapters:
 		for lv in ch.levels:
 			if lv.allowed_rules.size() >= 2:
@@ -40,10 +47,12 @@ func _initialize() -> void:
 	await _wait(0.3)
 	_save("4k_settings")
 	_unmount()
+	await _shot(load("res://ui/level_select.tscn").instantiate(), "4k_select", 0.4)
+	await _shot(load("res://ui/credits_scene.tscn").instantiate(), "4k_credits", 0.4)
 
 	game.current = first
 	game.ending_pending = false
-	await _shot(load("res://ui/story_scene.tscn").instantiate(), "4k_story", 2.5)   # 等打字机把第一句打完
+	await _shot(load("res://ui/story_scene.tscn").instantiate(), "4k_story", 7.0 if _suffix == "_en" else 2.5)   # 等打字机把第一句打完
 
 	game.current = with_machines
 	var scene: LevelScene = load("res://ui/level_scene.tscn").instantiate()
@@ -134,5 +143,6 @@ func _wait(sec: float) -> void:
 
 func _save(tag: String) -> void:
 	var img := _sv.get_texture().get_image()
-	img.save_png("%s/%s.png" % [OUT_DIR, tag])
-	print("  %s.png %dx%d" % [tag, img.get_width(), img.get_height()])
+	var name := tag + _suffix
+	img.save_png("%s/%s.png" % [OUT_DIR, name])
+	print("  %s.png %dx%d" % [name, img.get_width(), img.get_height()])

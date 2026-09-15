@@ -18,12 +18,6 @@ text = "它不是选错了一条路……它像是同时认出了两条互相冲
 scene = "伦敦街上"
 nora_expr = "苦恼"
 
-[sub_resource type="Resource" id="Resource_adydy"]
-script = ExtResource("1_fl7da")
-speaker = "诺拉·拉芙蒂"
-text = "小织也是，前几天被人不小心放在窗台旁淋了雨，现在连句完整的话都说不出来，机械厂来的维修工却说他们也找不到问题……"
-scene = "伦敦街上"
-nora_expr = "苦恼"
 
 [sub_resource type="Resource" id="Resource_m11vx"]
 script = ExtResource("1_fl7da")
@@ -51,7 +45,7 @@ nora_expr = "严肃"
 
 [sub_resource type="Resource" id="Resource_6nyhu"]
 script = ExtResource("2_p7gpl")
-lines = Array[ExtResource("1_fl7da")]([SubResource("Resource_fl7da"), SubResource("Resource_p7gpl"), SubResource("Resource_adydy"), SubResource("Resource_m11vx"), SubResource("Resource_m3g0s"), SubResource("Resource_tplwd")])
+lines = Array[ExtResource("1_fl7da")]([SubResource("Resource_fl7da"), SubResource("Resource_p7gpl"), SubResource("Resource_m11vx"), SubResource("Resource_m3g0s"), SubResource("Resource_tplwd")])
 
 [resource]
 script = ExtResource("3_adydy")

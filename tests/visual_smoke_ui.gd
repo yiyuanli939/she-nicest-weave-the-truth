@@ -171,6 +171,9 @@ func _run() -> void:
 	var story := current_scene as StoryScene
 	_check(story != null, "有对话的关先进 StoryScene")
 	if story != null:
+		_check(story._continue_hint.text == StoryScene.CONTINUE_HINT_TEXT
+				and story._continue_hint.get_global_rect().get_center().distance_to(StoryScene.CONTINUE_HINT_CENTER) <= 1.0,
+				"「按任意键继续」由文字还原并对齐原图")
 		_check(_labels_with(story, "街景") == 0 and _labels_with(story, "第九纹") == 0, "故事界面不显示场景名/关名")
 		_check(story._scene_pic.visible and story._scene_pic.texture != null
 				and story._scene_pic.texture.resource_path.ends_with("scene_street.png"), "第 0 句换到街景插图")
@@ -245,6 +248,9 @@ func _run() -> void:
 	# ---- D. 仪器架:只显示本关上架的仪器,按图顺序紧凑排列;未上架的不显示 ----
 	var board: ProofBoard = scene._board
 	var s := scene.session
+	_check(scene._palette._title.text == PalettePanel.TITLE_TEXT
+			and (scene._palette._title.position + scene._palette._title.size * 0.5).distance_to(PalettePanel.TITLE_CENTER) <= 1.0,
+			"「仪器架」由文字还原并对齐原图")
 	var last_y := -1.0
 	var order_ok := true
 	var shown := 0
@@ -584,13 +590,22 @@ func _run() -> void:
 	_check(nbui._handle.text.contains("继"), "划出后夹子变「继续工作」")
 	_check(nbui._entries.size() == scene.allowed_rules.size() and nbui._page == 0 and nbui._page_pic.visible
 			and nbui._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
-			"只显示本关 %d 台仪器的页,从并织机整页图开始(得 %d)" % [scene.allowed_rules.size(), nbui._entries.size()])
-	_check(nbui._page_pic.position == NotebookUI.PAGE_OFFSET and nbui._page_pic.stretch_mode == TextureRect.STRETCH_KEEP
-			and nbui._page_pic.texture.get_size() == Vector2(3840, 2160),
-			"整页图全屏尺寸原样摆放(抽屉开位时与屏幕对齐,不缩放不改长宽比)")
+			"只显示本关 %d 台仪器的页,从并织机开始(得 %d)" % [scene.allowed_rules.size(), nbui._entries.size()])
+	_check(nbui._title_label.text == "并织机"
+			and nbui._title_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_CENTER
+			and nbui._body_label.text == "左侧上下两口各收一幅纹样，织成一幅左右并排的并纹，少了任何一股，机器都不会开工。"
+			and nbui._body_label.horizontal_alignment == HORIZONTAL_ALIGNMENT_LEFT,
+			"并织机标题居中、正文左对齐并由运行时文字显示")
+	_check(nbui._content_scroll.position == NotebookUI.CONTENT_RECT.position
+			and nbui._content_scroll.size == NotebookUI.CONTENT_RECT.size
+			and nbui._page_pic.expand_mode == TextureRect.EXPAND_KEEP_SIZE
+			and nbui._page_pic.stretch_mode == TextureRect.STRETCH_KEEP
+			and nbui._page_pic.texture.get_size() == Vector2(987, 570),
+			"标题、正文、原尺寸图示排列在纸张安全区内")
 	_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
 	await _settle()
-	_check(nbui._page == 1 and nbui._page_pic.texture.resource_path.ends_with("notebook/and_elim.png"), "点「翻页」到第 2 页(拆股机整页图)")
+	_check(nbui._page == 1 and nbui._title_label.text == "拆股机"
+			and nbui._page_pic.texture.resource_path.ends_with("notebook/and_elim.png"), "点「翻页」到第 2 页(拆股机)")
 	_check(sfx.last_slot == &"page", "音效:翻页响 page(得 %s)" % sfx.last_slot)
 	for i in nbui._entries.size() - 1:
 		_click(_center(nbui._flip), MOUSE_BUTTON_LEFT)
@@ -814,6 +829,9 @@ func _run() -> void:
 			var pr: Rect2 = wp._panel.get_global_rect()
 			_check(wp.visible and pr.position.distance_to(Vector2(1333, 672)) <= 1.0 and pr.size == Vector2(1174, 816),
 					"通关弹窗居中、图原尺寸 1174×816(得 %s)" % pr)
+			_check(wp._title.text == WinPopup.TITLE_TEXT
+					and wp._title.get_global_rect().get_center().distance_to(pr.position + WinPopup.TITLE_CENTER) <= 1.0,
+					"「织成了!」由文字还原并对齐原图")
 			var br: Rect2 = wp._continue_btn.get_global_rect()
 			_check(br.position.y >= pr.position.y + 512 and br.end.y <= pr.position.y + 744
 					and absf(br.get_center().x - pr.get_center().x) <= 1.0 and wp._continue_btn.text == "继续",
@@ -961,7 +979,8 @@ func _run() -> void:
 	_check(nb2._entries.size() == 1 and nb2._page == 0 and nb2._page_pic.texture.resource_path.ends_with("notebook/and_intro.png"),
 			"自动翻到并织机那页")
 	_check(nb2._new_label.visible and nb2._new_label.text == "新机器!" and nb2._new_label.position == NotebookUI.NEW_LABEL_POS
-			and nb2._new_label.get_index() > nb2._page_pic.get_index(), "并织机是本关新机器:纸左上角显示「新机器!」(在整页图之上)")
+			and nb2._new_label.get_parent() == nb2._drawer
+			and nb2._new_label.get_index() > nb2._content_scroll.get_index(), "并织机是本关新机器:纸左上角显示「新机器!」(在页面内容之上)")
 	var lbl_rect: Rect2 = nb2._new_label.get_global_rect()
 	_check(lbl_rect.position.x > NotebookUI.OPEN_X + 411 and lbl_rect.position.y > NotebookUI.DRAWER_Y + 278
 			and lbl_rect.end.x < 1451 and lbl_rect.end.y < NotebookUI.DRAWER_Y + 560,

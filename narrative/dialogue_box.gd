@@ -3,7 +3,7 @@ extends Control
 ## 对话文字区:名字 + 台词打字机 + 推进(打字中 点击/按键 = 整句显示;显示完再点 = 下一句;最后一句后再点 = 关闭)。
 ## 显示期间是模态的:左键与任意键在 _input 层截获(点面板、点台词、点任意处都推进),
 ## 不用全屏捕捉 Control —— 那样面板本身会先吃掉点击,点在台词上就不推进。
-## 只管文字,没有自己的底(底图/立绘由 StoryScene 摆,底图右下角已印「按任意键继续」);
+## 只管文字,没有自己的底(底图/立绘与可本地化的「按任意键继续」由 StoryScene 摆);
 ## 位置由宿主调 layout()。robot_cue 逐行转发(cue 信号)。
 
 signal finished
@@ -11,6 +11,7 @@ signal cue(cue_name: String)
 signal line_shown(line: DialogueLine)
 
 const CHARS_PER_SEC := 40.0
+const MIN_TYPE_SEC := 0.45                 # 短句也要让玩家看见打字过程；长句仍按原速度
 const NAME_FONT_SIZE := 56
 const TEXT_FONT_SIZE := 48
 const NAME_COLOR := Color(0.627, 0.275, 0.227)   # 红棕(参考图里名字的颜色)
@@ -62,8 +63,8 @@ func _advance() -> void:
 		_finish()
 		return
 	var line := _lines[_idx]
-	_speaker.text = StoryArt.display_name(line.speaker)
-	_text.text = line.text
+	_speaker.text = tr(StoryArt.display_name(line.speaker))
+	_text.text = tr(line.text)
 	line_shown.emit(line)
 	if line.robot_cue != "":
 		cue.emit(line.robot_cue)
@@ -72,7 +73,7 @@ func _advance() -> void:
 		_tween.kill()
 	var total := _text.get_total_character_count()
 	_tween = _text.create_tween()
-	_tween.tween_property(_text, "visible_characters", total, total / CHARS_PER_SEC)
+	_tween.tween_property(_text, "visible_characters", total, maxf(total / CHARS_PER_SEC, MIN_TYPE_SEC))
 
 
 ## 模态截获:左键(按下与抬起都不放给下层)与任意键(按下)都推进
@@ -84,7 +85,8 @@ func _input(event: InputEvent) -> void:
 		if mb.button_index != MOUSE_BUTTON_LEFT:
 			return
 		get_viewport().set_input_as_handled()
-		if mb.pressed:
+		# 双击会产生第二个 pressed；若第一下刚换句，第二下会立刻补全新句，看起来像跳过打字。
+		if mb.pressed and not mb.double_click:
 			_step()
 		return
 	var key := event as InputEventKey
@@ -104,9 +106,7 @@ func _step() -> void:
 			_tween.kill()
 		# 不能设 -1:getter 也返回 -1,会让上面的"打字中"判断永真,点击就再也推进不了
 		_text.visible_characters = _text.get_total_character_count()
-		SoundFx.hit(self, &"skip")
 	else:
-		SoundFx.hit(self, &"next")
 		_advance()
 
 

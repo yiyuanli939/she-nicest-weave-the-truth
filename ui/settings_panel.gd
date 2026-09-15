@@ -88,11 +88,11 @@ func _init() -> void:
 	_robot_btn.set_meta(SoundFx.META, &"toggle")
 	box.add_child(_robot_btn)
 	_maint_btn = _button(_on_open_maint)
-	_maint_btn.text = "小机维护"
+	_maint_btn.text = tr("小机维护")
 	_maint_btn.set_meta(SoundFx.META, &"")   # 面板 open 自己响
 	box.add_child(_maint_btn)
 	_close_btn = _button(close)
-	_close_btn.text = "关闭"
+	_close_btn.text = tr("关闭")
 	_close_btn.set_meta(SoundFx.META, &"")   # close() 里响,Esc 同一处
 	box.add_child(_close_btn)
 
@@ -172,7 +172,7 @@ func refresh() -> void:
 	_robot_btn.visible = possible
 	_maint_btn.visible = possible and bool(_robot.enabled)
 	if possible:
-		_robot_btn.text = "小机联动:" + ("开" if bool(_robot.enabled) else "关")
+		_robot_btn.text = tr("小机联动:开" if bool(_robot.enabled) else "小机联动:关")
 
 
 # ---- 纯函数(测试盯) ----
@@ -250,7 +250,7 @@ func _on_toggle_fullscreen() -> void:
 
 
 func _set_fullscreen_text(on: bool) -> void:
-	_fullscreen_btn.text = "全屏:" + ("开" if on else "关")
+	_fullscreen_btn.text = tr("全屏:开" if on else "全屏:关")
 
 
 # ---- 小机 ----
@@ -270,7 +270,7 @@ func _on_open_maint() -> void:
 
 func _label(text: String, size: int) -> Label:
 	var l := Label.new()
-	l.text = text
+	l.text = tr(text)
 	l.add_theme_font_size_override("font_size", size)
 	l.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE

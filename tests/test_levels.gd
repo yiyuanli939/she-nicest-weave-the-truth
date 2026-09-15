@@ -51,18 +51,27 @@ func test_titles_follow_art_spec() -> bool:
 	return ok
 
 
-## 诺拉的笔记 = 七台仪器各一条说明,顺序同仪器架,全量常驻(不解锁)
-## 诺拉的笔记 = 七台仪器各一张整页图(标题/正文全画在图里,引擎侧无文案)
+## 诺拉的笔记 = 七台仪器各一条可本地化说明 + 一张独立图示，顺序同仪器架，全量常驻。
 func test_notebook_is_machine_manual() -> bool:
 	var nb := NotebookCatalog.load_default()
 	var ok := check(nb != null and nb.entries.size() == Rules.all_ids().size(), "笔记条数 = 仪器数")
-	var expected := [&"and_intro", &"and_elim", &"imp_intro", &"imp_elim", &"or_intro", &"or_elim", &"false_elim"]
+	var expected: Array = [
+		[&"and_intro", "并织机", "左侧上下两口各收一幅纹样，织成一幅左右并排的并纹，少了任何一股，机器都不会开工。"],
+		[&"and_elim", "拆股机", "收一幅并纹，上口吐出它的左半，下口吐出它的右半，想用哪股接哪股。"],
+		[&"imp_intro", "封程机", "左上口自己钉一副纹样，机器会凭空吐出它，但吐出的只是虚纹，切不可放入最终交付，必须用它织出另一幅纹样（也可以与自身相同），接入右上口，随后右下口便可吐出一副实在的叠层纹。"],
+		[&"imp_elim", "引渡机", "左上口收一副迭层纹，左下口收它上层的纹样，机器吐出下层的纹样。"],
+		[&"or_intro", "岔纹机", "收一幅纹样，织成岔纹；上口输出的纹样中它在左上，下口输出的纹样中它在右下，对角线另一侧的纹样则由你自己钉。"],
+		[&"or_elim", "汇路机", "上1口收入一副岔纹，岔纹对角线两侧的纹样分别由右2和右3口吐出，吐出的两幅纹样均为虚纹，若用他们都能织出同一副纹样分别送入左2和左3口，则汇路机可以织出这副纹样的实纹。"],
+		[&"false_elim", "溃散机", "收进一幅焦纹以后，这台机器什么都肯织——织什么由你钉。工坊严令：慎用。"],
+	]
 	for i in expected.size():
-		var e := nb.entry(expected[i])
-		ok = check(e != null, "仪器 %s 应有笔记条目" % expected[i]) and ok
+		var row: Array = expected[i]
+		var e := nb.entry(row[0])
+		ok = check(e != null, "仪器 %s 应有笔记条目" % row[0]) and ok
 		if e != null:
-			ok = check(e.id == nb.entries[i].id, "条目顺序应同仪器架:%s" % expected[i]) and ok
-			ok = check(e.image != "" and ResourceLoader.exists(e.image), "%s 整页图存在:%s" % [expected[i], e.image]) and ok
+			ok = check(e.id == nb.entries[i].id, "条目顺序应同仪器架:%s" % row[0]) and ok
+			ok = check(e.title == row[1] and e.description == row[2], "%s 标题与正文和说明文档一致" % row[0]) and ok
+			ok = check(e.image != "" and ResourceLoader.exists(e.image), "%s 图示存在:%s" % [row[0], e.image]) and ok
 	return ok
 
 

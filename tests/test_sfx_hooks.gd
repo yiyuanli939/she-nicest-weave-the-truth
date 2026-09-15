@@ -1,6 +1,6 @@
 extends TestBase
 ## 操作音效的挂点(UI 冒烟没真实输入到的那些):拒删 / 拔线 / 接线被拒不响 / 拖动松手 / 缩放去重 / 重置 / 通关(代解不响)/
-## 指引换条不重复 / 钉被拒·取消钉住 / 静音区间 / 撤销重建不响;钉纹样弹窗 开·笔刷·落笔·清空;对话 显示完·下一句;
+## 指引换条不重复 / 钉被拒·取消钉住 / 静音区间 / 撤销重建不响;钉纹样弹窗 开·笔刷·落笔·清空;对话全显与下一句静音;
 ## 设置弹窗 开·关·音效滑条;笔记抽屉 开·翻页·关;各按钮的 meta 槽位。无头下 LevelScene 用默认配置(无 Game)。
 ## 用 /root/Sfx(autoload)断言;--script 模式没有 autoload 时临时挂一个同名节点让 SoundFx.hit 找得到。
 
@@ -167,10 +167,11 @@ func test_dialogue_hooks() -> bool:
 		l.text = "一段足够长的台词让打字机还没打完就被点了一下一二三四五六七八九十"
 		dlg.lines.append(l)
 	db.play(dlg)
+	var plays_before: int = sfx.play_count
 	db._step()
-	var ok := check(sfx.last_slot == &"skip" and db._idx == 0, "打字中点一下:先显示完,响 skip(得 %s)" % sfx.last_slot)
+	var ok := check(sfx.play_count == plays_before and db._idx == 0, "打字中点一下:先显示完,不播放音效")
 	db._step()
-	ok = check(sfx.last_slot == &"next" and db._idx == 1, "显示完再点:下一句,响 next") and ok
+	ok = check(sfx.play_count == plays_before and db._idx == 1, "显示完再点:下一句,不播放音效") and ok
 	tree.root.remove_child(db)
 	db.free()
 	return ok

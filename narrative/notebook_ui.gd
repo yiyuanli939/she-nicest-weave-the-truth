@@ -4,8 +4,8 @@ extends CanvasLayer
 ## 底图 assets/art/level/notebook_bg.png 原尺寸 3798×2065)。
 ## 平时收在屏幕右缘只露出黄铜夹子(「笔记」);点击向左划出(缓动),夹子文字变「继续工作」;再点向右收回。
 ## 「翻页」循环切换条目(只显示本关已上架仪器的页)。
-## 条目内容 = 整页 PNG(NotebookEntry.image,3840×2160 全屏导出、透明底,标题/正文全画在图里):
-## 抽屉划出到位时图与屏幕对齐 → 在抽屉内摆在 PAGE_OFFSET(负的抽屉开位)、原尺寸不缩放;引擎不再渲染条目文字。
+## 条目内容 = NotebookEntry 的运行时标题/正文 + 独立透明图示；三者在纸张安全区内纵向排列。
+## 图示保持原尺寸；当前译文超出安全区时只在纸内滚动，避免文字与图示重叠或跑出纸张。
 ## 下面的位置/字号常量全部来自对参考图的模板匹配与墨迹量测(不是拍脑袋居中):
 ## tests/test_art_alignment.gd 盯着抽屉开位与参考图一致;tools/shot_4k.gd 出 1:1 截图给美术对照。
 ## 坐标为抽屉内 / 3840×2160 逻辑像素;美术调位置改下面常量。
@@ -23,23 +23,38 @@ const HANDLE_CENTER_OPEN := Vector2(346, 1019)          # 划出后「继续 / �
 const HANDLE_CENTER_CLOSED := Vector2(254, 1021)        # 收起时「笔 / 记」两行的整体中心(抽屉内;关内预览夹子上的字 ≈ 屏幕 (3744,1084))
 const HANDLE_FONT_SIZE := 78                            # 夹子文字字号:参考「继续工作」墨高 64–65 = 站酷小薇 78 号
 const HANDLE_LINE_PITCH := 92.0                         # 夹子两行的行距(参考实测;Button 按字形自然行距只有 79,用 _pitched_font 垫到 92)
+const HANDLE_FONT_SIZE_EN_CLOSED := 40                  # NOTEBOOK 单字竖排，完整落在收起夹子内
+const HANDLE_LINE_PITCH_EN_CLOSED := 48.0
 const FLIP_FONT_SIZE := 82                              # 「翻页」字号:参考墨迹 152×66 = 82 号
 const FLIP_RECT := Rect2(3172, 1532, 220, 144)          # 右下角折角「翻页」:中心抽屉内 (3282,1604) = 参考屏幕 (3299.5,1631.5);
 														# 尺寸 = Button 最小尺寸(字宽 168 / 单行按字体全高 120,各 + 内边距 24×2),
 														# 小于它 Button 会自己撑大、中心跑偏
 														# 折角三角形(抽屉内):直角 (3195,1540),斜边 (3460,1540)→(3195,1788)
-const CONTENT_RECT := Rect2(642, 436, 2661, 1262)       # 七张整页图内容包围盒(抽屉内;屏幕 659..3319 × 463..1724 实测),仅作参考
-const PAGE_OFFSET := Vector2(-OPEN_X, -DRAWER_Y)        # 整页图按全屏导出:抽屉开位时正好与屏幕对齐
+const FLIP_FONT_SIZE_EN := 72
+const FLIP_RECT_EN := Rect2(3190, 1532, 210, 144)       # 英文 NEXT 完整落在折角三角范围内
+const CONTENT_RECT := Rect2(642, 436, 2661, 1262)       # 纸张安全区(抽屉内;打开后屏幕 659..3319 × 463..1724)
+const CONTENT_GAP := 20
+const TITLE_FONT_SIZE := 96
+const TITLE_COLOR := Color("644545")
+const BODY_FONT_SIZE := 60
+const BODY_COLOR := Color("A3472E")
+const BODY_LINE_SPACING := 10
+const OR_ELIM_IMAGE_SCALE_EN := 0.78                    # 汇路机英文正文较长，等比缩图后整页无需滚动条
 # 「新机器!」:本关首次上架的仪器那页,纸左上角的提示(用户 2026-09-02;美术图没有 → 纯文字 + 常量留位)
 const NEW_LABEL_TEXT := "新机器!"
 const NEW_LABEL_POS := Vector2(470, 318)                # 抽屉内坐标:纸面左上角实测 (411,278)(notebook_bg 纸色包围盒)向内 (59,40);
-														# 整页图标题墨迹从屏幕 x 1451 起、夹子从抽屉 y 560 起,都不压(冒烟盯)
+														# 页面内容从 x 642 / y 436 起、夹子从抽屉 y 560 起,都不压(冒烟盯)
 const NEW_LABEL_FONT_SIZE := 82                         # 与「翻页」同号
-const NEW_LABEL_COLOR := Color("A3472E")                # 整页图正文红字的中位色(and_intro.png 量的)
+const NEW_LABEL_COLOR := Color("A3472E")                # 与笔记正文相同的红色
 
 var _drawer: Control
 var _handle: Button
 var _flip: Button
+var _content_scroll: ScrollContainer
+var _content: VBoxContainer
+var _title_label: Label
+var _body_label: Label
+var _page_center: CenterContainer
 var _page_pic: TextureRect
 var _new_label: Label
 var _new_rules: Array[StringName] = []    # 本关首次上架的仪器 id:翻到它们的页时显示「新机器!」
@@ -47,7 +62,7 @@ var _entries: Array[NotebookEntry] = []
 var _page := 0
 var _open := false
 var _tween: Tween
-var _page_cache: Dictionary = {}          # 整页图路径 → Texture2D:进关时逐帧读完本关的页,翻页不再同步解码 3840×2160 PNG
+var _page_cache: Dictionary = {}          # 图示路径 → Texture2D:进关时逐帧预热，翻页不再同步解码 PNG
 
 
 func _init() -> void:
@@ -62,30 +77,62 @@ func _init() -> void:
 	_drawer.position = Vector2(3840.0 - CLOSED_PEEK, DRAWER_Y)
 	add_child(_drawer)
 
+	_content_scroll = ScrollContainer.new()
+	_content_scroll.position = CONTENT_RECT.position
+	_content_scroll.size = CONTENT_RECT.size
+	_content_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_content_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_drawer.add_child(_content_scroll)
+	_content = VBoxContainer.new()
+	_content.custom_minimum_size.x = CONTENT_RECT.size.x
+	_content.add_theme_constant_override("separation", CONTENT_GAP)
+	_content_scroll.add_child(_content)
+
+	_title_label = Label.new()
+	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_title_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_title_label.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
+	_title_label.add_theme_color_override("font_color", TITLE_COLOR)
+	_title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_content.add_child(_title_label)
+	_body_label = Label.new()
+	_body_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	_body_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_body_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body_label.add_theme_font_size_override("font_size", BODY_FONT_SIZE)
+	_body_label.add_theme_color_override("font_color", BODY_COLOR)
+	_body_label.add_theme_constant_override("line_spacing", BODY_LINE_SPACING)
+	_body_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_content.add_child(_body_label)
+	_page_center = CenterContainer.new()
+	_page_center.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_content.add_child(_page_center)
+	_page_pic = TextureRect.new()
+	_page_pic.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+	_page_pic.stretch_mode = TextureRect.STRETCH_KEEP
+	_page_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_page_center.add_child(_page_pic)
+
 	_handle = _make_text_button(Rect2(Vector2.ZERO, HANDLE_SIZE), HANDLE_FONT_SIZE)
 	_handle.add_theme_font_override("font", _pitched_font(HANDLE_FONT_SIZE, HANDLE_LINE_PITCH))
 	_handle.set_meta(SoundFx.META, &"")   # 抽屉滑出 / 收起各有音
 	_handle.pressed.connect(toggle)
 	_drawer.add_child(_handle)
-	_flip = _make_text_button(FLIP_RECT, FLIP_FONT_SIZE)
-	_flip.text = "翻页"
+	var english := TranslationServer.get_locale().to_lower().begins_with("en")
+	_flip = _make_text_button(FLIP_RECT_EN if english else FLIP_RECT, FLIP_FONT_SIZE_EN if english else FLIP_FONT_SIZE)
+	_flip.text = tr("翻页")
 	_flip.set_meta(SoundFx.META, &"")     # 翻页音在 _next_page
 	_flip.pressed.connect(_next_page)
 	_drawer.add_child(_flip)
 
-	_page_pic = TextureRect.new()
-	_page_pic.position = PAGE_OFFSET
-	_page_pic.stretch_mode = TextureRect.STRETCH_KEEP   # 原尺寸:不缩放、不改长宽比(美术要求)
-	_page_pic.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_drawer.add_child(_page_pic)
 	_new_label = Label.new()
-	_new_label.text = NEW_LABEL_TEXT
+	_new_label.text = tr(NEW_LABEL_TEXT)
 	_new_label.position = NEW_LABEL_POS
 	_new_label.add_theme_font_size_override("font_size", NEW_LABEL_FONT_SIZE)
 	_new_label.add_theme_color_override("font_color", NEW_LABEL_COLOR)
 	_new_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_new_label.visible = false
-	_drawer.add_child(_new_label)   # 在整页图之上
+	_drawer.add_child(_new_label)   # 作为抽屉的最后一层，始终盖在页面内容之上
 	_set_handle_text(false)
 
 
@@ -120,7 +167,12 @@ static func _pitched_font(size: int, pitch: float) -> Font:
 
 ## 夹子文字:收起「笔 / 记」竖排两行,划出「继续 / 工作」两行两字(参考图的排版);按钮整体挪到对应的中心
 func _set_handle_text(opened: bool) -> void:
-	_handle.text = "继续\n工作" if opened else "笔\n记"
+	_handle.text = tr("继续\n工作") if opened else tr("笔\n记")
+	var english_closed := not opened and TranslationServer.get_locale().to_lower().begins_with("en")
+	var font_size := HANDLE_FONT_SIZE_EN_CLOSED if english_closed else HANDLE_FONT_SIZE
+	var line_pitch := HANDLE_LINE_PITCH_EN_CLOSED if english_closed else HANDLE_LINE_PITCH
+	_handle.add_theme_font_size_override("font_size", font_size)
+	_handle.add_theme_font_override("font", _pitched_font(font_size, line_pitch))
 	var center := HANDLE_CENTER_OPEN if opened else HANDLE_CENTER_CLOSED
 	_handle.position = (center - HANDLE_SIZE * 0.5).round()
 
@@ -139,8 +191,8 @@ func _snap() -> void:
 	_drawer.position.x = _target_x(_open)
 
 
-## 把本关允许的整页图读进缓存(LevelScene 进关时调;open() 也兜底调):一张 3840×2160 同步解码约 20 ms,
-## 攒在翻页那一下会卡一帧(Web 更慢),挪到进关时做、在树里时一帧一张摊开。缓存持有引用,ResourceCache 不会中途释放。
+## 把本关允许的图示读进缓存(LevelScene 进关时调;open() 也兜底调)，避免翻页时同步解码卡顿。
+## 在树里时一帧一张摊开；缓存持有引用，ResourceCache 不会中途释放。
 func preload_pages(nb: NotebookCatalog, unlocked: Array = []) -> void:
 	for e in nb.entries:
 		if not unlocked.has(e.id) or e.image == "" or _page_cache.has(e.image) or not ResourceLoader.exists(e.image):
@@ -213,21 +265,34 @@ func _slide(opened: bool) -> void:
 
 func _show_page() -> void:
 	if _entries.is_empty():
-		_page_pic.visible = false   # 空 = 白纸(占位文字已按要求全部删除)
+		_content_scroll.visible = false   # 空 = 白纸
+		_title_label.text = ""
+		_body_label.text = ""
+		_page_pic.texture = null
+		_page_pic.visible = false
 		_flip.visible = false
 		_new_label.visible = false
 		return
+	_content_scroll.visible = true
 	_flip.visible = _entries.size() > 1
 	var e := _entries[_page]
+	_title_label.text = tr(e.title)
+	_body_label.text = tr(e.description)
 	_new_label.visible = _new_rules.has(e.id)
 	var tex: Texture2D = _page_cache.get(e.image)
 	if tex == null and e.image != "" and ResourceLoader.exists(e.image):
 		tex = load(e.image)
 		_page_cache[e.image] = tex
 	if tex == null:
-		push_warning("NotebookUI: 缺整页图 " + e.image)
+		push_warning("NotebookUI: 缺图示 " + e.image)
 	_page_pic.texture = tex
 	_page_pic.visible = tex != null
+	var shrink_or_elim := tex != null and e.id == &"or_elim" \
+			and TranslationServer.get_locale().to_lower().begins_with("en")
+	_page_pic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE if shrink_or_elim else TextureRect.EXPAND_KEEP_SIZE
+	_page_pic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED if shrink_or_elim else TextureRect.STRETCH_KEEP
+	_page_pic.custom_minimum_size = tex.get_size() * OR_ELIM_IMAGE_SCALE_EN if shrink_or_elim else Vector2.ZERO
+	_content_scroll.scroll_vertical = 0
 
 
 ## 翻到下一条,最后一条回到第一条(美术要求)

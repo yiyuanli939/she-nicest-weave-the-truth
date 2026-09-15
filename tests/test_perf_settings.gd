@@ -4,7 +4,7 @@ extends TestBase
 ##      (纯 2D Control 游戏;Web 版本来就只能用它,视觉已验证;原来的 Forward+/d3d12 是脚手架默认);
 ##   ② 每帧脚本工作只许出现在白名单文件里(各自有 set_process 门控),_process 里不许 queue_redraw,
 ##      全项目不许循环 Tween(set_loops)/ SubViewport;
-##   ③ 贴图导入全部开 mipmap(全局过滤器 LINEAR_WITH_MIPMAPS;4K 整页图在 1080p 上 2× 缩小采样);
+##   ③ 贴图导入全部开 mipmap(全局过滤器 LINEAR_WITH_MIPMAPS;大图在小窗口中会缩小采样);
 ##   ④ export_presets.cfg 有 Windows 预设,且和 Web 预设一样排除素材源目录(否则几十 MB 原画进包)。
 
 const SCAN_DIRS: Array[String] = ["res://api", "res://board", "res://game", "res://narrative", "res://pattern", "res://ui"]

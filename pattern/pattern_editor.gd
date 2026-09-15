@@ -98,7 +98,7 @@ func _init() -> void:
 	band.content_margin_bottom = TITLE_BAND_PAD
 	title_panel.add_theme_stylebox_override("panel", band)
 	var title := Label.new()
-	title.text = TITLE_TEXT
+	title.text = tr(TITLE_TEXT)
 	title.add_theme_font_size_override("font_size", TITLE_FONT_SIZE)
 	title_panel.add_child(title)
 	box.add_child(title_panel)
@@ -120,7 +120,7 @@ func _init() -> void:
 	col.add_child(_gap(GAP_PREVIEW_HINT))
 
 	var hint := Label.new()
-	hint.text = HINT_TEXT
+	hint.text = tr(HINT_TEXT)
 	hint.add_theme_font_size_override("font_size", HINT_FONT_SIZE)
 	col.add_child(hint)
 	col.add_child(_gap(GAP_HINT_BRUSH))
@@ -180,7 +180,7 @@ func open_for(atoms: Array[StringName], atom_colors: Dictionary,
 
 func _make_action_button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
-	b.text = text
+	b.text = tr(text)
 	b.add_theme_font_size_override("font_size", FONT_SIZE)
 	UiStyles.fill_button(b, BUTTON_BG, BUTTON_MARGIN_H, BUTTON_MARGIN_V)
 	b.pressed.connect(cb)
@@ -193,7 +193,6 @@ func _make_swatch(a: StringName) -> Button:
 	b.custom_minimum_size = SWATCH_SIZE
 	b.toggle_mode = true
 	b.button_group = _group
-	b.tooltip_text = "染这一色"
 	var col := _preview.atom_color(a)
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var sb := StyleBoxFlat.new()
@@ -214,7 +213,6 @@ func _make_struct_button(id: String, style: String) -> Button:
 	b.custom_minimum_size = SWATCH_SIZE
 	b.toggle_mode = true
 	b.button_group = _group
-	b.tooltip_text = {"and": "并织:分成左右两半", "imp": "迭层:分成上下两层", "or": "岔纹:分成两支"}[id]
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = ICON_BG.darkened(0.05) if state == "hover" else ICON_BG
@@ -238,7 +236,6 @@ func _make_bot_button() -> Button:
 	b.custom_minimum_size = SWATCH_SIZE
 	b.toggle_mode = true
 	b.button_group = _group
-	b.tooltip_text = "焦纹"
 	for state in ["normal", "hover", "pressed", "focus"]:
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = ICON_BG.darkened(0.05) if state == "hover" else ICON_BG
