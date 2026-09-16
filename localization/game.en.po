@@ -51,25 +51,25 @@ msgid "焦纹"
 msgstr "Scorched Pattern"
 
 msgid "并织机"
-msgstr "Joining Machine"
+msgstr "Joining Loom"
 
 msgid "拆股机"
-msgstr "Splitting Machine"
+msgstr "Splitting Loom"
 
 msgid "封程机"
-msgstr "Binding Machine"
+msgstr "Binding Loom"
 
 msgid "引渡机"
-msgstr "Relay Machine"
+msgstr "Relay Loom"
 
 msgid "岔纹机"
-msgstr "Forking Machine"
+msgstr "Forking Loom"
 
 msgid "汇路机"
-msgstr "Convergence Machine"
+msgstr "Convergence Loom"
 
 msgid "溃散机"
-msgstr "Unraveling Machine"
+msgstr "Unraveling Loom"
 
 msgid "诺拉"
 msgstr "Nora"
@@ -124,7 +124,7 @@ msgid "返回主界面"
 msgstr "Back to Main Menu"
 
 msgid "仪器架"
-msgstr "MACHINES"
+msgstr "Rack"
 
 msgid "重置"
 msgstr "Reset"
@@ -148,7 +148,7 @@ msgid "钉纹样"
 msgstr "Pin"
 
 msgid "给本口的自由纹样赋值(求解只看输入和钉住的纹样,不从下游反推)"
-msgstr "Assign the free pattern at this port. The machine uses only its inputs and pinned patterns; it never infers backward from downstream."
+msgstr "Assign the free pattern at this port. The loom uses only its inputs and pinned patterns; it never infers backward from downstream."
 
 msgid "冲突"
 msgstr "CONFLICT"
@@ -175,10 +175,10 @@ msgid "有一口的纹样要你自己定:点这台仪器里纹样旁边的钉纹
 msgstr "One port needs a pattern from you: select Pin beside it, draw a pattern, and pin it in place."
 
 msgid "从左边的仪器架点一台仪器,它会落在织案中央"
-msgstr "Select a machine from the rack on the left to place it at the center of the worktable."
+msgstr "Select a loom from the rack on the left to place it at the center of the worktable."
 
 msgid "按住线轴或仪器的出口往外拖出一条线,接到下一台仪器或目标织机的入口"
-msgstr "Drag from a spool or machine output and connect the thread to another machine or the Goal Loom."
+msgstr "Drag from a spool or loom output and connect the thread to another loom or the Goal Loom."
 
 # Pattern editor
 
@@ -218,7 +218,7 @@ msgid "感谢游玩"
 msgstr "THANK YOU FOR PLAYING"
 
 msgid "新机器!"
-msgstr "NEW MACHINE!"
+msgstr "NEW LOOM!"
 
 msgid "翻页"
 msgstr "NEXT"
@@ -232,25 +232,25 @@ msgstr "N\nO\nT\nE\nB\nO\nO\nK"
 # Notebook pages
 
 msgid "左侧上下两口各收一幅纹样，织成一幅左右并排的并纹，少了任何一股，机器都不会开工。"
-msgstr "The two ports on the left each take one pattern and weave them side by side into a Joined Pattern. If either strand is missing, the machine will not run."
+msgstr "The two ports on the left each take one pattern and weave them side by side into a Joined Pattern. If either strand is missing, the loom will not run."
 
 msgid "收一幅并纹，上口吐出它的左半，下口吐出它的右半，想用哪股接哪股。"
 msgstr "Takes a Joined Pattern. The upper port yields its left half and the lower port yields its right half. Connect whichever strand you need."
 
 msgid "左上口自己钉一副纹样，机器会凭空吐出它，但吐出的只是虚纹，切不可放入最终交付，必须用它织出另一幅纹样（也可以与自身相同），接入右上口，随后右下口便可吐出一副实在的叠层纹。"
-msgstr "Pin a pattern at the upper-left port. The machine produces it from nothing, but only as a provisional pattern that must never be submitted. Use it to weave another pattern, which may be identical, and feed that into the upper-right port. The lower-right port will then yield a certified Layered Pattern."
+msgstr "Pin a pattern at the upper-left port. The loom produces it from nothing, but only as a provisional pattern that must never be submitted. Use it to weave another pattern, which may be identical, and feed that into the upper-right port. The lower-right port will then yield a certified Layered Pattern."
 
 msgid "左上口收一副迭层纹，左下口收它上层的纹样，机器吐出下层的纹样。"
-msgstr "The upper-left port takes a Layered Pattern, and the lower-left port takes its upper layer. The machine yields the lower layer."
+msgstr "The upper-left port takes a Layered Pattern, and the lower-left port takes its upper layer. The loom yields the lower layer."
 
 msgid "收一幅纹样，织成岔纹；上口输出的纹样中它在左上，下口输出的纹样中它在右下，对角线另一侧的纹样则由你自己钉。"
 msgstr "Takes one pattern and weaves a Forked Pattern. In the upper output it occupies the upper-left branch; in the lower output it occupies the lower-right branch. You pin the pattern on the other side of the diagonal."
 
 msgid "上1口收入一副岔纹，岔纹对角线两侧的纹样分别由右2和右3口吐出，吐出的两幅纹样均为虚纹，若用他们都能织出同一副纹样分别送入左2和左3口，则汇路机可以织出这副纹样的实纹。"
-msgstr "Left port 1 takes a Forked Pattern. Right ports 2 and 3 yield the patterns from its two diagonal branches, both as provisional patterns. If each can be used to weave the same result and those results are fed into left ports 2 and 3, the Convergence Machine yields that result as a certified pattern."
+msgstr "Left port 1 takes a Forked Pattern. Right ports 2 and 3 yield the patterns from its two diagonal branches, both as provisional patterns. If each can be used to weave the same result and those results are fed into left ports 2 and 3, the Convergence Loom yields that result as a certified pattern."
 
 msgid "收进一幅焦纹以后，这台机器什么都肯织——织什么由你钉。工坊严令：慎用。"
-msgstr "Once it takes a Scorched Pattern, this machine will weave anything you pin. Workshop order: use with care."
+msgstr "Once it takes a Scorched Pattern, this loom will weave anything you pin. Workshop order: use with care."
 
 # Settings
 
@@ -307,10 +307,10 @@ msgstr "Inspired by: The Incredible Proof Machine (incredible.pm) and Terence Ta
 # Dialogue — Chapter I
 
 msgid "第一次来东区的静语纹工坊？别被这些机器吓着。它们不织布，只把不同颜色的静语丝编成静语纹，整座城都等着用呢。"
-msgstr "First time in an East End Hush Pattern workshop? Don't let the machines frighten you. They don't weave cloth. They weave colored Hush Threads into Hush Patterns, and the whole city is waiting for them."
+msgstr "First time in an East End Hush Pattern workshop? Don't let the looms frighten you. They don't weave cloth. They weave colored Hush Threads into Hush Patterns, and the whole city is waiting for them."
 
 msgid "你就是新来的见习织工？诺拉·拉芙蒂？我是莉娅·科尔宾。先别碰那几台亮着铜灯的机器，它们脾气比工头还坏。"
-msgstr "You're the new apprentice weaver? Nora Lafferty? I'm Leah Corbin. Don't touch the machines with the brass lamps yet. Their tempers are worse than the foreman's."
+msgstr "You're the new apprentice weaver? Nora Lafferty? I'm Leah Corbin. Don't touch the looms with the brass lamps yet. Their tempers are worse than the foreman's."
 
 msgid "这些就是静语织机？我以为我们做的是……布料。"
 msgstr "These are Hush Looms? I thought we made... cloth."
@@ -319,13 +319,13 @@ msgid "普通织坊才用那种织布机。我们织的是静语纹。门锁认�
 msgstr "Ordinary mills use those looms. We weave Hush Patterns. Door locks read them, post machines read them, and so do contract cabinets and the new automata. Without these patterns, half of London would be struck deaf and dumb."
 
 msgid "我会记下来的。我平时就有随手记笔记的习惯，新织法、机器规矩，能写下来的我都尽量写下来。"
-msgstr "I'll write it all down. I always keep notes close at hand—new weaving methods, machine rules, anything I can put on paper."
+msgstr "I'll write it all down. I always keep notes close at hand—new weaving methods, loom rules, anything I can put on paper."
 
 msgid "那是个好习惯。工坊里要记的东西多着呢，等你忙起来，就知道一本笔记能救多少次急。"
 msgstr "A good habit. There is plenty to remember in a workshop. Once things get busy, you'll learn how often a notebook can save you."
 
 msgid "可我听说，真正让那些机器运转的是学院写的“程式”。程式之严密、之复杂非一般人能解，唯有最具理性的学院绅士才能掌握。"
-msgstr "But I've heard that what truly drives these machines are the Academy's “programs”—so rigorous and intricate that only its most rational gentlemen can master them."
+msgstr "But I've heard that what truly drives these looms are the Academy's “programs”—so rigorous and intricate that only its most rational gentlemen can master them."
 
 msgid "学院写他们的符号，我们照规矩把纹样织出来。至于什么算“真正的学问”，那是绅士们最爱争的事。我们只管别让城市停摆。"
 msgstr "The Academy writes its symbols; we follow the rules and weave the patterns. What counts as “true scholarship” is the gentlemen's favorite quarrel. Our concern is keeping the city running."
@@ -352,7 +352,7 @@ msgid "对。记住，静语丝不是越多越好，关系对了才算纹样。"
 msgstr "Exactly. More Hush Threads do not make a better weave. Only the right relation makes a pattern."
 
 msgid "还有，机器要是出现怪响、回针、余光，都写进工坊记录。学院未必肯收，但我们自己得记。"
-msgstr "And if a machine makes an odd sound, reverses a needle, or leaves an afterglow, put it in the workshop record. The Academy may refuse it, but we must keep our own account."
+msgstr "And if a loom makes an odd sound, reverses a needle, or leaves an afterglow, put it in the workshop record. The Academy may refuse it, but we must keep our own account."
 
 msgid "学院为什么不收？"
 msgstr "Why would the Academy refuse it?"
@@ -396,25 +396,25 @@ msgid "先不看太深。我把这几条最简单的符号抄下来，和工坊�
 msgstr "I won't go too deep yet. I'll copy down the simplest symbols and compare them with the workshop's weaving methods, one by one."
 
 msgid "如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。"
-msgstr "If A and B can be joined into A conjunction B, then these symbols are not describing something else... They describe the same structure as the workshop's machines."
+msgstr "If A and B can be joined into A conjunction B, then these symbols are not describing something else... They describe the same structure as the workshop's looms."
 
 msgid "今天学“引渡”。如果有红色和蓝色的叠层纹，再加上红色的线，就能引出蓝线。"
 msgstr "Today you'll learn relaying. Given a Layered Pattern of red over blue, together with a red thread, you can relay the blue thread out."
 
 msgid "还有对于你现在来说可能最难以理解的机器——封程机。"
-msgstr "And then there is the machine you may find hardest to understand for now—the Binding Machine."
+msgstr "And then there is the loom you may find hardest to understand for now—the Binding Loom."
 
 msgid "我们可以直接在封程机上绕过一切规则自由钉出纹样。"
-msgstr "On the Binding Machine, we can bypass every rule and freely pin any pattern."
+msgstr "On the Binding Loom, we can bypass every rule and freely pin any pattern."
 
 msgid "那代价呢？"
 msgstr "What is the cost?"
 
 msgid "问得好！这样的纹样是一种“虚纹”，它可以被输入其它织机，但也只能输入织机，不能直接拿去验收。"
-msgstr "Good question! Such a pattern is a “provisional pattern.” It may be fed into other machines, but that is all; it cannot be submitted for inspection."
+msgstr "Good question! Such a pattern is a “provisional pattern.” It may be fed into other looms, but that is all; it cannot be submitted for inspection."
 
 msgid "不过，你利用虚纹生成的新纹样可以反过来输入封程机，生成一张上方为你所钉的纹样，下方为新纹样的叠层纹，这个叠层纹就是可以被验收的“实纹”了。"
-msgstr "But you can feed the new pattern woven from that provisional pattern back into the Binding Machine. It produces a Layered Pattern with your pinned pattern above and the new pattern below. That Layered Pattern is a certified pattern fit for inspection."
+msgstr "But you can feed the new pattern woven from that provisional pattern back into the Binding Loom. It produces a Layered Pattern with your pinned pattern above and the new pattern below. That Layered Pattern is a certified pattern fit for inspection."
 
 msgid "如果用学院的写法……A，还有“如果A成立，则B成立”，或说“A蕴含B”，就能得到 B。"
 msgstr "In the Academy's notation... From A, together with “if A holds, then B holds,” or “A implies B,” we can derive B."
@@ -471,13 +471,13 @@ msgid "他们把纸退回来，说“缺乏合资格观察者确认，不纳入�
 msgstr "They sent it back, saying, “Not admitted to the public archive without confirmation by a qualified observer.” So I pinned it in our own record book instead."
 
 msgid "可如果它真的会影响机器呢？"
-msgstr "But what if it really affects the machines?"
+msgstr "But what if it really affects the looms?"
 
 msgid "那就等机器出事以后，他们再派一位先生来重新发现一遍吧。"
-msgstr "Then once a machine fails, they can send a gentleman to discover it all over again."
+msgstr "Then once a loom fails, they can send a gentleman to discover it all over again."
 
 msgid "他们把同一种规则写成符号，就说那是知识；我们把它织进机器里，却只算手艺。"
-msgstr "They write the same rules as symbols and call it knowledge. We weave them into machines, and it counts only as craft."
+msgstr "They write the same rules as symbols and call it knowledge. We weave them into looms, and it counts only as craft."
 
 # Dialogue — Chapter III
 
@@ -488,7 +488,7 @@ msgid "正好。诺拉，今天学“岔纹”。一条已经成立的纹样，�
 msgstr "Perfect timing. Nora, today you'll learn forking. Any established pattern can be combined with a pattern of your own choosing to make a Forked Pattern. This one is certified—handy, isn't it?"
 
 msgid "还有汇路机，机如其名，放进一个岔纹，它会给出两个虚纹，如果通过这两条虚纹都可以引回同一个纹样，那被引回的纹样就会被输出为可以验收的实纹。"
-msgstr "Then there is the Convergence Machine. Just as its name suggests, feed it a Forked Pattern and it yields two provisional patterns. If each can lead back to the same pattern, that common result is produced as a certified pattern fit for inspection."
+msgstr "Then there is the Convergence Loom. Just as its name suggests, feed it a Forked Pattern and it yields two provisional patterns. If each can lead back to the same pattern, that common result is produced as a certified pattern fit for inspection."
 
 msgid "A成立，所以“A或B”，“A析取B”成立……A或B成立时，如果A蕴含C且B蕴含C，则C也成立……"
 msgstr "A holds, so “A or B”—the disjunction of A and B—holds... And if A or B holds, while A implies C and B implies C, then C also holds..."
@@ -497,7 +497,7 @@ msgid "你最近越来越爱给织法起学院名字了。"
 msgstr "Lately you have grown very fond of giving our weaving methods Academy names."
 
 msgid "不过这批机器用的三号丝太多了。天气再闷一点，我可不喜欢它们把余响也当成一条新路。"
-msgstr "Still, this batch of machines uses far too much Number Three thread. If the weather grows any more humid, I would rather they did not mistake an after-echo for a new route."
+msgstr "Still, this batch of looms uses far too much Number Three thread. If the weather grows any more humid, I would rather they did not mistake an after-echo for a new route."
 
 msgid "三号丝已经通过学院规格测试。只要纹样严格按程式制作，就不会产生未定义状态。"
 msgstr "Number Three thread has passed the Academy's specification tests. As long as every pattern follows its program exactly, no undefined state can arise."
@@ -512,7 +512,7 @@ msgid "它不是选错了一条路……它像是同时认出了两条互相冲�
 msgstr "It did not choose the wrong route... It seems to have recognized two conflicting states at once."
 
 msgid "请远离那台机器。学院已经收到异常报告。初步判断是部分工坊纹样偏离程式。"
-msgstr "Please step away from that machine. The Academy has received reports of anomalies. Our preliminary judgment is that patterns from certain workshops deviated from their programs."
+msgstr "Please step away from that loom. The Academy has received reports of anomalies. Our preliminary judgment is that patterns from certain workshops deviated from their programs."
 
 msgid "如果纹样没偏呢？"
 msgstr "What if the patterns did not deviate?"
@@ -553,7 +553,7 @@ msgid "推演记录里出现了矛盾。一旦系统得到某命题与它的否�
 msgstr "A contradiction appeared in the inference record. Once the system derives both a proposition and its negation, it reaches contradiction at the bottom; the current program then permits any command whatever to follow."
 
 msgid "所以那些荒唐指令不是机器越过了规则。恰恰相反，它每一步都在规则里面。"
-msgstr "So those absurd instructions did not come from the machine breaking the rules. On the contrary, every step obeyed them."
+msgstr "So those absurd instructions did not come from the automaton breaking the rules. On the contrary, every step obeyed them."
 
 msgid "……是。我们原以为推演器损坏了。但目前没有发现非法推演。"
 msgstr "...Yes. We thought the inference engine had failed, but so far we have found no invalid inference."
@@ -568,7 +568,7 @@ msgid "如果这个前提是真的，余响就不该存在。可莉娅看见过�
 msgstr "If that premise were true, the after-echo could not exist. But Leah has seen it, and so have I."
 
 msgid "机器没有把一个状态推成两个状态。是物理上的两道信号，被程式解释成了“P”和“非 P”。"
-msgstr "The machine did not infer two states from one. Two physical signals were interpreted by the program as “P” and “not P.”"
+msgstr "The automaton did not infer two states from one. Two physical signals were interpreted by the program as “P” and “not P.”"
 
 msgid "学院排除的不是一个无关紧要的抱怨。他们排除的是能告诉他们前提为假的证据。"
 msgstr "The Academy did not dismiss an irrelevant complaint. It dismissed the evidence that could have shown its premise was false."
@@ -604,7 +604,7 @@ msgid "当然。莉娅·科尔宾。"
 msgstr "Of course. Leah Corbin."
 
 msgid "威客利夫先生向学院和管理局提交了申请，随着管理局协议的变化，机器重新启动了。"
-msgstr "Mr. Wycliffe submitted a petition to the Academy and the Administration. As the Administration's protocols changed, the machines started again."
+msgstr "Mr. Wycliffe submitted a petition to the Academy and the Administration. As the Administration's protocols changed, the automata started again."
 
 msgid "织机声和昨天没什么不同……但我似乎感觉到自己对这份工作的心情有所变化，是什么呢……"
 msgstr "The looms sound no different from yesterday... Yet something in how I feel about this work seems to have changed. What is it...?"

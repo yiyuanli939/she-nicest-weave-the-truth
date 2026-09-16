@@ -11,13 +11,14 @@
 | 岔纹 | Forked Pattern |
 | 叠层纹 / 迭层纹 | Layered Pattern |
 | 焦纹 | Scorched Pattern |
-| 并织机 | Joining Machine |
-| 拆股机 | Splitting Machine |
-| 封程机 | Binding Machine |
-| 引渡机 | Relay Machine |
-| 岔纹机 | Forking Machine |
-| 汇路机 | Convergence Machine |
-| 溃散机 | Unraveling Machine |
+| 并织机 | Joining Loom |
+| 拆股机 | Splitting Loom |
+| 封程机 | Binding Loom |
+| 引渡机 | Relay Loom |
+| 岔纹机 | Forking Loom |
+| 汇路机 | Convergence Loom |
+| 溃散机 | Unraveling Loom |
+| 仪器架 | Rack |
 | 虚纹 | provisional pattern |
 | 实纹 | certified pattern |
 | 诺拉·拉芙蒂 | Nora Lafferty |

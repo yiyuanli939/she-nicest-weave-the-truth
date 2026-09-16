@@ -50,8 +50,8 @@ ui_graph_delete={
 
 [internationalization]
 
-locale/fallback="zh_CN"
 locale/translations=PackedStringArray("res://localization/game.en.po")
+locale/fallback="zh_CN"
 
 [physics]
 
