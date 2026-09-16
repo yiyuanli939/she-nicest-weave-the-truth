@@ -39,9 +39,23 @@ text = "把字符换成颜色，把“为真”换成“纹样”……这不就
 scene = "诺拉房间"
 nora_expr = "惊讶"
 
+[sub_resource type="Resource" id="moved_l06_Resource_h5fu7"]
+script = ExtResource("1_sk1ha")
+speaker = "诺拉·拉芙蒂"
+text = "先不看太深。我把这几条最简单的符号抄下来，和工坊的织法一条条对着试。"
+scene = "诺拉房间"
+nora_expr = "严肃"
+
+[sub_resource type="Resource" id="moved_l06_Resource_pogll"]
+script = ExtResource("1_sk1ha")
+speaker = "诺拉·拉芙蒂"
+text = "如果 A 和 B 能并成 A合取B，那么这些符号至少不是在描述另一种东西……它们和工坊的织机在描述同一种结构。"
+scene = "诺拉房间"
+nora_expr = "严肃"
+
 [sub_resource type="Resource" id="Resource_f4nwn"]
 script = ExtResource("2_nkml8")
-lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_sk1ha"), SubResource("Resource_nkml8"), SubResource("Resource_lp67d"), SubResource("Resource_0wxft"), SubResource("Resource_vltgm")])
+lines = Array[ExtResource("1_sk1ha")]([SubResource("Resource_sk1ha"), SubResource("Resource_nkml8"), SubResource("Resource_lp67d"), SubResource("Resource_0wxft"), SubResource("Resource_vltgm"), SubResource("moved_l06_Resource_h5fu7"), SubResource("moved_l06_Resource_pogll")])
 
 [resource]
 script = ExtResource("3_lp67d")

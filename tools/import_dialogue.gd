@@ -5,8 +5,8 @@ extends SceneTree
 ## 默认读 res://information/dialogue.csv。表头(列顺序随意,按名字识别,支持策划表别名):
 ##   关卡id|关卡, 发言人, 场景, 左侧人物|左位人物, 左侧表情|左位人物表情, 诺拉表情|主角表情, 台词|语句, 小机动作(可缺)
 ## 表头行之前的行(策划的注意事项)自动跳过。
-## 关卡可写 l01…l16,也可写「章-节」(如 1-1;映射按关卡目录章节大小);OUTRO_EPISODES(4-3)写入
-## outro_dialogue(通关后播,注意事项②),其余写入 intro_dialogue;表里出现的关两个字段都会重写(缺者清空)。
+## 关卡可写 l01…l16,也可写原剧情段号「章-节」;EPISODE_PLACEMENT 决定调整后的播放位置。
+## 表里出现的原关卡与目标关卡两个字段都会重写(缺者清空),避免移动后旧位置残留。
 ## 场景/人物/表情写中文名(合法值见 narrative/story_art.gd);左侧人物可写登记短名、全名或「无」;
 ## 表情空 = 默认(注意事项①);台词里可含逗号、换行(用引号包住)。
 ## 导入是原子的:只要有任何错误(坏行/找不到关卡/某段首句没场景),一关都不写,改完重跑。
@@ -27,6 +27,13 @@ const COL_ALIASES: Dictionary = {
 const REQUIRED: Array = ["关卡id", "发言人", "台词"]
 ## 表头注意事项②:这些段落在通关后播(→ outro_dialogue),其余进关前播(→ intro_dialogue)
 const OUTRO_EPISODES: Array = ["4-3"]
+## 源表段号保持稳定,重导入也遵循 2026-09-16 的剧情编排。
+const EPISODE_PLACEMENT: Dictionary = {
+	"2-1": ["1-5", "intro"],
+	"2-2": ["2-1", "intro"],
+	"4-1": ["4-2", "intro"],
+	"4-2": ["4-3", "intro"],
+}
 
 
 func _initialize() -> void:
@@ -108,6 +115,11 @@ static func parse_csv(text: String, ep_map: Dictionary = {}) -> Dictionary:
 		var raw_level: String = get.call("关卡id")
 		var level_id: String = ep_map.get(raw_level, raw_level)
 		var is_outro: bool = OUTRO_EPISODES.has(raw_level)
+		var source_id := level_id
+		if EPISODE_PLACEMENT.has(raw_level):
+			var placement: Array = EPISODE_PLACEMENT[raw_level]
+			level_id = ep_map.get(placement[0], placement[0])
+			is_outro = placement[1] == "outro"
 		var line := DialogueLine.new()
 		line.speaker = get.call("发言人")
 		line.text = get.call("台词")
@@ -126,6 +138,8 @@ static func parse_csv(text: String, ep_map: Dictionary = {}) -> Dictionary:
 			continue
 		if not out.levels.has(level_id):
 			out.levels[level_id] = {intro = null, outro = null}
+		if not out.levels.has(source_id):
+			out.levels[source_id] = {intro = null, outro = null}
 		var slot := "outro" if is_outro else "intro"
 		if out.levels[level_id][slot] == null:
 			out.levels[level_id][slot] = DialogueRes.new()

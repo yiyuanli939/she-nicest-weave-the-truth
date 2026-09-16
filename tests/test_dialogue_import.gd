@@ -8,6 +8,30 @@ func _importer() -> GDScript:
 	return load(IMPORTER)
 
 
+func test_relocated_episodes() -> bool:
+	var ep := {"1-5": "l05", "2-1": "l06", "2-2": "l07", "4-1": "l14", "4-2": "l15", "4-3": "l16"}
+	var csv := "关卡,发言人,语句,场景\n"
+	# 跨关移动不能误删已写入的目标剧情;合并段落按源表顺序连续播放。
+	for episode in ["4-3", "4-2", "4-1", "2-2", "1-5", "2-1"]:
+		csv += "%s,诺拉,%s,工坊\n" % [episode, episode]
+	var r: Dictionary = _importer().parse_csv(csv, ep)
+	if not check(r.errors.is_empty(), "移动剧情无导入错误:%s" % str(r.errors)):
+		return false
+	var ok := true
+	var opening: DialogueRes = r.levels["l05"].intro
+	ok = check(opening != null and opening.lines.size() == 2
+			and opening.lines[0].text == "1-5" and opening.lines[1].text == "2-1"
+			and r.levels["l05"].outro == null, "l05 开场先播原 1-5 再播原 2-1,无通关后剧情") and ok
+	for row in [["l06", "intro", "2-2"],
+			["l15", "intro", "4-1"], ["l16", "intro", "4-2"], ["l16", "outro", "4-3"]]:
+		var dlg: DialogueRes = r.levels[row[0]][row[1]]
+		ok = check(dlg != null and dlg.lines.size() == 1 and dlg.lines[0].text == row[2],
+				"%s %s 播放原 %s" % row) and ok
+	for id in ["l07", "l14"]:
+		ok = check(r.levels[id].intro == null and r.levels[id].outro == null, "%s 清空旧剧情" % id) and ok
+	return ok
+
+
 func test_parse_basic_rows() -> bool:
 	var csv := "﻿关卡id,发言人,场景,左侧人物,左侧表情,诺拉表情,台词,小机动作\r\n" \
 		+ "l01,莉娅,工坊,莉娅,默认,,\"欢迎来到织坊,\n先认认线轴。\",greet\r\n" \

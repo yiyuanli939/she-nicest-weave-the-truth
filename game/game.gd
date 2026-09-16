@@ -79,6 +79,7 @@ func next_level() -> LevelDef:
 
 func start_level(lv: LevelDef) -> void:
 	ending_pending = false
+	outro_pending = false
 	current = lv
 	var robot := get_node_or_null("/root/Robot")
 	if robot != null:
@@ -108,7 +109,8 @@ func goto_credits() -> void:
 
 # ---- 结局(表头注意事项②:4-3 在通关后播,播完感谢游玩黑屏 → 开发者信息) ----
 
-var ending_pending := false        # StoryScene 据此播 outro_dialogue 而非 intro_dialogue
+var ending_pending := false        # 最终结局:剧情后播放感谢游玩
+var outro_pending := false         # 普通通关后剧情:播完进入下一关
 var credits_fade_pending := false  # 开发者信息页从黑淡入一次(「淡出到开发者信息界面」)
 
 
@@ -116,6 +118,20 @@ var credits_fade_pending := false  # 开发者信息页从黑淡入一次(「淡
 func play_ending() -> void:
 	ending_pending = true
 	get_tree().change_scene_to_file("res://ui/story_scene.tscn")
+
+
+func play_outro() -> void:
+	outro_pending = true
+	get_tree().change_scene_to_file("res://ui/story_scene.tscn")
+
+
+func finish_outro() -> void:
+	outro_pending = false
+	var next := next_level()
+	if next != null:
+		start_level(next)
+	else:
+		goto_select()
 
 
 ## StoryScene 感谢游玩黑屏放完后调

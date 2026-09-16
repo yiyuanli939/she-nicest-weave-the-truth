@@ -4,6 +4,7 @@ extends Control
 ## 无字底图 + 场景插图 + 左右立绘(主角诺拉恒右,左侧人物可空)+ 对话文字区 + 可本地化继续提示。
 ## 两人同在时,没在说话的人叠一张 50% 透明遮罩(与立绘完全重合)。不显示场景/地点名。
 ## 进关前播 intro_dialogue,播完(或对话为空)切入棋盘;推进由 DialogueBox 在 _input 层截获左键/任意键。
+## 普通通关后(Game.outro_pending)播 outro_dialogue,播完进入下一关的开场或棋盘。
 ## 结局(Game.ending_pending):改播 outro_dialogue,播完淡入纯黑 + 白色大字「感谢游玩」(剧情表注意事项②),
 ## 黑屏时小机修好(broken=false + calm),再由 Game.finish_ending 淡出到开发者信息页。
 ## 坐标为 3840×2160 逻辑像素,图片原尺寸;美术调位置改下面常量。
@@ -41,7 +42,7 @@ var _outro := false
 
 func _ready() -> void:
 	var game := get_node_or_null("/root/Game")
-	_outro = game != null and game.ending_pending
+	_outro = game != null and (game.ending_pending or game.outro_pending)
 	var dlg: DialogueRes = null
 	if game != null and game.current != null:
 		dlg = game.current.outro_dialogue if _outro else game.current.intro_dialogue
@@ -172,7 +173,12 @@ func _set_portrait(side: int, char_name: String, expr: String) -> void:
 
 func _on_dialogue_finished() -> void:
 	if _outro:
-		_play_thanks()
+		var game := get_node_or_null("/root/Game")
+		if game != null and game.ending_pending:
+			_play_thanks()
+		elif game != null and not _leaving:
+			_leaving = true
+			game.finish_outro()
 	else:
 		_go_board()
 

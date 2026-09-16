@@ -378,14 +378,17 @@ func _exit_tree() -> void:
 		robot.cue("idle")
 
 
-## 通关弹窗「继续」:有下一关 → 下一关;最后一关且有结局剧情 → 播 4-3 → 感谢游玩;
+## 通关弹窗「继续」:先播本关通关后剧情再进下一关;末关剧情后播放感谢游玩。
 ## 都没有(目录外注入的关)→ 回选关。通关盘已由 notify_solved 记档,弹窗是模态的,盘不会再变
 func _on_continue() -> void:
-	if _game.next_level() != null:
-		_game.start_level(_game.next_level())
-	elif _game.current != null and _game.current.outro_dialogue != null \
+	if _game.current != null and _game.current.outro_dialogue != null \
 			and not _game.current.outro_dialogue.lines.is_empty():
-		_game.play_ending()
+		if _game.next_level() != null:
+			_game.play_outro()
+		else:
+			_game.play_ending()
+	elif _game.next_level() != null:
+		_game.start_level(_game.next_level())
 	else:
 		_game.goto_select()
 

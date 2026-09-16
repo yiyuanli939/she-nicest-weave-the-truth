@@ -139,6 +139,10 @@ func _run() -> void:
 			_click(scene._win_popup._continue_btn.get_global_rect().get_center(), MOUSE_BUTTON_LEFT)   # 真实点击弹窗「继续」
 			await _settle()
 
+			if lv.id == &"l05":
+				_check(current_scene is StoryScene and game.current.id == &"l06" and not game.outro_pending,
+						"1-5 通关后直接进入第二章第一关开场(原 2-2 剧情)")
+
 	_check(game.save.solved.size() == 16, "存档记录 16 关 (得 %d)" % game.save.solved.size())
 
 	# 选关页金印
@@ -164,10 +168,11 @@ func _run() -> void:
 		await _settle()
 		_check(current_scene is LevelScene, "对话播完自动进棋盘")
 
-	# 结局(剧情表注意事项②):l16 无进关对话;通关后「继续」→ 4-3 → 感谢游玩黑屏 → 开发者信息
+	# l16 开场播原 4-2;通关后「继续」仍播 4-3 → 感谢游玩黑屏 → 开发者信息
 	game.start_level(game.catalog.all_levels()[15])
 	await _settle()
-	_check(current_scene is LevelScene, "l16(4-3 移到通关后)进关直接是棋盘")
+	_check(current_scene is StoryScene and not game.ending_pending, "l16 进关先播原 4-2 剧情")
+	await _skip_story()
 	var l16 := current_scene as LevelScene
 	_check(not l16._win_popup.visible and not l16.session.is_solved() and not _goal_wired(l16),
 			"已通关的 l16 重开:棋盘恢复但目标线拆掉(差一步),不弹通关弹窗")

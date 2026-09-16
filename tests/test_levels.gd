@@ -87,10 +87,10 @@ func test_dialogue_lines_reference_registered_art() -> bool:
 				ok = check(line.scene == "" or StoryArt.SCENES.has(line.scene), "%s 场景 %s" % [lv.id, line.scene]) and ok
 				ok = check(line.left_char == "" or (StoryArt.CHARACTERS.has(line.left_char) and not StoryArt.is_nora(line.left_char)), "%s 左侧人物 %s" % [lv.id, line.left_char]) and ok
 				ok = check(StoryArt.EXPRESSIONS.has(line.left_expr) and StoryArt.EXPRESSIONS.has(line.nora_expr), "%s 表情" % lv.id) and ok
-	# 剧情表注意事项②:4-3 是通关后剧情 → 最后一关必须有 outro、没有 intro
+	# 末关开场为原 4-2 剧情,通关后仍是原 4-3 结局
 	var last: LevelDef = cat.all_levels()[-1]
 	ok = check(last.outro_dialogue != null and not last.outro_dialogue.lines.is_empty(), "l16 有通关后剧情(4-3)") and ok
-	ok = check(last.intro_dialogue == null or last.intro_dialogue.lines.is_empty(), "l16 无进关对话") and ok
+	ok = check(last.intro_dialogue != null and not last.intro_dialogue.lines.is_empty(), "l16 进关播放原 4-2 剧情") and ok
 	return ok
 
 
@@ -152,7 +152,7 @@ func test_reordered_levels_2026_09() -> bool:
 	return ok
 
 
-## 剧情表 information/dialogue.csv 与 .tres 逐句一致(关卡重排时剧情按「章-节」位置留在原处,靠这条盯着不错位)
+## 剧情表 information/dialogue.csv 经播放位置映射后与 .tres 逐句一致
 func test_tres_dialogue_matches_csv() -> bool:
 	var importer: GDScript = load("res://tools/import_dialogue.gd")
 	var csv := FileAccess.get_file_as_string("res://information/dialogue.csv")
